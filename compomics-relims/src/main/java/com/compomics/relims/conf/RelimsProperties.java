@@ -6,7 +6,6 @@ import com.compomics.util.experiment.biology.PTMFactory;
 import com.google.common.base.Function;
 import com.google.common.base.Joiner;
 import com.google.common.collect.Lists;
-import com.google.common.io.Files;
 import com.google.common.io.Resources;
 import org.apache.commons.configuration.ConfigurationException;
 import org.apache.commons.configuration.PropertiesConfiguration;
@@ -19,7 +18,7 @@ import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
 
-import static com.google.common.base.Preconditions.*;
+import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * This class is a
@@ -38,7 +37,8 @@ public class RelimsProperties {
 
     static {
         try {
-            URL lResource = Resources.getResource("config" + iFolderSeparator + "relims.properties");
+//            URL lResource = Resources.getResource("config" + iFolderSeparator + "relims.properties");
+            URL lResource = Resources.getResource("config" + iFolderSeparator + "relims-frisbee.properties");
             config = new PropertiesConfiguration(lResource);
 
             // Set the workspace for all future Commands to the SearchGUI folder
