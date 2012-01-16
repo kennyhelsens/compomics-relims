@@ -1,5 +1,6 @@
 package com.compomics.relims.model.beans;
 
+import com.compomics.acromics.config.CoreConfiguration;
 import com.compomics.mascotdatfile.util.interfaces.Modification;
 import com.compomics.omssa.xsd.UserMod;
 import com.compomics.relims.conf.RelimsProperties;
@@ -62,11 +63,13 @@ public class SearchBean {
         resolveModifications();
 
         logger.debug("setting modifications to searchgui configuration file");
+
         SearchGuiModStringFunction lSearchGuiModStringFunction = new SearchGuiModStringFunction();
         PropertiesConfiguration lSearchGuiConfiguration = RelimsProperties.getDefaultSearchGuiConfiguration();
+        String lDatabaseFile = RelimsProperties.getDefaultSearchDatabase();
         lSearchGuiConfiguration.setProperty("FIXED_MODIFICATIONS", lSearchGuiModStringFunction.apply(iProjectSetupBean.getFixedMatchedPTMs()));
         lSearchGuiConfiguration.setProperty("VARIABLE_MODIFICATIONS", lSearchGuiModStringFunction.apply(iProjectSetupBean.getVariableMatchedPTMs()));
-        lSearchGuiConfiguration.setProperty("DATABASE_FILE", "E:\\db\\uniprot_sprot_101104_human_concat.fasta");
+        lSearchGuiConfiguration.setProperty("DATABASE_FILE", lDatabaseFile);
 
         File lSearchGuiConfigurationFile = RelimsProperties.getTmpFile("" + iProjectSetupBean.getProjectID() + "_" + lTimeStamp);
         logger.debug("saving searchgui configuration to " + lSearchGuiConfigurationFile.getCanonicalPath());

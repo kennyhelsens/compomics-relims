@@ -235,5 +235,9 @@ public class RelimsProperties {
     public static int getSpectrumLimitCount() {
         return config.getInt("program.param.spectrum.limit.count");
     }
+
+    public static String getDefaultSearchDatabase() {
+        return "searchgui.fasta.default";
+    }
 }
 
