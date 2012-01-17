@@ -197,6 +197,15 @@
             <version>0.3</version>
         </dependency>
 
+        <!--&lt;!&ndash;Swing commons for Properties editing.-->
+
+        <!--&ndash;&gt;-->
+        <!--<dependency>-->
+            <!--<groupId>org.nuiton.thirdparty</groupId>-->
+            <!--<artifactId>l2fprod-common</artifactId>-->
+            <!--<version>0.1</version>-->
+        <!--</dependency>-->
+
 
     </dependencies>
     <!-- The deployment maven2 repository-->

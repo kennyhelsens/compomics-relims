@@ -224,10 +224,10 @@ public class DatfileIterator implements Iterator<MascotDatfileInf> {
 
             buildIterationUnits(rs);
             // All user information from the query was transformed into IterationUnit's, the construction is completed.
+            ps.close();
 
         } catch (SQLException e) {
             logger.error(e.getMessage(), e);  //To change body of catch statement use File | Settings | File Templates.
         }
     }
-
 }

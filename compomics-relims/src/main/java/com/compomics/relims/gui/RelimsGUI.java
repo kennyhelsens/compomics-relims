@@ -3,11 +3,13 @@ package com.compomics.relims.gui;
 import com.compomics.mslims.db.accessors.Project;
 import com.compomics.relims.concurrent.ProjectRunner;
 import com.compomics.relims.conf.RelimsProperties;
+import com.compomics.relims.gui.listener.ConfigurationSaveListener;
 import com.compomics.relims.model.mslims.MsLimsProvider;
 import com.google.common.io.Files;
 import org.apache.log4j.Logger;
 
 import javax.swing.*;
+import javax.swing.table.TableModel;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -33,17 +35,22 @@ public class RelimsGUI implements Observer {
 
     private JPanel jpanContent;
     private JButton btnStart;
+    private JButton btnOptions;
     private JScrollPane scrollLayout;
     private JTextArea txtMessagePanel;
     private JButton iStopButton;
     private JPanel jpanButtons;
+    private JTable tblOptions;
+    private JButton btnSaveOptions;
+    private JPanel jpanOptions;
+    private JSplitPane splitContent;
 
     private int iProjectCounter = 0;
     public ResultObserver iResultObserver;
 
     public static void main(String[] args) {
         JFrame lFrame = new JFrame("RelimsGUI");
-        lFrame.setContentPane(new RelimsGUI().jpanContent);
+        lFrame.setContentPane(new RelimsGUI().$$$getRootComponent$$$());
         lFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         lFrame.pack();
         lFrame.setVisible(true);
@@ -59,6 +66,12 @@ public class RelimsGUI implements Observer {
         TextAreaAppender.setTextArea(txtMessagePanel);
         logger.debug("initialized GUI");
         logger.debug("setting listeners");
+
+        TableModel lTableModel = new RelimsPropertiesTableModel();
+        tblOptions.setModel(lTableModel);
+        tblOptions.setRowHeight(10);
+
+
 
 
         setListeners();
@@ -106,6 +119,8 @@ public class RelimsGUI implements Observer {
                 shutdown();
             }
         });
+
+         btnSaveOptions.addActionListener(new ConfigurationSaveListener());
     }
 
     private void shutdown() {
@@ -175,7 +190,11 @@ public class RelimsGUI implements Observer {
      * @noinspection ALL
      */
     public JComponent $$$getRootComponent$$$() {
-        return jpanContent;
+        return splitContent;
+    }
+
+    private void createUIComponents() {
+        // TODO: place custom component creation code here
     }
 
     private class ResultObserver implements Observer {
