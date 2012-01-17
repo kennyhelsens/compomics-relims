@@ -237,7 +237,7 @@ public class RelimsProperties {
     }
 
     public static String getDefaultSearchDatabase() {
-        return "searchgui.fasta.default";
+        return config.getString("searchgui.fasta.default");
     }
 }
 
