@@ -1,10 +1,11 @@
 package com.compomics.relims.playground;
 
 import com.compomics.relims.conf.RelimsProperties;
+import com.compomics.relims.interfaces.SearchCommandGenerator;
 import com.compomics.relims.model.SearchList;
 import com.compomics.relims.model.SearchProcessor;
 import com.compomics.relims.model.beans.ProjectSetupBean;
-import com.compomics.relims.model.beans.SearchBean;
+import com.compomics.relims.model.beans.SearchCommandVarModImpl;
 import com.google.common.collect.Lists;
 import org.apache.log4j.Logger;
 import org.xml.sax.SAXException;
@@ -37,13 +38,13 @@ public class SearchProcessorTester {
         ProjectSetupBean lProjectSetupBean = new ProjectSetupBean();
         lProjectSetupBean.setProjectID(0);
 
-        // simulate a SearchBean
-        SearchBean lSearchBean = new SearchBean("test", null, null, lProjectSetupBean, lSpectrumFiles);
+        // simulate a SearchCommandGenerator
+        SearchCommandGenerator lSearchBean = new SearchCommandVarModImpl("test", null, null, lProjectSetupBean, lSpectrumFiles);
 
         lSearchBean.setSearchResultFolder(lFile.getParentFile());
 
         // create a searchlist around this searchbean
-        SearchList<SearchBean> lSearchList = new SearchList<SearchBean>();
+        SearchList<SearchCommandGenerator> lSearchList = new SearchList<SearchCommandGenerator>();
         lSearchList.add(lSearchBean);
 
         // create a search processor using this searchbean

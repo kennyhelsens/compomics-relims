@@ -2,6 +2,7 @@ package com.compomics.relims.conf;
 
 import com.compomics.omssa.xsd.UserMod;
 import com.compomics.relims.concurrent.Command;
+import com.compomics.relims.guava.functions.SpeciesFinderFunction;
 import com.compomics.util.experiment.biology.PTMFactory;
 import com.google.common.base.Function;
 import com.google.common.base.Joiner;
@@ -69,7 +70,6 @@ public class RelimsProperties {
     public static File getWorkSpacePath() {
         return new File(config.getString("workspace.file"));
     }
-
 
 
     public static File getWorkSpace() {
@@ -243,5 +243,53 @@ public class RelimsProperties {
     public static PropertiesConfiguration getConfig() {
         return config;
     }
+
+    public static int getMinimumNumberOfSpectra() {
+        return config.getInt("predicate.project.spectrum.min");
+    }
+
+
+    public static int getMinimumNumberOfPeptides() {
+        return config.getInt("predicate.project.peptide.min");
+    }
+
+    public static int getAllowedSpeciesTestSize() {
+        return config.getInt("predicate.project.species.size");
+    }
+
+    public static SpeciesFinderFunction.SPECIES getAllowedSpecies() {
+        String lSpecies = config.getString("predicate.project.species.type");
+        if (lSpecies.equals("drosphila")) {
+            return SpeciesFinderFunction.SPECIES.DROSOPHILA;
+
+        } else if (lSpecies.equals("human")) {
+            return SpeciesFinderFunction.SPECIES.HUMAN;
+
+        } else if (lSpecies.equals("yeast")) {
+            return SpeciesFinderFunction.SPECIES.YEAST;
+
+        } else if (lSpecies.equals("mouse")) {
+            return SpeciesFinderFunction.SPECIES.MOUSE;
+
+        } else if (lSpecies.equals("rat")) {
+            return SpeciesFinderFunction.SPECIES.RAT;
+
+        } else if (lSpecies.equals("mixture")) {
+            return SpeciesFinderFunction.SPECIES.MIX;
+
+        } else {
+            return SpeciesFinderFunction.SPECIES.NA;
+        }
+    }
+
+    public static String getDatabaseFilename(String aDbVarID) {
+        return config.getString("relims.dbvar.ids." + aDbVarID + ".file");
+    }
+
+    public static String[] getDatabaseVarIDs() {
+        return config.getStringArray("relims.dbvar.ids");
+    }
+
+
 }
 

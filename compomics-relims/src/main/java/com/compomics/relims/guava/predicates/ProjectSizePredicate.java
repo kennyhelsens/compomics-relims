@@ -1,6 +1,7 @@
 package com.compomics.relims.guava.predicates;
 
 import com.compomics.mslims.db.accessors.Project;
+import com.compomics.relims.conf.RelimsProperties;
 import com.compomics.relims.model.mslims.MsLimsProvider;
 import com.google.common.base.Predicate;
 import org.apache.log4j.Logger;
@@ -12,12 +13,20 @@ import javax.annotation.Nullable;
  */
 public class ProjectSizePredicate implements Predicate<Project> {
     private static Logger logger = Logger.getLogger(ProjectSizePredicate.class);
-    private final int iMinimumNumberOfSpectra;
-    private final int iMinimumNumberOfPeptides;
+    private int iMinimumNumberOfSpectra;
+    private int iMinimumNumberOfPeptides;
 
-    public ProjectSizePredicate(int aMinimumNumberOfSpectra, int aMinimumNumberOfPeptides) {
-        iMinimumNumberOfSpectra = aMinimumNumberOfSpectra;
+    public ProjectSizePredicate() {
+        iMinimumNumberOfSpectra = RelimsProperties.getMinimumNumberOfSpectra();
+        iMinimumNumberOfPeptides = RelimsProperties.getMinimumNumberOfPeptides();
+    }
+
+    public void setMinimumNumberOfPeptides(int aMinimumNumberOfPeptides) {
         iMinimumNumberOfPeptides = aMinimumNumberOfPeptides;
+    }
+
+    public void setMinimumNumberOfSpectra(int aMinimumNumberOfSpectra) {
+        iMinimumNumberOfSpectra = aMinimumNumberOfSpectra;
     }
 
     public boolean apply(@Nullable Project aProject) {

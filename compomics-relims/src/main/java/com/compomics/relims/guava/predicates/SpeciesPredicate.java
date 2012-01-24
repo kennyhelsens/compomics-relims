@@ -1,6 +1,7 @@
 package com.compomics.relims.guava.predicates;
 
 import com.compomics.mslims.db.accessors.Project;
+import com.compomics.relims.conf.RelimsProperties;
 import com.compomics.relims.guava.functions.SpeciesFinderFunction;
 import com.compomics.relims.model.mslims.MsLimsProvider;
 import com.google.common.base.Predicate;
@@ -21,6 +22,11 @@ public class SpeciesPredicate implements Predicate<Project> {
     public SpeciesPredicate(SpeciesFinderFunction.SPECIES aAllowedSpecies, int aNumberToTest) {
         iAllowedSpecies = aAllowedSpecies;
         iNumberToTest = aNumberToTest;
+    }
+
+    public SpeciesPredicate() {
+        iAllowedSpecies = RelimsProperties.getAllowedSpecies();
+        iNumberToTest = RelimsProperties.getAllowedSpeciesTestSize();
     }
 
     public boolean apply(@Nullable Project aProject) {

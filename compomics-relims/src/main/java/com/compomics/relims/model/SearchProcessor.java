@@ -3,7 +3,8 @@ package com.compomics.relims.model;
 import com.compomics.omssa.xsd.UserMod;
 import com.compomics.relims.conf.RelimsProperties;
 import com.compomics.relims.guava.functions.DoubleRounder;
-import com.compomics.relims.model.beans.SearchBean;
+import com.compomics.relims.interfaces.SearchCommandGenerator;
+import com.compomics.relims.model.beans.SearchCommandVarModImpl;
 import com.compomics.util.experiment.biology.Peptide;
 import com.compomics.util.experiment.identification.Advocate;
 import com.compomics.util.experiment.identification.PeptideAssumption;
@@ -31,14 +32,14 @@ import static com.google.common.base.Preconditions.checkState;
 public class SearchProcessor {
     private static Logger logger = Logger.getLogger(SearchProcessor.class);
     private static final DoubleRounder iRounder = new DoubleRounder(4);
-    private final SearchList<SearchBean> iSearchList;
+    private final SearchList<SearchCommandGenerator> iSearchList;
     private char iSeparator = ',';
     private char iSubSeparator = ';';
 
     private ArrayList<UserMod> iRelimsModifications = RelimsProperties.getRelimsMods();
 
 
-    public SearchProcessor(SearchList<SearchBean> aSearchList) {
+    public SearchProcessor(SearchList<SearchCommandGenerator> aSearchList) {
         iSearchList = aSearchList;
 
 
@@ -52,7 +53,7 @@ public class SearchProcessor {
         Joiner joiner = Joiner.on(iSeparator);
         int lLineCount = 0;
 
-        for (SearchBean lSearch : iSearchList) {
+        for (SearchCommandVarModImpl lSearch : iSearchList) {
             logger.debug("processing search " + lSearch.getName());
             File lResultFolder = lSearch.getSearchResultFolder();
 

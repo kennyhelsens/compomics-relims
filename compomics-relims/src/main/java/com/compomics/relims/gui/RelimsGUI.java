@@ -1,7 +1,7 @@
 package com.compomics.relims.gui;
 
 import com.compomics.mslims.db.accessors.Project;
-import com.compomics.relims.concurrent.ProjectRunner;
+import com.compomics.relims.concurrent.ProjectRunnerVarModImpl;
 import com.compomics.relims.conf.RelimsProperties;
 import com.compomics.relims.gui.listener.ConfigurationSaveListener;
 import com.compomics.relims.model.mslims.MsLimsProvider;
@@ -69,7 +69,7 @@ public class RelimsGUI implements Observer {
 
         TableModel lTableModel = new RelimsPropertiesTableModel();
         tblOptions.setModel(lTableModel);
-        tblOptions.setRowHeight(10);
+        tblOptions.setRowHeight(15);
 
 
 
@@ -105,7 +105,7 @@ public class RelimsGUI implements Observer {
                 }
 
                 for (Project lProject : lRandomProjects) {
-                    ProjectRunner lProjectRunner = new ProjectRunner(lProject);
+                    ProjectRunnerVarModImpl lProjectRunner = new ProjectRunnerVarModImpl(lProject);
                     lProjectRunner.addObserver(RelimsGUI.this);
                     lProjectRunner.addObserver(iResultObserver);
                     iService.execute(lProjectRunner);
