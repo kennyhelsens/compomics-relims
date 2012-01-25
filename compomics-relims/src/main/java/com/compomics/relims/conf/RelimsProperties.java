@@ -283,12 +283,28 @@ public class RelimsProperties {
     }
 
     public static String getDatabaseFilename(String aDbVarID) {
-        return config.getString("relims.dbvar.ids." + aDbVarID + ".file");
+        return config.getString("relims.db.ids." + aDbVarID + ".file");
+    }
+
+    public static String getDatabaseTitle(String aDbVarID) {
+        return config.getString("relims.db.ids." + aDbVarID + ".name");
     }
 
     public static String[] getDatabaseVarIDs() {
-        return config.getStringArray("relims.dbvar.ids");
+        return config.getStringArray("relims.db.ids");
     }
+
+
+    public static String[] getRelimsClassList() {
+        return config.getStringArray("relims.runner.classes");
+    }
+
+    public static Class getRelimsClass(String aClassID) throws ClassNotFoundException {
+        String lClassname = config.getString("relims.runner.classes." + aClassID);
+        return Class.forName(lClassname);
+    }
+
+
 
 
 }

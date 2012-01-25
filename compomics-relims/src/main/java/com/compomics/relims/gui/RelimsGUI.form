@@ -63,6 +63,10 @@
                   <text value="Stop"/>
                 </properties>
               </component>
+              <component id="dc178" class="javax.swing.JComboBox" binding="cmbRunnerClasses" default-binding="true">
+                <constraints/>
+                <properties/>
+              </component>
             </children>
           </grid>
         </children>

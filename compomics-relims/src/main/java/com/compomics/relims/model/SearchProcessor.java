@@ -3,8 +3,8 @@ package com.compomics.relims.model;
 import com.compomics.omssa.xsd.UserMod;
 import com.compomics.relims.conf.RelimsProperties;
 import com.compomics.relims.guava.functions.DoubleRounder;
+import com.compomics.relims.guava.functions.ProteinJoiner;
 import com.compomics.relims.interfaces.SearchCommandGenerator;
-import com.compomics.relims.model.beans.SearchCommandVarModImpl;
 import com.compomics.util.experiment.biology.Peptide;
 import com.compomics.util.experiment.identification.Advocate;
 import com.compomics.util.experiment.identification.PeptideAssumption;
@@ -20,7 +20,10 @@ import org.apache.log4j.Logger;
 import org.xml.sax.SAXException;
 
 import javax.annotation.Nullable;
-import java.io.*;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FilenameFilter;
+import java.io.IOException;
 import java.nio.charset.Charset;
 import java.util.*;
 
@@ -38,11 +41,14 @@ public class SearchProcessor {
 
     private ArrayList<UserMod> iRelimsModifications = RelimsProperties.getRelimsMods();
 
+    private boolean includeProteinDetails = false;
+    private boolean includeExtraModDetails = false;
+
+    private ProteinJoiner iProteinJoiner = new ProteinJoiner();
+
 
     public SearchProcessor(SearchList<SearchCommandGenerator> aSearchList) {
         iSearchList = aSearchList;
-
-
     }
 
     public void process() throws SAXException, IOException {
@@ -53,7 +59,7 @@ public class SearchProcessor {
         Joiner joiner = Joiner.on(iSeparator);
         int lLineCount = 0;
 
-        for (SearchCommandVarModImpl lSearch : iSearchList) {
+        for (SearchCommandGenerator lSearch : iSearchList) {
             logger.debug("processing search " + lSearch.getName());
             File lResultFolder = lSearch.getSearchResultFolder();
 
@@ -79,17 +85,17 @@ public class SearchProcessor {
                     for (SpectrumMatch lSpectrumMatch : matches) {
                         lLineCount++;
 
-                        HashMap<Double,ArrayList<PeptideAssumption>> lAllAssumptions = lSpectrumMatch.getAllAssumptions(Advocate.OMSSA);
+                        HashMap<Double, ArrayList<PeptideAssumption>> lAllAssumptions = lSpectrumMatch.getAllAssumptions(Advocate.OMSSA);
                         List<Double> lDoubles = Lists.newArrayList();
                         lDoubles.addAll(lAllAssumptions.keySet());
 
                         Collections.sort(lDoubles, new Comparator<Double>() {
                             public int compare(Double aDouble, Double aDouble1) {
-                                if(aDouble < aDouble1){
+                                if (aDouble < aDouble1) {
                                     return -1;
-                                }else if(aDouble>aDouble1){
+                                } else if (aDouble > aDouble1) {
                                     return 1;
-                                }else{
+                                } else {
                                     return 0;
                                 }
                             }
@@ -113,7 +119,14 @@ public class SearchProcessor {
                                 lFeatures.addAll(lGeneralFeatures);
                                 lFeatures.addAll(extractSpectrumFeatures(lSpectrumMatch));
                                 lFeatures.addAll(extractPeptideFeatures(lPeptideAssumption));
-                                lFeatures.addAll(extractModificationFeatures(lPeptideAssumption));
+
+                                if (includeExtraModDetails) {
+                                    lFeatures.addAll(extractModificationFeatures(lPeptideAssumption));
+                                }
+
+                                if (includeProteinDetails) {
+                                    lFeatures.addAll(extractProteinFeatures(lPeptideAssumption));
+                                }
 
                                 writer.write(joiner.join(lFeatures));
                                 writer.newLine();
@@ -135,6 +148,24 @@ public class SearchProcessor {
         writer.close();
 
         logger.debug("finished writing " + lLineCount + " spectrum identifications");
+
+    }
+
+    private Collection<? extends String> extractProteinFeatures(PeptideAssumption aBestAssumption) {
+
+        ArrayList<String> lParentProteins = aBestAssumption.getPeptide().getParentProteins();
+        ArrayList<String> lResults = Lists.newArrayList();
+
+        lResults.add("" + lParentProteins.size());
+        String lConcatenatedProteins = iProteinJoiner.apply(lParentProteins);
+        lResults.add("" + lConcatenatedProteins);
+        if(lConcatenatedProteins.indexOf("SHUFFLED") > 0){
+            lResults.add("SHUFFLED");
+        }else{
+            lResults.add("NON_SHUFFLED");
+        }
+
+        return lResults;
 
     }
 
@@ -181,5 +212,13 @@ public class SearchProcessor {
         lFeatures.add("" + iRounder.apply(aPeptideAssumption.getEValue()));
 
         return lFeatures;
+    }
+
+    public void setIncludeProteinDetails(boolean aStatus) {
+        includeProteinDetails = aStatus;
+    }
+
+    public void setIncludeExtraModDetails(boolean aStatus) {
+        includeExtraModDetails = aStatus;
     }
 }

@@ -17,7 +17,6 @@ import com.compomics.relims.model.SearchList;
 import com.compomics.relims.model.SearchProcessor;
 import com.compomics.relims.model.beans.ProjectSetupBean;
 import com.compomics.relims.model.beans.SearchCommandVarDbImpl;
-import com.compomics.relims.model.beans.SearchCommandVarModImpl;
 import com.compomics.relims.model.mslims.DatfileIterator;
 import com.compomics.relims.model.mslims.MsLimsProvider;
 import com.google.common.collect.Lists;
@@ -37,15 +36,14 @@ import java.util.Observable;
  */
 public class ProjectRunnerVarDBImpl extends Observable implements ProjectRunner {
     private static Logger logger = Logger.getLogger(ProjectRunnerVarDBImpl.class);
-    private final Project iProject;
+    private Project iProject;
     private ProjectSizePredicate iProjectSizePredicate;
     private InstrumentPredicate iInstrumentPredicate;
     private ModificationSetPredicate iModificationSetPredicate;
     private SpeciesPredicate iSpeciesPredicate;
 
 
-    public ProjectRunnerVarDBImpl(Project aProjectID) {
-        iProject = aProjectID;
+    public ProjectRunnerVarDBImpl() {
         ArrayList lAllowedInstruments = new ArrayList();
         lAllowedInstruments.add(8);
         lAllowedInstruments.add(9);
@@ -105,9 +103,6 @@ public class ProjectRunnerVarDBImpl extends Observable implements ProjectRunner 
             SearchCommandGenerator lSearchBean = null;
 
             // First define a search without the relims modification.
-            lSearchBean = new SearchCommandVarModImpl("original", lFixMods, lVarMods, lProjectSetupBean, iSpectrumFiles);
-            lSearchList.add(lSearchBean);
-
             String[] lDatabaseVarIDs = RelimsProperties.getDatabaseVarIDs();
             for (String lDatabaseVarID : lDatabaseVarIDs) {
                 lSearchBean = new SearchCommandVarDbImpl(lDatabaseVarID, lFixMods, lVarMods, lDatabaseVarID, lProjectSetupBean, iSpectrumFiles);
@@ -138,6 +133,10 @@ public class ProjectRunnerVarDBImpl extends Observable implements ProjectRunner 
         } catch (SAXException e) {
             logger.error(e.getMessage(), e);
         }
+    }
+
+    public void setProject(Project aProject) {
+        iProject = aProject;
     }
 
 

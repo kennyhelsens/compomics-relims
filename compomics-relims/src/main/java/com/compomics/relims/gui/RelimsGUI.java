@@ -1,9 +1,10 @@
 package com.compomics.relims.gui;
 
 import com.compomics.mslims.db.accessors.Project;
-import com.compomics.relims.concurrent.ProjectRunnerVarModImpl;
 import com.compomics.relims.conf.RelimsProperties;
 import com.compomics.relims.gui.listener.ConfigurationSaveListener;
+import com.compomics.relims.gui.listener.MyRunnerClassesModel;
+import com.compomics.relims.interfaces.ProjectRunner;
 import com.compomics.relims.model.mslims.MsLimsProvider;
 import com.google.common.io.Files;
 import org.apache.log4j.Logger;
@@ -44,6 +45,7 @@ public class RelimsGUI implements Observer {
     private JButton btnSaveOptions;
     private JPanel jpanOptions;
     private JSplitPane splitContent;
+    private JComboBox cmbRunnerClasses;
 
     private int iProjectCounter = 0;
     public ResultObserver iResultObserver;
@@ -71,7 +73,7 @@ public class RelimsGUI implements Observer {
         tblOptions.setModel(lTableModel);
         tblOptions.setRowHeight(15);
 
-
+        cmbRunnerClasses.setModel(new MyRunnerClassesModel());
 
 
         setListeners();
@@ -103,12 +105,28 @@ public class RelimsGUI implements Observer {
                 } catch (IOException e) {
                     logger.error(e.getMessage(), e);
                 }
+                try {
 
-                for (Project lProject : lRandomProjects) {
-                    ProjectRunnerVarModImpl lProjectRunner = new ProjectRunnerVarModImpl(lProject);
-                    lProjectRunner.addObserver(RelimsGUI.this);
-                    lProjectRunner.addObserver(iResultObserver);
-                    iService.execute(lProjectRunner);
+                    for (Project lProject : lRandomProjects) {
+                        String lClassID = cmbRunnerClasses.getSelectedItem().toString();
+                        Class lRelimsClass = RelimsProperties.getRelimsClass(lClassID);
+                        Object o = lRelimsClass.newInstance();
+
+                        ProjectRunner lRunner = (ProjectRunner) o;
+                        lRunner.setProject(lProject);
+
+                        Observable lObservable = (Observable) o;
+                        lObservable.addObserver(RelimsGUI.this);
+                        lObservable.addObserver(iResultObserver);
+
+                        iService.execute(lRunner);
+                    }
+                } catch (ClassNotFoundException e) {
+                    logger.error(e.getMessage(), e);
+                } catch (InstantiationException e) {
+                    logger.error(e.getMessage(), e);
+                } catch (IllegalAccessException e) {
+                    logger.error(e.getMessage(), e);
                 }
             }
         });
@@ -120,7 +138,7 @@ public class RelimsGUI implements Observer {
             }
         });
 
-         btnSaveOptions.addActionListener(new ConfigurationSaveListener());
+        btnSaveOptions.addActionListener(new ConfigurationSaveListener());
     }
 
     private void shutdown() {

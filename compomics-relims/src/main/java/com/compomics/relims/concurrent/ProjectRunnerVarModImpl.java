@@ -36,15 +36,15 @@ import java.util.Observable;
  */
 public class ProjectRunnerVarModImpl extends Observable implements ProjectRunner {
     private static Logger logger = Logger.getLogger(ProjectRunnerVarModImpl.class);
-    private final Project iProject;
+    private Project iProject;
     private ProjectSizePredicate iProjectSizePredicate;
     private InstrumentPredicate iInstrumentPredicate;
     private ModificationSetPredicate iModificationSetPredicate;
     private SpeciesPredicate iSpeciesPredicate;
 
 
-    public ProjectRunnerVarModImpl(Project aProjectID) {
-        iProject = aProjectID;
+    public ProjectRunnerVarModImpl() {
+
         ArrayList lAllowedInstruments = new ArrayList();
         lAllowedInstruments.add(8);
         lAllowedInstruments.add(9);
@@ -138,6 +138,10 @@ public class ProjectRunnerVarModImpl extends Observable implements ProjectRunner
         } catch (SAXException e) {
             logger.error(e.getMessage(), e);
         }
+    }
+
+    public void setProject(Project aProject) {
+        iProject = aProject;
     }
 
 
