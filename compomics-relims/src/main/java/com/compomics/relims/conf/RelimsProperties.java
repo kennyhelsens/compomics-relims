@@ -283,11 +283,11 @@ public class RelimsProperties {
     }
 
     public static String getDatabaseFilename(String aDbVarID) {
-        return config.getString("relims.db.ids." + aDbVarID + ".file");
+        return config.getString("relims.db." + aDbVarID + ".file");
     }
 
     public static String getDatabaseTitle(String aDbVarID) {
-        return config.getString("relims.db.ids." + aDbVarID + ".name");
+        return config.getString("relims.db." + aDbVarID + ".name");
     }
 
     public static String[] getDatabaseVarIDs() {
