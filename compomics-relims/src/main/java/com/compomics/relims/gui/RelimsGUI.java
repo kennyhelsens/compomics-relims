@@ -22,8 +22,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Observable;
 import java.util.Observer;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 
 /**
  * This class is a
@@ -112,14 +114,16 @@ public class RelimsGUI implements Observer {
                         Class lRelimsClass = RelimsProperties.getRelimsClass(lClassID);
                         Object o = lRelimsClass.newInstance();
 
-                        ProjectRunner lRunner = (ProjectRunner) o;
-                        lRunner.setProject(lProject);
+                        ProjectRunner lCallable = (ProjectRunner) o;
+                        lCallable.setProject(lProject);
 
                         Observable lObservable = (Observable) o;
                         lObservable.addObserver(RelimsGUI.this);
                         lObservable.addObserver(iResultObserver);
 
-                        iService.execute(lRunner);
+                        Future<String> future = iService.submit(lCallable);
+//                        String result = future.get();
+//                        logger.info(String.format("Callable finished with result %s", result));
                     }
                 } catch (ClassNotFoundException e) {
                     logger.error(e.getMessage(), e);
@@ -127,6 +131,10 @@ public class RelimsGUI implements Observer {
                     logger.error(e.getMessage(), e);
                 } catch (IllegalAccessException e) {
                     logger.error(e.getMessage(), e);
+//                } catch (InterruptedException e) {
+//                    e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+//                } catch (ExecutionException e) {
+//                    e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
                 }
             }
         });

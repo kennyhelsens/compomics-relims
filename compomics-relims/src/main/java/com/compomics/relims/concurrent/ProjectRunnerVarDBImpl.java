@@ -56,7 +56,7 @@ public class ProjectRunnerVarDBImpl extends Observable implements ProjectRunner 
 
     }
 
-    public void run() {
+    public String call() {
         try {
 
             long lProjectid = iProject.getProjectid();
@@ -64,17 +64,17 @@ public class ProjectRunnerVarDBImpl extends Observable implements ProjectRunner 
 
             if (!iProjectSizePredicate.apply(iProject)) {
                 logger.debug("END " + lProjectid);
-                return;
+                return "Premature end for project size";
             }
 
             if (!iInstrumentPredicate.apply(iProject)) {
                 logger.debug("END " + lProjectid);
-                return;
+                return "Premature end for instrument type";
             }
 
             if (!iSpeciesPredicate.apply(iProject)) {
                 logger.debug("END " + lProjectid);
-                return;
+                return "Premature end for species type";
             }
 
             logger.debug("retrieving setup for project " + lProjectid);
@@ -83,7 +83,7 @@ public class ProjectRunnerVarDBImpl extends Observable implements ProjectRunner 
             logger.debug("comparing Mascot modification sets within project " + lProjectid);
             if (!iModificationSetPredicate.apply(lProjectSetupBean)) {
                 logger.debug("END" + lProjectid);
-                return;
+                return "Premature end for distinct modification sets";
             }
 
             ModificationList lModificationList = lProjectSetupBean.getModificationLists().get(0);
@@ -133,6 +133,7 @@ public class ProjectRunnerVarDBImpl extends Observable implements ProjectRunner 
         } catch (SAXException e) {
             logger.error(e.getMessage(), e);
         }
+        return("SUCCES");
     }
 
     public void setProject(Project aProject) {

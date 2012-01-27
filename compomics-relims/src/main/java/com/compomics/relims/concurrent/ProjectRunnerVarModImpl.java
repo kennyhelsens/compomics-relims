@@ -57,35 +57,35 @@ public class ProjectRunnerVarModImpl extends Observable implements ProjectRunner
 
     }
 
-    public void run() {
+    public String call() {
         try {
 
             long lProjectid = iProject.getProjectid();
             logger.debug("created new projectrunner on " + lProjectid);
 
             if (!iProjectSizePredicate.apply(iProject)) {
-                logger.debug("END " + lProjectid);
-                return;
-            }
+                         logger.debug("END " + lProjectid);
+                         return "Premature end for project size";
+                     }
 
-            if (!iInstrumentPredicate.apply(iProject)) {
-                logger.debug("END " + lProjectid);
-                return;
-            }
+                     if (!iInstrumentPredicate.apply(iProject)) {
+                         logger.debug("END " + lProjectid);
+                         return "Premature end for instrument type";
+                     }
 
-            if (!iSpeciesPredicate.apply(iProject)) {
-                logger.debug("END " + lProjectid);
-                return;
-            }
+                     if (!iSpeciesPredicate.apply(iProject)) {
+                         logger.debug("END " + lProjectid);
+                         return "Premature end for species type";
+                     }
 
-            logger.debug("retrieving setup for project " + lProjectid);
-            ProjectSetupBean lProjectSetupBean = buildProjectSetup(lProjectid);
+                     logger.debug("retrieving setup for project " + lProjectid);
+                     ProjectSetupBean lProjectSetupBean = buildProjectSetup(lProjectid);
 
-            logger.debug("comparing Mascot modification sets within project " + lProjectid);
-            if (!iModificationSetPredicate.apply(lProjectSetupBean)) {
-                logger.debug("END" + lProjectid);
-                return;
-            }
+                     logger.debug("comparing Mascot modification sets within project " + lProjectid);
+                     if (!iModificationSetPredicate.apply(lProjectSetupBean)) {
+                         logger.debug("END" + lProjectid);
+                         return "Premature end for distinct modification sets";
+                     }
 
             ModificationList lModificationList = lProjectSetupBean.getModificationLists().get(0);
             ArrayList<Modification> lFixMods = Lists.newArrayList(lModificationList.getFixedModifications());
@@ -138,6 +138,7 @@ public class ProjectRunnerVarModImpl extends Observable implements ProjectRunner
         } catch (SAXException e) {
             logger.error(e.getMessage(), e);
         }
+        return("SUCCES");
     }
 
     public void setProject(Project aProject) {
