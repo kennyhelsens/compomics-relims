@@ -6,6 +6,7 @@ import com.compomics.relims.gui.listener.ConfigurationSaveListener;
 import com.compomics.relims.gui.listener.MyRunnerClassesModel;
 import com.compomics.relims.interfaces.ProjectRunner;
 import com.compomics.relims.model.mslims.MsLimsProvider;
+import com.google.common.collect.Lists;
 import com.google.common.io.Files;
 import org.apache.log4j.Logger;
 
@@ -59,6 +60,13 @@ public class RelimsGUI implements Observer {
         lFrame.pack();
         lFrame.setVisible(true);
 
+//        try {
+//            UIManager.setLookAndFeel(new SyntheticaStandardLookAndFeel());
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//        }
+
+
     }
 
     /**
@@ -94,48 +102,68 @@ public class RelimsGUI implements Observer {
         btnStart.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent aActionEvent) {
 
-                iProjectCounter = 0;
-                logger.debug("clicked start button");
-                int lRandomSize = RelimsProperties.getRandomProjectAttempts();
-                logger.debug("selecting " + lRandomSize + " random projects");
-                ArrayList<Project> lRandomProjects = MsLimsProvider.getInstance().getRandomProjects(lRandomSize);
+                ExecutorService withinExecutor = Executors.newSingleThreadExecutor();
 
 //                lRandomProjects.addAll(0, MsLimsProvider.getInstance().getProjects(new int[]{731}));
 
-                try {
-                    iResultObserver = new ResultObserver();
-                } catch (IOException e) {
-                    logger.error(e.getMessage(), e);
-                }
-                try {
 
-                    for (Project lProject : lRandomProjects) {
-                        String lClassID = cmbRunnerClasses.getSelectedItem().toString();
-                        Class lRelimsClass = RelimsProperties.getRelimsClass(lClassID);
-                        Object o = lRelimsClass.newInstance();
+                iProjectCounter = 0;
 
-                        ProjectRunner lCallable = (ProjectRunner) o;
-                        lCallable.setProject(lProject);
+                withinExecutor.submit(new Runnable() {
 
-                        Observable lObservable = (Observable) o;
-                        lObservable.addObserver(RelimsGUI.this);
-                        lObservable.addObserver(iResultObserver);
 
-                        Future<String> future = iService.submit(lCallable);
-//                        String result = future.get();
-//                        logger.info(String.format("Callable finished with result %s", result));
+                    public void run() {
+                        try {
+                            iResultObserver = new ResultObserver();
+                        } catch (IOException e) {
+                            logger.error(e.getMessage(), e);
+                        }
+                        try {
+
+                            int lRandomSize = RelimsProperties.getRandomProjectAttempts();
+                            ArrayList<Project> lRandomProjects = MsLimsProvider.getInstance().getRandomProjects(lRandomSize);
+                            logger.debug("clicked start button");
+                            logger.debug("selecting " + lRandomSize + " random projects");
+
+                            List<Future> iFutures = Lists.newArrayList();
+
+
+                            for (Project lProject : lRandomProjects) {
+                                String lClassID = cmbRunnerClasses.getSelectedItem().toString();
+                                Class lRelimsClass = RelimsProperties.getRelimsClass(lClassID);
+                                Object o = lRelimsClass.newInstance();
+
+                                ProjectRunner lCallable = (ProjectRunner) o;
+                                lCallable.setProject(lProject);
+
+                                Observable lObservable = (Observable) o;
+                                lObservable.addObserver(RelimsGUI.this);
+                                lObservable.addObserver(iResultObserver);
+
+                                iFutures.add(iService.submit(lCallable));
+
+                            }
+
+                            for (Future lFuture : iFutures) {
+                                String result = lFuture.get().toString();
+                                logger.info(String.format("Callable finished with result %s", result));
+                            }
+
+
+                        } catch (ClassNotFoundException e) {
+                            logger.error(e.getMessage(), e);
+                        } catch (InstantiationException e) {
+                            logger.error(e.getMessage(), e);
+                        } catch (IllegalAccessException e) {
+                            logger.error(e.getMessage(), e);
+                        } catch (InterruptedException e) {
+                            logger.error(e.getMessage(), e);
+                        } catch (ExecutionException e) {
+                            logger.error(e.getMessage(), e);
+                        }
                     }
-                } catch (ClassNotFoundException e) {
-                    logger.error(e.getMessage(), e);
-                } catch (InstantiationException e) {
-                    logger.error(e.getMessage(), e);
-                } catch (IllegalAccessException e) {
-                    logger.error(e.getMessage(), e);
-//                } catch (InterruptedException e) {
-//                    e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
-//                } catch (ExecutionException e) {
-//                    e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
-                }
+                });
+
             }
         });
 
