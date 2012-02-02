@@ -39,7 +39,7 @@ public class RelimsProperties {
     static {
         try {
 //            URL lResource = Resources.getResource("config" + iFolderSeparator + "relims.properties");
-            URL lResource = Resources.getResource("config" + iFolderSeparator + "relims-covm.properties");
+            URL lResource = Resources.getResource("config" + iFolderSeparator + "relims-frisbee.properties");
             config = new PropertiesConfiguration(lResource);
 
             // Set the workspace for all future Commands to the SearchGUI folder
@@ -304,7 +304,14 @@ public class RelimsProperties {
         return Class.forName(lClassname);
     }
 
-
+    public static int[] getPredifinedProjects() {
+        String[] lProjectStrings = config.getStringArray("relims.projects.list");
+        int[] lProjectInts = new int[lProjectStrings.length];
+        for (int i = 0; i < lProjectInts.length; i++) {
+            lProjectInts[i] = Integer.parseInt(lProjectStrings[i]);
+        }
+        return lProjectInts;
+    }
 
 
 }

@@ -49,6 +49,12 @@ public class MsLimsProvider {
         return lProjectIds;
     }
 
+    public ArrayList<Project> getPreDefinedProjects() {
+        int[] lProjectIntegers = RelimsProperties.getPredifinedProjects();
+        ArrayList<Project> lProjects = getProjects(lProjectIntegers);
+        return lProjects;
+    }
+
     public ArrayList<Project> getProjects(int[] lProjectIdNumbers) {
         Project[] lAllProjects = getAllProjects();
 
@@ -59,7 +65,6 @@ public class MsLimsProvider {
                 lProjects.add(lProject);
             }
         }
-
         return lProjects;
     }
 
@@ -170,9 +175,9 @@ public class MsLimsProvider {
 
         // for debugging purposes
         int lMaxSpectra;
-        if(RelimsProperties.hasSpectrumLimit()){
+        if (RelimsProperties.hasSpectrumLimit()) {
             lMaxSpectra = RelimsProperties.getSpectrumLimitCount();
-        }else{
+        } else {
             lMaxSpectra = Integer.MAX_VALUE;
         }
 

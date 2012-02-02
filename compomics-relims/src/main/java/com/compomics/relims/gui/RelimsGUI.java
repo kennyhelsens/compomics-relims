@@ -122,13 +122,19 @@ public class RelimsGUI implements Observer {
 
                             int lRandomSize = RelimsProperties.getRandomProjectAttempts();
                             ArrayList<Project> lRandomProjects = MsLimsProvider.getInstance().getRandomProjects(lRandomSize);
+                            ArrayList<Project> lPreDefinedProjects = MsLimsProvider.getInstance().getPreDefinedProjects();
+
+                            ArrayList<Project> lAllProjects = Lists.newArrayList();
+                            lAllProjects.addAll(lPreDefinedProjects);
+                            lAllProjects.addAll(lRandomProjects);
+
                             logger.debug("clicked start button");
                             logger.debug("selecting " + lRandomSize + " random projects");
 
                             List<Future> iFutures = Lists.newArrayList();
 
 
-                            for (Project lProject : lRandomProjects) {
+                            for (Project lProject : lAllProjects) {
                                 String lClassID = cmbRunnerClasses.getSelectedItem().toString();
                                 Class lRelimsClass = RelimsProperties.getRelimsClass(lClassID);
                                 Object o = lRelimsClass.newInstance();
