@@ -29,31 +29,7 @@ public class MSLIMS {
     static {
         try {
 
-            Properties lProps = new Properties();
-
-            String driver = "com.mysql.jdbc.Driver";
-            Driver d = (Driver)Class.forName(driver).newInstance();
-
-            String user = RelimsProperties.getDbUserName();
-            String pass = RelimsProperties.getDbPass();
-            String dbname = RelimsProperties.getDbDatabaseName();
-            String adress = RelimsProperties.getDbAdress();
-
-            if(user != null) {
-               lProps.put("user", user);
-            }
-
-            if(pass != null) {
-               lProps.put("password", pass);
-            }
-            String url = "jdbc:mysql://" + adress + "/" + dbname;
-
-            logger.info("DatabaseObjectFactory established static connection to " + url + " for user " + user);
-
-            CONNECTION = d.connect(url, lProps);
-
-
-            logger.info("DatabaseObjectFactory established static connection to " + url + " for user " + user);
+            establishConnection();
 
         } catch (InstantiationException e) {
             e.printStackTrace();
@@ -64,6 +40,43 @@ public class MSLIMS {
         } catch (SQLException e) {
             e.printStackTrace();
         }
+    }
+
+    private static void establishConnection() throws InstantiationException, IllegalAccessException, ClassNotFoundException, SQLException {
+        Properties lProps = new Properties();
+
+        String driver = "com.mysql.jdbc.Driver";
+        Driver d = (Driver)Class.forName(driver).newInstance();
+
+        String user = RelimsProperties.getDbUserName();
+        String pass = RelimsProperties.getDbPass();
+        String dbname = RelimsProperties.getDbDatabaseName();
+        String adress = RelimsProperties.getDbAdress();
+
+        if(user != null) {
+           lProps.put("user", user);
+        }
+
+        if(pass != null) {
+           lProps.put("password", pass);
+        }
+        String url = "jdbc:mysql://" + adress + "/" + dbname;
+
+        logger.info("DatabaseObjectFactory established static connection to " + url + " for user " + user);
+
+        CONNECTION = d.connect(url, lProps);
+
+
+        logger.info("DatabaseObjectFactory established static connection to " + url + " for user " + user);
+    }
+
+    public static void reset() throws SQLException, ClassNotFoundException, IllegalAccessException, InstantiationException {
+        if(CONNECTION != null){
+            if(CONNECTION.isClosed() == false){
+                CONNECTION.close();
+            }
+        }
+        establishConnection();
     }
 
     @Override

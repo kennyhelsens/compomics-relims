@@ -245,6 +245,19 @@ public class MsLimsProvider {
         } catch (SQLException e) {
             logger.error(e.getMessage(), e);
         } catch (IOException e) {
+            try {
+                MSLIMS.reset();
+            } catch (SQLException e1) {
+                e1.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+            } catch (ClassNotFoundException e1) {
+                e1.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+            } catch (IllegalAccessException e1) {
+                e1.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+            } catch (InstantiationException e1) {
+                e1.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+            }
+
+            Thread.currentThread().stop();
             logger.error(e.getMessage(), e);
         }
 
