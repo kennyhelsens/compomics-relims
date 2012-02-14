@@ -136,11 +136,18 @@
     <!-- Dependencies -->
     <dependencies>
         <!--Apache commons configuration-->
-                <dependency>
-                    <groupId>de.proteinms.omxparser</groupId>
-                    <artifactId>omssa-parser</artifactId>
-                    <version>1.4.6</version>
-                </dependency>
+        <dependency>
+            <groupId>de.proteinms.omxparser</groupId>
+            <artifactId>omssa-parser</artifactId>
+            <version>1.4.6</version>
+        </dependency>
+
+        <dependency>
+            <groupId>mysql</groupId>
+            <artifactId>mysql-connector-java</artifactId>
+            <version>5.1.6</version>
+        </dependency>
+
 
         <dependency>
             <groupId>log4j</groupId>
@@ -170,6 +177,12 @@
             <groupId>com.compomics</groupId>
             <artifactId>ms-lims</artifactId>
             <version>7.6.2</version>
+            <exclusions>
+                <exclusion>
+                    <artifactId>mysql</artifactId>
+                    <groupId>mysql-connector-java</groupId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <!--Apache commons configuration-->
         <dependency>
@@ -201,9 +214,9 @@
 
         <!--&ndash;&gt;-->
         <!--<dependency>-->
-            <!--<groupId>org.nuiton.thirdparty</groupId>-->
-            <!--<artifactId>l2fprod-common</artifactId>-->
-            <!--<version>0.1</version>-->
+        <!--<groupId>org.nuiton.thirdparty</groupId>-->
+        <!--<artifactId>l2fprod-common</artifactId>-->
+        <!--<version>0.1</version>-->
         <!--</dependency>-->
 
 

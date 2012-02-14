@@ -102,7 +102,7 @@ public class RelimsGUI implements Observer {
         btnStart.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent aActionEvent) {
 
-                ExecutorService withinExecutor = Executors.newSingleThreadExecutor();
+                ExecutorService withinExecutor = Executors.newFixedThreadPool(1);
 
 //                lRandomProjects.addAll(0, MsLimsProvider.getInstance().getProjects(new int[]{731}));
 
@@ -147,13 +147,14 @@ public class RelimsGUI implements Observer {
                                 lObservable.addObserver(iResultObserver);
 
                                 iFutures.add(iService.submit(lCallable));
-
                             }
-
-                            for (Future lFuture : iFutures) {
-                                String result = lFuture.get().toString();
-                                logger.info(String.format("Callable finished with result %s", result));
-                            }
+//
+//                            for (Future lFuture : iFutures) {
+//                                logger.info(String.format("Callable started"));
+//                                String result = lFuture.get().toString();
+//                                System.out.println(String.format("Callable finished with result %s", result));
+//                                logger.info(String.format("Callable finished with result %s", result));
+//                            }
 
 
                         } catch (ClassNotFoundException e) {
@@ -162,10 +163,10 @@ public class RelimsGUI implements Observer {
                             logger.error(e.getMessage(), e);
                         } catch (IllegalAccessException e) {
                             logger.error(e.getMessage(), e);
-                        } catch (InterruptedException e) {
-                            logger.error(e.getMessage(), e);
-                        } catch (ExecutionException e) {
-                            logger.error(e.getMessage(), e);
+//                        } catch (InterruptedException e) {
+//                            logger.error(e.getMessage(), e);
+//                        } catch (ExecutionException e) {
+//                            logger.error(e.getMessage(), e);
                         }
                     }
                 });

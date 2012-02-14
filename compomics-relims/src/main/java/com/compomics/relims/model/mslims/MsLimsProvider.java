@@ -17,6 +17,7 @@ import java.io.IOException;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.*;
 
 /**
@@ -73,16 +74,19 @@ public class MsLimsProvider {
         long lNumberOfSpectra = 0;
 
         try {
-            String lQuery = "select count(distinct spectrumid) from spectrum as s where s.l_projectid=?";
-            PreparedStatement ps = MSLIMS.getConnection().prepareStatement(lQuery);
-            ps.setLong(1, aProjectID);
+            String lQuery = "select count(distinct spectrumid) from spectrum as s where s.l_projectid=" + aProjectID;
 
-            ResultSet lResultSet = ps.executeQuery();
+            logger.debug("QUERY - " + lQuery.replaceAll("\\?", ""+aProjectID));
+
+            Statement ps = MSLIMS.getConnection().createStatement();
+            ps.execute(lQuery);
+            ResultSet lResultSet = ps.getResultSet();
+
             lResultSet.next();
             lNumberOfSpectra = lResultSet.getLong(1);
 
-            ps.close();
             lResultSet.close();
+            ps.close();
 
             return lNumberOfSpectra;
 
@@ -106,8 +110,8 @@ public class MsLimsProvider {
                 lInstrumentIDSet.add(lInstrumentID);
             }
 
-            ps.close();
             lResultSet.close();
+            ps.close();
 
         } catch (SQLException e) {
             logger.error(e.getMessage(), e);
@@ -130,8 +134,8 @@ public class MsLimsProvider {
                 lAccessionSet.add(lAccession);
             }
 
-            ps.close();
             lResultSet.close();
+            ps.close();
 
         } catch (SQLException e) {
             logger.error(e.getMessage(), e);
@@ -152,8 +156,8 @@ public class MsLimsProvider {
             lResultSet.next();
             lNumberOfPeptides = lResultSet.getLong(1);
 
-            ps.close();
             lResultSet.close();
+            ps.close();
 
             return lNumberOfPeptides;
 
@@ -257,7 +261,7 @@ public class MsLimsProvider {
                 e1.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
             }
 
-            Thread.currentThread().stop();
+//            Thread.currentThread().stop();
             logger.error(e.getMessage(), e);
         }
 

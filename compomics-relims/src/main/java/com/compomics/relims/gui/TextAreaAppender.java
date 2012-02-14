@@ -30,14 +30,13 @@ public class TextAreaAppender extends ConsoleAppender {
      * Format and then append the loggingEvent to the stored
      * JTextArea.
      */
-    public void append(LoggingEvent loggingEvent) {
+    public synchronized void append(LoggingEvent loggingEvent) {
         final String message = this.layout.format(loggingEvent);
         iMessages.addFirst(message);
+        final String lContent = Joiner.on("").join(iMessages);
         iService.submit(new Runnable() {
             public void run() {
-                String lContent = Joiner.on("").join(iMessages);
                 jTextArea.setText(lContent);
-//                jTextArea.updateUI();
             }
         });
     }

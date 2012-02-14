@@ -44,6 +44,8 @@ public class ProjectRunnerVarDBImpl extends Observable implements ProjectRunner 
 
 
     public ProjectRunnerVarDBImpl() {
+        logger.debug("constructing new projectrunner");
+
         ArrayList lAllowedInstruments = new ArrayList();
         lAllowedInstruments.add(8);
         lAllowedInstruments.add(9);
@@ -58,6 +60,8 @@ public class ProjectRunnerVarDBImpl extends Observable implements ProjectRunner 
 
     public String call() {
         try {
+
+            logger.debug("calling new projectrunner");
 
             long lProjectid = iProject.getProjectid();
             logger.debug("created new projectrunner on " + lProjectid);

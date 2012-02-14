@@ -62,10 +62,7 @@ public class MSLIMS {
         }
         String url = "jdbc:mysql://" + adress + "/" + dbname;
 
-        logger.info("DatabaseObjectFactory established static connection to " + url + " for user " + user);
-
         CONNECTION = d.connect(url, lProps);
-
 
         logger.info("DatabaseObjectFactory established static connection to " + url + " for user " + user);
     }

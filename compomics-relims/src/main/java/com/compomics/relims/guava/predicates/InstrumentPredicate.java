@@ -23,7 +23,10 @@ public class InstrumentPredicate implements Predicate<Project> {
     }
 
     public boolean apply(@Nullable Project aProject) {
-        long lProjectid = aProject.getProjectid();
+        long lProjectid = 0;
+        if (aProject != null) {
+            lProjectid = aProject.getProjectid();
+        }
 
         HashSet<Integer> lInstrumentsForProject = MsLimsProvider.getInstance().getInstrumentsForProject(lProjectid);
         Sets.SetView<Integer> lUnion = Sets.union(lInstrumentsForProject, iAllowedInstrumentIDs);
