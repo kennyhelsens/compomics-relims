@@ -32,8 +32,8 @@ import static com.google.common.base.Preconditions.checkState;
 /**
  * This class is a
  */
-public class OMSSASearchProcessor implements SearchProcessor {
-    private static Logger logger = Logger.getLogger(OMSSASearchProcessor.class);
+public class XTandemSearchProcessor implements SearchProcessor {
+    private static Logger logger = Logger.getLogger(XTandemSearchProcessor.class);
     private static final DoubleRounder iRounder = new DoubleRounder(4);
     private final SearchList<SearchCommandGenerator> iSearchList;
     private char iSeparator = ',';
@@ -47,12 +47,12 @@ public class OMSSASearchProcessor implements SearchProcessor {
     private ProteinJoiner iProteinJoiner = new ProteinJoiner();
 
 
-    public OMSSASearchProcessor(SearchList<SearchCommandGenerator> aSearchList) {
+    public XTandemSearchProcessor(SearchList<SearchCommandGenerator> aSearchList) {
         iSearchList = aSearchList;
     }
 
     public void process() throws SAXException, IOException {
-        File lOutput = new File(RelimsProperties.getWorkSpace(), "relims_omssa_output_pr_" + iSearchList.get(0).getProjectId() + ".csv");
+        File lOutput = new File(RelimsProperties.getWorkSpace(), "relims_xtandem_output_pr_" + iSearchList.get(0).getProjectId() + ".csv");
         BufferedWriter writer = Files.newWriter(lOutput, Charset.defaultCharset());
 
 
@@ -69,22 +69,25 @@ public class OMSSASearchProcessor implements SearchProcessor {
             lGeneralFeatures.add("" + Joiner.on(";").join(lSearch.getSpectrumFiles()));
 
             // load your identification file "yourFile" (Mascot DAT file, OMSSA OMX file or X!Tandem XML file)
-            File[] lOmssaResultFiles = lResultFolder.listFiles(new FilenameFilter() {
+            File[] lResultFiles = lResultFolder.listFiles(new FilenameFilter() {
                 public boolean accept(File aFile, String s) {
-                    return s.endsWith(".omx");
+                    boolean lXML = s.endsWith(".xml");
+                    boolean lModFree = (!s.contains("mod"));
+                    return (lXML && lModFree);
                 }
             });
 
-            for (File lOmssaResultFile : lOmssaResultFiles) {
+            for (File lResultFile : lResultFiles) {
                 // get the correspondig reader
-                IdfileReader lIdFileReader = IdfileReaderFactory.getInstance().getFileReader(lOmssaResultFile, true);
+                IdfileReader lIdFileReader = IdfileReaderFactory.getInstance().getFileReader(lResultFile, true);
                 logger.debug("writing results to " + lOutput.getCanonicalPath());
                 // load all identifications
                 HashSet<SpectrumMatch> matches = lIdFileReader.getAllSpectrumMatches();
                 for (SpectrumMatch lSpectrumMatch : matches) {
                     lLineCount++;
 
-                    HashMap<Double, ArrayList<PeptideAssumption>> lAllAssumptions = lSpectrumMatch.getAllAssumptions(Advocate.OMSSA);
+                    HashMap<Double, ArrayList<PeptideAssumption>> lAllAssumptions = lSpectrumMatch.getAllAssumptions(Advocate.XTANDEM);
+
                     List<Double> lDoubles = Lists.newArrayList();
                     lDoubles.addAll(lAllAssumptions.keySet());
 
@@ -100,8 +103,8 @@ public class OMSSASearchProcessor implements SearchProcessor {
                         }
                     });
 
-
                     ArrayList<PeptideAssumption> lSortedAssumptions = Lists.newArrayList();
+
                     int lRank = 0;
                     for (Double lEValue : lDoubles) {
                         ArrayList<PeptideAssumption> lPeptideAssumptions = lAllAssumptions.get(lEValue);

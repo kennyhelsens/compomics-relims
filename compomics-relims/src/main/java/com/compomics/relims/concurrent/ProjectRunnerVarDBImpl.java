@@ -13,6 +13,7 @@ import com.compomics.relims.interfaces.SearchCommandGenerator;
 import com.compomics.relims.model.OMSSASearchProcessor;
 import com.compomics.relims.model.SearchList;
 import com.compomics.relims.model.SearchProcessor;
+import com.compomics.relims.model.XTandemSearchProcessor;
 import com.compomics.relims.model.beans.ProjectSetupBean;
 import com.compomics.relims.model.beans.SearchCommandVarDbImpl;
 import com.compomics.relims.model.mslims.DatfileIterator;
@@ -127,8 +128,18 @@ public class ProjectRunnerVarDBImpl extends Observable implements ProjectRunner 
             }
 
             logger.debug("processing the search results");
-            SearchProcessor lSearchProcessor = new OMSSASearchProcessor(lSearchList);
-            lSearchProcessor.process();
+
+            if (RelimsProperties.useOmssa()) {
+                logger.debug("processing omssa results");
+                SearchProcessor lSearchProcessor = new OMSSASearchProcessor(lSearchList);
+                lSearchProcessor.process();
+            }
+
+            if (RelimsProperties.useTandem()) {
+                logger.debug("processing xtandem results");
+                SearchProcessor lSearchProcessor = new XTandemSearchProcessor(lSearchList);
+                lSearchProcessor.process();
+            }
 
             synchronized (iProject) {
                 setChanged();
