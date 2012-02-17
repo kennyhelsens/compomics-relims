@@ -126,7 +126,7 @@ public class RelimsGUI implements Observer {
 
                             ArrayList<Project> lAllProjects = Lists.newArrayList();
                             lAllProjects.addAll(lPreDefinedProjects);
-                            lAllProjects.addAll(lRandomProjects);
+//                            lAllProjects.addAll(lRandomProjects);
 
                             logger.debug("clicked start button");
                             logger.debug("selecting " + lRandomSize + " random projects");
