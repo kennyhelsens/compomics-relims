@@ -2,6 +2,7 @@ package com.compomics.relims.playground;
 
 import com.compomics.relims.conf.RelimsProperties;
 import com.compomics.relims.interfaces.SearchCommandGenerator;
+import com.compomics.relims.model.OMSSASearchProcessor;
 import com.compomics.relims.model.SearchList;
 import com.compomics.relims.model.SearchProcessor;
 import com.compomics.relims.model.beans.ProjectSetupBean;
@@ -48,7 +49,7 @@ public class SearchProcessorTester {
         lSearchList.add(lSearchBean);
 
         // create a search processor using this searchbean
-        SearchProcessor lSearchProcessor = new SearchProcessor(lSearchList);
+        SearchProcessor lSearchProcessor = new OMSSASearchProcessor(lSearchList);
         try {
             lSearchProcessor.process();
         } catch (SAXException e) {
