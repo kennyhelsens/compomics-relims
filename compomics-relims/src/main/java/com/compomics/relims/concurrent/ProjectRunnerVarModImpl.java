@@ -7,12 +7,10 @@ import com.compomics.mascotdatfile.util.mascot.Parameters;
 import com.compomics.mslims.db.accessors.Project;
 import com.compomics.omssa.xsd.UserMod;
 import com.compomics.relims.conf.RelimsProperties;
-import com.compomics.relims.guava.predicates.InstrumentPredicate;
-import com.compomics.relims.guava.predicates.ModificationSetPredicate;
-import com.compomics.relims.guava.predicates.ProjectSizePredicate;
-import com.compomics.relims.guava.predicates.SpeciesPredicate;
+import com.compomics.relims.guava.predicates.*;
 import com.compomics.relims.interfaces.ProjectRunner;
 import com.compomics.relims.interfaces.SearchCommandGenerator;
+import com.compomics.relims.model.OMSSASearchProcessor;
 import com.compomics.relims.model.SearchList;
 import com.compomics.relims.model.SearchProcessor;
 import com.compomics.relims.model.beans.ProjectSetupBean;
@@ -41,6 +39,7 @@ public class ProjectRunnerVarModImpl extends Observable implements ProjectRunner
     private InstrumentPredicate iInstrumentPredicate;
     private ModificationSetPredicate iModificationSetPredicate;
     private SpeciesPredicate iSpeciesPredicate;
+    private SearchSetSizePredicate iSearchSetSizePredicate;
 
 
     public ProjectRunnerVarModImpl() {
@@ -54,6 +53,7 @@ public class ProjectRunnerVarModImpl extends Observable implements ProjectRunner
         iInstrumentPredicate = new InstrumentPredicate(new HashSet<Integer>(lAllowedInstruments));
         iModificationSetPredicate = new ModificationSetPredicate();
         iSpeciesPredicate = new SpeciesPredicate();
+        iSearchSetSizePredicate = new SearchSetSizePredicate();
 
     }
 
@@ -64,28 +64,33 @@ public class ProjectRunnerVarModImpl extends Observable implements ProjectRunner
             logger.debug("created new projectrunner on " + lProjectid);
 
             if (!iProjectSizePredicate.apply(iProject)) {
-                         logger.debug("END " + lProjectid);
-                         return "Premature end for project size";
-                     }
+                logger.debug("END " + lProjectid);
+                return "Premature end for project size";
+            }
 
-                     if (!iInstrumentPredicate.apply(iProject)) {
-                         logger.debug("END " + lProjectid);
-                         return "Premature end for instrument type";
-                     }
+            if (!iInstrumentPredicate.apply(iProject)) {
+                logger.debug("END " + lProjectid);
+                return "Premature end for instrument type";
+            }
 
-                     if (!iSpeciesPredicate.apply(iProject)) {
-                         logger.debug("END " + lProjectid);
-                         return "Premature end for species type";
-                     }
 
-                     logger.debug("retrieving setup for project " + lProjectid);
-                     ProjectSetupBean lProjectSetupBean = buildProjectSetup(lProjectid);
+            if (!iSearchSetSizePredicate.apply(iProject)) {
+                logger.debug("END " + lProjectid);
+                return "Premature end for search set size";
+            }
+            if (!iSpeciesPredicate.apply(iProject)) {
+                logger.debug("END " + lProjectid);
+                return "Premature end for species type";
+            }
 
-                     logger.debug("comparing Mascot modification sets within project " + lProjectid);
-                     if (!iModificationSetPredicate.apply(lProjectSetupBean)) {
-                         logger.debug("END" + lProjectid);
-                         return "Premature end for distinct modification sets";
-                     }
+            logger.debug("retrieving setup for project " + lProjectid);
+            ProjectSetupBean lProjectSetupBean = buildProjectSetup(lProjectid);
+
+            logger.debug("comparing Mascot modification sets within project " + lProjectid);
+            if (!iModificationSetPredicate.apply(lProjectSetupBean)) {
+                logger.debug("END" + lProjectid);
+                return "Premature end for distinct modification sets";
+            }
 
             ModificationList lModificationList = lProjectSetupBean.getModificationLists().get(0);
             ArrayList<Modification> lFixMods = Lists.newArrayList(lModificationList.getFixedModifications());
@@ -123,7 +128,7 @@ public class ProjectRunnerVarModImpl extends Observable implements ProjectRunner
             }
 
             logger.debug("processing the search results");
-            SearchProcessor lSearchProcessor = new SearchProcessor(lSearchList);
+            SearchProcessor lSearchProcessor = new OMSSASearchProcessor(lSearchList);
             lSearchProcessor.process();
 
             synchronized (iProject) {
@@ -138,7 +143,7 @@ public class ProjectRunnerVarModImpl extends Observable implements ProjectRunner
         } catch (SAXException e) {
             logger.error(e.getMessage(), e);
         }
-        return("SUCCES");
+        return ("SUCCES");
     }
 
     public void setProject(Project aProject) {

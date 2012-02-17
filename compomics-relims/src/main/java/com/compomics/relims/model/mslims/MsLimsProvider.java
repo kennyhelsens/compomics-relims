@@ -76,7 +76,7 @@ public class MsLimsProvider {
         try {
             String lQuery = "select count(distinct spectrumid) from spectrum as s where s.l_projectid=" + aProjectID;
 
-            logger.debug("QUERY - " + lQuery.replaceAll("\\?", ""+aProjectID));
+            logger.debug("QUERY - " + lQuery.replaceAll("\\?", "" + aProjectID));
 
             Statement ps = MSLIMS.getConnection().createStatement();
             ps.execute(lQuery);
@@ -266,5 +266,29 @@ public class MsLimsProvider {
         }
 
         return output;
+    }
+
+    public long getNumberOfSearchesForProject(long aProjectid) {
+
+        long lNumberOfSearches = 0;
+
+        try {
+            String lQuery = "select count(distinct title) from identification as i, spectrum as s where i.l_spectrumid=s.spectrumid and s.l_projectid=?";
+            PreparedStatement ps = MSLIMS.getConnection().prepareStatement(lQuery);
+            ps.setLong(1, aProjectid);
+
+            ResultSet lResultSet = ps.executeQuery();
+            lResultSet.next();
+            lNumberOfSearches = lResultSet.getLong(1);
+
+            lResultSet.close();
+            ps.close();
+
+            return lNumberOfSearches;
+
+        } catch (SQLException e) {
+            logger.error(e.getMessage(), e);
+        }
+        return lNumberOfSearches;
     }
 }

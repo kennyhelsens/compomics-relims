@@ -7,12 +7,10 @@ import com.compomics.mascotdatfile.util.mascot.Parameters;
 import com.compomics.mslims.db.accessors.Project;
 import com.compomics.relims.conf.RelimsProperties;
 import com.compomics.relims.guava.functions.SpeciesFinderFunction;
-import com.compomics.relims.guava.predicates.InstrumentPredicate;
-import com.compomics.relims.guava.predicates.ModificationSetPredicate;
-import com.compomics.relims.guava.predicates.ProjectSizePredicate;
-import com.compomics.relims.guava.predicates.SpeciesPredicate;
+import com.compomics.relims.guava.predicates.*;
 import com.compomics.relims.interfaces.ProjectRunner;
 import com.compomics.relims.interfaces.SearchCommandGenerator;
+import com.compomics.relims.model.OMSSASearchProcessor;
 import com.compomics.relims.model.SearchList;
 import com.compomics.relims.model.SearchProcessor;
 import com.compomics.relims.model.beans.ProjectSetupBean;
@@ -41,6 +39,7 @@ public class ProjectRunnerVarDBImpl extends Observable implements ProjectRunner 
     private InstrumentPredicate iInstrumentPredicate;
     private ModificationSetPredicate iModificationSetPredicate;
     private SpeciesPredicate iSpeciesPredicate;
+    private SearchSetSizePredicate iSearchSetSizePredicate;
 
 
     public ProjectRunnerVarDBImpl() {
@@ -55,6 +54,7 @@ public class ProjectRunnerVarDBImpl extends Observable implements ProjectRunner 
         iInstrumentPredicate = new InstrumentPredicate(new HashSet<Integer>(lAllowedInstruments));
         iModificationSetPredicate = new ModificationSetPredicate();
         iSpeciesPredicate = new SpeciesPredicate(SpeciesFinderFunction.SPECIES.HUMAN, 50);
+        iSearchSetSizePredicate = new SearchSetSizePredicate();
 
     }
 
@@ -74,6 +74,11 @@ public class ProjectRunnerVarDBImpl extends Observable implements ProjectRunner 
             if (!iInstrumentPredicate.apply(iProject)) {
                 logger.debug("END " + lProjectid);
                 return "Premature end for instrument type";
+            }
+
+            if (!iSearchSetSizePredicate.apply(iProject)) {
+                logger.debug("END " + lProjectid);
+                return "Premature end for search set size";
             }
 
             if (!iSpeciesPredicate.apply(iProject)) {
@@ -122,7 +127,7 @@ public class ProjectRunnerVarDBImpl extends Observable implements ProjectRunner 
             }
 
             logger.debug("processing the search results");
-            SearchProcessor lSearchProcessor = new SearchProcessor(lSearchList);
+            SearchProcessor lSearchProcessor = new OMSSASearchProcessor(lSearchList);
             lSearchProcessor.process();
 
             synchronized (iProject) {
