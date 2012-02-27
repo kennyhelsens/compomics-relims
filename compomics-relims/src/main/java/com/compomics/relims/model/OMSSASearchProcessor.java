@@ -68,6 +68,11 @@ public class OMSSASearchProcessor implements SearchProcessor {
             lGeneralFeatures.add("" + lSearch.getProjectId());
             lGeneralFeatures.add("" + Joiner.on(";").join(lSearch.getSpectrumFiles()));
 
+            String lDatabaseFilename = RelimsProperties.getDatabaseFilename(lSearch.getName());
+            iProteinJoiner.initProteinMap(new File(lDatabaseFilename));
+            iProteinJoiner.setsPeptideStartIncluded(true);
+
+
             // load your identification file "yourFile" (Mascot DAT file, OMSSA OMX file or X!Tandem XML file)
             File[] lOmssaResultFiles = lResultFolder.listFiles(new FilenameFilter() {
                 public boolean accept(File aFile, String s) {
@@ -133,10 +138,10 @@ public class OMSSASearchProcessor implements SearchProcessor {
                             writer.write(line);
                             writer.newLine();
 
-                            if (lLineCount % 1000 == 0) {
+                            if (lLineCount % 100 == 0) {
                                 writer.flush();
                             }
-                            if (lLineCount % 10000 == 0) {
+                            if (lLineCount % 1000 == 0) {
                                 logger.debug("written " + lLineCount + " entries ...");
                             }
                         }
@@ -157,9 +162,12 @@ public class OMSSASearchProcessor implements SearchProcessor {
         ArrayList<String> lParentProteins = aBestAssumption.getPeptide().getParentProteins();
         ArrayList<String> lResults = Lists.newArrayList();
 
-        lResults.add("" + lParentProteins.size());
+        iProteinJoiner.setCurrentPeptide(aBestAssumption.getPeptide().getSequence());
         String lConcatenatedProteins = iProteinJoiner.apply(lParentProteins);
+
+        lResults.add("" + lParentProteins.size());
         lResults.add("" + lConcatenatedProteins);
+
         if (lConcatenatedProteins.indexOf("SHUFFLED") > 0) {
             lResults.add("SHUFFLED");
         } else {

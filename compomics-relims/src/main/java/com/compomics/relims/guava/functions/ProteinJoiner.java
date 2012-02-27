@@ -33,13 +33,13 @@ public class ProteinJoiner implements Function<ArrayList<String>, String> {
             ArrayList<String> lNewList = Lists.newArrayList();
             int lStartIndex = -1;
 
-            for (String lAccession : lNewList) {
+            for (String lAccession : input) {
                 Object lProteinSequenceObject = iProteinMap.get(lAccession);
                 if (lProteinSequenceObject != null) {
                     String lProteinSequenceString = lProteinSequenceObject.toString();
                     lStartIndex = lProteinSequenceString.indexOf(iCurrentPeptide);
                 }
-                lNewList.add(lAccession + "*" + lStartIndex);
+                lNewList.add(lAccession + "|" + lStartIndex);
             }
 
             input = lNewList; // set the input pointer to the newly created List that includes the start indices.
