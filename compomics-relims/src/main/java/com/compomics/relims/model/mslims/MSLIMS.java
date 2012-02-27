@@ -27,6 +27,10 @@ public class MSLIMS {
 // -------------------------- STATIC METHODS --------------------------
 
     static {
+        initiate();
+    }
+
+    public static void initiate(){
         try {
 
             Properties lProps = new Properties();
@@ -81,16 +85,10 @@ public class MSLIMS {
 
         try {
             if(CONNECTION == null || CONNECTION.isClosed()){
-                reset();
+                initiate();
             }
         } catch (SQLException e) {
-            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
-        } catch (ClassNotFoundException e) {
-            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
-        } catch (IllegalAccessException e) {
-            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
-        } catch (InstantiationException e) {
-            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+            logger.error(e.getMessage(), e);
         }
 
         return CONNECTION;
