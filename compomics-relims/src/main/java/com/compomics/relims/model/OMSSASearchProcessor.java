@@ -41,7 +41,7 @@ public class OMSSASearchProcessor implements SearchProcessor {
 
     private ArrayList<UserMod> iRelimsModifications = RelimsProperties.getRelimsMods();
 
-    private boolean includeProteinDetails = false;
+    private boolean includeProteinDetails = true;
     private boolean includeExtraModDetails = false;
 
     private ProteinJoiner iProteinJoiner = new ProteinJoiner();
@@ -127,7 +127,10 @@ public class OMSSASearchProcessor implements SearchProcessor {
                                 lFeatures.addAll(extractProteinFeatures(lPeptideAssumption));
                             }
 
-                            writer.write(joiner.join(lFeatures));
+                            String line = joiner.join(lFeatures);
+                            System.out.println(line);
+
+                            writer.write(line);
                             writer.newLine();
 
                             if (lLineCount % 1000 == 0) {

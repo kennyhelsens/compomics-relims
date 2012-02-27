@@ -115,19 +115,19 @@ public class SpeciesFinderFunction implements Function<Set<String>, SpeciesFinde
         if (iSpeciesCounter.get(HUMAN) > lExpectedSize * iExpectedMatchFrequency) {
             return HUMAN;
 
-        } else if (iSpeciesCounter.get(RAT) == lExpectedSize * iExpectedMatchFrequency) {
+        } else if (iSpeciesCounter.get(RAT) > lExpectedSize * iExpectedMatchFrequency) {
             return RAT;
 
-        } else if (iSpeciesCounter.get(MOUSE) == lExpectedSize * iExpectedMatchFrequency) {
+        } else if (iSpeciesCounter.get(MOUSE) > lExpectedSize * iExpectedMatchFrequency) {
             return MOUSE;
 
-        } else if (iSpeciesCounter.get(DROSOPHILA) == lExpectedSize * iExpectedMatchFrequency) {
+        } else if (iSpeciesCounter.get(DROSOPHILA) > lExpectedSize * iExpectedMatchFrequency) {
             return DROSOPHILA;
 
-        } else if (iSpeciesCounter.get(YEAST) == lExpectedSize * iExpectedMatchFrequency) {
+        } else if (iSpeciesCounter.get(YEAST) > lExpectedSize * iExpectedMatchFrequency) {
             return YEAST;
 
-        } else if (iSpeciesCounter.get(OTHER) == lExpectedSize * iExpectedMatchFrequency) {
+        } else if (iSpeciesCounter.get(OTHER) > lExpectedSize * iExpectedMatchFrequency) {
             return OTHER;
         }
 

@@ -54,7 +54,7 @@ public class ProjectRunnerVarDBImpl extends Observable implements ProjectRunner 
         iProjectSizePredicate = new ProjectSizePredicate();
         iInstrumentPredicate = new InstrumentPredicate(new HashSet<Integer>(lAllowedInstruments));
         iModificationSetPredicate = new ModificationSetPredicate();
-        iSpeciesPredicate = new SpeciesPredicate(SpeciesFinderFunction.SPECIES.HUMAN, 50);
+        iSpeciesPredicate = new SpeciesPredicate(SpeciesFinderFunction.SPECIES.MOUSE, 50);
         iSearchSetSizePredicate = new SearchSetSizePredicate();
 
     }
@@ -72,10 +72,10 @@ public class ProjectRunnerVarDBImpl extends Observable implements ProjectRunner 
                 return "Premature end for project size";
             }
 
-            if (!iInstrumentPredicate.apply(iProject)) {
-                logger.debug("END " + lProjectid);
-                return "Premature end for instrument type";
-            }
+//            if (!iInstrumentPredicate.apply(iProject)) {
+//                logger.debug("END " + lProjectid);
+//                return "Premature end for instrument type";
+//            }
 
             if (!iSearchSetSizePredicate.apply(iProject)) {
                 logger.debug("END " + lProjectid);

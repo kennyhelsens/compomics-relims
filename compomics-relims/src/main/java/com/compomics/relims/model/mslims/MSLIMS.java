@@ -88,6 +88,21 @@ public class MSLIMS {
     }
 
     protected static Connection getConnection(){
+
+        try {
+            if(CONNECTION == null || CONNECTION.isClosed()){
+                reset();
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+        } catch (IllegalAccessException e) {
+            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+        } catch (InstantiationException e) {
+            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+        }
+
         return CONNECTION;
     }
 }

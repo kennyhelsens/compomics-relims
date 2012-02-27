@@ -133,10 +133,10 @@ public class XTandemSearchProcessor implements SearchProcessor {
                             writer.write(joiner.join(lFeatures));
                             writer.newLine();
 
-                            if (lLineCount % 1000 == 0) {
+                            if (lLineCount % 100 == 0) {
                                 writer.flush();
                             }
-                            if (lLineCount % 10000 == 0) {
+                            if (lLineCount % 1000 == 0) {
                                 logger.debug("written " + lLineCount + " entries ...");
                             }
                         }
@@ -165,9 +165,7 @@ public class XTandemSearchProcessor implements SearchProcessor {
         } else {
             lResults.add("NON_SHUFFLED");
         }
-
         return lResults;
-
     }
 
     private Collection<? extends String> extractSpectrumFeatures(SpectrumMatch aSpectrumMatch) {
@@ -207,9 +205,9 @@ public class XTandemSearchProcessor implements SearchProcessor {
                 lPeptide.getParentProteins());
 
         lFeatures.add(lPeptide.getSequence());
+//        lFeatures.add(lPeptide.getModifiedSequenceAsString(true));
         lFeatures.add("" + aPeptideAssumption.getRank());
         lFeatures.add("" + lProteins);
-        lFeatures.add("" + iRounder.apply(lPeptide.getMass()));
         lFeatures.add("" + iRounder.apply(aPeptideAssumption.getEValue()));
 
         return lFeatures;

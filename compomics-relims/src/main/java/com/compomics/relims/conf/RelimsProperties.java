@@ -39,7 +39,8 @@ public class RelimsProperties {
     static {
         try {
 //            URL lResource = Resources.getResource("config" + iFolderSeparator + "relims.properties");
-            URL lResource = Resources.getResource("config" + iFolderSeparator + "relims-frisbee.properties");
+//            URL lResource = Resources.getResource("config" + iFolderSeparator + "relims-frisbee.properties");
+            URL lResource = Resources.getResource("config" + iFolderSeparator + "relims-covm.properties");
             config = new PropertiesConfiguration(lResource);
 
             // Set the workspace for all future Commands to the SearchGUI folder
