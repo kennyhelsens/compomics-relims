@@ -41,7 +41,7 @@ public class XTandemSearchProcessor implements SearchProcessor {
 
     private ArrayList<UserMod> iRelimsModifications = RelimsProperties.getRelimsMods();
 
-    private boolean includeProteinDetails = false;
+    private boolean includeProteinDetails = true;
     private boolean includeExtraModDetails = false;
 
     private ProteinJoiner iProteinJoiner = new ProteinJoiner();
@@ -68,6 +68,10 @@ public class XTandemSearchProcessor implements SearchProcessor {
             lGeneralFeatures.add("" + lSearch.getProjectId());
             lGeneralFeatures.add("" + Joiner.on(";").join(lSearch.getSpectrumFiles()));
 
+            String lDatabaseFilename = RelimsProperties.getDatabaseFilename(lSearch.getName());
+            iProteinJoiner.initProteinMap(new File(lDatabaseFilename));
+            iProteinJoiner.setsPeptideStartIncluded(true);
+
             // load your identification file "yourFile" (Mascot DAT file, OMSSA OMX file or X!Tandem XML file)
             File[] lResultFiles = lResultFolder.listFiles(new FilenameFilter() {
                 public boolean accept(File aFile, String s) {
@@ -81,6 +85,8 @@ public class XTandemSearchProcessor implements SearchProcessor {
                 // get the correspondig reader
                 IdfileReader lIdFileReader = IdfileReaderFactory.getInstance().getFileReader(lResultFile, true);
                 logger.debug("writing results to " + lOutput.getCanonicalPath());
+
+
                 // load all identifications
                 HashSet<SpectrumMatch> matches = lIdFileReader.getAllSpectrumMatches();
                 for (SpectrumMatch lSpectrumMatch : matches) {
@@ -102,6 +108,7 @@ public class XTandemSearchProcessor implements SearchProcessor {
                             }
                         }
                     });
+
 
                     ArrayList<PeptideAssumption> lSortedAssumptions = Lists.newArrayList();
 
@@ -157,8 +164,10 @@ public class XTandemSearchProcessor implements SearchProcessor {
         ArrayList<String> lParentProteins = aBestAssumption.getPeptide().getParentProteins();
         ArrayList<String> lResults = Lists.newArrayList();
 
-        lResults.add("" + lParentProteins.size());
+        iProteinJoiner.setCurrentPeptide(aBestAssumption.getPeptide().getSequence());
         String lConcatenatedProteins = iProteinJoiner.apply(lParentProteins);
+
+        lResults.add("" + lParentProteins.size());
         lResults.add("" + lConcatenatedProteins);
         if (lConcatenatedProteins.indexOf("SHUFFLED") > 0) {
             lResults.add("SHUFFLED");

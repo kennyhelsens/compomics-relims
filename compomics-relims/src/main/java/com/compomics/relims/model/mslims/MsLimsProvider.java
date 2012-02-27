@@ -250,7 +250,7 @@ public class MsLimsProvider {
             logger.error(e.getMessage(), e);
         } catch (IOException e) {
             try {
-                MSLIMS.reset();
+                MSLIMS.initiate();
             } catch (SQLException e1) {
                 e1.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
             } catch (ClassNotFoundException e1) {
