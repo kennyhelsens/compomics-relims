@@ -1,13 +1,13 @@
-package com.compomics.relims.model.mslims;
+package com.compomics.relims.model;
 
-import com.compomics.mslims.db.accessors.Project;
 import com.compomics.mslims.db.accessors.Spectrum_file;
 import com.compomics.mslims.util.fileio.MascotGenericFile;
 import com.compomics.relims.conf.RelimsProperties;
+import com.compomics.relims.exception.RelimsException;
+import com.compomics.relims.model.beans.RelimsProjectBean;
+import com.compomics.relims.model.interfaces.DataProvider;
 import com.google.common.base.Joiner;
-import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
-import com.google.common.primitives.Ints;
 import org.apache.log4j.Logger;
 
 import java.io.BufferedWriter;
@@ -18,57 +18,21 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.util.*;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Vector;
 
 /**
  * This class is a
  */
-public class MsLimsProvider {
-    private static MsLimsProvider ourInstance = new MsLimsProvider();
-    private static Logger logger = Logger.getLogger(MsLimsProvider.class);
+public class MsLimsDataProvider implements DataProvider {
 
-    public static MsLimsProvider getInstance() {
+    private static MsLimsDataProvider ourInstance = new MsLimsDataProvider();
+    private static Logger logger = Logger.getLogger(MsLimsDataProvider.class);
+
+    public static MsLimsDataProvider getInstance() {
         return ourInstance;
     }
-
-    protected Project[] getAllProjects() {
-        try {
-            return Project.getAllProjects(MSLIMS.getConnection());
-        } catch (SQLException e) {
-            logger.error(e.getMessage(), e);
-        }
-        return null;
-    }
-
-    public ArrayList<Project> getRandomProjects(int lSize) {
-        Project[] lAllProjects = getAllProjects();
-        Random lRandom = new Random();
-        ArrayList<Project> lProjectIds = Lists.newArrayList();
-        while (lProjectIds.size() < lSize) {
-            lProjectIds.add(lAllProjects[lRandom.nextInt(lAllProjects.length) + 1]);
-        }
-        return lProjectIds;
-    }
-
-    public ArrayList<Project> getPreDefinedProjects() {
-        int[] lProjectIntegers = RelimsProperties.getPredifinedProjects();
-        ArrayList<Project> lProjects = getProjects(lProjectIntegers);
-        return lProjects;
-    }
-
-    public ArrayList<Project> getProjects(int[] lProjectIdNumbers) {
-        Project[] lAllProjects = getAllProjects();
-
-        ArrayList<Project> lProjects = Lists.newArrayList();
-        for (Project lProject : lAllProjects) {
-            int lRetain = Ints.indexOf(lProjectIdNumbers, (int) lProject.getProjectid());
-            if (lRetain >= 0) {
-                lProjects.add(lProject);
-            }
-        }
-        return lProjects;
-    }
-
 
     public long getNumberOfSpectraForProject(long aProjectID) {
         long lNumberOfSpectra = 0;
@@ -78,7 +42,7 @@ public class MsLimsProvider {
 
             logger.debug("QUERY - " + lQuery.replaceAll("\\?", "" + aProjectID));
 
-            Statement ps = MSLIMS.getConnection().createStatement();
+            Statement ps = ConnectionProvider.getConnection().createStatement();
             ps.execute(lQuery);
             ResultSet lResultSet = ps.getResultSet();
 
@@ -101,7 +65,7 @@ public class MsLimsProvider {
 
         try {
             String lQuery = "select distinct l_instrumentid from spectrum as s where s.l_projectid=?";
-            PreparedStatement ps = MSLIMS.getConnection().prepareStatement(lQuery);
+            PreparedStatement ps = ConnectionProvider.getConnection().prepareStatement(lQuery);
             ps.setLong(1, aProjectID);
 
             ResultSet lResultSet = ps.executeQuery();
@@ -125,7 +89,7 @@ public class MsLimsProvider {
 
         try {
             String lQuery = "select distinct accession from identification as i, spectrum as s where i.l_spectrumid=s.spectrumid and s.l_projectid=?";
-            PreparedStatement ps = MSLIMS.getConnection().prepareStatement(lQuery);
+            PreparedStatement ps = ConnectionProvider.getConnection().prepareStatement(lQuery);
             ps.setLong(1, aProjectID);
 
             ResultSet lResultSet = ps.executeQuery();
@@ -149,7 +113,7 @@ public class MsLimsProvider {
 
         try {
             String lQuery = "select count(distinct sequence) from identification as i, spectrum as s where i.l_spectrumid=s.spectrumid and s.l_projectid=?";
-            PreparedStatement ps = MSLIMS.getConnection().prepareStatement(lQuery);
+            PreparedStatement ps = ConnectionProvider.getConnection().prepareStatement(lQuery);
             ps.setLong(1, aProjectID);
 
             ResultSet lResultSet = ps.executeQuery();
@@ -168,7 +132,7 @@ public class MsLimsProvider {
     }
 
     public DatfileIterator getDatfilesForProject(long aProjectID) {
-        return new DatfileIterator(MSLIMS.getConnection(), aProjectID);
+        return new DatfileIterator(ConnectionProvider.getConnection(), aProjectID);
     }
 
     public File getSpectraForProject(long aProjectID) throws IOException {
@@ -194,7 +158,7 @@ public class MsLimsProvider {
             StringBuffer query = new StringBuffer("select distinct(spectrumid), filename from spectrum where l_projectid=");
             query.append(aProjectID);
 
-            PreparedStatement ps = MSLIMS.getConnection().prepareStatement(query.toString());
+            PreparedStatement ps = ConnectionProvider.getConnection().prepareStatement(query.toString());
             ResultSet rs = ps.executeQuery();
             HashMap<Integer, String> lSpectrumids = new HashMap<Integer, String>();
             int lSpectrumCounter = 0;
@@ -212,7 +176,7 @@ public class MsLimsProvider {
             query.append(" where l_spectrumid in (" + lSpectrumIdJoiner + ")");
 
 
-            ps = MSLIMS.getConnection().prepareStatement(query.toString());
+            ps = ConnectionProvider.getConnection().prepareStatement(query.toString());
             rs = ps.executeQuery();
 
             Vector<String> lSpectrumFiles = new Vector<String>();
@@ -249,7 +213,7 @@ public class MsLimsProvider {
         } catch (SQLException e) {
             logger.error(e.getMessage(), e);
         } catch (IOException e) {
-            MSLIMS.initiate();
+            ConnectionProvider.initiate();
 
 //            Thread.currentThread().stop();
             logger.error(e.getMessage(), e);
@@ -264,7 +228,7 @@ public class MsLimsProvider {
 
         try {
             String lQuery = "select count(distinct title) from identification as i, spectrum as s where i.l_spectrumid=s.spectrumid and s.l_projectid=?";
-            PreparedStatement ps = MSLIMS.getConnection().prepareStatement(lQuery);
+            PreparedStatement ps = ConnectionProvider.getConnection().prepareStatement(lQuery);
             ps.setLong(1, aProjectid);
 
             ResultSet lResultSet = ps.executeQuery();
@@ -280,5 +244,9 @@ public class MsLimsProvider {
             logger.error(e.getMessage(), e);
         }
         return lNumberOfSearches;
+    }
+
+    public RelimsProjectBean buildProjectBean(long aProjectid) {
+        throw new RelimsException("NOT YET IMPLEMENTED");
     }
 }

@@ -4,20 +4,18 @@ import com.compomics.mascotdatfile.util.interfaces.MascotDatfileInf;
 import com.compomics.mascotdatfile.util.interfaces.Modification;
 import com.compomics.mascotdatfile.util.mascot.ModificationList;
 import com.compomics.mascotdatfile.util.mascot.Parameters;
-import com.compomics.mslims.db.accessors.Project;
 import com.compomics.omssa.xsd.UserMod;
 import com.compomics.relims.conf.RelimsProperties;
-import com.compomics.relims.guava.predicates.*;
-import com.compomics.relims.interfaces.ProjectRunner;
-import com.compomics.relims.interfaces.SearchCommandGenerator;
-import com.compomics.relims.model.OMSSASearchProcessor;
-import com.compomics.relims.model.SearchList;
-import com.compomics.relims.model.SearchProcessor;
-import com.compomics.relims.model.XTandemSearchProcessor;
-import com.compomics.relims.model.beans.ProjectSetupBean;
-import com.compomics.relims.model.beans.SearchCommandVarModImpl;
-import com.compomics.relims.model.mslims.DatfileIterator;
-import com.compomics.relims.model.mslims.MsLimsProvider;
+import com.compomics.relims.model.guava.predicates.*;
+import com.compomics.relims.model.interfaces.DataProvider;
+import com.compomics.relims.model.interfaces.ProjectRunner;
+import com.compomics.relims.model.interfaces.SearchCommandGenerator;
+import com.compomics.relims.model.interfaces.SearchProcessor;
+import com.compomics.relims.model.*;
+import com.compomics.relims.model.beans.RelimsProjectBean;
+import com.compomics.relims.model.DatfileIterator;
+import com.compomics.relims.model.MsLimsDataProvider;
+import com.google.common.base.Predicate;
 import com.google.common.collect.Lists;
 import org.apache.commons.configuration.ConfigurationException;
 import org.apache.log4j.Logger;
@@ -26,7 +24,6 @@ import org.xml.sax.SAXException;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.Observable;
 
 
@@ -35,39 +32,33 @@ import java.util.Observable;
  */
 public class ProjectRunnerVarModImpl extends Observable implements ProjectRunner {
     private static Logger logger = Logger.getLogger(ProjectRunnerVarModImpl.class);
-    private Project iProject;
-    private ProjectSizePredicate iProjectSizePredicate;
-    private InstrumentPredicate iInstrumentPredicate;
-    private ModificationSetPredicate iModificationSetPredicate;
-    private SpeciesPredicate iSpeciesPredicate;
-    private SearchSetSizePredicate iSearchSetSizePredicate;
 
+    private DataProvider iDataProvider;
+    private RelimsProjectBean iRelimsProjectBean;
+
+    private PredicateManager iPredicateManager;
 
     public ProjectRunnerVarModImpl() {
 
-        ArrayList lAllowedInstruments = new ArrayList();
-        lAllowedInstruments.add(8);
-        lAllowedInstruments.add(9);
-        lAllowedInstruments.add(10);
+    }
 
-        iProjectSizePredicate = new ProjectSizePredicate();
-        iInstrumentPredicate = new InstrumentPredicate(new HashSet<Integer>(lAllowedInstruments));
-        iModificationSetPredicate = new ModificationSetPredicate();
-        iSpeciesPredicate = new SpeciesPredicate();
-        iSearchSetSizePredicate = new SearchSetSizePredicate();
-
+    public void setPredicateManager(PredicateManager aPredicateManager) {
+        iPredicateManager = aPredicateManager;
     }
 
     public String call() {
         try {
 
-            long lProjectid = iProject.getProjectid();
+            long lProjectid = iRelimsProjectBean.getProjectid();
             logger.debug("created new projectrunner on " + lProjectid);
 
-            if (!iProjectSizePredicate.apply(iProject)) {
+            Predicate<RelimsProjectBean> lProjectSizePredicate = iPredicateManager.getProjectSizePredicate();
+            if (!lProjectSizePredicate.apply(iRelimsProjectBean)) {
                 logger.debug("END " + lProjectid);
                 return "Premature end for project size";
             }
+
+
 
             if (!iInstrumentPredicate.apply(iProject)) {
                 logger.debug("END " + lProjectid);
@@ -85,7 +76,7 @@ public class ProjectRunnerVarModImpl extends Observable implements ProjectRunner
             }
 
             logger.debug("retrieving setup for project " + lProjectid);
-            ProjectSetupBean lProjectSetupBean = buildProjectSetup(lProjectid);
+            RelimsProjectBean lProjectSetupBean = buildProjectSetup(lProjectid);
 
             logger.debug("comparing Mascot modification sets within project " + lProjectid);
             if (!iModificationSetPredicate.apply(lProjectSetupBean)) {
@@ -102,7 +93,7 @@ public class ProjectRunnerVarModImpl extends Observable implements ProjectRunner
 
             logger.debug("loading MS/MS spectra from project");
             ArrayList<File> iSpectrumFiles = Lists.newArrayList();
-            File lSpectrumFile = MsLimsProvider.getInstance().getSpectraForProject(lProjectid);
+            File lSpectrumFile = MsLimsDataProvider.getInstance().getSpectraForProject(lProjectid);
             iSpectrumFiles.add(lSpectrumFile);
 
 
@@ -132,7 +123,7 @@ public class ProjectRunnerVarModImpl extends Observable implements ProjectRunner
 
             if (RelimsProperties.useOmssa()) {
                 logger.debug("processing omssa results");
-                SearchProcessor lSearchProcessor = new OMSSASearchProcessor(lSearchList);
+                SearchProcessor lSearchProcessor = new OmssaSearchProcessor(lSearchList);
                 lSearchProcessor.process();
             }
 
@@ -157,15 +148,21 @@ public class ProjectRunnerVarModImpl extends Observable implements ProjectRunner
         return ("SUCCES");
     }
 
-    public void setProject(Project aProject) {
-        iProject = aProject;
+
+    public void setProject(RelimsProjectBean aRelimsProjectBean) {
+        iRelimsProjectBean = aRelimsProjectBean;
+    }
+
+    public void setDataProvider(DataProvider aDataProvider) {
+        iDataProvider = aDataProvider;
     }
 
 
-    private ProjectSetupBean buildProjectSetup(long aProjectid) {
-        ProjectSetupBean lProjectSetupBean = new ProjectSetupBean();
 
-        DatfileIterator lIterator = MsLimsProvider.getInstance().getDatfilesForProject(aProjectid);
+    private RelimsProjectBean buildProjectSetup(long aProjectid) {
+        RelimsProjectBean lProjectSetupBean = new RelimsProjectBean();
+
+        DatfileIterator lIterator = MsLimsDataProvider.getInstance().getDatfilesForProject(aProjectid);
         ArrayList<Parameters> lParameterSets = Lists.newArrayList();
         ArrayList<ModificationList> lModificationLists = Lists.newArrayList();
         while (lIterator.hasNext()) {

@@ -1,4 +1,4 @@
-package com.compomics.relims.guava.functions;
+package com.compomics.relims.model.guava.functions;
 
 import com.compomics.mascotdatfile.util.mascot.FixedModification;
 import com.compomics.mascotdatfile.util.mascot.ModificationList;

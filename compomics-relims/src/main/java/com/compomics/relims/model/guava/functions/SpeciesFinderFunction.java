@@ -1,4 +1,4 @@
-package com.compomics.relims.guava.functions;
+package com.compomics.relims.model.guava.functions;
 
 import com.google.common.base.Function;
 import com.google.common.collect.Sets;
@@ -16,7 +16,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Set;
 
-import static com.compomics.relims.guava.functions.SpeciesFinderFunction.SPECIES.*;
+import static com.compomics.relims.model.guava.functions.SpeciesFinderFunction.SPECIES.*;
 
 /**
  * This class is a

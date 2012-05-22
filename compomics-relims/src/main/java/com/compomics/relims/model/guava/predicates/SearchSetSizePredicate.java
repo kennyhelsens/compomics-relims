@@ -1,7 +1,7 @@
-package com.compomics.relims.guava.predicates;
+package com.compomics.relims.model.guava.predicates;
 
 import com.compomics.mslims.db.accessors.Project;
-import com.compomics.relims.model.mslims.MsLimsProvider;
+import com.compomics.relims.model.MsLimsDataProvider;
 import com.google.common.base.Predicate;
 import org.apache.log4j.Logger;
 
@@ -25,7 +25,7 @@ public class SearchSetSizePredicate implements Predicate<Project> {
     public boolean apply(@Nullable Project aProject) {
 
         long lProjectid = aProject.getProjectid();
-        long lSearchesPerProject = MsLimsProvider.getInstance().getNumberOfSearchesForProject(lProjectid);
+        long lSearchesPerProject = MsLimsDataProvider.getInstance().getNumberOfSearchesForProject(lProjectid);
         if(lSearchesPerProject <= iMaximumNumberOfSearches){
             logger.debug("search count (" + lSearchesPerProject + ") for project " + lProjectid + " is NOT OK");
             return false;

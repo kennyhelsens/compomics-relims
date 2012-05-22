@@ -1,13 +1,10 @@
 package com.compomics.relims.gui;
 
-import com.compomics.mslims.db.accessors.Project;
+import com.compomics.relims.concurrent.RelimsJob;
 import com.compomics.relims.conf.RelimsProperties;
 import com.compomics.relims.gui.listener.ConfigurationSaveListener;
 import com.compomics.relims.gui.listener.MyRunnerClassesModel;
-import com.compomics.relims.interfaces.ProjectRunner;
-import com.compomics.relims.model.mslims.MsLimsProvider;
-import com.google.common.collect.Lists;
-import com.google.common.io.Files;
+import com.compomics.relims.model.interfaces.ProjectRunner;
 import org.apache.log4j.Logger;
 
 import javax.swing.*;
@@ -15,43 +12,32 @@ import javax.swing.table.TableModel;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.IOException;
-import java.nio.charset.Charset;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Observable;
 import java.util.Observer;
-import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
 
 /**
  * This class is a
  */
 public class RelimsGUI implements Observer {
 
-    static private ExecutorService iService = Executors.newSingleThreadExecutor();
 
     private static Logger logger = Logger.getLogger(RelimsGUI.class);
 
     private JPanel jpanContent;
     private JButton btnStart;
-    private JButton btnOptions;
     private JScrollPane scrollLayout;
     private JTextArea txtMessagePanel;
     private JButton iStopButton;
     private JPanel jpanButtons;
     private JTable tblOptions;
     private JButton btnSaveOptions;
-    private JPanel jpanOptions;
     private JSplitPane splitContent;
     private JComboBox cmbRunnerClasses;
+    protected RelimsJob iRelimsJob;
 
-    private int iProjectCounter = 0;
-    public ResultObserver iResultObserver;
 
     public static void main(String[] args) {
         JFrame lFrame = new JFrame("RelimsGUI");
@@ -59,14 +45,6 @@ public class RelimsGUI implements Observer {
         lFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         lFrame.pack();
         lFrame.setVisible(true);
-
-//        try {
-//            UIManager.setLookAndFeel(new SyntheticaStandardLookAndFeel());
-//        } catch (Exception e) {
-//            e.printStackTrace();
-//        }
-
-
     }
 
     /**
@@ -102,106 +80,35 @@ public class RelimsGUI implements Observer {
         btnStart.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent aActionEvent) {
 
-                ExecutorService withinExecutor = Executors.newFixedThreadPool(1);
+                try {
+                    ExecutorService withinExecutor = Executors.newFixedThreadPool(1);
 
-//                lRandomProjects.addAll(0, MsLimsProvider.getInstance().getProjects(new int[]{731}));
+                    String lClassID = cmbRunnerClasses.getSelectedItem().toString();
+                    Class lRelimsClass = null;
+                    lRelimsClass = RelimsProperties.getRelimsClass(lClassID);
 
+                    iRelimsJob = new RelimsJob(lRelimsClass);
 
-                iProjectCounter = 0;
+                    withinExecutor.submit(iRelimsJob);
 
-                withinExecutor.submit(new Runnable() {
-
-
-                    public void run() {
-                        try {
-                            iResultObserver = new ResultObserver();
-                        } catch (IOException e) {
-                            logger.error(e.getMessage(), e);
-                        }
-                        try {
-
-                            int lRandomSize = RelimsProperties.getRandomProjectAttempts();
-                            ArrayList<Project> lRandomProjects = MsLimsProvider.getInstance().getRandomProjects(lRandomSize);
-                            ArrayList<Project> lPreDefinedProjects = MsLimsProvider.getInstance().getPreDefinedProjects();
-
-                            ArrayList<Project> lAllProjects = Lists.newArrayList();
-                            lAllProjects.addAll(lPreDefinedProjects);
-//                            lAllProjects.addAll(lRandomProjects);
-
-                            logger.debug("clicked start button");
-                            logger.debug("selecting " + lRandomSize + " random projects");
-
-                            List<Future> iFutures = Lists.newArrayList();
-
-
-                            for (Project lProject : lAllProjects) {
-                                String lClassID = cmbRunnerClasses.getSelectedItem().toString();
-                                Class lRelimsClass = RelimsProperties.getRelimsClass(lClassID);
-                                Object o = lRelimsClass.newInstance();
-
-                                ProjectRunner lCallable = (ProjectRunner) o;
-                                lCallable.setProject(lProject);
-
-                                Observable lObservable = (Observable) o;
-                                lObservable.addObserver(RelimsGUI.this);
-                                lObservable.addObserver(iResultObserver);
-
-                                iFutures.add(iService.submit(lCallable));
-                            }
-//
-//                            for (Future lFuture : iFutures) {
-//                                logger.info(String.format("Callable started"));
-//                                String result = lFuture.get().toString();
-//                                System.out.println(String.format("Callable finished with result %s", result));
-//                                logger.info(String.format("Callable finished with result %s", result));
-//                            }
-
-
-                        } catch (ClassNotFoundException e) {
-                            logger.error(e.getMessage(), e);
-                        } catch (InstantiationException e) {
-                            logger.error(e.getMessage(), e);
-                        } catch (IllegalAccessException e) {
-                            logger.error(e.getMessage(), e);
-//                        } catch (InterruptedException e) {
-//                            logger.error(e.getMessage(), e);
-//                        } catch (ExecutionException e) {
-//                            logger.error(e.getMessage(), e);
-                        }
-                    }
-                });
-
+                } catch (ClassNotFoundException e) {
+                    logger.error(e.getMessage(), e);
+                }
             }
         });
 
 
         iStopButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent aActionEvent) {
-                shutdown();
+                iRelimsJob.shutdown();
             }
         });
 
         btnSaveOptions.addActionListener(new ConfigurationSaveListener());
     }
 
-    private void shutdown() {
-        List<Runnable> lRunnables = iService.shutdownNow();
-        for (Runnable lRunnable : lRunnables) {
-            logger.debug("shutting down " + lRunnable.toString());
-        }
-        iService = Executors.newSingleThreadExecutor();
-    }
 
 
-    public void update(Observable aObservable, Object o) {
-        synchronized (this) {
-            iProjectCounter++;
-            logger.debug("PROJECT SUCCES COUNT " + iProjectCounter + "(" + o.toString() + ").");
-            if (iProjectCounter == RelimsProperties.getMaxSucces()) {
-                shutdown();
-            }
-        }
-    }
 
     /**
      * Method generated by IntelliJ IDEA GUI Designer
@@ -258,30 +165,4 @@ public class RelimsGUI implements Observer {
         // TODO: place custom component creation code here
     }
 
-    private class ResultObserver implements Observer {
-
-        public BufferedWriter iObservingWriter;
-
-        private ResultObserver() throws IOException {
-            File lFile = RelimsProperties.getTmpFile("runner.results.csv");
-            iObservingWriter = Files.newWriter(lFile, Charset.defaultCharset());
-        }
-
-        public void update(Observable aObservable, Object o) {
-            try {
-                iObservingWriter.write(o.toString());
-                iObservingWriter.newLine();
-                iObservingWriter.flush();
-            } catch (IOException e) {
-                logger.error(e.getMessage(), e);
-            }
-        }
-
-        public void close() throws IOException {
-            if (iObservingWriter != null) {
-                iObservingWriter.flush();
-                iObservingWriter.close();
-            }
-        }
-    }
 }

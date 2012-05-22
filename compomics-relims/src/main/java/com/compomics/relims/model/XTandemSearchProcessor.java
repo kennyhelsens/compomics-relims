@@ -2,9 +2,10 @@ package com.compomics.relims.model;
 
 import com.compomics.omssa.xsd.UserMod;
 import com.compomics.relims.conf.RelimsProperties;
-import com.compomics.relims.guava.functions.DoubleRounder;
-import com.compomics.relims.guava.functions.ProteinJoiner;
-import com.compomics.relims.interfaces.SearchCommandGenerator;
+import com.compomics.relims.model.guava.functions.DoubleRounderFunction;
+import com.compomics.relims.model.guava.functions.ProteinJoinerFunction;
+import com.compomics.relims.model.interfaces.SearchCommandGenerator;
+import com.compomics.relims.model.interfaces.SearchProcessor;
 import com.compomics.util.experiment.biology.Peptide;
 import com.compomics.util.experiment.identification.Advocate;
 import com.compomics.util.experiment.identification.PeptideAssumption;
@@ -34,7 +35,7 @@ import static com.google.common.base.Preconditions.checkState;
  */
 public class XTandemSearchProcessor implements SearchProcessor {
     private static Logger logger = Logger.getLogger(XTandemSearchProcessor.class);
-    private static final DoubleRounder iRounder = new DoubleRounder(4);
+    private static final DoubleRounderFunction I_ROUNDER_FUNCTION = new DoubleRounderFunction(4);
     private final SearchList<SearchCommandGenerator> iSearchList;
     private char iSeparator = ',';
     private char iSubSeparator = ';';
@@ -44,7 +45,7 @@ public class XTandemSearchProcessor implements SearchProcessor {
     private boolean includeProteinDetails = true;
     private boolean includeExtraModDetails = false;
 
-    private ProteinJoiner iProteinJoiner = new ProteinJoiner();
+    private ProteinJoinerFunction iProteinJoiner = new ProteinJoinerFunction();
 
 
     public XTandemSearchProcessor(SearchList<SearchCommandGenerator> aSearchList) {
@@ -217,7 +218,7 @@ public class XTandemSearchProcessor implements SearchProcessor {
 //        lFeatures.add(lPeptide.getModifiedSequenceAsString(true));
         lFeatures.add("" + aPeptideAssumption.getRank());
         lFeatures.add("" + lProteins);
-        lFeatures.add("" + iRounder.apply(aPeptideAssumption.getEValue()));
+        lFeatures.add("" + I_ROUNDER_FUNCTION.apply(aPeptideAssumption.getEValue()));
 
         return lFeatures;
     }

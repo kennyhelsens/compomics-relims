@@ -190,12 +190,14 @@
             <artifactId>utilities</artifactId>
             <version>3.3.5</version>
         </dependency>
+
         <!--Apache commons configuration-->
         <dependency>
-            <groupId>eu.isas.searchgui</groupId>
-            <artifactId>SearchGUI</artifactId>
-            <version>1.6.2</version>
+            <groupId>eu.isas.peptideshaker</groupId>
+            <artifactId>PeptideShaker</artifactId>
+            <version>0.17.1</version>
         </dependency>
+
         <!--Apache commons configuration-->
         <dependency>
             <groupId>com.compomics.acromics</groupId>

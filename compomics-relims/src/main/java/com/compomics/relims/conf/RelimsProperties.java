@@ -2,7 +2,7 @@ package com.compomics.relims.conf;
 
 import com.compomics.omssa.xsd.UserMod;
 import com.compomics.relims.concurrent.Command;
-import com.compomics.relims.guava.functions.SpeciesFinderFunction;
+import com.compomics.relims.model.guava.functions.SpeciesFinderFunction;
 import com.compomics.util.experiment.biology.PTMFactory;
 import com.google.common.base.Function;
 import com.google.common.base.Joiner;
@@ -18,6 +18,7 @@ import java.io.File;
 import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.List;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -305,13 +306,15 @@ public class RelimsProperties {
         return Class.forName(lClassname);
     }
 
-    public static int[] getPredifinedProjects() {
+    public static List<Long> getPredifinedProjects() {
         String[] lProjectStrings = config.getStringArray("relims.projects.list");
-        int[] lProjectInts = new int[lProjectStrings.length];
-        for (int i = 0; i < lProjectInts.length; i++) {
-            lProjectInts[i] = Integer.parseInt(lProjectStrings[i]);
+        List<Long> lProjectIds = Lists.newArrayList();
+
+        for (String lProjectString : lProjectStrings) {
+            lProjectIds.add(Long.parseLong(lProjectString));
+
         }
-        return lProjectInts;
+        return lProjectIds;
     }
 
 

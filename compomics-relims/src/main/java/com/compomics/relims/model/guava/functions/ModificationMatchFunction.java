@@ -1,4 +1,4 @@
-package com.compomics.relims.guava.functions;
+package com.compomics.relims.model.guava.functions;
 
 import com.compomics.mascotdatfile.util.interfaces.Modification;
 import com.compomics.relims.conf.RelimsProperties;
@@ -15,20 +15,20 @@ import java.util.Iterator;
 /**
  * This class is a
  */
-public class ModMatchFunction implements Function<Modification, PTM> {
-    DoubleRounder iDoubleRounder = new DoubleRounder(2);
-    private static Logger logger = Logger.getLogger(ModMatchFunction.class);
+public class ModificationMatchFunction implements Function<Modification, PTM> {
+    DoubleRounderFunction iDoubleRounderFunction = new DoubleRounderFunction(2);
+    private static Logger logger = Logger.getLogger(ModificationMatchFunction.class);
 
     public PTM apply(@Nullable Modification aModification) {
         PTMFactory lPTMFactory = RelimsProperties.getPTMFactory(false);
 
-        double lSpecifiedMass = iDoubleRounder.apply(aModification.getMass());
+        double lSpecifiedMass = iDoubleRounderFunction.apply(aModification.getMass());
 
         Iterator<PTM> lPtmIterator = lPTMFactory.getPtmIterator();
         while (lPtmIterator.hasNext()) {
             PTM lPTM = lPtmIterator.next();
             ArrayList<String> lPTMResidues = lPTM.getResidues();
-            double lRunningMass = iDoubleRounder.apply(lPTM.getMass());
+            double lRunningMass = iDoubleRounderFunction.apply(lPTM.getMass());
             if (Double.compare(lSpecifiedMass, lRunningMass) == 0) {
 
                 // Amino acid modification should not have a mascot "term-like" location

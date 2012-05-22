@@ -1,4 +1,4 @@
-package com.compomics.relims.model.mslims;
+package com.compomics.relims.model;
 
 import com.compomics.mascotdatfile.util.interfaces.MascotDatfileInf;
 import com.compomics.mascotdatfile.util.mascot.enumeration.MascotDatfileType;

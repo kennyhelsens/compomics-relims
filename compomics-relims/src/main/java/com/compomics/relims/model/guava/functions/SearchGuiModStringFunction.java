@@ -1,4 +1,4 @@
-package com.compomics.relims.guava.functions;
+package com.compomics.relims.model.guava.functions;
 
 import com.google.common.base.Function;
 import com.google.common.base.Joiner;

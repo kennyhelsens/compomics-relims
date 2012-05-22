@@ -10,7 +10,7 @@ import java.util.ArrayList;
 /**
  * This class is a
  */
-public class ProjectSetupBean {
+public class RelimsProjectBean {
 
     ArrayList<Parameters> iParameterSet = Lists.newArrayList();
     ArrayList<ModificationList> iModificationLists = Lists.newArrayList();
@@ -19,7 +19,7 @@ public class ProjectSetupBean {
     private UserModsFile iUserModsFile;
     private int iProjectID;
 
-    public ProjectSetupBean() {
+    public RelimsProjectBean() {
     }
 
     public ArrayList<ModificationList> getModificationLists() {

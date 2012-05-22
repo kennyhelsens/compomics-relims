@@ -1,9 +1,9 @@
-package com.compomics.relims.guava.predicates;
+package com.compomics.relims.model.guava.predicates;
 
 import com.compomics.mslims.db.accessors.Project;
 import com.compomics.relims.conf.RelimsProperties;
-import com.compomics.relims.guava.functions.SpeciesFinderFunction;
-import com.compomics.relims.model.mslims.MsLimsProvider;
+import com.compomics.relims.model.guava.functions.SpeciesFinderFunction;
+import com.compomics.relims.model.MsLimsDataProvider;
 import com.google.common.base.Predicate;
 import com.google.common.collect.Sets;
 import org.apache.log4j.Logger;
@@ -32,7 +32,7 @@ public class SpeciesPredicate implements Predicate<Project> {
     public boolean apply(@Nullable Project aProject) {
 
         long lProjectid = aProject.getProjectid();
-        HashSet<String> lAccessionsForProject = MsLimsProvider.getInstance().getProteinAccessionsForProject(lProjectid);
+        HashSet<String> lAccessionsForProject = MsLimsDataProvider.getInstance().getProteinAccessionsForProject(lProjectid);
         HashSet<String> lReducedSet = Sets.newHashSet();
 
         int lCounter = 0;

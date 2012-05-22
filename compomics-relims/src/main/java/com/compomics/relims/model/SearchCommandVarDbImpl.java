@@ -1,11 +1,12 @@
-package com.compomics.relims.model.beans;
+package com.compomics.relims.model;
 
 import com.compomics.mascotdatfile.util.interfaces.Modification;
 import com.compomics.relims.conf.RelimsProperties;
-import com.compomics.relims.guava.functions.ModMatchFunction;
-import com.compomics.relims.guava.functions.SearchGuiModStringFunction;
-import com.compomics.relims.interfaces.SearchCommandGenerator;
-import com.compomics.relims.model.UserModsFile;
+import com.compomics.relims.model.guava.functions.ModificationMatchFunction;
+import com.compomics.relims.model.guava.functions.SearchGuiModStringFunction;
+import com.compomics.relims.model.interfaces.SearchCommandGenerator;
+import com.compomics.relims.model.beans.RelimsProjectBean;
+import com.compomics.relims.model.beans.SearchGUIJobBean;
 import com.compomics.util.experiment.biology.PTM;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
@@ -21,20 +22,20 @@ import java.util.ArrayList;
  * This class is a
  */
 public class SearchCommandVarDbImpl implements SearchCommandGenerator {
-    private static ModMatchFunction iModMatcher = new ModMatchFunction();
+    private static ModificationMatchFunction iModificationMatcher = new ModificationMatchFunction();
     private static Logger logger = Logger.getLogger(SearchCommandVarDbImpl.class);
 
     private String iName = null;
     private ArrayList<Modification> iFixedModifications = null;
     private ArrayList<Modification> iVariableModifications = null;
-    private ProjectSetupBean iProjectSetupBean = null;
+    private RelimsProjectBean iProjectSetupBean = null;
     private String iDbVarID = null;
 
     private File iSearchResultFolder = null;
     private ArrayList<File> iSpectrumFiles;
 
 
-    public SearchCommandVarDbImpl(String aName, ArrayList<Modification> aFixMods, ArrayList<Modification> aVarMods, ProjectSetupBean aProjectSetupBean, ArrayList<File> aSpectrumFiles) {
+    public SearchCommandVarDbImpl(String aName, ArrayList<Modification> aFixMods, ArrayList<Modification> aVarMods, RelimsProjectBean aProjectSetupBean, ArrayList<File> aSpectrumFiles) {
         iName = aName;
         iFixedModifications = aFixMods;
         iVariableModifications = aVarMods;
@@ -42,7 +43,7 @@ public class SearchCommandVarDbImpl implements SearchCommandGenerator {
         iSpectrumFiles = aSpectrumFiles;
     }
 
-    public SearchCommandVarDbImpl(String aName, ArrayList<Modification> aFixMods, ArrayList<Modification> aVarMods, String aDbVarId, ProjectSetupBean aProjectSetupBean, ArrayList<File> aSpectrumFiles) {
+    public SearchCommandVarDbImpl(String aName, ArrayList<Modification> aFixMods, ArrayList<Modification> aVarMods, String aDbVarId, RelimsProjectBean aProjectSetupBean, ArrayList<File> aSpectrumFiles) {
         iName = aName;
         iFixedModifications = aFixMods;
         iVariableModifications = aVarMods;
@@ -56,7 +57,6 @@ public class SearchCommandVarDbImpl implements SearchCommandGenerator {
         long lTimeStamp = System.currentTimeMillis();
         iSearchResultFolder = new File(RelimsProperties.getWorkSpace(), ("" + getProjectId() + "_" + lTimeStamp));
         iSearchResultFolder.mkdir();
-
 
         logger.debug("matching modification sets");
         resolveModifications();
@@ -108,13 +108,13 @@ public class SearchCommandVarDbImpl implements SearchCommandGenerator {
         lAllMods.addAll(iVariableModifications);
         lAllMods.addAll(iFixedModifications);
 
-        ArrayList<Modification> lUserMods = Lists.newArrayList();
+        ArrayList<Modification> lMascotDatfileModifications = Lists.newArrayList();
 
         try {
             for (Object o : lAllMods) {
                 Modification lMod = (Modification) o;
                 // Could we find an appropriate match for this Modification?
-                PTM lMatchedPTM = iModMatcher.apply(lMod);
+                PTM lMatchedPTM = iModificationMatcher.apply(lMod);
                 if (lMatchedPTM != null) {
                     if(lMod.isFixed()){
                         lFixedMatchedPTMs.add(lMatchedPTM.getName());
@@ -124,26 +124,26 @@ public class SearchCommandVarDbImpl implements SearchCommandGenerator {
                     logger.debug("match OK " + lMod.getType() + " " + lMod.getLocation());
                 } else {
                     logger.debug("match FAIL " + lMod.getType() + " " + lMod.getLocation());
-                    lUserMods.add(lMod);
+                    lMascotDatfileModifications.add(lMod);
                 }
             }
 
             // Persist the so-far unknown usermods in the PTMFactory.
             boolean lBuildUserMods = false;
-            if(lUserMods.size() > 0){
+            if(lMascotDatfileModifications.size() > 0){
                 lBuildUserMods = true;
             }
 
             if (lBuildUserMods) {
                 UserModsFile lUserModsFile;
                 int lPTMFactorySize = RelimsProperties.getPTMFactory(false).getPtmMap().size();
-                int lUserModsSize = lUserMods.size();
+                int lUserModsSize = lMascotDatfileModifications.size();
 
                 logger.debug("loading " + lUserModsSize + " extra usermods for the current search (PTMFactory size:" + lPTMFactorySize + ")");
-                lUserModsFile = new UserModsFile(lUserMods);
+                lUserModsFile = new UserModsFile();
+                lUserModsFile.setMascotModifications(lMascotDatfileModifications);
 
                 File lFile = RelimsProperties.getSearchGuiUserModFile();
-
                 if (lFile.exists()) {
                     lFile.delete();
                 }

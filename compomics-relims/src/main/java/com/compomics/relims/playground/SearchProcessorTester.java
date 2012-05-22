@@ -1,12 +1,12 @@
 package com.compomics.relims.playground;
 
 import com.compomics.relims.conf.RelimsProperties;
-import com.compomics.relims.interfaces.SearchCommandGenerator;
-import com.compomics.relims.model.OMSSASearchProcessor;
+import com.compomics.relims.model.interfaces.SearchCommandGenerator;
+import com.compomics.relims.model.interfaces.SearchProcessor;
+import com.compomics.relims.model.OmssaSearchProcessor;
+import com.compomics.relims.model.SearchCommandVarModImpl;
 import com.compomics.relims.model.SearchList;
-import com.compomics.relims.model.SearchProcessor;
-import com.compomics.relims.model.beans.ProjectSetupBean;
-import com.compomics.relims.model.beans.SearchCommandVarModImpl;
+import com.compomics.relims.model.beans.RelimsProjectBean;
 import com.google.common.collect.Lists;
 import org.apache.log4j.Logger;
 import org.xml.sax.SAXException;
@@ -36,7 +36,7 @@ public class SearchProcessorTester {
         lSpectrumFiles.add(lSpectrumFile);
 
         // create a dummy project setupbean
-        ProjectSetupBean lProjectSetupBean = new ProjectSetupBean();
+        RelimsProjectBean lProjectSetupBean = new RelimsProjectBean();
         lProjectSetupBean.setProjectID(0);
 
         // simulate a SearchCommandGenerator
@@ -49,7 +49,7 @@ public class SearchProcessorTester {
         lSearchList.add(lSearchBean);
 
         // create a search processor using this searchbean
-        SearchProcessor lSearchProcessor = new OMSSASearchProcessor(lSearchList);
+        SearchProcessor lSearchProcessor = new OmssaSearchProcessor(lSearchList);
         try {
             lSearchProcessor.process();
         } catch (SAXException e) {

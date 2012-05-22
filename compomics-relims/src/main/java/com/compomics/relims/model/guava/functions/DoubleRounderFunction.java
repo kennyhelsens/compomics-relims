@@ -1,4 +1,4 @@
-package com.compomics.relims.guava.functions;
+package com.compomics.relims.model.guava.functions;
 
 import com.google.common.base.Function;
 
@@ -9,16 +9,16 @@ import java.math.RoundingMode;
 /**
  * This class is a
  */
-public class DoubleRounder implements Function<Double, Double> {
+public class DoubleRounderFunction implements Function<Double, Double> {
 
-    private static DoubleRounder instance = new DoubleRounder();
+    private static DoubleRounderFunction instance = new DoubleRounderFunction();
     private int iDecimals = 2;
 
-    public DoubleRounder() {
+    public DoubleRounderFunction() {
 
     }
 
-    public DoubleRounder(int aDecimals) {
+    public DoubleRounderFunction(int aDecimals) {
         iDecimals = aDecimals;
     }
 

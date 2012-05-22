@@ -1,4 +1,4 @@
-package com.compomics.relims.model.mslims;
+package com.compomics.relims.model;
 
 import com.compomics.relims.conf.RelimsProperties;
 import org.apache.log4j.Logger;
@@ -16,9 +16,9 @@ import java.util.Properties;
  * <p/>
  * This class
  */
-public class MSLIMS {
+public class ConnectionProvider {
 	// Class specific log4j logger for DatabaseObjectFactory instances.
-	private static Logger logger = Logger.getLogger(MSLIMS.class);
+	private static Logger logger = Logger.getLogger(ConnectionProvider.class);
 // ------------------------------ FIELDS ------------------------------
 
     private static Connection CONNECTION;

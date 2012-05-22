@@ -4,7 +4,8 @@ import com.compomics.mascotdatfile.util.interfaces.Modification;
 import com.compomics.omssa.xsd.LocationTypeEnum;
 import com.compomics.omssa.xsd.UserMod;
 import com.compomics.omssa.xsd.UserModCollection;
-import com.compomics.relims.guava.functions.DoubleRounder;
+import com.compomics.relims.model.guava.functions.DoubleRounderFunction;
+import com.google.common.collect.Lists;
 import org.apache.log4j.Logger;
 
 import java.io.File;
@@ -16,27 +17,23 @@ import java.util.ArrayList;
  */
 public class UserModsFile {
     private static Logger logger = Logger.getLogger(UserModsFile.class);
-    private ArrayList<Modification> iModifications;
-    private ArrayList<UserMod> iRelimsModifications = null;
-    DoubleRounder iDoubleRounder = new DoubleRounder(4);
+    private DoubleRounderFunction iDoubleRounderFunction = new DoubleRounderFunction(4);
 
-    public UserModsFile(ArrayList<Modification> aModifications) {
-        iModifications = aModifications;
-    }
+    private ArrayList<Modification> iMascotModifications = Lists.newArrayList();
+    private ArrayList<UserMod> iOMSSAXSDModifications = Lists.newArrayList();
 
-    public UserModsFile(ArrayList<Modification> aModifications, ArrayList<UserMod> aRelimsModifications) {
-        iModifications = aModifications;
-        iRelimsModifications = aRelimsModifications;
+    public UserModsFile() {
+
     }
 
     public void write(File aFile) throws IOException {
         UserModCollection lUserModCollection = new UserModCollection();
 
-        for (Modification lModification : iModifications) {
+        for (Modification lModification : iMascotModifications) {
             String lShortName = lModification.getShortType();
             String lResidue = lModification.getLocation();
             String lLocation = lModification.getLocation().toLowerCase();
-            double lMonoMass = iDoubleRounder.apply(lModification.getMass());
+            double lMonoMass = iDoubleRounderFunction.apply(lModification.getMass());
             boolean hasResidue = hasLocation(lModification);
 
             // Get LocationType.
@@ -79,8 +76,8 @@ public class UserModsFile {
 
 
         // Add the relims mods, if any!
-        if (iRelimsModifications != null && iRelimsModifications.size() > 0) {
-            lUserModCollection.addAll(iRelimsModifications);
+        if (iOMSSAXSDModifications != null && iOMSSAXSDModifications.size() > 0) {
+            lUserModCollection.addAll(iOMSSAXSDModifications);
         }
 
         int lNumberOfMods = lUserModCollection.size();
@@ -91,14 +88,14 @@ public class UserModsFile {
 
     public ArrayList<String> getFixedModsAsString() {
         ArrayList<String> lResult = new ArrayList<String>();
-        for (Modification lModification : iModifications) {
+        for (Modification lModification : iMascotModifications) {
             if (lModification.isFixed()) {
                 lResult.add(getModificationNameID(lModification, hasLocation((lModification))));
             }
         }
 
-        if(iRelimsModifications != null){
-            for (UserMod lRelimsMod : iRelimsModifications) {
+        if(iOMSSAXSDModifications != null){
+            for (UserMod lRelimsMod : iOMSSAXSDModifications) {
                 if (lRelimsMod.isFixed()) {
                     lResult.add(lRelimsMod.getModificationName());
                 }
@@ -110,14 +107,14 @@ public class UserModsFile {
 
     public ArrayList<String> getVarModsAsString() {
         ArrayList<String> lResult = new ArrayList<String>();
-        for (Modification lModification : iModifications) {
+        for (Modification lModification : iMascotModifications) {
             if (lModification.isFixed() == false) {
                 lResult.add(getModificationNameID(lModification, hasLocation((lModification))));
             }
         }
 
-        if (iRelimsModifications != null) {
-            for (UserMod lRelimsMod : iRelimsModifications) {
+        if (iOMSSAXSDModifications != null) {
+            for (UserMod lRelimsMod : iOMSSAXSDModifications) {
                 if (lRelimsMod.isFixed() == false) {
                     lResult.add(lRelimsMod.getModificationName());
                 }
@@ -163,4 +160,12 @@ public class UserModsFile {
         return hasResidue;
     }
 
+
+    public void setMascotModifications(ArrayList<Modification> aMascotModifications) {
+        iMascotModifications = aMascotModifications;
+    }
+
+    public void setOMSSAXSDModifications(ArrayList<UserMod> aOMSSAXSDModifications) {
+        iOMSSAXSDModifications = aOMSSAXSDModifications;
+    }
 }

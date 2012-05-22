@@ -1,7 +1,7 @@
-package com.compomics.relims.guava.predicates;
+package com.compomics.relims.model.guava.predicates;
 
 import com.compomics.mslims.db.accessors.Project;
-import com.compomics.relims.model.mslims.MsLimsProvider;
+import com.compomics.relims.model.MsLimsDataProvider;
 import com.google.common.base.Joiner;
 import com.google.common.base.Predicate;
 import com.google.common.collect.Sets;
@@ -28,7 +28,7 @@ public class InstrumentPredicate implements Predicate<Project> {
             lProjectid = aProject.getProjectid();
         }
 
-        HashSet<Integer> lInstrumentsForProject = MsLimsProvider.getInstance().getInstrumentsForProject(lProjectid);
+        HashSet<Integer> lInstrumentsForProject = MsLimsDataProvider.getInstance().getInstrumentsForProject(lProjectid);
         Sets.SetView<Integer> lUnion = Sets.union(lInstrumentsForProject, iAllowedInstrumentIDs);
         if (lUnion.size() > iAllowedInstrumentIDs.size()) {
             logger.debug("project " + lProjectid + " has non-allowed instruments (" + Joiner.on(",").join(lInstrumentsForProject) + ")");

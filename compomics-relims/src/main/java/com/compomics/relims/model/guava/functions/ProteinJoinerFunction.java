@@ -1,4 +1,4 @@
-package com.compomics.relims.guava.functions;
+package com.compomics.relims.model.guava.functions;
 
 import com.google.common.base.Function;
 import com.google.common.base.Joiner;
@@ -18,9 +18,9 @@ import java.util.ArrayList;
 /**
  * This class is a
  */
-public class ProteinJoiner implements Function<ArrayList<String>, String> {
+public class ProteinJoinerFunction implements Function<ArrayList<String>, String> {
     Joiner lJoiner = Joiner.on("||");
-    private static Logger logger = Logger.getLogger(ProteinJoiner.class);
+    private static Logger logger = Logger.getLogger(ProteinJoinerFunction.class);
 
     private static FastHashMap iProteinMap;
 
@@ -33,13 +33,13 @@ public class ProteinJoiner implements Function<ArrayList<String>, String> {
             ArrayList<String> lNewList = Lists.newArrayList();
             int lStartIndex = -1;
 
-            for (String lAccession : input) {
+            for (String lAccession : lNewList) {
                 Object lProteinSequenceObject = iProteinMap.get(lAccession);
                 if (lProteinSequenceObject != null) {
                     String lProteinSequenceString = lProteinSequenceObject.toString();
                     lStartIndex = lProteinSequenceString.indexOf(iCurrentPeptide);
                 }
-                lNewList.add(lAccession + "|" + lStartIndex);
+                lNewList.add(lAccession + "*" + lStartIndex);
             }
 
             input = lNewList; // set the input pointer to the newly created List that includes the start indices.
