@@ -1,7 +1,8 @@
-package com.compomics.relims.model;
+package com.compomics.relims.model.processor;
 
 import com.compomics.omssa.xsd.UserMod;
 import com.compomics.relims.conf.RelimsProperties;
+import com.compomics.relims.model.beans.SearchList;
 import com.compomics.relims.model.guava.functions.DoubleRounderFunction;
 import com.compomics.relims.model.guava.functions.ProteinJoinerFunction;
 import com.compomics.relims.model.interfaces.SearchCommandGenerator;

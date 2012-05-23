@@ -1,4 +1,4 @@
-package com.compomics.relims.model;
+package com.compomics.relims.model.provider;
 
 import com.compomics.relims.conf.RelimsProperties;
 import org.apache.log4j.Logger;
@@ -81,7 +81,7 @@ public class ConnectionProvider {
         CONNECTION.close();
     }
 
-    protected static Connection getConnection(){
+    public static Connection getConnection(){
 
         try {
             if(CONNECTION == null || CONNECTION.isClosed()){

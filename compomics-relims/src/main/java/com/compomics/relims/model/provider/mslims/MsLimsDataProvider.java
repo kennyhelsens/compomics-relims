@@ -1,9 +1,10 @@
-package com.compomics.relims.model;
+package com.compomics.relims.model.provider.mslims;
 
 import com.compomics.mslims.db.accessors.Spectrum_file;
 import com.compomics.mslims.util.fileio.MascotGenericFile;
 import com.compomics.relims.conf.RelimsProperties;
 import com.compomics.relims.exception.RelimsException;
+import com.compomics.relims.model.provider.ConnectionProvider;
 import com.compomics.relims.model.beans.RelimsProjectBean;
 import com.compomics.relims.model.interfaces.DataProvider;
 import com.google.common.base.Joiner;

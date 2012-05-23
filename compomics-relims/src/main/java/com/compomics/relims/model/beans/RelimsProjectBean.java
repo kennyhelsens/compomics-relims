@@ -17,7 +17,7 @@ public class RelimsProjectBean {
     private ArrayList<String> iVariableMatchedPTMs;
     private ArrayList<String> iFixedMatchedPTMs;
     private UserModsFile iUserModsFile;
-    private int iProjectID;
+    private long iProjectID;
 
     public RelimsProjectBean() {
     }
@@ -62,7 +62,7 @@ public class RelimsProjectBean {
         return iUserModsFile;
     }
 
-    public int getProjectID() {
+    public long getProjectID() {
         return iProjectID;
     }
 

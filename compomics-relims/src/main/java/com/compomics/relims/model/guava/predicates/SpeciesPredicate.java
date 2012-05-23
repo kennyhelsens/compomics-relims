@@ -1,9 +1,9 @@
 package com.compomics.relims.model.guava.predicates;
 
-import com.compomics.mslims.db.accessors.Project;
 import com.compomics.relims.conf.RelimsProperties;
+import com.compomics.relims.model.beans.RelimsProjectBean;
 import com.compomics.relims.model.guava.functions.SpeciesFinderFunction;
-import com.compomics.relims.model.MsLimsDataProvider;
+import com.compomics.relims.model.provider.mslims.MsLimsDataProvider;
 import com.google.common.base.Predicate;
 import com.google.common.collect.Sets;
 import org.apache.log4j.Logger;
@@ -14,7 +14,7 @@ import java.util.HashSet;
 /**
  * This class is a
  */
-public class SpeciesPredicate implements Predicate<Project> {
+public class SpeciesPredicate implements Predicate<RelimsProjectBean> {
     private static Logger logger = Logger.getLogger(SpeciesPredicate.class);
     private final SpeciesFinderFunction.SPECIES iAllowedSpecies;
     private final int iNumberToTest;
@@ -29,9 +29,10 @@ public class SpeciesPredicate implements Predicate<Project> {
         iNumberToTest = RelimsProperties.getAllowedSpeciesTestSize();
     }
 
-    public boolean apply(@Nullable Project aProject) {
+    public boolean apply(@Nullable RelimsProjectBean aProjectBean) {
 
-        long lProjectid = aProject.getProjectid();
+        long lProjectid = aProjectBean.getProjectID();
+
         HashSet<String> lAccessionsForProject = MsLimsDataProvider.getInstance().getProteinAccessionsForProject(lProjectid);
         HashSet<String> lReducedSet = Sets.newHashSet();
 

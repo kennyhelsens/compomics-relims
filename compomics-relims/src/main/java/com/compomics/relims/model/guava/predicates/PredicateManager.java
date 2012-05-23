@@ -39,4 +39,20 @@ public class PredicateManager {
     public ProjectSizePredicate getProjectSizePredicate() {
         return iProjectSizePredicate;
     }
+
+    public InstrumentPredicate getInstrumentPredicate() {
+        return iInstrumentPredicate;
+    }
+
+    public ModificationSetPredicate getModificationSetPredicate() {
+        return iModificationSetPredicate;
+    }
+
+    public SearchSetSizePredicate getSearchSetSizePredicate() {
+        return iSearchSetSizePredicate;
+    }
+
+    public SpeciesPredicate getSpeciesPredicate() {
+        return iSpeciesPredicate;
+    }
 }

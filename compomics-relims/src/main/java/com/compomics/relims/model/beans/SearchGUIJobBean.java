@@ -36,7 +36,7 @@ public class SearchGUIJobBean {
     private boolean xtandem = false;
     private File config = null;
     private File results = null;
-    private ArrayList<File> spectra = null;
+    private List<File> spectra = null;
 
 
     public void setConfig(File aConfig) {
@@ -59,7 +59,7 @@ public class SearchGUIJobBean {
         search = aSearch;
     }
 
-    public void setSpectra(ArrayList<File> aSpectra) {
+    public void setSpectra(List<File> aSpectra) {
         spectra = aSpectra;
     }
 

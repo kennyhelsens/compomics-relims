@@ -4,7 +4,6 @@ import com.compomics.relims.concurrent.RelimsJob;
 import com.compomics.relims.conf.RelimsProperties;
 import com.compomics.relims.gui.listener.ConfigurationSaveListener;
 import com.compomics.relims.gui.listener.MyRunnerClassesModel;
-import com.compomics.relims.model.interfaces.ProjectRunner;
 import org.apache.log4j.Logger;
 
 import javax.swing.*;
@@ -12,7 +11,6 @@ import javax.swing.table.TableModel;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.util.List;
 import java.util.Observable;
 import java.util.Observer;
 import java.util.concurrent.ExecutorService;
@@ -165,4 +163,7 @@ public class RelimsGUI implements Observer {
         // TODO: place custom component creation code here
     }
 
+    public void update(Observable aObservable, Object o) {
+        logger.debug("update method in RelimsGUI not implemented");
+    }
 }

@@ -11,6 +11,7 @@ import org.apache.log4j.Logger;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * This class is a
@@ -19,8 +20,8 @@ public class UserModsFile {
     private static Logger logger = Logger.getLogger(UserModsFile.class);
     private DoubleRounderFunction iDoubleRounderFunction = new DoubleRounderFunction(4);
 
-    private ArrayList<Modification> iMascotModifications = Lists.newArrayList();
-    private ArrayList<UserMod> iOMSSAXSDModifications = Lists.newArrayList();
+    private List<Modification> iMascotModifications = Lists.newArrayList();
+    private List<UserMod> iOMSSAXSDModifications = Lists.newArrayList();
 
     public UserModsFile() {
 
@@ -161,11 +162,11 @@ public class UserModsFile {
     }
 
 
-    public void setMascotModifications(ArrayList<Modification> aMascotModifications) {
+    public void setMascotModifications(List<Modification> aMascotModifications) {
         iMascotModifications = aMascotModifications;
     }
 
-    public void setOMSSAXSDModifications(ArrayList<UserMod> aOMSSAXSDModifications) {
+    public void setOMSSAXSDModifications(List<UserMod> aOMSSAXSDModifications) {
         iOMSSAXSDModifications = aOMSSAXSDModifications;
     }
 }

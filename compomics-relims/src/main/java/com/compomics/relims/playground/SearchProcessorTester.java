@@ -1,11 +1,11 @@
 package com.compomics.relims.playground;
 
+import com.compomics.relims.concurrent.SearchCommandVarMod;
 import com.compomics.relims.conf.RelimsProperties;
 import com.compomics.relims.model.interfaces.SearchCommandGenerator;
 import com.compomics.relims.model.interfaces.SearchProcessor;
-import com.compomics.relims.model.OmssaSearchProcessor;
-import com.compomics.relims.model.SearchCommandVarModImpl;
-import com.compomics.relims.model.SearchList;
+import com.compomics.relims.model.processor.OmssaSearchProcessor;
+import com.compomics.relims.model.beans.SearchList;
 import com.compomics.relims.model.beans.RelimsProjectBean;
 import com.google.common.collect.Lists;
 import org.apache.log4j.Logger;
@@ -40,7 +40,7 @@ public class SearchProcessorTester {
         lProjectSetupBean.setProjectID(0);
 
         // simulate a SearchCommandGenerator
-        SearchCommandGenerator lSearchBean = new SearchCommandVarModImpl("test", null, null, lProjectSetupBean, lSpectrumFiles);
+        SearchCommandGenerator lSearchBean = new SearchCommandVarMod("test", null, null, lProjectSetupBean, lSpectrumFiles);
 
         lSearchBean.setSearchResultFolder(lFile.getParentFile());
 

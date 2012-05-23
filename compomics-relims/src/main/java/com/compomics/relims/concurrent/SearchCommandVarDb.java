@@ -1,13 +1,13 @@
-package com.compomics.relims.model;
+package com.compomics.relims.concurrent;
 
 import com.compomics.mascotdatfile.util.interfaces.Modification;
-import com.compomics.omssa.xsd.UserMod;
 import com.compomics.relims.conf.RelimsProperties;
+import com.compomics.relims.model.UserModsFile;
+import com.compomics.relims.model.beans.RelimsProjectBean;
+import com.compomics.relims.model.beans.SearchGUIJobBean;
 import com.compomics.relims.model.guava.functions.ModificationMatchFunction;
 import com.compomics.relims.model.guava.functions.SearchGuiModStringFunction;
 import com.compomics.relims.model.interfaces.SearchCommandGenerator;
-import com.compomics.relims.model.beans.RelimsProjectBean;
-import com.compomics.relims.model.beans.SearchGUIJobBean;
 import com.compomics.util.experiment.biology.PTM;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
@@ -18,37 +18,30 @@ import org.apache.log4j.Logger;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * This class is a
  */
-public class SearchCommandVarModImpl implements SearchCommandGenerator {
+public class SearchCommandVarDb implements SearchCommandGenerator {
     private static ModificationMatchFunction iModificationMatcher = new ModificationMatchFunction();
-    private static Logger logger = Logger.getLogger(SearchCommandVarModImpl.class);
+    private static Logger logger = Logger.getLogger(SearchCommandVarDb.class);
 
     private String iName = null;
-    private ArrayList<Modification> iFixedModifications = null;
-    private ArrayList<Modification> iVariableModifications = null;
-    private ArrayList<UserMod> iOMSSAXSDModifications = null;
+    private List<Modification> iFixedModifications = null;
+    private List<Modification> iVariableModifications = null;
     private RelimsProjectBean iProjectSetupBean = null;
+    private String iDbVarID = null;
 
     private File iSearchResultFolder = null;
-    private ArrayList<File> iSpectrumFiles;
+    private List<File> iSpectrumFiles;
 
 
-    public SearchCommandVarModImpl(String aName, ArrayList<Modification> aFixMods, ArrayList<Modification> aVarMods, RelimsProjectBean aProjectSetupBean, ArrayList<File> aSpectrumFiles) {
+    public SearchCommandVarDb(String aName, List<Modification> aFixMods, List<Modification> aVarMods, String aDbVarId, RelimsProjectBean aProjectSetupBean, List<File> aSpectrumFiles) {
         iName = aName;
         iFixedModifications = aFixMods;
         iVariableModifications = aVarMods;
-        iProjectSetupBean = aProjectSetupBean;
-        iSpectrumFiles = aSpectrumFiles;
-    }
-
-    public SearchCommandVarModImpl(String aName, ArrayList<Modification> aFixMods, ArrayList<Modification> aVarMods, ArrayList<UserMod> aAOMSSAXSDModifications, RelimsProjectBean aProjectSetupBean, ArrayList<File> aSpectrumFiles) {
-        iName = aName;
-        iFixedModifications = aFixMods;
-        iVariableModifications = aVarMods;
-        iOMSSAXSDModifications = aAOMSSAXSDModifications;
+        iDbVarID = aDbVarId;
         iProjectSetupBean = aProjectSetupBean;
         iSpectrumFiles = aSpectrumFiles;
     }
@@ -58,7 +51,6 @@ public class SearchCommandVarModImpl implements SearchCommandGenerator {
         long lTimeStamp = System.currentTimeMillis();
         iSearchResultFolder = new File(RelimsProperties.getWorkSpace(), ("" + getProjectId() + "_" + lTimeStamp));
         iSearchResultFolder.mkdir();
-
 
         logger.debug("matching modification sets");
         resolveModifications();
@@ -70,7 +62,9 @@ public class SearchCommandVarModImpl implements SearchCommandGenerator {
         String lDatabaseFile = RelimsProperties.getDefaultSearchDatabase();
         lSearchGuiConfiguration.setProperty("FIXED_MODIFICATIONS", lSearchGuiModStringFunction.apply(iProjectSetupBean.getFixedMatchedPTMs()));
         lSearchGuiConfiguration.setProperty("VARIABLE_MODIFICATIONS", lSearchGuiModStringFunction.apply(iProjectSetupBean.getVariableMatchedPTMs()));
-        lSearchGuiConfiguration.setProperty("DATABASE_FILE", lDatabaseFile);
+
+        // Specify the search database.
+        setDbVarProperty(lSearchGuiConfiguration);
 
         File lSearchGuiConfigurationFile = RelimsProperties.getTmpFile("" + iProjectSetupBean.getProjectID() + "_" + lTimeStamp);
         logger.debug("saving searchgui configuration to " + lSearchGuiConfigurationFile.getCanonicalPath());
@@ -96,6 +90,10 @@ public class SearchCommandVarModImpl implements SearchCommandGenerator {
         return lSearchGUIJobBean.getSearchGUICommandString();
     }
 
+    private void setDbVarProperty(PropertiesConfiguration aSearchGuiConfiguration) {
+        aSearchGuiConfiguration.setProperty("DATABASE_FILE", RelimsProperties.getDatabaseFilename(iDbVarID));
+    }
+
     private void resolveModifications() {
         ArrayList<String> lFixedMatchedPTMs = Lists.newArrayList();
         ArrayList<String> lVariableMatchedPTMs = Lists.newArrayList();
@@ -104,7 +102,7 @@ public class SearchCommandVarModImpl implements SearchCommandGenerator {
         lAllMods.addAll(iVariableModifications);
         lAllMods.addAll(iFixedModifications);
 
-        ArrayList<Modification> lMascotModifications = Lists.newArrayList();
+        ArrayList<Modification> lMascotDatfileModifications = Lists.newArrayList();
 
         try {
             for (Object o : lAllMods) {
@@ -120,34 +118,26 @@ public class SearchCommandVarModImpl implements SearchCommandGenerator {
                     logger.debug("match OK " + lMod.getType() + " " + lMod.getLocation());
                 } else {
                     logger.debug("match FAIL " + lMod.getType() + " " + lMod.getLocation());
-                    lMascotModifications.add(lMod);
+                    lMascotDatfileModifications.add(lMod);
                 }
             }
 
             // Persist the so-far unknown usermods in the PTMFactory.
             boolean lBuildUserMods = false;
-            if(lMascotModifications.size() > 0){
+            if(lMascotDatfileModifications.size() > 0){
                 lBuildUserMods = true;
-            }else if(iOMSSAXSDModifications != null && iOMSSAXSDModifications.size() > 0){
-                lBuildUserMods  = true;
             }
 
             if (lBuildUserMods) {
                 UserModsFile lUserModsFile;
                 int lPTMFactorySize = RelimsProperties.getPTMFactory(false).getPtmMap().size();
-                int lUserModsSize = lMascotModifications.size();
-
-                if(iOMSSAXSDModifications != null){
-                    lUserModsSize = lUserModsSize + iOMSSAXSDModifications.size();
-                }
+                int lUserModsSize = lMascotDatfileModifications.size();
 
                 logger.debug("loading " + lUserModsSize + " extra usermods for the current search (PTMFactory size:" + lPTMFactorySize + ")");
                 lUserModsFile = new UserModsFile();
-                lUserModsFile.setMascotModifications(lMascotModifications);
-                lUserModsFile.setOMSSAXSDModifications(iOMSSAXSDModifications);
+                lUserModsFile.setMascotModifications(lMascotDatfileModifications);
 
                 File lFile = RelimsProperties.getSearchGuiUserModFile();
-
                 if (lFile.exists()) {
                     lFile.delete();
                 }
@@ -162,9 +152,6 @@ public class SearchCommandVarModImpl implements SearchCommandGenerator {
             }
 
             int lMatchCount = lFixedMatchedPTMs.size() + lVariableMatchedPTMs.size();
-            if(iOMSSAXSDModifications != null){
-                lMatchCount = lMatchCount - iOMSSAXSDModifications.size();
-            }
             int lOriginalCount = lAllMods.size();
 
             // Be sure that all modifications have been matched!
@@ -183,11 +170,11 @@ public class SearchCommandVarModImpl implements SearchCommandGenerator {
         return iName;
     }
 
-    public ArrayList<File> getSpectrumFiles() {
+    public List<File> getSpectrumFiles() {
         return iSpectrumFiles;
     }
 
-    public int getProjectId(){
+    public long getProjectId(){
         return iProjectSetupBean.getProjectID();
     }
 

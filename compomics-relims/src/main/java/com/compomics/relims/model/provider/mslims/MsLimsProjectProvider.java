@@ -1,7 +1,8 @@
-package com.compomics.relims.model;
+package com.compomics.relims.model.provider.mslims;
 
 import com.compomics.mslims.db.accessors.Project;
-import com.compomics.relims.model.interfaces.ProjectProvider;
+import com.compomics.relims.model.provider.ConnectionProvider;
+import com.compomics.relims.model.provider.ProjectProvider;
 import com.google.common.collect.Lists;
 
 import java.sql.SQLException;

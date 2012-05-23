@@ -1,4 +1,4 @@
-package com.compomics.relims.model;
+package com.compomics.relims.model.provider.mslims;
 
 import com.compomics.mascotdatfile.util.interfaces.MascotDatfileInf;
 import com.compomics.mascotdatfile.util.mascot.enumeration.MascotDatfileType;
@@ -123,15 +123,6 @@ public class DatfileIterator implements Iterator<MascotDatfileInf> {
      */
     public MascotDatfileType getMascotDatfileType() {
         return iMascotDatfileType;
-    }
-
-    /**
-     * Setter for property 'mascotDatfileType'.
-     *
-     * @param aMascotDatfileType Value to set for property 'mascotDatfileType'.
-     */
-    public void setMascotDatfileType(final MascotDatfileType aMascotDatfileType) {
-        iMascotDatfileType = aMascotDatfileType;
     }
 
 

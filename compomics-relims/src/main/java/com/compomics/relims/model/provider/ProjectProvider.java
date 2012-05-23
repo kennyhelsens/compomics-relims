@@ -1,7 +1,8 @@
-package com.compomics.relims.model.interfaces;
+package com.compomics.relims.model.provider;
 
 import com.compomics.relims.conf.RelimsProperties;
 import com.compomics.relims.model.beans.RelimsProjectBean;
+import com.compomics.relims.model.interfaces.DataProvider;
 import org.apache.log4j.Logger;
 
 import java.util.List;

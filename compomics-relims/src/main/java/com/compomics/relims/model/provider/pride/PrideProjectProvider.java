@@ -1,8 +1,8 @@
-package com.compomics.relims.model;
+package com.compomics.relims.model.provider.pride;
 
 import com.compomics.relims.exception.RelimsException;
+import com.compomics.relims.model.provider.ProjectProvider;
 import com.compomics.relims.model.interfaces.DataProvider;
-import com.compomics.relims.model.interfaces.ProjectProvider;
 
 import java.util.List;
 

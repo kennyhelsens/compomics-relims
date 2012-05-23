@@ -4,7 +4,7 @@ import org.apache.commons.configuration.ConfigurationException;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
+import java.util.List;
 
 /**
  * This class is a
@@ -14,9 +14,9 @@ public interface SearchCommandGenerator {
 
     public String getName();
 
-    public ArrayList<File> getSpectrumFiles();
+    public List<File> getSpectrumFiles();
 
-    public int getProjectId();
+    public long getProjectId();
 
     public File getSearchResultFolder();
 

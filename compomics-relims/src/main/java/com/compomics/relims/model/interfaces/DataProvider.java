@@ -1,6 +1,6 @@
 package com.compomics.relims.model.interfaces;
 
-import com.compomics.relims.model.DatfileIterator;
+import com.compomics.relims.model.provider.mslims.DatfileIterator;
 import com.compomics.relims.model.beans.RelimsProjectBean;
 
 import java.io.File;
