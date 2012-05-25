@@ -24,39 +24,42 @@ public class VarModSearchStrategy implements SearchStrategy {
     private static Logger logger = Logger.getLogger(VarModSearchStrategy.class);
 
     private List<File> iSpectrumFiles = null;
-    private RelimsProjectBean iRelimsProjectBean;
 
+    public void fill(SearchList<SearchCommandGenerator> aSearchList, RelimsProjectBean aRelimsProjectBean) {
 
-    public void fill(SearchList<SearchCommandGenerator> aSearchList) {
-        ModificationList lModificationList = iRelimsProjectBean.getModificationLists().get(0);
+        ModificationList lModificationList = aRelimsProjectBean.getModificationLists().get(0);
         ArrayList<Modification> lFixMods = Lists.newArrayList(lModificationList.getFixedModifications());
         ArrayList<Modification> lVarMods = Lists.newArrayList(lModificationList.getVariableModifications());
         ArrayList<Modification> lMods = Lists.newArrayList();
         lMods.addAll(lFixMods);
         lMods.addAll(lVarMods);
 
-
         // First define a search without the relims modification.
         SearchCommandGenerator lSearchBean = null;
-        lSearchBean = new SearchCommandVarMod("original", lFixMods, lVarMods, iRelimsProjectBean, iSpectrumFiles);
+        lSearchBean = new SearchCommandVarMod("original", lFixMods, lVarMods, aRelimsProjectBean, iSpectrumFiles);
         aSearchList.add(lSearchBean);
+
 
         ArrayList<UserMod> lRelimsMods = RelimsProperties.getRelimsMods();
         for (UserMod lRelimsModification : lRelimsMods) {
             ArrayList<UserMod> lRelimsModList = new ArrayList<UserMod>();
             lRelimsModList.add(lRelimsModification);
-            lSearchBean = new SearchCommandVarMod(lRelimsModification.getModificationName(), lFixMods, lVarMods, lRelimsModList, iRelimsProjectBean, iSpectrumFiles);
+
+
+            lSearchBean = new SearchCommandVarMod(
+                    lRelimsModification.getModificationName(),
+                    lFixMods,
+                    lVarMods,
+                    lRelimsModList,
+                    aRelimsProjectBean,
+                    iSpectrumFiles);
+
             aSearchList.add(lSearchBean);
         }
-
     }
 
     public void setSpectrumFiles(List<File> aSpectrumFiles) {
         iSpectrumFiles = aSpectrumFiles;
-    }
-
-    public void setRelimsProjectBean(RelimsProjectBean aRelimsProjectBean) {
-        iRelimsProjectBean = aRelimsProjectBean;
     }
 
     public String getName() {
@@ -65,14 +68,5 @@ public class VarModSearchStrategy implements SearchStrategy {
 
     public String getDescription() {
         return "Run n parallel searches in n Protein sequence databases";
-    }
-
-
-    @Override
-    public String toString() {
-        return "VarModSearchStrategy{" +
-                "iRelimsProjectBean=" + iRelimsProjectBean +
-                ", iSpectrumFiles=" + iSpectrumFiles +
-                '}';
     }
 }

@@ -13,8 +13,6 @@ public interface ProjectRunner extends Callable<String> {
 
     public void setProject(RelimsProjectBean aRelimsProjectBean);
 
-    public void setDataProvider(DataProvider aDataProvider);
-
     public void setPredicateManager(PredicateManager aPredicateManager);
 
     public void setSearchStrategy(SearchStrategy aSearchStrategy);

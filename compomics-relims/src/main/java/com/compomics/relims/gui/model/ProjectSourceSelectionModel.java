@@ -1,4 +1,4 @@
-package com.compomics.relims.gui.listener;
+package com.compomics.relims.gui.model;
 
 import com.compomics.relims.conf.RelimsProperties;
 
@@ -8,10 +8,10 @@ import javax.swing.event.ListDataListener;
 /**
  * This class is a
  */
-public class MyRunnerClassesModel implements ComboBoxModel {
+public class ProjectSourceSelectionModel implements ComboBoxModel {
 
-    String[] iRunnerIds = RelimsProperties.getRelimsClassList();
-    Object iSelectedItem = iRunnerIds[1];
+    String[] iSourceIds = RelimsProperties.getRelimsSourceList();
+    Object iSelectedItem = iSourceIds[0];
 
     public void setSelectedItem(Object o) {
         iSelectedItem = o;
@@ -22,11 +22,11 @@ public class MyRunnerClassesModel implements ComboBoxModel {
     }
 
     public int getSize() {
-        return iRunnerIds.length;
+        return iSourceIds.length;
     }
 
     public Object getElementAt(int i) {
-        return iRunnerIds[i];
+        return iSourceIds[i];
     }
 
     public void addListDataListener(ListDataListener aListDataListener) {

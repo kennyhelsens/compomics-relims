@@ -39,9 +39,9 @@ public class RelimsProperties {
 
     static {
         try {
-//            URL lResource = Resources.getResource("config" + iFolderSeparator + "relims.properties");
-//            URL lResource = Resources.getResource("config" + iFolderSeparator + "relims-frisbee.properties");
-            URL lResource = Resources.getResource("config" + iFolderSeparator + "relims-covm.properties");
+//            URL lResource = Resources.getResource("resources" + iFolderSeparator + "conf" + iFolderSeparator + "relims.properties");
+            URL lResource = Resources.getResource("resources" + iFolderSeparator + "conf" + iFolderSeparator + "relims-frisbee.properties");
+//            URL lResource = Resources.getResource("resources" + iFolderSeparator + "conf" + iFolderSeparator + "relims-covm.properties");
             config = new PropertiesConfiguration(lResource);
 
             // Set the workspace for all future Commands to the SearchGUI folder
@@ -61,7 +61,7 @@ public class RelimsProperties {
     }
 
     public static String getSearchGuiConfFolder() {
-        return config.getString("searchgui.directory") + iFolderSeparator + "conf";
+        return config.getString("searchgui.directory") + iFolderSeparator + "resources" + iFolderSeparator + "conf";
     }
 
     public static String getSearchGuiArchive() {
@@ -113,10 +113,10 @@ public class RelimsProperties {
         try {
 
             ptmFactory = PTMFactory.getInstance();
-            ptmFactory.importModifications(lModFile);
-            ptmFactory.importModifications(lUserModFile);
+            ptmFactory.importModifications(lModFile, false);
+            ptmFactory.importModifications(lUserModFile, true);
 
-            logger.debug("loaded PTMFactory (size: " + ptmFactory.getPtmMap().size() + " mods)");
+            logger.debug("loaded PTMFactory (size: " + ptmFactory.getPTMs().size() + " mods)");
 
         } catch (IOException e) {
             logger.error("error initializing OMSSA mods", e);
@@ -139,7 +139,11 @@ public class RelimsProperties {
         if (iSearchGUIPropertiesConfiguration == null) {
 
             try {
-                File lPropertiesFile = new File(getSearchGuiFolder(), RelimsProperties.iFolderSeparator + "conf" + iFolderSeparator + "default_SearchGUI.properties");
+                File lPropertiesFile = new File(getSearchGuiFolder(),
+                        iFolderSeparator + "resources" +
+                        iFolderSeparator + "conf" +
+                        iFolderSeparator + "default_SearchGUI.properties");
+
                 iSearchGUIPropertiesConfiguration = new PropertiesConfiguration(lPropertiesFile);
                 return iSearchGUIPropertiesConfiguration;
 
@@ -298,11 +302,20 @@ public class RelimsProperties {
 
 
     public static String[] getRelimsClassList() {
-        return config.getStringArray("relims.runner.classes");
+        return config.getStringArray("relims.strategy.ids");
     }
 
-    public static Class getRelimsClass(String aClassID) throws ClassNotFoundException {
-        String lClassname = config.getString("relims.runner.classes." + aClassID);
+    public static String[] getRelimsSourceList() {
+        return config.getStringArray("relims.source.ids");
+    }
+
+    public static Class getRelimsSearchStrategyClass(String aStrategyID) throws ClassNotFoundException {
+        String lClassname = config.getString("relims.strategy.class." + aStrategyID);
+        return Class.forName(lClassname);
+    }
+
+    public static Class getRelimsSourceClass(String aSourceID) throws ClassNotFoundException {
+        String lClassname = config.getString("relims.source.class." + aSourceID);
         return Class.forName(lClassname);
     }
 

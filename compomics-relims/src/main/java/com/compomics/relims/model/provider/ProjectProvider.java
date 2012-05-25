@@ -28,8 +28,7 @@ public abstract class ProjectProvider {
         return iDataProvider.buildProjectBean(aProjectid);
     }
 
-    public void setDataProvider(DataProvider aDataProvider) {
-        iDataProvider = aDataProvider;
+    public DataProvider getDataProvider(){
+        return iDataProvider;
     }
-
 }

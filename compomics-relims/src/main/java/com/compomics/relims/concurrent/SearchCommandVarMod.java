@@ -136,7 +136,7 @@ public class SearchCommandVarMod implements SearchCommandGenerator {
 
             if (lBuildUserMods) {
                 UserModsFile lUserModsFile;
-                int lPTMFactorySize = RelimsProperties.getPTMFactory(false).getPtmMap().size();
+                int lPTMFactorySize = RelimsProperties.getPTMFactory(false).getPTMs().size();
                 int lUserModsSize = lMascotModifications.size();
 
                 if(iOMSSAXSDModifications != null){

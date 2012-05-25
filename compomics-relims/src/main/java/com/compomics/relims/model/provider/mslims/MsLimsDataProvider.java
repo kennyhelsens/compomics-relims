@@ -1,13 +1,16 @@
 package com.compomics.relims.model.provider.mslims;
 
+import com.compomics.mascotdatfile.util.interfaces.MascotDatfileInf;
+import com.compomics.mascotdatfile.util.mascot.ModificationList;
+import com.compomics.mascotdatfile.util.mascot.Parameters;
 import com.compomics.mslims.db.accessors.Spectrum_file;
 import com.compomics.mslims.util.fileio.MascotGenericFile;
 import com.compomics.relims.conf.RelimsProperties;
-import com.compomics.relims.exception.RelimsException;
-import com.compomics.relims.model.provider.ConnectionProvider;
 import com.compomics.relims.model.beans.RelimsProjectBean;
 import com.compomics.relims.model.interfaces.DataProvider;
+import com.compomics.relims.model.provider.ConnectionProvider;
 import com.google.common.base.Joiner;
+import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import org.apache.log4j.Logger;
 
@@ -19,6 +22,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Vector;
@@ -248,6 +252,30 @@ public class MsLimsDataProvider implements DataProvider {
     }
 
     public RelimsProjectBean buildProjectBean(long aProjectid) {
-        throw new RelimsException("NOT YET IMPLEMENTED");
+
+        RelimsProjectBean lRelimsProjectBean = new RelimsProjectBean();
+
+        lRelimsProjectBean.setProjectID((int) aProjectid);
+
+        ArrayList<Parameters> lParameterSets = Lists.newArrayList();
+        ArrayList<ModificationList> lModificationLists = Lists.newArrayList();
+
+        DatfileIterator lIterator = this.getDatfilesForProject(aProjectid);
+        int lCounter = 0;
+        while (lIterator.hasNext()) {
+            MascotDatfileInf lNext = lIterator.next();
+            lParameterSets.add(lNext.getParametersSection());
+            lModificationLists.add(lNext.getModificationList());
+            if (lCounter++ > 3) {
+                continue;
+            }
+
+        }
+
+        lRelimsProjectBean.setModificationLists(lModificationLists);
+        lRelimsProjectBean.setParameterSets(lParameterSets);
+
+        return lRelimsProjectBean;
+
     }
 }

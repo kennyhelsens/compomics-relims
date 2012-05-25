@@ -1,4 +1,4 @@
-package com.compomics.relims.gui;
+package com.compomics.relims.gui.model;
 
 import com.compomics.relims.conf.RelimsProperties;
 import com.compomics.relims.exception.RelimsException;
@@ -10,6 +10,7 @@ import javax.swing.table.DefaultTableModel;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
+import java.util.Vector;
 
 /**
  * This class is a
@@ -36,6 +37,16 @@ public class RelimsPropertiesTableModel extends DefaultTableModel {
         addTableModelListener(lTableModelListener);
 
 
+    }
+
+    private void setColumnNames() {
+        Vector<String> lColumnNames = new Vector<String>(2);
+        lColumnNames.addElement("Property");
+        lColumnNames.addElement("Value");
+        lColumnNames.addElement("");
+        lColumnNames.addElement("");
+
+        setColumnIdentifiers(lColumnNames);
     }
 
     public int getRowCount() {

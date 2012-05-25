@@ -66,7 +66,7 @@ public class RelimsProjectBean {
         return iProjectID;
     }
 
-    public void setProjectID(int aProjectID) {
+    public void setProjectID(long aProjectID) {
         iProjectID = aProjectID;
     }
 }

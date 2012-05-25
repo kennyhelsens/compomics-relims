@@ -22,12 +22,11 @@ public class VarDBSearchStrategy implements SearchStrategy {
     private static Logger logger = Logger.getLogger(VarDBSearchStrategy.class);
 
     private List<File> iSpectrumFiles = null;
-    private RelimsProjectBean iRelimsProjectBean;
 
-    public void fill(SearchList<SearchCommandGenerator> aSearchList) {
+    public void fill(SearchList<SearchCommandGenerator> aSearchList, RelimsProjectBean aRelimsProjectBean) {
 
 
-            ModificationList lModificationList = iRelimsProjectBean.getModificationLists().get(0);
+            ModificationList lModificationList = aRelimsProjectBean.getModificationLists().get(0);
             List<Modification> lFixMods = Lists.newArrayList(lModificationList.getFixedModifications());
             List<Modification> lVarMods = Lists.newArrayList(lModificationList.getVariableModifications());
             List<Modification> lMods = Lists.newArrayList();
@@ -40,7 +39,7 @@ public class VarDBSearchStrategy implements SearchStrategy {
             // First define a search without the relims modification.
             String[] lDatabaseVarIDs = RelimsProperties.getDatabaseVarIDs();
             for (String lDatabaseVarID : lDatabaseVarIDs) {
-                lSearchBean = new SearchCommandVarDb(lDatabaseVarID, lFixMods, lVarMods, lDatabaseVarID, iRelimsProjectBean, iSpectrumFiles);
+                lSearchBean = new SearchCommandVarDb(lDatabaseVarID, lFixMods, lVarMods, lDatabaseVarID, aRelimsProjectBean, iSpectrumFiles);
                 aSearchList.add(lSearchBean);
             }
     }
@@ -49,9 +48,6 @@ public class VarDBSearchStrategy implements SearchStrategy {
         iSpectrumFiles = aSpectrumFiles;
     }
 
-    public void setRelimsProjectBean(RelimsProjectBean aRelimsProjectBean) {
-        iRelimsProjectBean = aRelimsProjectBean;
-    }
 
     public String getName() {
         return "VarDBStrategy";

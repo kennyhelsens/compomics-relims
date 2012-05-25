@@ -1,20 +1,16 @@
 package com.compomics.relims.concurrent;
 
-import com.compomics.mascotdatfile.util.interfaces.MascotDatfileInf;
-import com.compomics.mascotdatfile.util.mascot.ModificationList;
-import com.compomics.mascotdatfile.util.mascot.Parameters;
-import com.compomics.relims.exception.RelimsException;
 import com.compomics.relims.model.beans.RelimsProjectBean;
 import com.compomics.relims.model.beans.SearchList;
 import com.compomics.relims.model.guava.predicates.PredicateManager;
-import com.compomics.relims.model.interfaces.DataProvider;
 import com.compomics.relims.model.interfaces.ProjectRunner;
 import com.compomics.relims.model.interfaces.SearchCommandGenerator;
 import com.compomics.relims.model.interfaces.SearchStrategy;
-import com.compomics.relims.model.provider.mslims.DatfileIterator;
 import com.compomics.relims.model.provider.mslims.MsLimsDataProvider;
 import com.google.common.base.Predicate;
 import com.google.common.collect.Lists;
+import eu.isas.peptideshaker.cmd.PeptideShakerCLI;
+import eu.isas.peptideshaker.cmd.PeptideShakerCLIInputBean;
 import org.apache.commons.configuration.ConfigurationException;
 import org.apache.log4j.Logger;
 
@@ -30,7 +26,6 @@ import java.util.Observable;
 public class ProjectRunnerImpl extends Observable implements ProjectRunner {
     private static Logger logger = Logger.getLogger(ProjectRunnerImpl.class);
 
-    private DataProvider iDataProvider;
     private RelimsProjectBean iRelimsProjectBean;
 
     private PredicateManager iPredicateManager;
@@ -84,35 +79,52 @@ public class ProjectRunnerImpl extends Observable implements ProjectRunner {
             }
 
             logger.debug("loading MS/MS spectra from project");
-            ArrayList<File> iSpectrumFiles = Lists.newArrayList();
+
+            ArrayList<File> lSpectrumFiles = Lists.newArrayList();
             File lSpectrumFile = MsLimsDataProvider.getInstance().getSpectraForProject(lProjectid);
-            iSpectrumFiles.add(lSpectrumFile);
+            lSpectrumFiles.add(lSpectrumFile);
+
+            iSearchStrategy.setSpectrumFiles(lSpectrumFiles);
+
+            SearchList lSearchCommandList = new SearchList();
+            iSearchStrategy.fill(lSearchCommandList, iRelimsProjectBean);
 
 
-            SearchList lSearchList = new SearchList();
-            iSearchStrategy.fill(lSearchList);
+            logger.debug("launching the searchlist with " + lSearchCommandList.size() + " MOD variants");
 
-
-            logger.debug("launching the searchlist with " + lSearchList.size() + " MOD variants");
-
-            for (Object aLSearchList : lSearchList) {
-                SearchCommandGenerator lSearch = (SearchCommandGenerator) aLSearchList;
+            for (Object lSearchCommand : lSearchCommandList) {
+                SearchCommandGenerator lSearch = (SearchCommandGenerator) lSearchCommand;
                 String lCommand = lSearch.generateCommand();
 
                 logger.debug("starting to run search " + lSearch.getName());
                 Command.run(lCommand);
+
+                logger.debug("processing the search results with PeptideShaker");
+
+                PeptideShakerCLIInputBean lPeptideShakerCLIInputBean = new PeptideShakerCLIInputBean();
+
+                lPeptideShakerCLIInputBean.setInput(lSearch.getSearchResultFolder());
+                lPeptideShakerCLIInputBean.setOutput(lSearch.getSearchResultFolder());
+                lPeptideShakerCLIInputBean.setPSMFDR(1.0);
+                lPeptideShakerCLIInputBean.setPeptideFDR(1.0);
+                lPeptideShakerCLIInputBean.setProteinFDR(1.0);
+                lPeptideShakerCLIInputBean.setExperimentID(String.format("projectid_%d", lSearch.getProjectId()));
+                lPeptideShakerCLIInputBean.setSampleID(lSearch.getName());
+
+                PeptideShakerCLI lPeptideShakerCLI = new PeptideShakerCLI(lPeptideShakerCLIInputBean);
+                lPeptideShakerCLI.call();
+
+                logger.debug(String.format(
+                        "finished PeptideShakerCLI on project '%s', sample '%s'",
+                        lPeptideShakerCLIInputBean.getExperimentID(),
+                        lPeptideShakerCLIInputBean.getSampleID()));
+
             }
 
-
-            logger.debug("processing the search results with PeptideShaker");
-            throw new RelimsException("NOT YET IMPLEMENTED");
-
-//            synchronized (iRelimsProjectBean) {
-//                setChanged();
-//                notifyObservers(iRelimsProjectBean);
-//            }
-//
-
+            synchronized (iRelimsProjectBean) {
+                setChanged();
+                notifyObservers(iRelimsProjectBean);
+            }
 
         } catch (IOException e) {
             logger.error(e.getMessage(), e);
@@ -128,30 +140,8 @@ public class ProjectRunnerImpl extends Observable implements ProjectRunner {
         iRelimsProjectBean = aRelimsProjectBean;
     }
 
-    public void setDataProvider(DataProvider aDataProvider) {
-        iDataProvider = aDataProvider;
-    }
-
     public void setSearchStrategy(SearchStrategy aSearchStrategy) {
         iSearchStrategy = aSearchStrategy;
     }
 
-
-    private RelimsProjectBean buildProjectSetup(long aProjectid) {
-        RelimsProjectBean lProjectSetupBean = new RelimsProjectBean();
-
-        DatfileIterator lIterator = MsLimsDataProvider.getInstance().getDatfilesForProject(aProjectid);
-        ArrayList<Parameters> lParameterSets = Lists.newArrayList();
-        ArrayList<ModificationList> lModificationLists = Lists.newArrayList();
-        while (lIterator.hasNext()) {
-            MascotDatfileInf lNext = lIterator.next();
-            lParameterSets.add(lNext.getParametersSection());
-            lModificationLists.add(lNext.getModificationList());
-        }
-        lProjectSetupBean.setModificationLists(lModificationLists);
-        lProjectSetupBean.setParameterSets(lParameterSets);
-        lProjectSetupBean.setProjectID((int) aProjectid);
-
-        return lProjectSetupBean;
-    }
 }

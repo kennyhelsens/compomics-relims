@@ -30,19 +30,19 @@ public class SearchCommandVarDb implements SearchCommandGenerator {
     private String iName = null;
     private List<Modification> iFixedModifications = null;
     private List<Modification> iVariableModifications = null;
-    private RelimsProjectBean iProjectSetupBean = null;
+    private RelimsProjectBean iRelimsProjectBean = null;
     private String iDbVarID = null;
 
     private File iSearchResultFolder = null;
     private List<File> iSpectrumFiles;
 
 
-    public SearchCommandVarDb(String aName, List<Modification> aFixMods, List<Modification> aVarMods, String aDbVarId, RelimsProjectBean aProjectSetupBean, List<File> aSpectrumFiles) {
+    public SearchCommandVarDb(String aName, List<Modification> aFixMods, List<Modification> aVarMods, String aDbVarId, RelimsProjectBean aRelimsProjectBean, List<File> aSpectrumFiles) {
         iName = aName;
         iFixedModifications = aFixMods;
         iVariableModifications = aVarMods;
         iDbVarID = aDbVarId;
-        iProjectSetupBean = aProjectSetupBean;
+        iRelimsProjectBean = aRelimsProjectBean;
         iSpectrumFiles = aSpectrumFiles;
     }
 
@@ -60,13 +60,13 @@ public class SearchCommandVarDb implements SearchCommandGenerator {
         SearchGuiModStringFunction lSearchGuiModStringFunction = new SearchGuiModStringFunction();
         PropertiesConfiguration lSearchGuiConfiguration = RelimsProperties.getDefaultSearchGuiConfiguration();
         String lDatabaseFile = RelimsProperties.getDefaultSearchDatabase();
-        lSearchGuiConfiguration.setProperty("FIXED_MODIFICATIONS", lSearchGuiModStringFunction.apply(iProjectSetupBean.getFixedMatchedPTMs()));
-        lSearchGuiConfiguration.setProperty("VARIABLE_MODIFICATIONS", lSearchGuiModStringFunction.apply(iProjectSetupBean.getVariableMatchedPTMs()));
+        lSearchGuiConfiguration.setProperty("FIXED_MODIFICATIONS", lSearchGuiModStringFunction.apply(iRelimsProjectBean.getFixedMatchedPTMs()));
+        lSearchGuiConfiguration.setProperty("VARIABLE_MODIFICATIONS", lSearchGuiModStringFunction.apply(iRelimsProjectBean.getVariableMatchedPTMs()));
 
         // Specify the search database.
         setDbVarProperty(lSearchGuiConfiguration);
 
-        File lSearchGuiConfigurationFile = RelimsProperties.getTmpFile("" + iProjectSetupBean.getProjectID() + "_" + lTimeStamp);
+        File lSearchGuiConfigurationFile = RelimsProperties.getTmpFile("" + iRelimsProjectBean.getProjectID() + "_" + lTimeStamp);
         logger.debug("saving searchgui configuration to " + lSearchGuiConfigurationFile.getCanonicalPath());
         lSearchGuiConfiguration.save(lSearchGuiConfigurationFile);
 
@@ -130,7 +130,7 @@ public class SearchCommandVarDb implements SearchCommandGenerator {
 
             if (lBuildUserMods) {
                 UserModsFile lUserModsFile;
-                int lPTMFactorySize = RelimsProperties.getPTMFactory(false).getPtmMap().size();
+                int lPTMFactorySize = RelimsProperties.getPTMFactory(false).getPTMs().size();
                 int lUserModsSize = lMascotDatfileModifications.size();
 
                 logger.debug("loading " + lUserModsSize + " extra usermods for the current search (PTMFactory size:" + lPTMFactorySize + ")");
@@ -145,7 +145,7 @@ public class SearchCommandVarDb implements SearchCommandGenerator {
                 lFile.createNewFile();
                 lUserModsFile.write(lFile);
 
-                iProjectSetupBean.setUserModsFile(lUserModsFile);
+                iRelimsProjectBean.setUserModsFile(lUserModsFile);
 
                 lVariableMatchedPTMs.addAll(lUserModsFile.getVarModsAsString());
                 lFixedMatchedPTMs.addAll(lUserModsFile.getFixedModsAsString());
@@ -158,8 +158,8 @@ public class SearchCommandVarDb implements SearchCommandGenerator {
             String lErrorMessage = "not all mods were matched! (original:" + lOriginalCount + " - matched: " + lMatchCount + ")";
             Preconditions.checkArgument(lOriginalCount == lMatchCount, lErrorMessage);
 
-            iProjectSetupBean.setFixedMatchedPTMs(lFixedMatchedPTMs);
-            iProjectSetupBean.setVariableMatchedPTMs(lVariableMatchedPTMs);
+            iRelimsProjectBean.setFixedMatchedPTMs(lFixedMatchedPTMs);
+            iRelimsProjectBean.setVariableMatchedPTMs(lVariableMatchedPTMs);
 
         } catch (IOException e) {
             logger.error(e.getMessage(), e);
@@ -175,7 +175,7 @@ public class SearchCommandVarDb implements SearchCommandGenerator {
     }
 
     public long getProjectId(){
-        return iProjectSetupBean.getProjectID();
+        return iRelimsProjectBean.getProjectID();
     }
 
     public File getSearchResultFolder() {

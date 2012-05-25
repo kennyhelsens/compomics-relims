@@ -24,9 +24,10 @@ public class ModificationMatchFunction implements Function<Modification, PTM> {
 
         double lSpecifiedMass = iDoubleRounderFunction.apply(aModification.getMass());
 
-        Iterator<PTM> lPtmIterator = lPTMFactory.getPtmIterator();
-        while (lPtmIterator.hasNext()) {
-            PTM lPTM = lPtmIterator.next();
+        Iterator<String> lPtmNameIterator = lPTMFactory.getPTMs().iterator();
+        while (lPtmNameIterator.hasNext()) {
+            String lPTMName = lPtmNameIterator.next();
+            PTM lPTM = lPTMFactory.getPTM(lPTMName);
             ArrayList<String> lPTMResidues = lPTM.getResidues();
             double lRunningMass = iDoubleRounderFunction.apply(lPTM.getMass());
             if (Double.compare(lSpecifiedMass, lRunningMass) == 0) {

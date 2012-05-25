@@ -61,7 +61,7 @@
                 <configuration>
                     <archive>
                         <manifest>
-                            <mainClass>com.compomics.relims.gui.RelimsGUI</mainClass>
+                            <mainClass>com.compomics.relims.gui.RelimsIDEAGUI</mainClass>
                             <addClasspath>true</addClasspath>
                             <classpathPrefix>lib</classpathPrefix>
                         </manifest>
@@ -137,9 +137,9 @@
     <dependencies>
         <!--Apache commons configuration-->
         <dependency>
-            <groupId>de.proteinms.omxparser</groupId>
-            <artifactId>omssa-parser</artifactId>
-            <version>1.4.6</version>
+            <groupId>eu.isas.peptideshaker</groupId>
+            <artifactId>PeptideShaker</artifactId>
+            <version>0.17.2-beta</version>
         </dependency>
 
         <dependency>
@@ -184,19 +184,6 @@
                 </exclusion>
             </exclusions>
         </dependency>
-        <!--Apache commons configuration-->
-        <dependency>
-            <groupId>com.compomics</groupId>
-            <artifactId>utilities</artifactId>
-            <version>3.3.5</version>
-        </dependency>
-
-        <!--Apache commons configuration-->
-        <dependency>
-            <groupId>eu.isas.peptideshaker</groupId>
-            <artifactId>PeptideShaker</artifactId>
-            <version>0.17.1</version>
-        </dependency>
 
         <!--Apache commons configuration-->
         <dependency>
@@ -211,16 +198,6 @@
             <artifactId>omssa-xsd</artifactId>
             <version>0.3</version>
         </dependency>
-
-        <!--&lt;!&ndash;Swing commons for Properties editing.-->
-
-        <!--&ndash;&gt;-->
-        <!--<dependency>-->
-        <!--<groupId>org.nuiton.thirdparty</groupId>-->
-        <!--<artifactId>l2fprod-common</artifactId>-->
-        <!--<version>0.1</version>-->
-        <!--</dependency>-->
-
 
     </dependencies>
     <!-- The deployment maven2 repository-->

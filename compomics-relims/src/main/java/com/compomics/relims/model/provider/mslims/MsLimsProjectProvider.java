@@ -15,6 +15,11 @@ import java.util.Random;
  */
 public class MsLimsProjectProvider extends ProjectProvider {
 
+    public MsLimsProjectProvider() {
+        super();
+        iDataProvider = new MsLimsDataProvider();
+    }
+
     public List<Long> getAllProjects() {
         ArrayList<Long> lAllProjectIds = Lists.newArrayList();
         try {

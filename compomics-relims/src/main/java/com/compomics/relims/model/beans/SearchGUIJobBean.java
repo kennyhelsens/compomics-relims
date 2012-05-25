@@ -84,8 +84,9 @@ public class SearchGUIJobBean {
             });
 
             lCommandParts.add(RelimsProperties.getJavaExec());
-            lCommandParts.add("-jar");
+            lCommandParts.add("-cp");
             lCommandParts.add(lSearchGuiArchiveName);
+            lCommandParts.add("eu.isas.searchgui.SearchGUI");
             lCommandParts.add(gui ? "" : "-no_gui");
             lCommandParts.add(search ? "-search" : "");
             lCommandParts.add(omssa ? "-omssa" : "");

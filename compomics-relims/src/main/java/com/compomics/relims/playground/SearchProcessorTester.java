@@ -2,17 +2,15 @@ package com.compomics.relims.playground;
 
 import com.compomics.relims.concurrent.SearchCommandVarMod;
 import com.compomics.relims.conf.RelimsProperties;
-import com.compomics.relims.model.interfaces.SearchCommandGenerator;
-import com.compomics.relims.model.interfaces.SearchProcessor;
-import com.compomics.relims.model.processor.OmssaSearchProcessor;
-import com.compomics.relims.model.beans.SearchList;
 import com.compomics.relims.model.beans.RelimsProjectBean;
+import com.compomics.relims.model.beans.SearchList;
+import com.compomics.relims.model.interfaces.SearchCommandGenerator;
 import com.google.common.collect.Lists;
+import eu.isas.peptideshaker.cmd.PeptideShakerCLI;
+import eu.isas.peptideshaker.cmd.PeptideShakerCLIInputBean;
 import org.apache.log4j.Logger;
-import org.xml.sax.SAXException;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.ArrayList;
 
 /**
@@ -49,14 +47,19 @@ public class SearchProcessorTester {
         lSearchList.add(lSearchBean);
 
         // create a search processor using this searchbean
-        SearchProcessor lSearchProcessor = new OmssaSearchProcessor(lSearchList);
-        try {
-            lSearchProcessor.process();
-        } catch (SAXException e) {
-            logger.error(e.getMessage(), e);
-        } catch (IOException e) {
-            logger.error(e.getMessage(), e);
-        }
+        PeptideShakerCLIInputBean lPeptideShakerCLIInputBean = new PeptideShakerCLIInputBean();
+
+        lPeptideShakerCLIInputBean.setInput(lSearchBean.getSearchResultFolder());
+        lPeptideShakerCLIInputBean.setOutput(lSearchBean.getSearchResultFolder());
+        lPeptideShakerCLIInputBean.setPSMFDR(1.0);
+        lPeptideShakerCLIInputBean.setPeptideFDR(1.0);
+        lPeptideShakerCLIInputBean.setProteinFDR(1.0);
+        lPeptideShakerCLIInputBean.setExperimentID(String.format("projectid_%d", lSearchBean.getProjectId()));
+        lPeptideShakerCLIInputBean.setSampleID(lSearchBean.getName());
+
+        PeptideShakerCLI lPeptideShakerCLI = new PeptideShakerCLI(lPeptideShakerCLIInputBean);
+        lPeptideShakerCLI.call();
+
         System.exit(0);
     }
 }
