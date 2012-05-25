@@ -43,9 +43,9 @@ public class RelimsProperties {
 
             int lOperatingSystem = Utilities.getOperatingSystem();
 
-            if(lOperatingSystem == Utilities.OS_UNIX_MASK){
-                lResource = Resources.getResource("resources" + iFolderSeparator + "conf" + iFolderSeparator + "relims-unix.properties");
-            }else if(lOperatingSystem == Utilities.OS_WINDOWS_MASK){
+            if(lOperatingSystem == Utilities.OS_MAC){
+                lResource = Resources.getResource("resources" + iFolderSeparator + "conf" + iFolderSeparator + "relims-mac.properties");
+            }else if(lOperatingSystem == Utilities.OS_WIN_OTHER){
                 lResource = Resources.getResource("resources" + iFolderSeparator + "conf" + iFolderSeparator + "relims-windows.properties");
             }else{
                 lResource = Resources.getResource("resources" + iFolderSeparator + "conf" + iFolderSeparator + "relims.properties");
