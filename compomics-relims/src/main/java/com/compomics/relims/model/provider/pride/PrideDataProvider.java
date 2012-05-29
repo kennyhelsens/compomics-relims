@@ -51,4 +51,8 @@ public class PrideDataProvider implements DataProvider {
         throw new RelimsException("NOT YET IMPLEMENTED");
     }
 
+    public String toString(){
+        return "PrideDataProvider";
+    }
+
 }

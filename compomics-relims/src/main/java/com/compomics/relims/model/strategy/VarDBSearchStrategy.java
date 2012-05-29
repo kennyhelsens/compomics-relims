@@ -21,7 +21,7 @@ public class VarDBSearchStrategy implements SearchStrategy {
 
     private static Logger logger = Logger.getLogger(VarDBSearchStrategy.class);
 
-    private List<File> iSpectrumFiles = null;
+    private List<File> iSpectrumFiles = Lists.newArrayList();
 
     public void fill(SearchList<SearchCommandGenerator> aSearchList, RelimsProjectBean aRelimsProjectBean) {
 
@@ -44,8 +44,8 @@ public class VarDBSearchStrategy implements SearchStrategy {
             }
     }
 
-    public void setSpectrumFiles(List<File> aSpectrumFiles) {
-        iSpectrumFiles = aSpectrumFiles;
+    public void addSpectrumFile(File aSpectrumFile) {
+        iSpectrumFiles.add(aSpectrumFile);
     }
 
 

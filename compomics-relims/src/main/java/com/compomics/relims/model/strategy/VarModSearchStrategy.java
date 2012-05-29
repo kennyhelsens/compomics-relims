@@ -23,7 +23,7 @@ public class VarModSearchStrategy implements SearchStrategy {
 
     private static Logger logger = Logger.getLogger(VarModSearchStrategy.class);
 
-    private List<File> iSpectrumFiles = null;
+    private List<File> iSpectrumFiles = Lists.newArrayList();
 
     public void fill(SearchList<SearchCommandGenerator> aSearchList, RelimsProjectBean aRelimsProjectBean) {
 
@@ -58,8 +58,8 @@ public class VarModSearchStrategy implements SearchStrategy {
         }
     }
 
-    public void setSpectrumFiles(List<File> aSpectrumFiles) {
-        iSpectrumFiles = aSpectrumFiles;
+    public void addSpectrumFile(File aSpectrumFile) {
+        iSpectrumFiles.add(aSpectrumFile);
     }
 
     public String getName() {

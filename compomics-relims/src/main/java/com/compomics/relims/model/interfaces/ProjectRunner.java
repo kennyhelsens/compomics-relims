@@ -16,4 +16,6 @@ public interface ProjectRunner extends Callable<String> {
     public void setPredicateManager(PredicateManager aPredicateManager);
 
     public void setSearchStrategy(SearchStrategy aSearchStrategy);
+
+    public void setDataProvider(DataProvider aDataProvider);
 }

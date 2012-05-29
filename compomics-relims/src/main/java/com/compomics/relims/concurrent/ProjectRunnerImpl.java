@@ -3,12 +3,11 @@ package com.compomics.relims.concurrent;
 import com.compomics.relims.model.beans.RelimsProjectBean;
 import com.compomics.relims.model.beans.SearchList;
 import com.compomics.relims.model.guava.predicates.PredicateManager;
+import com.compomics.relims.model.interfaces.DataProvider;
 import com.compomics.relims.model.interfaces.ProjectRunner;
 import com.compomics.relims.model.interfaces.SearchCommandGenerator;
 import com.compomics.relims.model.interfaces.SearchStrategy;
-import com.compomics.relims.model.provider.mslims.MsLimsDataProvider;
 import com.google.common.base.Predicate;
-import com.google.common.collect.Lists;
 import eu.isas.peptideshaker.cmd.PeptideShakerCLI;
 import eu.isas.peptideshaker.cmd.PeptideShakerCLIInputBean;
 import org.apache.commons.configuration.ConfigurationException;
@@ -16,8 +15,10 @@ import org.apache.log4j.Logger;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Observable;
+
+import static java.lang.String.format;
 
 
 /**
@@ -30,6 +31,7 @@ public class ProjectRunnerImpl extends Observable implements ProjectRunner {
 
     private PredicateManager iPredicateManager;
     private SearchStrategy iSearchStrategy;
+    private DataProvider iDataProvider;
 
     public ProjectRunnerImpl() {
 
@@ -43,60 +45,44 @@ public class ProjectRunnerImpl extends Observable implements ProjectRunner {
         try {
 
             long lProjectid = iRelimsProjectBean.getProjectID();
-            logger.debug("created new projectrunner on " + lProjectid);
+            logger.debug("creating projectrunner for " + lProjectid);
 
-            Predicate<RelimsProjectBean> lProjectSizePredicate = iPredicateManager.getProjectSizePredicate();
-            if (!lProjectSizePredicate.apply(iRelimsProjectBean)) {
-                logger.debug("END " + lProjectid);
-                return "Premature end for project size";
+
+
+            Collection<Predicate> lPredicates = iPredicateManager.createCollection(
+                    PredicateManager.Types.PROJECT_SIZE,
+                    PredicateManager.Types.INSTRUMENT,
+                    PredicateManager.Types.SPECIES,
+                    PredicateManager.Types.SEARCH_SET_SIZE,
+                    PredicateManager.Types.MODIFICATION_SET
+            );
+
+
+            logger.debug(format("validating project contents by %d predices", lPredicates.size()));
+            for (Predicate lProjectPredicate : lPredicates) {
+                boolean lResult = lProjectPredicate.apply(iRelimsProjectBean);
+                if (!lResult) {
+                    logger.debug("END " + lProjectid);
+                    return "Premature end for project size";
+                }
             }
 
-
-            Predicate<RelimsProjectBean> lInstrumentPredicate = iPredicateManager.getInstrumentPredicate();
-            if (!lInstrumentPredicate.apply(iRelimsProjectBean)) {
-                logger.debug("END " + lProjectid);
-                return "Premature end for instrument type";
-            }
-
-            Predicate<RelimsProjectBean> lSearchSetSizePredicate = iPredicateManager.getSearchSetSizePredicate();
-            if (!lSearchSetSizePredicate.apply(iRelimsProjectBean)) {
-                logger.debug("END " + lProjectid);
-                return "Premature end for search set size";
-            }
-
-            Predicate<RelimsProjectBean> lSpeciesPredicate = iPredicateManager.getSpeciesPredicate();
-            if (!lSpeciesPredicate.apply(iRelimsProjectBean)) {
-                logger.debug("END " + lProjectid);
-                return "Premature end for species type";
-            }
+            logger.debug(format("loading MS/MS spectra for project %s from %s", lProjectid, iDataProvider.toString()));
+            File lSpectrumFile = iDataProvider.getSpectraForProject(lProjectid);
+            iSearchStrategy.addSpectrumFile(lSpectrumFile);
 
 
-            Predicate<RelimsProjectBean> lModificationSetPrediate = iPredicateManager.getModificationSetPredicate();
-            logger.debug("comparing Mascot modification sets within project " + lProjectid);
-            if (!lModificationSetPrediate.apply(iRelimsProjectBean)) {
-                logger.debug("END" + lProjectid);
-                return "Premature end for distinct modification sets";
-            }
-
-            logger.debug("loading MS/MS spectra from project");
-
-            ArrayList<File> lSpectrumFiles = Lists.newArrayList();
-            File lSpectrumFile = MsLimsDataProvider.getInstance().getSpectraForProject(lProjectid);
-            lSpectrumFiles.add(lSpectrumFile);
-
-            iSearchStrategy.setSpectrumFiles(lSpectrumFiles);
-
-            SearchList lSearchCommandList = new SearchList();
+            logger.debug(format("creating SearchCommands for project %s", lProjectid));
+            SearchList<SearchCommandGenerator> lSearchCommandList = new SearchList<SearchCommandGenerator>();
             iSearchStrategy.fill(lSearchCommandList, iRelimsProjectBean);
 
 
-            logger.debug("launching the searchlist with " + lSearchCommandList.size() + " MOD variants");
-
+            logger.debug(format("launching the searchlist with %d MOD variants", lSearchCommandList.size()));
             for (Object lSearchCommand : lSearchCommandList) {
                 SearchCommandGenerator lSearch = (SearchCommandGenerator) lSearchCommand;
                 String lCommand = lSearch.generateCommand();
 
-                logger.debug("starting to run search " + lSearch.getName());
+                logger.debug(format("running search %s", lSearch.getName()));
                 Command.run(lCommand);
 
                 logger.debug("processing the search results with PeptideShaker");
@@ -108,13 +94,13 @@ public class ProjectRunnerImpl extends Observable implements ProjectRunner {
                 lPeptideShakerCLIInputBean.setPSMFDR(1.0);
                 lPeptideShakerCLIInputBean.setPeptideFDR(1.0);
                 lPeptideShakerCLIInputBean.setProteinFDR(1.0);
-                lPeptideShakerCLIInputBean.setExperimentID(String.format("projectid_%d", lSearch.getProjectId()));
+                lPeptideShakerCLIInputBean.setExperimentID(format("projectid_%d", lSearch.getProjectId()));
                 lPeptideShakerCLIInputBean.setSampleID(lSearch.getName());
 
                 PeptideShakerCLI lPeptideShakerCLI = new PeptideShakerCLI(lPeptideShakerCLIInputBean);
                 lPeptideShakerCLI.call();
 
-                logger.debug(String.format(
+                logger.debug(format(
                         "finished PeptideShakerCLI on project '%s', sample '%s'",
                         lPeptideShakerCLIInputBean.getExperimentID(),
                         lPeptideShakerCLIInputBean.getSampleID()));
@@ -132,7 +118,7 @@ public class ProjectRunnerImpl extends Observable implements ProjectRunner {
             logger.error(e.getMessage(), e);
         }
 
-        return ("SUCCES");
+        return (format("SUCCES for project %d", iRelimsProjectBean.getProjectID()));
     }
 
 
@@ -142,6 +128,10 @@ public class ProjectRunnerImpl extends Observable implements ProjectRunner {
 
     public void setSearchStrategy(SearchStrategy aSearchStrategy) {
         iSearchStrategy = aSearchStrategy;
+    }
+
+    public void setDataProvider(DataProvider aDataProvider) {
+        iDataProvider = aDataProvider;
     }
 
 }

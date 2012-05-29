@@ -278,4 +278,11 @@ public class MsLimsDataProvider implements DataProvider {
         return lRelimsProjectBean;
 
     }
+
+    public String toString(){
+        return "MsLimsDataProvider";
+    }
+
 }
+
+

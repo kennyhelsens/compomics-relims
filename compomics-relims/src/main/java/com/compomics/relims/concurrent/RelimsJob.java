@@ -70,6 +70,8 @@ public class RelimsJob implements Callable, Closable {
             iProjectRunner.setProject(lRelimsProjectBean);
             iProjectRunner.setSearchStrategy(iSearchStrategy);
             iProjectRunner.setPredicateManager(iPredicateManager);
+            iProjectRunner.setDataProvider(iProjectProvider.getDataProvider());
+
 
             Observable lObservable = (Observable) iProjectRunner;
             lObservable.addObserver(iResultObserver);
