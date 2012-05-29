@@ -18,6 +18,7 @@ import org.apache.log4j.Logger;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 /**
@@ -59,7 +60,7 @@ public class SearchCommandVarDb implements SearchCommandGenerator {
 
         SearchGuiModStringFunction lSearchGuiModStringFunction = new SearchGuiModStringFunction();
         PropertiesConfiguration lSearchGuiConfiguration = RelimsProperties.getDefaultSearchGuiConfiguration();
-        String lDatabaseFile = RelimsProperties.getDefaultSearchDatabase();
+
         lSearchGuiConfiguration.setProperty("FIXED_MODIFICATIONS", lSearchGuiModStringFunction.apply(iRelimsProjectBean.getFixedMatchedPTMs()));
         lSearchGuiConfiguration.setProperty("VARIABLE_MODIFICATIONS", lSearchGuiModStringFunction.apply(iRelimsProjectBean.getVariableMatchedPTMs()));
 
@@ -98,11 +99,11 @@ public class SearchCommandVarDb implements SearchCommandGenerator {
         ArrayList<String> lFixedMatchedPTMs = Lists.newArrayList();
         ArrayList<String> lVariableMatchedPTMs = Lists.newArrayList();
 
-        ArrayList<Modification> lAllMods = Lists.newArrayList();
+        Collection<Modification> lAllMods = Lists.newArrayList();
         lAllMods.addAll(iVariableModifications);
         lAllMods.addAll(iFixedModifications);
 
-        ArrayList<Modification> lMascotDatfileModifications = Lists.newArrayList();
+        List<Modification> lMascotDatfileModifications = Lists.newArrayList();
 
         try {
             for (Object o : lAllMods) {

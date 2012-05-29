@@ -11,29 +11,19 @@ import java.math.RoundingMode;
  */
 public class DoubleRounderFunction implements Function<Double, Double> {
 
-    private static DoubleRounderFunction instance = new DoubleRounderFunction();
     private int iDecimals = 2;
-
-    public DoubleRounderFunction() {
-
-    }
 
     public DoubleRounderFunction(int aDecimals) {
         iDecimals = aDecimals;
     }
 
     public Double apply(@Nullable Double aDouble) {
-        BigDecimal lBigDecimal = new BigDecimal(aDouble);
-        lBigDecimal.setScale(iDecimals, RoundingMode.DOWN);
-        return lBigDecimal.doubleValue();
-    }
-
-
-    public int getDecimals() {
-        return iDecimals;
-    }
-
-    public void setDecimals(int aDecimals) {
-        iDecimals = aDecimals;
+        if (aDouble != null) {
+            BigDecimal lBigDecimal = new BigDecimal(aDouble);
+            lBigDecimal.setScale(iDecimals, RoundingMode.DOWN);
+            return lBigDecimal.doubleValue();
+        }else{
+            return null;
+        }
     }
 }

@@ -14,6 +14,7 @@ import org.apache.log4j.Logger;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 /**
@@ -30,7 +31,7 @@ public class VarModSearchStrategy implements SearchStrategy {
         ModificationList lModificationList = aRelimsProjectBean.getModificationLists().get(0);
         ArrayList<Modification> lFixMods = Lists.newArrayList(lModificationList.getFixedModifications());
         ArrayList<Modification> lVarMods = Lists.newArrayList(lModificationList.getVariableModifications());
-        ArrayList<Modification> lMods = Lists.newArrayList();
+        Collection<Modification> lMods = Lists.newArrayList();
         lMods.addAll(lFixMods);
         lMods.addAll(lVarMods);
 
@@ -40,7 +41,7 @@ public class VarModSearchStrategy implements SearchStrategy {
         aSearchList.add(lSearchBean);
 
 
-        ArrayList<UserMod> lRelimsMods = RelimsProperties.getRelimsMods();
+        Iterable<UserMod> lRelimsMods = RelimsProperties.getRelimsMods();
         for (UserMod lRelimsModification : lRelimsMods) {
             ArrayList<UserMod> lRelimsModList = new ArrayList<UserMod>();
             lRelimsModList.add(lRelimsModification);

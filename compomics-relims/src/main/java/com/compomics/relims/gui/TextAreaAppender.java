@@ -5,6 +5,7 @@ import org.apache.log4j.ConsoleAppender;
 import org.apache.log4j.spi.LoggingEvent;
 
 import javax.swing.*;
+import java.util.Deque;
 import java.util.LinkedList;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -16,9 +17,9 @@ import java.util.concurrent.Executors;
 public class TextAreaAppender extends ConsoleAppender {
 
     static private JTextArea jTextArea = null;
-    static private ExecutorService iService = Executors.newSingleThreadExecutor();;
+    static private ExecutorService iService = Executors.newSingleThreadExecutor();
 
-    static private LinkedList iMessages = new LinkedList();
+    static private Deque iMessages = new LinkedList();
     /**
      * Set the target JTextArea for the logging information to appear.
      */

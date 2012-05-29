@@ -13,7 +13,6 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Set;
 
 import static com.compomics.relims.model.guava.functions.SpeciesFinderFunction.SPECIES.*;
@@ -26,8 +25,6 @@ public class SpeciesFinderFunction implements Function<Set<String>, SpeciesFinde
     public double iExpectedMatchFrequency;
 
     public enum SPECIES {HUMAN, YEAST, MOUSE, RAT, DROSOPHILA, OTHER, NA, MIX}
-
-    ;
 
     private static Logger logger = Logger.getLogger(SpeciesFinderFunction.class);
     private HashMap<SPECIES, Integer> iSpeciesCounter;
@@ -135,7 +132,7 @@ public class SpeciesFinderFunction implements Function<Set<String>, SpeciesFinde
     }
 
     public static void main(String[] args) {
-        HashSet<String> lAccessionList = Sets.newHashSet();
+        Set<String> lAccessionList = Sets.newHashSet();
         lAccessionList.add("P60709");
         lAccessionList.add("Q96H99");
         lAccessionList.add("Q6P2E6");

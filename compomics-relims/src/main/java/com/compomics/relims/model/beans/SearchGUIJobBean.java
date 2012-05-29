@@ -9,7 +9,7 @@ import org.apache.log4j.Logger;
 import javax.annotation.Nullable;
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 /**
@@ -68,7 +68,7 @@ public class SearchGUIJobBean {
     }
 
     public String getSearchGUICommandString() {
-        ArrayList<String> lCommandParts = Lists.newArrayList();
+        Collection<String> lCommandParts = Lists.newArrayList();
         try {
             String lSearchGuiArchiveName = RelimsProperties.getSearchGuiArchivePath();
             List<String> lSpectrumFiles = Lists.transform(spectra, new Function<File, String>() {

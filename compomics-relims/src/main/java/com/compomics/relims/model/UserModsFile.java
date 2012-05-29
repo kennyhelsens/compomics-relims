@@ -11,6 +11,7 @@ import org.apache.log4j.Logger;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 /**
@@ -87,8 +88,8 @@ public class UserModsFile {
         lUserModCollection.build(aFile);
     }
 
-    public ArrayList<String> getFixedModsAsString() {
-        ArrayList<String> lResult = new ArrayList<String>();
+    public Collection<String> getFixedModsAsString() {
+        Collection<String> lResult = new ArrayList<String>();
         for (Modification lModification : iMascotModifications) {
             if (lModification.isFixed()) {
                 lResult.add(getModificationNameID(lModification, hasLocation((lModification))));
@@ -106,17 +107,17 @@ public class UserModsFile {
         return lResult;
     }
 
-    public ArrayList<String> getVarModsAsString() {
-        ArrayList<String> lResult = new ArrayList<String>();
+    public Collection<String> getVarModsAsString() {
+        Collection<String> lResult = new ArrayList<String>();
         for (Modification lModification : iMascotModifications) {
-            if (lModification.isFixed() == false) {
+            if (!lModification.isFixed()) {
                 lResult.add(getModificationNameID(lModification, hasLocation((lModification))));
             }
         }
 
         if (iOMSSAXSDModifications != null) {
             for (UserMod lRelimsMod : iOMSSAXSDModifications) {
-                if (lRelimsMod.isFixed() == false) {
+                if (!lRelimsMod.isFixed()) {
                     lResult.add(lRelimsMod.getModificationName());
                 }
             }
@@ -132,9 +133,6 @@ public class UserModsFile {
         }
         return lModificationName;
     }
-
-    ;
-
 
     private boolean hasLocation(Modification lModification) {
 

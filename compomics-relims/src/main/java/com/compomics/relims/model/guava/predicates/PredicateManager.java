@@ -23,12 +23,8 @@ public class PredicateManager {
 
     private Collection<Predicate> iPredicateCollection;
 
-    private final DataProvider iDataProvider;
-
 
     public PredicateManager(DataProvider aDataProvider) {
-        iDataProvider = aDataProvider;
-
         ArrayList lAllowedInstruments = new ArrayList();
         lAllowedInstruments.add(8);
         lAllowedInstruments.add(9);

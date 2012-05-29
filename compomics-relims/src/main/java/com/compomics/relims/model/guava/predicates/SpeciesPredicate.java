@@ -9,7 +9,7 @@ import com.google.common.collect.Sets;
 import org.apache.log4j.Logger;
 
 import javax.annotation.Nullable;
-import java.util.HashSet;
+import java.util.Set;
 
 /**
  * This class is a
@@ -33,8 +33,8 @@ public class SpeciesPredicate implements Predicate<RelimsProjectBean> {
 
         long lProjectid = aProjectBean.getProjectID();
 
-        HashSet<String> lAccessionsForProject = MsLimsDataProvider.getInstance().getProteinAccessionsForProject(lProjectid);
-        HashSet<String> lReducedSet = Sets.newHashSet();
+        Iterable<String> lAccessionsForProject = MsLimsDataProvider.getInstance().getProteinAccessionsForProject(lProjectid);
+        Set<String> lReducedSet = Sets.newHashSet();
 
         int lCounter = 0;
         for (String lAccession : lAccessionsForProject) {

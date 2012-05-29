@@ -9,8 +9,6 @@ import com.google.common.base.Joiner;
 import org.apache.log4j.Logger;
 
 import javax.annotation.Nullable;
-import java.util.ArrayList;
-import java.util.Iterator;
 
 /**
  * This class is a
@@ -22,52 +20,59 @@ public class ModificationMatchFunction implements Function<Modification, PTM> {
     public PTM apply(@Nullable Modification aModification) {
         PTMFactory lPTMFactory = RelimsProperties.getPTMFactory(false);
 
-        double lSpecifiedMass = iDoubleRounderFunction.apply(aModification.getMass());
+        double lSpecifiedMass = 0;
+        if (aModification != null) {
+            lSpecifiedMass = iDoubleRounderFunction.apply(aModification.getMass());
+        }
 
-        Iterator<String> lPtmNameIterator = lPTMFactory.getPTMs().iterator();
-        while (lPtmNameIterator.hasNext()) {
-            String lPTMName = lPtmNameIterator.next();
+        for (String lPTMName : lPTMFactory.getPTMs()) {
             PTM lPTM = lPTMFactory.getPTM(lPTMName);
-            ArrayList<String> lPTMResidues = lPTM.getResidues();
+            Iterable<String> lPTMResidues = lPTM.getResidues();
             double lRunningMass = iDoubleRounderFunction.apply(lPTM.getMass());
             if (Double.compare(lSpecifiedMass, lRunningMass) == 0) {
 
                 // Amino acid modification should not have a mascot "term-like" location
                 if (lPTM.getType() == 0) {
-                    if (aModification.getLocation().toLowerCase().indexOf("term") > 0) {
-                        continue;
-                    }
-                    if (aModification.getLocation().length() == 1) {
-                        String lModAA = aModification.getLocation().substring(0, 1);
-                        for (String lResidue : lPTMResidues) {
-                            if (lModAA.equals(lResidue)) {
-                                logMatchOk(aModification, lPTM);
-                                return lPTM;
-                            }
-                            ;
+                    if (aModification != null) {
+                        if (aModification.getLocation().toLowerCase().indexOf("term") > 0) {
+                            continue;
                         }
                     }
-                }else{
-                    if (aModification.getLocation().toLowerCase().indexOf("n-term") >= 0) {
-                        for (String lResidue : lPTMResidues) {
-                            if (lResidue.equals("[")) {
-                                logMatchOk(aModification, lPTM);
-                                return lPTM;
+                    if (aModification != null) {
+                        if (aModification.getLocation().length() == 1) {
+                            String lModAA = aModification.getLocation().substring(0, 1);
+                            for (String lResidue : lPTMResidues) {
+                                if (lModAA.equals(lResidue)) {
+                                    logMatchOk(aModification, lPTM);
+                                    return lPTM;
+                                }
                             }
                         }
-                    } else if (aModification.getLocation().toLowerCase().indexOf("c-term") >= 0) {
-                        for (String lResidue : lPTMResidues) {
-                            if (lResidue.equals("]")) {
-                                logMatchOk(aModification, lPTM);
-                                return lPTM;
+                    }
+                } else {
+                    if (aModification != null) {
+                        if (aModification.getLocation().toLowerCase().indexOf("n-term") >= 0) {
+                            for (String lResidue : lPTMResidues) {
+                                if (lResidue.equals("[")) {
+                                    logMatchOk(aModification, lPTM);
+                                    return lPTM;
+                                }
+                            }
+                        } else if (aModification.getLocation().toLowerCase().indexOf("c-term") >= 0) {
+                            for (String lResidue : lPTMResidues) {
+                                if (lResidue.equals("]")) {
+                                    logMatchOk(aModification, lPTM);
+                                    return lPTM;
+                                }
                             }
                         }
                     }
                 }
-
-
             }
+
+
         }
+
         return null;
     }
 

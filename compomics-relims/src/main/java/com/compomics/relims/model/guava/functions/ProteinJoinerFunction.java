@@ -63,7 +63,6 @@ public class ProteinJoinerFunction implements Function<ArrayList<String>, String
         if (iProteinMap != null) {
             iProteinMap.clear();
         }
-        ;
         iProteinMap = new FastHashMap();
 
         try {
@@ -83,7 +82,7 @@ public class ProteinJoinerFunction implements Function<ArrayList<String>, String
                     lineIsAccession = false;
                 }
 
-                if (lineIsAccession == false) {
+                if (!lineIsAccession) {
                     // the last line we have read is a sequence,
                     // so we can persist the accession-sequence pair into the hashmap.
                     iProteinMap.put(lCurrentAccession, lCurrentSequence);
@@ -97,4 +96,4 @@ public class ProteinJoinerFunction implements Function<ArrayList<String>, String
         }
 
     }
-};
+}

@@ -485,7 +485,7 @@ public class Utilities {
 
         int needed = 0;
 
-        HashMap names = initNameAndValues()[0];
+        Map names = initNameAndValues()[0];
 
         int lastModif = -1;
 
@@ -959,7 +959,7 @@ public class Utilities {
             return workingSet;
         }
 
-        ArrayList<String> lines = new ArrayList<String>();
+        Collection<String> lines = new ArrayList<String>();
 
         int lineStart = 0; // the position of start of currently processed line in the original string
 

@@ -1,12 +1,13 @@
 package com.compomics.relims.model.provider;
 
-import com.compomics.relims.conf.RelimsProperties;
 import org.apache.log4j.Logger;
 
 import java.sql.Connection;
 import java.sql.Driver;
 import java.sql.SQLException;
 import java.util.Properties;
+
+import static com.compomics.relims.conf.RelimsProperties.*;
 
 /**
  * Created by IntelliJ IDEA.
@@ -16,6 +17,7 @@ import java.util.Properties;
  * <p/>
  * This class
  */
+@SuppressWarnings({"FeatureEnvy"})
 public class ConnectionProvider {
 	// Class specific log4j logger for DatabaseObjectFactory instances.
 	private static Logger logger = Logger.getLogger(ConnectionProvider.class);
@@ -38,10 +40,10 @@ public class ConnectionProvider {
             String driver = "com.mysql.jdbc.Driver";
             Driver d = (Driver)Class.forName(driver).newInstance();
 
-            String user = RelimsProperties.getDbUserName();
-            String pass = RelimsProperties.getDbPass();
-            String dbname = RelimsProperties.getDbDatabaseName();
-            String adress = RelimsProperties.getDbAdress();
+            String user = getDbUserName();
+            String pass = getDbPass();
+            String dbname = getDbDatabaseName();
+            String adress = getDbAdress();
 
             if(user != null) {
                lProps.put("user", user);

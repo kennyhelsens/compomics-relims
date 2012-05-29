@@ -161,15 +161,17 @@ public class DatfileIterator implements Iterator<MascotDatfileInf> {
             // If the datfileid of this row is different then the datfileid of the current IterationUnit,
             // then a new IterationUnit must be created.
 
-            if (unit.getDatfileID() != lDatfileID) {
-                // Store the previous unit in the instance list.
-                iIterationUnits.add(unit);
-                // Create a new unit.
-                unit = new MsLimsIterationUnit(lDatfileID);
+            if (unit != null) {
+                if (unit.getDatfileID() != lDatfileID) {
+                    // Store the previous unit in the instance list.
+                    iIterationUnits.add(unit);
+                    // Create a new unit.
+                    unit = new MsLimsIterationUnit(lDatfileID);
+                }
+                // Always add the the identificationid and filename of this row to the current unit.
+                unit.add(lQueryNumber, lIdentificationid);
             }
 
-            // Always add the the identificationid and filename of this row to the current unit.
-            unit.add(lQueryNumber, lIdentificationid);
 
         }
 
@@ -182,14 +184,12 @@ public class DatfileIterator implements Iterator<MascotDatfileInf> {
         }
 
 
-        if (true) {
-//            logger.debug("DEBUG mode, only loading 5 datfiles!!");
-            iIterationUnitIndex = iIterationUnits.size() - 5;
-            if(iIterationUnitIndex < 0){
-                iIterationUnitIndex = 0;
-            }
-//            throw new IllegalAddException("fsfe");
+        logger.debug("DEBUG mode, only loading 5 datfiles!!");
+        iIterationUnitIndex = iIterationUnits.size() - 5;
+        if (iIterationUnitIndex < 0) {
+            iIterationUnitIndex = 0;
         }
+
         // Close fence post, Add the last unit as well!
     }
 

@@ -19,6 +19,7 @@ import org.apache.log4j.Logger;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 /**
@@ -102,11 +103,11 @@ public class SearchCommandVarMod implements SearchCommandGenerator {
         ArrayList<String> lFixedMatchedPTMs = Lists.newArrayList();
         ArrayList<String> lVariableMatchedPTMs = Lists.newArrayList();
 
-        ArrayList<Modification> lAllMods = Lists.newArrayList();
+        Collection<Modification> lAllMods = Lists.newArrayList();
         lAllMods.addAll(iVariableModifications);
         lAllMods.addAll(iFixedModifications);
 
-        ArrayList<Modification> lMascotModifications = Lists.newArrayList();
+        List<Modification> lMascotModifications = Lists.newArrayList();
 
         try {
             for (Object o : lAllMods) {

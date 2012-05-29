@@ -1,18 +1,17 @@
 package com.compomics.relims.model.beans;
 
 import com.compomics.mascotdatfile.util.mascot.ModificationList;
-import com.compomics.mascotdatfile.util.mascot.Parameters;
 import com.compomics.relims.model.UserModsFile;
 import com.google.common.collect.Lists;
 
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * This class is a
  */
 public class RelimsProjectBean {
 
-    ArrayList<Parameters> iParameterSet = Lists.newArrayList();
     ArrayList<ModificationList> iModificationLists = Lists.newArrayList();
     private ArrayList<String> iVariableMatchedPTMs;
     private ArrayList<String> iFixedMatchedPTMs;
@@ -30,15 +29,7 @@ public class RelimsProjectBean {
         iModificationLists = aModificationLists;
     }
 
-    public ArrayList<Parameters> getParameterSet() {
-        return iParameterSet;
-    }
-
-    public void setParameterSets(ArrayList<Parameters> aParameterSet) {
-        iParameterSet = aParameterSet;
-    }
-
-    public ArrayList<String> getVariableMatchedPTMs() {
+    public List<String> getVariableMatchedPTMs() {
         return iVariableMatchedPTMs;
     }
 
@@ -46,7 +37,7 @@ public class RelimsProjectBean {
         iVariableMatchedPTMs = aVariableMatchedPTMs;
     }
 
-    public ArrayList<String> getFixedMatchedPTMs() {
+    public List<String> getFixedMatchedPTMs() {
         return iFixedMatchedPTMs;
     }
 

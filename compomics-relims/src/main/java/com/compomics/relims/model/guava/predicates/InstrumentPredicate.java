@@ -8,7 +8,6 @@ import com.google.common.collect.Sets;
 import org.apache.log4j.Logger;
 
 import javax.annotation.Nullable;
-import java.util.HashSet;
 import java.util.Set;
 
 /**
@@ -28,7 +27,7 @@ public class InstrumentPredicate implements Predicate<RelimsProjectBean> {
             lProjectid = aProjectBean.getProjectID();
         }
 
-        HashSet<Integer> lInstrumentsForProject = MsLimsDataProvider.getInstance().getInstrumentsForProject(lProjectid);
+        Set<Integer> lInstrumentsForProject = MsLimsDataProvider.getInstance().getInstrumentsForProject(lProjectid);
         Sets.SetView<Integer> lUnion = Sets.union(lInstrumentsForProject, iAllowedInstrumentIDs);
         if (lUnion.size() > iAllowedInstrumentIDs.size()) {
             logger.debug("project " + lProjectid + " has non-allowed instruments (" + Joiner.on(",").join(lInstrumentsForProject) + ")");

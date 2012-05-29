@@ -136,10 +136,6 @@ public class MsLimsDataProvider implements DataProvider {
         return lNumberOfPeptides;
     }
 
-    public DatfileIterator getDatfilesForProject(long aProjectID) {
-        return new DatfileIterator(ConnectionProvider.getConnection(), aProjectID);
-    }
-
     public File getSpectraForProject(long aProjectID) throws IOException {
         // The stats and container thereof.
 
@@ -257,29 +253,22 @@ public class MsLimsDataProvider implements DataProvider {
 
         lRelimsProjectBean.setProjectID((int) aProjectid);
 
-        ArrayList<Parameters> lParameterSets = Lists.newArrayList();
+        ArrayList<Parameters> lParameterList = Lists.newArrayList();
         ArrayList<ModificationList> lModificationLists = Lists.newArrayList();
 
-        DatfileIterator lIterator = this.getDatfilesForProject(aProjectid);
-        int lCounter = 0;
+        DatfileIterator lIterator = new DatfileIterator(ConnectionProvider.getConnection(), aProjectid);
         while (lIterator.hasNext()) {
-            MascotDatfileInf lNext = lIterator.next();
-            lParameterSets.add(lNext.getParametersSection());
-            lModificationLists.add(lNext.getModificationList());
-            if (lCounter++ > 3) {
-                continue;
-            }
-
+            MascotDatfileInf lMascotDatfile = lIterator.next();
+            lModificationLists.add(lMascotDatfile.getModificationList());
         }
 
         lRelimsProjectBean.setModificationLists(lModificationLists);
-        lRelimsProjectBean.setParameterSets(lParameterSets);
 
         return lRelimsProjectBean;
 
     }
 
-    public String toString(){
+    public String toString() {
         return "MsLimsDataProvider";
     }
 
