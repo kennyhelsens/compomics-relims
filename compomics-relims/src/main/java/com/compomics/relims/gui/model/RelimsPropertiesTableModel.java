@@ -4,9 +4,12 @@ import com.compomics.relims.conf.RelimsProperties;
 import com.compomics.relims.exception.RelimsException;
 import com.compomics.relims.gui.listener.RelimsPropertiesTableModelListener;
 import com.google.common.collect.Lists;
+import org.apache.commons.configuration.ConfigurationException;
 import org.apache.commons.configuration.PropertiesConfiguration;
+import org.apache.log4j.Logger;
 
 import javax.swing.table.DefaultTableModel;
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
@@ -16,9 +19,11 @@ import java.util.Vector;
  * This class is a
  */
 public class RelimsPropertiesTableModel extends DefaultTableModel {
-    PropertiesConfiguration config;
-    int iNumberOfKeys = 0;
-    ArrayList<String> iKeyList = Lists.newArrayList();
+    private static Logger logger = Logger.getLogger(RelimsPropertiesTableModel.class);
+
+    private PropertiesConfiguration config;
+    private int iNumberOfKeys = 0;
+    private ArrayList<String> iKeyList = Lists.newArrayList();
 
     public RelimsPropertiesTableModel() {
         config = RelimsProperties.getConfig();
@@ -43,8 +48,6 @@ public class RelimsPropertiesTableModel extends DefaultTableModel {
         Vector<String> lColumnNames = new Vector<String>(2);
         lColumnNames.addElement("Property");
         lColumnNames.addElement("Value");
-        lColumnNames.addElement("");
-        lColumnNames.addElement("");
 
         setColumnIdentifiers(lColumnNames);
     }
@@ -78,6 +81,15 @@ public class RelimsPropertiesTableModel extends DefaultTableModel {
 
         // Update the config instance!
         config.setProperty(lKey, lValue);
+        File configFile = config.getFile();
+        if(configFile.exists()){
+            try {
+                config.save();
+                logger.debug(String.format("updated <%s> \t key:<%s> \t value:<%s>", configFile.getName(), lKey, lValue));
+            } catch (ConfigurationException e) {
+                logger.error(e.getMessage(), e);
+            }
+        }
 
     }
 
