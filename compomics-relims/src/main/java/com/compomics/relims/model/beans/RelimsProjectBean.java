@@ -69,4 +69,9 @@ public class RelimsProjectBean {
     public void setProjectID(long aProjectID) {
         iProjectID = aProjectID;
     }
+
+    @Override
+    public String toString() {
+        return "" + getProjectID();
+    }
 }
