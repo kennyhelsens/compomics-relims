@@ -1,11 +1,13 @@
 package com.compomics.relims.model.provider.mslims;
 
 import com.compomics.mascotdatfile.util.interfaces.MascotDatfileInf;
+import com.compomics.mascotdatfile.util.interfaces.Modification;
 import com.compomics.mascotdatfile.util.mascot.ModificationList;
-import com.compomics.mascotdatfile.util.mascot.Parameters;
 import com.compomics.mslims.db.accessors.Spectrum_file;
 import com.compomics.mslims.util.fileio.MascotGenericFile;
+import com.compomics.omssa.xsd.UserMod;
 import com.compomics.relims.conf.RelimsProperties;
+import com.compomics.relims.model.UserModConverter;
 import com.compomics.relims.model.beans.RelimsProjectBean;
 import com.compomics.relims.model.interfaces.DataProvider;
 import com.compomics.relims.model.provider.ConnectionProvider;
@@ -22,10 +24,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Vector;
+import java.util.*;
 
 /**
  * This class is a
@@ -253,7 +252,6 @@ public class MsLimsDataProvider implements DataProvider {
 
         lRelimsProjectBean.setProjectID((int) aProjectid);
 
-        ArrayList<Parameters> lParameterList = Lists.newArrayList();
         ArrayList<ModificationList> lModificationLists = Lists.newArrayList();
 
         DatfileIterator lIterator = new DatfileIterator(ConnectionProvider.getConnection(), aProjectid);
@@ -262,10 +260,23 @@ public class MsLimsDataProvider implements DataProvider {
             lModificationLists.add(lMascotDatfile.getModificationList());
         }
 
-        lRelimsProjectBean.setModificationLists(lModificationLists);
+        ModificationList lModificationList = lModificationLists.get(0);
+        ArrayList lFixMods = Lists.newArrayList(lModificationList.getFixedModifications());
+        ArrayList lVarMods = Lists.newArrayList(lModificationList.getVariableModifications());
+        List<Modification> lAllMascotMods = Lists.newArrayList();
+        lAllMascotMods.addAll(lFixMods);
+        lAllMascotMods.addAll(lVarMods);
+
+        List<UserMod> lUserModList = Lists.newArrayList();
+        for(Modification lMod : lAllMascotMods){
+            UserMod lUserMod = UserModConverter.convert(lMod);
+            lUserModList.add(lUserMod);
+        }
+
+//        lRelimsProjectBean.setModificationLists(lModificationLists);
+        lRelimsProjectBean.setStandardModificationList(lUserModList);
 
         return lRelimsProjectBean;
-
     }
 
     public String toString() {

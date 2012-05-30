@@ -13,11 +13,10 @@ import java.util.Vector;
  */
 public class PredicateManager {
 
-    public static enum Types {SPECIES, PROJECT_SIZE, INSTRUMENT, MODIFICATION_SET, SEARCH_SET_SIZE}
+    public static enum Types {SPECIES, PROJECT_SIZE, INSTRUMENT, SEARCH_SET_SIZE}
 
     private ProjectSizePredicate iProjectSizePredicate;
     private InstrumentPredicate iInstrumentPredicate;
-    private ModificationSetPredicate iModificationSetPredicate;
     private SpeciesPredicate iSpeciesPredicate;
     private SearchSetSizePredicate iSearchSetSizePredicate;
 
@@ -33,7 +32,6 @@ public class PredicateManager {
         iProjectSizePredicate = new ProjectSizePredicate(aDataProvider);
 
         iInstrumentPredicate = new InstrumentPredicate(new HashSet<Integer>(lAllowedInstruments));
-        iModificationSetPredicate = new ModificationSetPredicate();
         iSpeciesPredicate = new SpeciesPredicate();
         iSearchSetSizePredicate = new SearchSetSizePredicate();
 
@@ -57,10 +55,6 @@ public class PredicateManager {
                     iPredicateCollection.add(getInstrumentPredicate());
                     break;
 
-                case MODIFICATION_SET:
-                    iPredicateCollection.add(getModificationSetPredicate());
-                    break;
-
                 case SEARCH_SET_SIZE:
                     iPredicateCollection.add(getSearchSetSizePredicate());
                     break;
@@ -77,10 +71,6 @@ public class PredicateManager {
 
     private InstrumentPredicate getInstrumentPredicate() {
         return iInstrumentPredicate;
-    }
-
-    private ModificationSetPredicate getModificationSetPredicate() {
-        return iModificationSetPredicate;
     }
 
     private SearchSetSizePredicate getSearchSetSizePredicate() {

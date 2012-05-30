@@ -10,7 +10,7 @@
     <url>code.google.com/p/compomics-relims/</url>
     <!-- Set the version number for the whole project -->
     <properties>
-        <version.number>0.1</version.number>
+        <version.number>0.2</version.number>
     </properties>
     <!-- Licence -->
     <licenses>
@@ -196,7 +196,7 @@
         <dependency>
             <groupId>com.compomics</groupId>
             <artifactId>omssa-xsd</artifactId>
-            <version>0.3</version>
+            <version>0.3.1</version>
         </dependency>
 
     </dependencies>

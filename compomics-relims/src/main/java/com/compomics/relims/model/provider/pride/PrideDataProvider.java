@@ -1,7 +1,6 @@
 package com.compomics.relims.model.provider.pride;
 
 import com.compomics.relims.exception.RelimsException;
-import com.compomics.relims.model.provider.mslims.DatfileIterator;
 import com.compomics.relims.model.beans.RelimsProjectBean;
 import com.compomics.relims.model.interfaces.DataProvider;
 import org.apache.log4j.Logger;
@@ -32,11 +31,6 @@ public class PrideDataProvider implements DataProvider {
 
     public long getNumberOfPeptidesForProject(long aProjectID) {
         throw new RelimsException("NOT YET IMPLEMENTED");
-    }
-
-    public DatfileIterator getDatfilesForProject(long aProjectID) {
-        throw new RelimsException("NOT YET IMPLEMENTED");
-
     }
 
     public File getSpectraForProject(long aProjectID) throws IOException {

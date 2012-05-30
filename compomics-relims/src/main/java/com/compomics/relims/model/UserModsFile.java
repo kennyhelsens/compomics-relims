@@ -1,10 +1,8 @@
 package com.compomics.relims.model;
 
 import com.compomics.mascotdatfile.util.interfaces.Modification;
-import com.compomics.omssa.xsd.LocationTypeEnum;
 import com.compomics.omssa.xsd.UserMod;
 import com.compomics.omssa.xsd.UserModCollection;
-import com.compomics.relims.model.guava.functions.DoubleRounderFunction;
 import com.google.common.collect.Lists;
 import org.apache.log4j.Logger;
 
@@ -19,60 +17,16 @@ import java.util.List;
  */
 public class UserModsFile {
     private static Logger logger = Logger.getLogger(UserModsFile.class);
-    private DoubleRounderFunction iDoubleRounderFunction = new DoubleRounderFunction(4);
 
     private List<Modification> iMascotModifications = Lists.newArrayList();
     private List<UserMod> iOMSSAXSDModifications = Lists.newArrayList();
 
-    public UserModsFile() {
-
-    }
 
     public void write(File aFile) throws IOException {
         UserModCollection lUserModCollection = new UserModCollection();
 
-        for (Modification lModification : iMascotModifications) {
-            String lShortName = lModification.getShortType();
-            String lResidue = lModification.getLocation();
-            String lLocation = lModification.getLocation().toLowerCase();
-            double lMonoMass = iDoubleRounderFunction.apply(lModification.getMass());
-            boolean hasResidue = hasLocation(lModification);
-
-            // Get LocationType.
-            LocationTypeEnum lLocationTypeEnum = null;
-            if (lLocation.startsWith("n_term") || lLocation.startsWith("n-term")) {
-                // Nterm.
-                String[] lSplit = lLocation.split(" ");
-                if (lSplit.length == 1 || lSplit[1].toLowerCase().equals("protein")) {
-                    lLocationTypeEnum = LocationTypeEnum.MODNP;
-                } else {
-                    lLocationTypeEnum = LocationTypeEnum.MODNPAA;
-                    lResidue = lSplit[1];
-                }
-
-            } else if (lLocation.startsWith("c_term") || lLocation.startsWith("c-term")) {
-                String[] lSplit = lLocation.split(" ");
-                if (lSplit.length == 1 || lSplit[1].toLowerCase().equals("protein")) {
-                    lLocationTypeEnum = LocationTypeEnum.MODCP;
-                } else {
-                    lLocationTypeEnum = LocationTypeEnum.MODCPAA;
-                    lResidue = lSplit[1];
-                }
-            } else {
-                lLocationTypeEnum = LocationTypeEnum.MODAA;
-            }
-
-            UserMod lUserMod = new UserMod();
-
-            String lModificationName = getModificationNameID(lModification, hasResidue);
-
-            lUserMod.setLocationType(lLocationTypeEnum);
-            lUserMod.setMass(lMonoMass);
-            lUserMod.setModificationName(lModificationName);
-            if (hasResidue) {
-                lUserMod.setLocation(lResidue);
-            }
-
+        for (Modification lMascotModification : iMascotModifications) {
+            UserMod lUserMod = UserModConverter.convert(lMascotModification);
             lUserModCollection.add(lUserMod);
         }
 
@@ -88,11 +42,12 @@ public class UserModsFile {
         lUserModCollection.build(aFile);
     }
 
+
     public Collection<String> getFixedModsAsString() {
         Collection<String> lResult = new ArrayList<String>();
         for (Modification lModification : iMascotModifications) {
             if (lModification.isFixed()) {
-                lResult.add(getModificationNameID(lModification, hasLocation((lModification))));
+                lResult.add(UserModConverter.getModificationNameID(lModification, UserModConverter.hasLocation((lModification))));
             }
         }
 
@@ -111,7 +66,7 @@ public class UserModsFile {
         Collection<String> lResult = new ArrayList<String>();
         for (Modification lModification : iMascotModifications) {
             if (!lModification.isFixed()) {
-                lResult.add(getModificationNameID(lModification, hasLocation((lModification))));
+                lResult.add(UserModConverter.getModificationNameID(lModification, UserModConverter.hasLocation(lModification)));
             }
         }
 
@@ -126,38 +81,7 @@ public class UserModsFile {
         return lResult;
     }
 
-    private String getModificationNameID(Modification aModification, boolean hasLocation) {
-        String lModificationName = aModification.getType();
-        if (hasLocation) {
-            lModificationName = lModificationName.toLowerCase() + " of " + aModification.getLocation();
-        }
-        return lModificationName;
-    }
 
-    private boolean hasLocation(Modification lModification) {
-
-        String lLocation = lModification.getLocation().toLowerCase();
-        boolean hasResidue = false;
-
-        if (lLocation.startsWith("n_term") || lLocation.startsWith("n-term")) {
-            // Nterm.
-            String[] lSplit = lLocation.split(" ");
-            if (lSplit.length == 1 || lSplit[1].toLowerCase().equals("protein")) {
-            } else {
-                hasResidue = true;
-            }
-
-        } else if (lLocation.startsWith("c_term") || lLocation.startsWith("c-term")) {
-            String[] lSplit = lLocation.split(" ");
-            if (lSplit.length == 1 || lSplit[1].toLowerCase().equals("protein")) {
-            } else {
-                hasResidue = true;
-            }
-        } else {
-            hasResidue = true;
-        }
-        return hasResidue;
-    }
 
 
     public void setMascotModifications(List<Modification> aMascotModifications) {

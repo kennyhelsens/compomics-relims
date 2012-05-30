@@ -1,12 +1,10 @@
 package com.compomics.relims.concurrent;
 
+import com.compomics.relims.conf.RelimsProperties;
 import com.compomics.relims.model.beans.RelimsProjectBean;
 import com.compomics.relims.model.beans.SearchList;
 import com.compomics.relims.model.guava.predicates.PredicateManager;
-import com.compomics.relims.model.interfaces.DataProvider;
-import com.compomics.relims.model.interfaces.ProjectRunner;
-import com.compomics.relims.model.interfaces.SearchCommandGenerator;
-import com.compomics.relims.model.interfaces.SearchStrategy;
+import com.compomics.relims.model.interfaces.*;
 import com.google.common.base.Predicate;
 import eu.isas.peptideshaker.cmd.PeptideShakerCLI;
 import eu.isas.peptideshaker.cmd.PeptideShakerCLIInputBean;
@@ -32,10 +30,8 @@ public class ProjectRunnerImpl extends Observable implements ProjectRunner {
     private PredicateManager iPredicateManager;
     private SearchStrategy iSearchStrategy;
     private DataProvider iDataProvider;
+    private ModificationResolver iModificationResolver;
 
-    public ProjectRunnerImpl() {
-
-    }
 
     public void setPredicateManager(PredicateManager aPredicateManager) {
         iPredicateManager = aPredicateManager;
@@ -47,16 +43,12 @@ public class ProjectRunnerImpl extends Observable implements ProjectRunner {
             long lProjectid = iRelimsProjectBean.getProjectID();
             logger.debug("creating projectrunner for " + lProjectid);
 
-
-
             Collection<Predicate> lPredicates = iPredicateManager.createCollection(
                     PredicateManager.Types.PROJECT_SIZE,
                     PredicateManager.Types.INSTRUMENT,
                     PredicateManager.Types.SPECIES,
-                    PredicateManager.Types.SEARCH_SET_SIZE,
-                    PredicateManager.Types.MODIFICATION_SET
+                    PredicateManager.Types.SEARCH_SET_SIZE
             );
-
 
             logger.debug(format("validating project contents by %d predices", lPredicates.size()));
             for (Predicate lProjectPredicate : lPredicates) {
@@ -71,13 +63,15 @@ public class ProjectRunnerImpl extends Observable implements ProjectRunner {
             File lSpectrumFile = iDataProvider.getSpectraForProject(lProjectid);
             iSearchStrategy.addSpectrumFile(lSpectrumFile);
 
+            logger.debug("resolving modification sets");
+            iModificationResolver.resolveModificationList(iRelimsProjectBean);
+            iModificationResolver.persistUserMods(RelimsProperties.getSearchGuiUserModFile());
 
-            logger.debug(format("creating SearchCommands for project %s", lProjectid));
-            SearchList<SearchCommandGenerator> lSearchCommandList = new SearchList<SearchCommandGenerator>();
+            logger.debug(format("creating SearchCommands for project %s using SearchStrategy %s", lProjectid, iSearchStrategy.getName()));
+            SearchList lSearchCommandList = new SearchList();
             iSearchStrategy.fill(lSearchCommandList, iRelimsProjectBean);
 
-
-            logger.debug(format("launching the searchlist with %d MOD variants", lSearchCommandList.size()));
+            logger.debug(format("launching the searchlist with %d variants", lSearchCommandList.size()));
             for (Object lSearchCommand : lSearchCommandList) {
                 SearchCommandGenerator lSearch = (SearchCommandGenerator) lSearchCommand;
                 String lCommand = lSearch.generateCommand();
@@ -134,4 +128,7 @@ public class ProjectRunnerImpl extends Observable implements ProjectRunner {
         iDataProvider = aDataProvider;
     }
 
+    public void setModificationResolver(ModificationResolver aModificationResolver) {
+        iModificationResolver = aModificationResolver;
+    }
 }

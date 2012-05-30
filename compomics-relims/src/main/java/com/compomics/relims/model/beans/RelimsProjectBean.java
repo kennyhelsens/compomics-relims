@@ -1,10 +1,9 @@
 package com.compomics.relims.model.beans;
 
-import com.compomics.mascotdatfile.util.mascot.ModificationList;
+import com.compomics.omssa.xsd.UserMod;
 import com.compomics.relims.model.UserModsFile;
 import com.google.common.collect.Lists;
 
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -12,37 +11,54 @@ import java.util.List;
  */
 public class RelimsProjectBean {
 
-    ArrayList<ModificationList> iModificationLists = Lists.newArrayList();
-    private ArrayList<String> iVariableMatchedPTMs;
-    private ArrayList<String> iFixedMatchedPTMs;
-    private UserModsFile iUserModsFile;
-    private long iProjectID;
+    private long iProjectID = -1;
+
+    private UserModsFile iUserModsFile = new UserModsFile();
+
+    private List<String> iVariableMatchedPTMs = Lists.newArrayList();
+    private List<String> iFixedMatchedPTMs = Lists.newArrayList();
+    private List<UserMod> iStandardModificationList = Lists.newArrayList();
+    private List<UserMod> iExtraModificationList = Lists.newArrayList();
 
     public RelimsProjectBean() {
     }
 
-    public ArrayList<ModificationList> getModificationLists() {
-        return iModificationLists;
+    public List<UserMod> getStandardModificationList(){
+        return iStandardModificationList;
     }
 
-    public void setModificationLists(ArrayList<ModificationList> aModificationLists) {
-        iModificationLists = aModificationLists;
+    public List<UserMod> getExtraModificationList(){
+        return iExtraModificationList;
     }
+
+
+    public void setStandardModificationList(List<UserMod> aStandardModificationList){
+        iStandardModificationList.clear();
+        iStandardModificationList.addAll(aStandardModificationList);
+    }
+
+    public void setExtraModificationList(List<UserMod> aExtraModificationList) {
+        iExtraModificationList.clear();
+        iExtraModificationList.addAll(aExtraModificationList);
+    }
+
 
     public List<String> getVariableMatchedPTMs() {
         return iVariableMatchedPTMs;
     }
 
-    public void setVariableMatchedPTMs(ArrayList<String> aVariableMatchedPTMs) {
-        iVariableMatchedPTMs = aVariableMatchedPTMs;
+    public void setVariableMatchedPTMs(List<String> aVariableMatchedPTMs) {
+        iVariableMatchedPTMs.clear();
+        iVariableMatchedPTMs.addAll(aVariableMatchedPTMs);
     }
 
     public List<String> getFixedMatchedPTMs() {
         return iFixedMatchedPTMs;
     }
 
-    public void setFixedMatchedPTMs(ArrayList<String> aFixedMatchedPTMs) {
-        iFixedMatchedPTMs = aFixedMatchedPTMs;
+    public void setFixedMatchedPTMs(List<String> aFixedMatchedPTMs) {
+        iFixedMatchedPTMs.clear();
+        iFixedMatchedPTMs.addAll(aFixedMatchedPTMs);
     }
 
     public void setUserModsFile(UserModsFile aUserModsFile) {
@@ -64,5 +80,22 @@ public class RelimsProjectBean {
     @Override
     public String toString() {
         return "" + getProjectID();
+    }
+
+    @Override
+    public RelimsProjectBean clone() throws CloneNotSupportedException {
+        RelimsProjectBean lProjectBean = new RelimsProjectBean();
+
+        lProjectBean.setProjectID(getProjectID());
+
+        lProjectBean.setStandardModificationList(getStandardModificationList());
+        lProjectBean.setExtraModificationList(getExtraModificationList());
+
+        lProjectBean.setUserModsFile(getUserModsFile());
+
+        lProjectBean.setFixedMatchedPTMs(getFixedMatchedPTMs());
+        lProjectBean.setVariableMatchedPTMs(getVariableMatchedPTMs());
+
+        return lProjectBean;
     }
 }

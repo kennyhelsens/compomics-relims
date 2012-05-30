@@ -11,7 +11,7 @@ import javax.swing.event.ListDataListener;
 public class StrategySelectionModel implements ComboBoxModel {
 
     String[] iRunnerIds = RelimsProperties.getRelimsClassList();
-    Object iSelectedItem = iRunnerIds[1];
+    Object iSelectedItem = iRunnerIds[0];
 
     public void setSelectedItem(Object o) {
         iSelectedItem = o;

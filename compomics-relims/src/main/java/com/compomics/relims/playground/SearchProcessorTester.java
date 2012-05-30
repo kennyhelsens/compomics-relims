@@ -1,10 +1,10 @@
 package com.compomics.relims.playground;
 
+import com.compomics.relims.concurrent.SearchCommandGenerator;
 import com.compomics.relims.concurrent.SearchCommandVarMod;
 import com.compomics.relims.conf.RelimsProperties;
 import com.compomics.relims.model.beans.RelimsProjectBean;
 import com.compomics.relims.model.beans.SearchList;
-import com.compomics.relims.model.interfaces.SearchCommandGenerator;
 import com.google.common.collect.Lists;
 import eu.isas.peptideshaker.cmd.PeptideShakerCLI;
 import eu.isas.peptideshaker.cmd.PeptideShakerCLIInputBean;
@@ -38,12 +38,12 @@ public class SearchProcessorTester {
         lProjectSetupBean.setProjectID(0);
 
         // simulate a SearchCommandGenerator
-        SearchCommandGenerator lSearchBean = new SearchCommandVarMod("test", null, null, lProjectSetupBean, lSpectrumFiles);
+        SearchCommandGenerator lSearchBean = new SearchCommandVarMod("test", lProjectSetupBean, lSpectrumFiles);
 
         lSearchBean.setSearchResultFolder(lFile.getParentFile());
 
         // create a searchlist around this searchbean
-        SearchList<SearchCommandGenerator> lSearchList = new SearchList<SearchCommandGenerator>();
+        SearchList lSearchList = new SearchList();
         lSearchList.add(lSearchBean);
 
         // create a search processor using this searchbean

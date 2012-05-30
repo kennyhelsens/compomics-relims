@@ -18,4 +18,6 @@ public interface ProjectRunner extends Callable<String> {
     public void setSearchStrategy(SearchStrategy aSearchStrategy);
 
     public void setDataProvider(DataProvider aDataProvider);
+
+    public void setModificationResolver(ModificationResolver aModificationResolver);
 }

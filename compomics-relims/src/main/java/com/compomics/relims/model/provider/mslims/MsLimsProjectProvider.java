@@ -17,6 +17,7 @@ public class MsLimsProjectProvider extends ProjectProvider {
     public MsLimsProjectProvider() {
         super();
         iDataProvider = new MsLimsDataProvider();
+        iModificationResolver = new ModificationResolverMslimsImpl();
     }
 
     public List<Long> getAllProjects() {
@@ -32,6 +33,7 @@ public class MsLimsProjectProvider extends ProjectProvider {
         }
         return lAllProjectIds;
     }
+
 
     public List<Long> getRandomProjects(int lSize) {
         List<Long> lAllProjects = this.getAllProjects();
