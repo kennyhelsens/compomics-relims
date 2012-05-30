@@ -273,7 +273,6 @@ public class MsLimsDataProvider implements DataProvider {
             lUserModList.add(lUserMod);
         }
 
-//        lRelimsProjectBean.setModificationLists(lModificationLists);
         lRelimsProjectBean.setStandardModificationList(lUserModList);
 
         return lRelimsProjectBean;
