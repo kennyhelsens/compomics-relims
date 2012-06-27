@@ -85,9 +85,9 @@ public class ProjectRunnerImpl extends Observable implements ProjectRunner {
 
                 lPeptideShakerCLIInputBean.setInput(lSearch.getSearchResultFolder());
                 lPeptideShakerCLIInputBean.setOutput(lSearch.getSearchResultFolder());
-                lPeptideShakerCLIInputBean.setPSMFDR(1.0);
-                lPeptideShakerCLIInputBean.setPeptideFDR(1.0);
-                lPeptideShakerCLIInputBean.setProteinFDR(1.0);
+                lPeptideShakerCLIInputBean.setPSMFDR(5.0);
+                lPeptideShakerCLIInputBean.setPeptideFDR(5.0);
+                lPeptideShakerCLIInputBean.setProteinFDR(5.0);
                 lPeptideShakerCLIInputBean.setExperimentID(format("projectid_%d", lSearch.getProjectId()));
                 lPeptideShakerCLIInputBean.setSampleID(lSearch.getName());
 
