@@ -120,8 +120,13 @@ public class RelimsProperties {
         File lModFile = new File(getSearchGuiConfFolder(), config.getString("searchgui.mods"));
         File lUserModFile = new File(getSearchGuiConfFolder(), config.getString("searchgui.usermods.default"));
         try {
+            if(ptmFactory == null){
+                ptmFactory = PTMFactory.getInstance();
+            }
 
+            ptmFactory.clearFactory();
             ptmFactory = PTMFactory.getInstance();
+
             ptmFactory.importModifications(lModFile, false);
             ptmFactory.importModifications(lUserModFile, true);
 

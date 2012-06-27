@@ -135,6 +135,14 @@
     </repositories>
     <!-- Dependencies -->
     <dependencies>
+
+        <!--Apache commons configuration-->
+        <dependency>
+            <groupId>com.compomics</groupId>
+            <artifactId>pride-asa-pipeline</artifactId>
+            <version>1.1-SNAPSHOT</version>
+        </dependency>
+
         <!--Apache commons configuration-->
         <dependency>
             <groupId>eu.isas.peptideshaker</groupId>
@@ -192,6 +200,7 @@
             <version>0.2.1</version>
         </dependency>
 
+
         <!--Apache commons configuration-->
         <dependency>
             <groupId>com.compomics</groupId>
@@ -207,5 +216,13 @@
             <name>Genesis Maven Repository</name>
             <url>scp://genesis.ugent.be/home/maven/public_html/maven2</url>
         </repository>
+
+        <!--         use the following if you're not using a snapshot version. -->
+        <snapshotRepository>
+            <id>genesis-maven2-repo</id>
+            <name>Genesis Maven Repository</name>
+            <url>scp://genesis.ugent.be/home/maven/public_html/maven2</url>
+        </snapshotRepository>
+
     </distributionManagement>
 </project>

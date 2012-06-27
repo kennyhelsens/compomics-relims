@@ -14,9 +14,9 @@ import javax.annotation.Nullable;
 /**
  * This class is a
  */
-public class MascotDatfileModificationMatchFunction implements Function<UserMod, PTM> {
+public class OMSSAXSDModificationMatchFunction implements Function<UserMod, PTM> {
     DoubleRounderFunction iDoubleRounderFunction = new DoubleRounderFunction(2);
-    private static Logger logger = Logger.getLogger(MascotDatfileModificationMatchFunction.class);
+    private static Logger logger = Logger.getLogger(OMSSAXSDModificationMatchFunction.class);
 
     public PTM apply(@Nullable UserMod aMod) {
         PTMFactory lPTMFactory = RelimsProperties.getPTMFactory(false);

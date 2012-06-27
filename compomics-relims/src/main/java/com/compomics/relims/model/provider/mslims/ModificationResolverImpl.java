@@ -4,29 +4,29 @@ import com.compomics.omssa.xsd.UserMod;
 import com.compomics.relims.conf.RelimsProperties;
 import com.compomics.relims.model.UserModsFile;
 import com.compomics.relims.model.beans.RelimsProjectBean;
-import com.compomics.relims.model.guava.functions.MascotDatfileModificationMatchFunction;
+import com.compomics.relims.model.guava.functions.OMSSAXSDModificationMatchFunction;
 import com.compomics.relims.model.interfaces.ModificationResolver;
 import com.compomics.util.experiment.biology.PTM;
-import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
+import com.google.common.collect.Sets;
 import org.apache.log4j.Logger;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 
 /**
  * This class is a
  */
-public class ModificationResolverMslimsImpl implements ModificationResolver {
+public class ModificationResolverImpl implements ModificationResolver {
 
-    private static Logger logger = Logger.getLogger(ModificationResolverMslimsImpl.class);
+    private static Logger logger = Logger.getLogger(ModificationResolverImpl.class);
 
-    private static MascotDatfileModificationMatchFunction iMascotDatfileModificationMatcher = new MascotDatfileModificationMatchFunction();
+    private static OMSSAXSDModificationMatchFunction iOMSSAXSDModificationMatcher = new OMSSAXSDModificationMatchFunction();
 
-    protected ArrayList<String> iFixedMatchedPTMStrings = null;
-    protected ArrayList<String> iVariableMatchedPTMStrings = null;
+    protected HashSet<String> iFixedMatchedPTMStrings = null;
+    protected HashSet<String> iVariableMatchedPTMStrings = null;
 
     protected UserModsFile iUserModsFile = null;
 
@@ -43,16 +43,18 @@ public class ModificationResolverMslimsImpl implements ModificationResolver {
         lAllModifications.addAll(lStandardModificationList);
         lAllModifications.addAll(lExtraModificationList);
 
+        // Reload the PTM factory.
+        RelimsProperties.getPTMFactory(true);
 
-        iFixedMatchedPTMStrings = Lists.newArrayList();
-        iVariableMatchedPTMStrings = Lists.newArrayList();
+        iFixedMatchedPTMStrings = Sets.newHashSet();
+        iVariableMatchedPTMStrings = Sets.newHashSet();
 
         List<UserMod> lUnresolvedModifications = Lists.newArrayList();
 
         for (UserMod lUserMod : lAllModifications) {
 
             // Could we find an appropriate match for this Modification?
-            PTM lMatchedPTM = iMascotDatfileModificationMatcher.apply(lUserMod);
+            PTM lMatchedPTM = iOMSSAXSDModificationMatcher.apply(lUserMod);
             if (lMatchedPTM != null) {
                 if (lUserMod.isFixed()) {
                     iFixedMatchedPTMStrings.add(lMatchedPTM.getName());
@@ -76,8 +78,8 @@ public class ModificationResolverMslimsImpl implements ModificationResolver {
         }
 
         // Be sure that all modifications have been matched!
-        String lErrorMessage = "not all mods were matched! (original:" + lOriginalCount + " - matched: " + lMatchCount + ")";
-        Preconditions.checkArgument(lOriginalCount == lMatchCount, lErrorMessage);
+//        String lErrorMessage = "not all mods were matched! (original:" + lOriginalCount + " - matched: " + lMatchCount + ")";
+//        Preconditions.checkArgument(lOriginalCount == lMatchCount, lErrorMessage);
 
         iUserModsFile = new UserModsFile();
 
@@ -93,8 +95,8 @@ public class ModificationResolverMslimsImpl implements ModificationResolver {
             iFixedMatchedPTMStrings.addAll(iUserModsFile.getFixedModsAsString());
         }
 
-        iRelimsProjectBean.setFixedMatchedPTMs(iFixedMatchedPTMStrings);
-        iRelimsProjectBean.setVariableMatchedPTMs(iVariableMatchedPTMStrings);
+        iRelimsProjectBean.setFixedMatchedPTMs(Lists.newArrayList(iFixedMatchedPTMStrings));
+        iRelimsProjectBean.setVariableMatchedPTMs(Lists.newArrayList(iVariableMatchedPTMStrings));
 
         persistUserMods(RelimsProperties.getSearchGuiUserModFile());
     }

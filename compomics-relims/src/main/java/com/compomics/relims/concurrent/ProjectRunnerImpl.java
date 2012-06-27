@@ -44,10 +44,10 @@ public class ProjectRunnerImpl extends Observable implements ProjectRunner {
             logger.debug("creating projectrunner for " + lProjectid);
 
             Collection<Predicate> lPredicates = iPredicateManager.createCollection(
-                    PredicateManager.Types.PROJECT_SIZE,
-                    PredicateManager.Types.INSTRUMENT,
-                    PredicateManager.Types.SPECIES,
-                    PredicateManager.Types.SEARCH_SET_SIZE
+//                    PredicateManager.Types.PROJECT_SIZE,
+//                    PredicateManager.Types.INSTRUMENT,
+//                    PredicateManager.Types.SPECIES,
+//                    PredicateManager.Types.SEARCH_SET_SIZE
             );
 
             logger.debug(format("validating project contents by %d predices", lPredicates.size()));

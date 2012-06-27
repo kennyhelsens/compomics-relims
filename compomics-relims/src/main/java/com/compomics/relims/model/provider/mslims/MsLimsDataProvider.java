@@ -64,8 +64,8 @@ public class MsLimsDataProvider implements DataProvider {
         return lNumberOfSpectra;
     }
 
-    public HashSet<Integer> getInstrumentsForProject(long aProjectID) {
-        HashSet<Integer> lInstrumentIDSet = new HashSet<Integer>();
+    public Set<Integer> getInstrumentsForProject(long aProjectID) {
+        Set<Integer> lInstrumentIDSet = new HashSet<Integer>();
 
         try {
             String lQuery = "select distinct l_instrumentid from spectrum as s where s.l_projectid=?";
@@ -88,8 +88,8 @@ public class MsLimsDataProvider implements DataProvider {
         return lInstrumentIDSet;
     }
 
-    public HashSet<String> getProteinAccessionsForProject(long aProjectID) {
-        HashSet<String> lAccessionSet = Sets.newHashSet();
+    public Set<String> getProteinAccessionsForProject(long aProjectID) {
+        Set<String> lAccessionSet = Sets.newHashSet();
 
         try {
             String lQuery = "select distinct accession from identification as i, spectrum as s where i.l_spectrumid=s.spectrumid and s.l_projectid=?";

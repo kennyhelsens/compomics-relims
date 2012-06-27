@@ -4,7 +4,7 @@ import com.compomics.relims.model.beans.RelimsProjectBean;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.HashSet;
+import java.util.Set;
 
 /**
  * This class is a
@@ -13,9 +13,9 @@ public interface DataProvider {
 
     public long getNumberOfSpectraForProject(long aProjectID);
 
-    public HashSet<Integer> getInstrumentsForProject(long aProjectID);
+    public Set<Integer> getInstrumentsForProject(long aProjectID);
 
-    public HashSet<String> getProteinAccessionsForProject(long aProjectID);
+    public Set<String> getProteinAccessionsForProject(long aProjectID);
 
     public long getNumberOfPeptidesForProject(long aProjectID);
 

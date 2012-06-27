@@ -20,7 +20,7 @@ public class DoubleRounderFunction implements Function<Double, Double> {
     public Double apply(@Nullable Double aDouble) {
         if (aDouble != null) {
             BigDecimal lBigDecimal = new BigDecimal(aDouble);
-            lBigDecimal.setScale(iDecimals, RoundingMode.DOWN);
+            lBigDecimal = lBigDecimal.setScale(iDecimals, RoundingMode.DOWN);
             return lBigDecimal.doubleValue();
         }else{
             return null;

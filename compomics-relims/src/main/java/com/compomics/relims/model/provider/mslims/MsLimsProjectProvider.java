@@ -6,6 +6,7 @@ import com.compomics.relims.model.provider.ProjectProvider;
 import com.google.common.collect.Lists;
 
 import java.sql.SQLException;
+import java.util.Collection;
 import java.util.List;
 import java.util.Random;
 
@@ -17,7 +18,6 @@ public class MsLimsProjectProvider extends ProjectProvider {
     public MsLimsProjectProvider() {
         super();
         iDataProvider = new MsLimsDataProvider();
-        iModificationResolver = new ModificationResolverMslimsImpl();
     }
 
     public List<Long> getAllProjects() {
@@ -35,7 +35,7 @@ public class MsLimsProjectProvider extends ProjectProvider {
     }
 
 
-    public List<Long> getRandomProjects(int lSize) {
+    public Collection<Long> getRandomProjects(int lSize) {
         List<Long> lAllProjects = this.getAllProjects();
         List<Long> lRandomProjects = Lists.newArrayList();
 

@@ -77,6 +77,7 @@ public class RelimsNBGUI extends javax.swing.JFrame {
         jLabel3 = new javax.swing.JLabel();
         btnStop = new javax.swing.JButton();
         rdbSourcePRIDE = new javax.swing.JRadioButton();
+        rdbStraight = new javax.swing.JRadioButton();
         scrlTable = new javax.swing.JScrollPane();
         tblProperties = new javax.swing.JTable();
         jpanHead = new javax.swing.JPanel();
@@ -171,20 +172,30 @@ public class RelimsNBGUI extends javax.swing.JFrame {
             }
         });
 
+        btnGroupStrategy.add(rdbStraight);
+        rdbStraight.setText("Straight");
+        rdbStraight.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                rdbStraightActionPerformed(evt);
+            }
+        });
+
         org.jdesktop.layout.GroupLayout jpanMainLayout = new org.jdesktop.layout.GroupLayout(jpanMain);
         jpanMain.setLayout(jpanMainLayout);
         jpanMainLayout.setHorizontalGroup(
             jpanMainLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
             .add(jpanMainLayout.createSequentialGroup()
                 .addContainerGap()
-                .add(jpanMainLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.TRAILING, false)
-                    .add(org.jdesktop.layout.GroupLayout.LEADING, rdbSourceMSLIMS)
-                    .add(org.jdesktop.layout.GroupLayout.LEADING, rdbSourcePRIDE)
-                    .add(jpanMainLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-                        .add(jLabel3)
-                        .add(rdbVarMOD)
-                        .add(rdbVarDB)
-                        .add(jLabel2)))
+                .add(jpanMainLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+                    .add(jpanMainLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.TRAILING, false)
+                        .add(org.jdesktop.layout.GroupLayout.LEADING, rdbSourceMSLIMS)
+                        .add(org.jdesktop.layout.GroupLayout.LEADING, rdbSourcePRIDE)
+                        .add(jpanMainLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+                            .add(jLabel3)
+                            .add(rdbVarMOD)
+                            .add(rdbVarDB)
+                            .add(jLabel2)))
+                    .add(rdbStraight))
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED, 446, Short.MAX_VALUE)
                 .add(btnStart)
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
@@ -196,20 +207,22 @@ public class RelimsNBGUI extends javax.swing.JFrame {
             .add(jpanMainLayout.createSequentialGroup()
                 .addContainerGap()
                 .add(jpanMainLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+                    .add(btnStart)
+                    .add(btnStop)
                     .add(jpanMainLayout.createSequentialGroup()
                         .add(jLabel2)
                         .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                         .add(rdbVarMOD)
                         .add(3, 3, 3)
                         .add(rdbVarDB)
-                        .add(23, 23, 23)
-                        .add(jLabel3)
                         .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                        .add(rdbSourceMSLIMS)
-                        .add(3, 3, 3)
-                        .add(rdbSourcePRIDE))
-                    .add(btnStart)
-                    .add(btnStop))
+                        .add(rdbStraight)))
+                .add(26, 26, 26)
+                .add(jLabel3)
+                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                .add(rdbSourceMSLIMS)
+                .add(3, 3, 3)
+                .add(rdbSourcePRIDE)
                 .addContainerGap())
         );
 
@@ -320,6 +333,12 @@ public class RelimsNBGUI extends javax.swing.JFrame {
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
+    private void rdbStraightActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_rdbStraightActionPerformed
+        String s = RelimsProperties.getRelimsClassList()[2];
+        iStrategySelectionModel.setSelectedItem(s);
+        logger.debug(String.format("selected strategy %s", s));
+    }//GEN-LAST:event_rdbStraightActionPerformed
+
     private void rdbSourceMSLIMSActionPerformed(java.awt.event.ActionEvent evt) {
         String s = RelimsProperties.getRelimsSourceList()[0];
         iProjectSourceSelectionModel.setSelectedItem(s);
@@ -417,6 +436,7 @@ public class RelimsNBGUI extends javax.swing.JFrame {
     private javax.swing.JPanel jpanMain;
     private javax.swing.JRadioButton rdbSourceMSLIMS;
     private javax.swing.JRadioButton rdbSourcePRIDE;
+    private javax.swing.JRadioButton rdbStraight;
     private javax.swing.JRadioButton rdbVarDB;
     private javax.swing.JRadioButton rdbVarMOD;
     private javax.swing.JScrollPane scrlLogger;

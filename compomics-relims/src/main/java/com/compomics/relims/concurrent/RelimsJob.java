@@ -13,6 +13,7 @@ import com.google.common.collect.Lists;
 import org.apache.log4j.Logger;
 
 import java.io.IOException;
+import java.util.Collection;
 import java.util.List;
 import java.util.Observable;
 import java.util.concurrent.*;
@@ -29,19 +30,17 @@ public class RelimsJob implements Callable, Closable {
 
     protected ProjectRunner iProjectRunner;
     protected ProjectProvider iProjectProvider;
-    protected SearchStrategy iSearchStrategy;
     protected PredicateManager iPredicateManager;
+    private final String iSearchStrategyID;
 
 
     public RelimsJob(String aSearchStrategyID, String aProjectProviderID) {
+        iSearchStrategyID = aSearchStrategyID;
         try {
             iProjectRunner = new ProjectRunnerImpl();
 
             Class lSourceClass = RelimsProperties.getRelimsSourceClass(aProjectProviderID);
             iProjectProvider = (ProjectProvider) lSourceClass.newInstance();
-
-            Class lSearchStrategyClass = RelimsProperties.getRelimsSearchStrategyClass(aSearchStrategyID);
-            iSearchStrategy = (SearchStrategy) lSearchStrategyClass.newInstance();
 
             DataProvider lDataProvider = iProjectProvider.getDataProvider();
             iPredicateManager = new PredicateManager(lDataProvider);
@@ -62,32 +61,42 @@ public class RelimsJob implements Callable, Closable {
 
     public Object call() {
 
-        List<Long> lProjectIDList = iProjectProvider.getPreDefinedProjects();
+        Collection<Long> lProjectIDList = iProjectProvider.getPreDefinedProjects();
+//        Collection<Long> lProjectIDList = iProjectProvider.getAllProjects();
         List<Future> lFutures = Lists.newArrayList();
 
         for (Long lProjectID : lProjectIDList) {
-            RelimsProjectBean lRelimsProjectBean = iProjectProvider.getProject(lProjectID);
-            iProjectRunner.setProject(lRelimsProjectBean);
-            iProjectRunner.setSearchStrategy(iSearchStrategy);
-            iProjectRunner.setPredicateManager(iPredicateManager);
-            iProjectRunner.setDataProvider(iProjectProvider.getDataProvider());
-            iProjectRunner.setModificationResolver(iProjectProvider.getModificationResolver());
-
-            Observable lObservable = (Observable) iProjectRunner;
-            lObservable.addObserver(iResultObserver);
-
-            Future<String> lFuture = iService.submit(iProjectRunner);
 
             try {
+
+                Class searchStrategyClass = RelimsProperties.getRelimsSearchStrategyClass(iSearchStrategyID);
+                SearchStrategy searchStrategy = (SearchStrategy) searchStrategyClass.newInstance();
+
+                RelimsProjectBean lRelimsProjectBean = iProjectProvider.getProject(lProjectID);
+                iProjectRunner.setProject(lRelimsProjectBean);
+                iProjectRunner.setPredicateManager(iPredicateManager);
+                iProjectRunner.setDataProvider(iProjectProvider.getDataProvider());
+                iProjectRunner.setModificationResolver(iProjectProvider.getModificationResolver());
+                iProjectRunner.setSearchStrategy(searchStrategy);
+
+                Observable lObservable = (Observable) iProjectRunner;
+                lObservable.addObserver(iResultObserver);
+
+                Future<String> lFuture = iService.submit(iProjectRunner);
+
                 String s = lFuture.get();
             } catch (InterruptedException e) {
                 logger.error(e.getMessage(), e);
             } catch (ExecutionException e) {
                 logger.error(e.getMessage(), e);
+            } catch (ClassNotFoundException e) {
+                logger.error(e.getMessage(), e);
+            } catch (InstantiationException e) {
+                logger.error(e.getMessage(), e);
+            } catch (IllegalAccessException e) {
+                logger.error(e.getMessage(), e);
             }
-
         }
-
         return lFutures;
     }
 
