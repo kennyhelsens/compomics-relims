@@ -345,5 +345,12 @@ public class RelimsProperties {
     }
 
 
+    public static Double getMSTolerancePPM() {
+        return config.getDouble("searchgui.ms1.tolerance.ppm");  //To change body of created methods use File | Settings | File Templates.
+    }
+
+    public static Integer getMissedCleavages() {
+        return config.getInt("searchgui.missed.cleavages");  //To change body of created methods use File | Settings | File Templates.
+    }
 }
 

@@ -68,6 +68,9 @@ public abstract class SearchCommandGenerator {
         iSearchGuiConfiguration.setProperty("FIXED_MODIFICATIONS", lModFormatter.apply(iRelimsProjectBean.getFixedMatchedPTMs()));
         iSearchGuiConfiguration.setProperty("VARIABLE_MODIFICATIONS", lModFormatter.apply(iRelimsProjectBean.getVariableMatchedPTMs()));
 
+        iSearchGuiConfiguration.setProperty("PRECURSOR_MASS_TOLERANCE", RelimsProperties.getMSTolerancePPM());
+        iSearchGuiConfiguration.setProperty("MISSED_CLEAVAGES", RelimsProperties.getMissedCleavages());
+
         String lSearchDatabase = RelimsProperties.getDefaultSearchDatabase();
         logger.debug(String.format("setting DEFAULT fasta database '%s' to searchgui configuration", lSearchDatabase));
         iSearchGuiConfiguration.setProperty("DATABASE_FILE", lSearchDatabase);
