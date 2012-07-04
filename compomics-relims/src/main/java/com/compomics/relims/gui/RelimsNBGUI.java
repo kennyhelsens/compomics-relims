@@ -1,7 +1,3 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package com.compomics.relims.gui;
 
 import com.compomics.relims.concurrent.RelimsJob;
@@ -9,11 +5,14 @@ import com.compomics.relims.conf.RelimsProperties;
 import com.compomics.relims.gui.model.ProjectSourceSelectionModel;
 import com.compomics.relims.gui.model.RelimsPropertiesTableModel;
 import com.compomics.relims.gui.model.StrategySelectionModel;
+import java.awt.Toolkit;
 import org.apache.log4j.Logger;
 
 import javax.swing.table.TableColumnModel;
 import javax.swing.table.TableModel;
 import java.awt.event.ActionEvent;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -51,6 +50,32 @@ public class RelimsNBGUI extends javax.swing.JFrame {
          * Sets an UncaughtExceptionHandler and executes the thread by the ExecutorsService
          */
         Thread.setDefaultUncaughtExceptionHandler(new MyUncaughtExceptionHandler());
+        
+        // set the title of the frame and add the icon
+        this.setIconImage(Toolkit.getDefaultToolkit().getImage(getClass().getResource("/resources/image/logo_small.png")));
+        
+        setTitle("Relims " + getVersion());
+        setLocationRelativeTo(null);
+        setVisible(true);
+    }
+    
+    /**
+     * Retrieves the version number set in the pom file.
+     *
+     * @return the version number of Relims.
+     */
+    public String getVersion() {
+
+        java.util.Properties p = new java.util.Properties();
+
+        try {
+            InputStream is = this.getClass().getClassLoader().getResourceAsStream("compomics-relims.properties");
+            p.load(is);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        return p.getProperty("compomics-relims.version");
     }
 
     /**
@@ -64,38 +89,48 @@ public class RelimsNBGUI extends javax.swing.JFrame {
 
         btnGroupStrategy = new javax.swing.ButtonGroup();
         btnGroupSource = new javax.swing.ButtonGroup();
+        backgroundPanel = new javax.swing.JPanel();
+        settingsPanel = new javax.swing.JPanel();
         splitMain = new javax.swing.JSplitPane();
         scrlLogger = new javax.swing.JScrollPane();
         txtLogger = new javax.swing.JTextArea();
         tabCore = new javax.swing.JTabbedPane();
         jpanMain = new javax.swing.JPanel();
-        btnStart = new javax.swing.JButton();
-        jLabel2 = new javax.swing.JLabel();
-        rdbVarMOD = new javax.swing.JRadioButton();
-        rdbVarDB = new javax.swing.JRadioButton();
+        mainPanel = new javax.swing.JPanel();
         rdbSourceMSLIMS = new javax.swing.JRadioButton();
+        jLabel2 = new javax.swing.JLabel();
         jLabel3 = new javax.swing.JLabel();
-        btnStop = new javax.swing.JButton();
-        rdbSourcePRIDE = new javax.swing.JRadioButton();
         rdbStraight = new javax.swing.JRadioButton();
+        rdbSourcePRIDE = new javax.swing.JRadioButton();
+        rdbVarMOD = new javax.swing.JRadioButton();
+        btnStart = new javax.swing.JButton();
+        rdbVarDB = new javax.swing.JRadioButton();
+        btnStop = new javax.swing.JButton();
+        tableTabPanel = new javax.swing.JPanel();
+        tablePanel = new javax.swing.JPanel();
         scrlTable = new javax.swing.JScrollPane();
         tblProperties = new javax.swing.JTable();
-        jpanHead = new javax.swing.JPanel();
-        iconCompomics = new javax.swing.JLabel();
         iconRelims = new javax.swing.JLabel();
-        jPanel1 = new javax.swing.JPanel();
-        jSeparator2 = new javax.swing.JSeparator();
+        iconCompomics = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
-        setTitle("  ");
+        setTitle("Relims");
         setBackground(new java.awt.Color(255, 255, 255));
 
+        backgroundPanel.setBackground(new java.awt.Color(255, 255, 255));
+
+        settingsPanel.setBorder(javax.swing.BorderFactory.createTitledBorder("Settings"));
+        settingsPanel.setOpaque(false);
+
         splitMain.setBorder(javax.swing.BorderFactory.createEmptyBorder(1, 1, 1, 1));
+        splitMain.setDividerSize(4);
         splitMain.setOrientation(javax.swing.JSplitPane.VERTICAL_SPLIT);
         splitMain.setResizeWeight(0.6);
+        splitMain.setOpaque(false);
 
-        scrlLogger.setBorder(javax.swing.BorderFactory.createTitledBorder(javax.swing.BorderFactory.createEmptyBorder(1, 1, 1, 1), "Logger", javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION, javax.swing.border.TitledBorder.DEFAULT_POSITION, new java.awt.Font("Lucida Grande", 2, 10))); // NOI18N
-        scrlLogger.setViewportBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
+        scrlLogger.setBorder(javax.swing.BorderFactory.createTitledBorder(javax.swing.BorderFactory.createEmptyBorder(1, 1, 1, 1), "Log", javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION, javax.swing.border.TitledBorder.DEFAULT_POSITION, new java.awt.Font("Lucida Grande", 2, 10))); // NOI18N
+        scrlLogger.setViewportBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(204, 204, 204)));
+        scrlLogger.setOpaque(false);
 
         txtLogger.setColumns(20);
         txtLogger.setEditable(false);
@@ -108,6 +143,57 @@ public class RelimsNBGUI extends javax.swing.JFrame {
 
         jpanMain.setBackground(new java.awt.Color(255, 255, 255));
 
+        mainPanel.setOpaque(false);
+
+        btnGroupSource.add(rdbSourceMSLIMS);
+        rdbSourceMSLIMS.setSelected(true);
+        rdbSourceMSLIMS.setText("MSLIMS");
+        rdbSourceMSLIMS.setIconTextGap(10);
+        rdbSourceMSLIMS.setOpaque(false);
+        rdbSourceMSLIMS.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                rdbSourceMSLIMSActionPerformed(evt);
+            }
+        });
+
+        jLabel2.setFont(new java.awt.Font("Lucida Grande", 1, 12)); // NOI18N
+        jLabel2.setText("Strategy");
+
+        jLabel3.setFont(new java.awt.Font("Lucida Grande", 1, 12)); // NOI18N
+        jLabel3.setText("Source");
+
+        btnGroupStrategy.add(rdbStraight);
+        rdbStraight.setText("Straight");
+        rdbStraight.setIconTextGap(10);
+        rdbStraight.setOpaque(false);
+        rdbStraight.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                rdbStraightActionPerformed(evt);
+            }
+        });
+
+        btnGroupSource.add(rdbSourcePRIDE);
+        rdbSourcePRIDE.setText("PRIDE");
+        rdbSourcePRIDE.setIconTextGap(10);
+        rdbSourcePRIDE.setOpaque(false);
+        rdbSourcePRIDE.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                rdbSourcePRIDEActionPerformed(evt);
+            }
+        });
+
+        btnGroupStrategy.add(rdbVarMOD);
+        rdbVarMOD.setSelected(true);
+        rdbVarMOD.setText("Variable MODS");
+        rdbVarMOD.setIconTextGap(10);
+        rdbVarMOD.setOpaque(false);
+        rdbVarMOD.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                rdbVarMODActionPerformed(evt);
+            }
+        });
+
+        btnStart.setFont(btnStart.getFont().deriveFont(btnStart.getFont().getStyle() | java.awt.Font.BOLD));
         btnStart.setIcon(new javax.swing.ImageIcon(getClass().getResource("/resources/image/start.png"))); // NOI18N
         btnStart.setText("Start");
         btnStart.setBorderPainted(false);
@@ -120,38 +206,17 @@ public class RelimsNBGUI extends javax.swing.JFrame {
             }
         });
 
-        jLabel2.setFont(new java.awt.Font("Lucida Grande", 1, 12)); // NOI18N
-        jLabel2.setText("Strategy");
-
-        btnGroupStrategy.add(rdbVarMOD);
-        rdbVarMOD.setSelected(true);
-        rdbVarMOD.setText("Variable MODS");
-        rdbVarMOD.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                rdbVarMODActionPerformed(evt);
-            }
-        });
-
         btnGroupStrategy.add(rdbVarDB);
         rdbVarDB.setText("Variable DB");
+        rdbVarDB.setIconTextGap(10);
+        rdbVarDB.setOpaque(false);
         rdbVarDB.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 rdbVarDBActionPerformed(evt);
             }
         });
 
-        btnGroupSource.add(rdbSourceMSLIMS);
-        rdbSourceMSLIMS.setSelected(true);
-        rdbSourceMSLIMS.setText("MSLIMS");
-        rdbSourceMSLIMS.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                rdbSourceMSLIMSActionPerformed(evt);
-            }
-        });
-
-        jLabel3.setFont(new java.awt.Font("Lucida Grande", 1, 12)); // NOI18N
-        jLabel3.setText("Source");
-
+        btnStop.setFont(btnStop.getFont().deriveFont(btnStop.getFont().getStyle() | java.awt.Font.BOLD));
         btnStop.setIcon(new javax.swing.ImageIcon(getClass().getResource("/resources/image/exit.png"))); // NOI18N
         btnStop.setText("Stop");
         btnStop.setBorderPainted(false);
@@ -164,21 +229,54 @@ public class RelimsNBGUI extends javax.swing.JFrame {
             }
         });
 
-        btnGroupSource.add(rdbSourcePRIDE);
-        rdbSourcePRIDE.setText("PRIDE");
-        rdbSourcePRIDE.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                rdbSourcePRIDEActionPerformed(evt);
-            }
-        });
-
-        btnGroupStrategy.add(rdbStraight);
-        rdbStraight.setText("Straight");
-        rdbStraight.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                rdbStraightActionPerformed(evt);
-            }
-        });
+        org.jdesktop.layout.GroupLayout mainPanelLayout = new org.jdesktop.layout.GroupLayout(mainPanel);
+        mainPanel.setLayout(mainPanelLayout);
+        mainPanelLayout.setHorizontalGroup(
+            mainPanelLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+            .add(mainPanelLayout.createSequentialGroup()
+                .addContainerGap()
+                .add(mainPanelLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+                    .add(mainPanelLayout.createSequentialGroup()
+                        .add(mainPanelLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+                            .add(rdbStraight)
+                            .add(rdbVarMOD)
+                            .add(rdbVarDB)
+                            .add(jLabel2))
+                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED, 504, Short.MAX_VALUE)
+                        .add(btnStart)
+                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                        .add(btnStop))
+                    .add(mainPanelLayout.createSequentialGroup()
+                        .add(mainPanelLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+                            .add(rdbSourceMSLIMS)
+                            .add(rdbSourcePRIDE)
+                            .add(jLabel3))
+                        .add(0, 0, Short.MAX_VALUE)))
+                .addContainerGap())
+        );
+        mainPanelLayout.setVerticalGroup(
+            mainPanelLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+            .add(mainPanelLayout.createSequentialGroup()
+                .addContainerGap()
+                .add(mainPanelLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+                    .add(btnStart)
+                    .add(btnStop)
+                    .add(org.jdesktop.layout.GroupLayout.TRAILING, mainPanelLayout.createSequentialGroup()
+                        .add(jLabel2)
+                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.UNRELATED)
+                        .add(rdbVarMOD)
+                        .add(3, 3, 3)
+                        .add(rdbVarDB)
+                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                        .add(rdbStraight)))
+                .add(18, 18, 18)
+                .add(jLabel3)
+                .addPreferredGap(org.jdesktop.layout.LayoutStyle.UNRELATED)
+                .add(rdbSourceMSLIMS)
+                .add(3, 3, 3)
+                .add(rdbSourcePRIDE)
+                .addContainerGap(99, Short.MAX_VALUE))
+        );
 
         org.jdesktop.layout.GroupLayout jpanMainLayout = new org.jdesktop.layout.GroupLayout(jpanMain);
         jpanMain.setLayout(jpanMainLayout);
@@ -186,49 +284,22 @@ public class RelimsNBGUI extends javax.swing.JFrame {
             jpanMainLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
             .add(jpanMainLayout.createSequentialGroup()
                 .addContainerGap()
-                .add(jpanMainLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-                    .add(jpanMainLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.TRAILING, false)
-                        .add(org.jdesktop.layout.GroupLayout.LEADING, rdbSourceMSLIMS)
-                        .add(org.jdesktop.layout.GroupLayout.LEADING, rdbSourcePRIDE)
-                        .add(jpanMainLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-                            .add(jLabel3)
-                            .add(rdbVarMOD)
-                            .add(rdbVarDB)
-                            .add(jLabel2)))
-                    .add(rdbStraight))
-                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED, 446, Short.MAX_VALUE)
-                .add(btnStart)
-                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                .add(btnStop)
+                .add(mainPanel, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addContainerGap())
         );
         jpanMainLayout.setVerticalGroup(
             jpanMainLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
             .add(jpanMainLayout.createSequentialGroup()
                 .addContainerGap()
-                .add(jpanMainLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-                    .add(btnStart)
-                    .add(btnStop)
-                    .add(jpanMainLayout.createSequentialGroup()
-                        .add(jLabel2)
-                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                        .add(rdbVarMOD)
-                        .add(3, 3, 3)
-                        .add(rdbVarDB)
-                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                        .add(rdbStraight)))
-                .add(26, 26, 26)
-                .add(jLabel3)
-                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                .add(rdbSourceMSLIMS)
-                .add(3, 3, 3)
-                .add(rdbSourcePRIDE)
+                .add(mainPanel, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addContainerGap())
         );
 
         tabCore.addTab("Main", jpanMain);
 
-        scrlTable.setBorder(javax.swing.BorderFactory.createEmptyBorder(1, 1, 1, 1));
+        tableTabPanel.setOpaque(false);
+
+        tablePanel.setOpaque(false);
 
         tblProperties.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
@@ -243,91 +314,103 @@ public class RelimsNBGUI extends javax.swing.JFrame {
         ));
         scrlTable.setViewportView(tblProperties);
 
-        tabCore.addTab("Configuration", scrlTable);
+        org.jdesktop.layout.GroupLayout tablePanelLayout = new org.jdesktop.layout.GroupLayout(tablePanel);
+        tablePanel.setLayout(tablePanelLayout);
+        tablePanelLayout.setHorizontalGroup(
+            tablePanelLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+            .add(tablePanelLayout.createSequentialGroup()
+                .addContainerGap()
+                .add(scrlTable, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 805, Short.MAX_VALUE)
+                .addContainerGap())
+        );
+        tablePanelLayout.setVerticalGroup(
+            tablePanelLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+            .add(org.jdesktop.layout.GroupLayout.TRAILING, tablePanelLayout.createSequentialGroup()
+                .addContainerGap()
+                .add(scrlTable, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 273, Short.MAX_VALUE)
+                .addContainerGap())
+        );
+
+        org.jdesktop.layout.GroupLayout tableTabPanelLayout = new org.jdesktop.layout.GroupLayout(tableTabPanel);
+        tableTabPanel.setLayout(tableTabPanelLayout);
+        tableTabPanelLayout.setHorizontalGroup(
+            tableTabPanelLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+            .add(tableTabPanelLayout.createSequentialGroup()
+                .addContainerGap()
+                .add(tablePanel, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addContainerGap())
+        );
+        tableTabPanelLayout.setVerticalGroup(
+            tableTabPanelLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+            .add(tableTabPanelLayout.createSequentialGroup()
+                .addContainerGap()
+                .add(tablePanel, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addContainerGap())
+        );
+
+        tabCore.addTab("Config", tableTabPanel);
 
         splitMain.setLeftComponent(tabCore);
         tabCore.getAccessibleContext().setAccessibleName("Main");
 
-        jpanHead.setBackground(new java.awt.Color(255, 255, 255));
-        jpanHead.setBorder(javax.swing.BorderFactory.createTitledBorder(javax.swing.BorderFactory.createEmptyBorder(1, 1, 1, 1), " "));
-
-        iconCompomics.setIcon(new javax.swing.ImageIcon(getClass().getResource("/resources/image/compomics.png"))); // NOI18N
+        org.jdesktop.layout.GroupLayout settingsPanelLayout = new org.jdesktop.layout.GroupLayout(settingsPanel);
+        settingsPanel.setLayout(settingsPanelLayout);
+        settingsPanelLayout.setHorizontalGroup(
+            settingsPanelLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+            .add(settingsPanelLayout.createSequentialGroup()
+                .addContainerGap()
+                .add(splitMain)
+                .addContainerGap())
+        );
+        settingsPanelLayout.setVerticalGroup(
+            settingsPanelLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+            .add(org.jdesktop.layout.GroupLayout.TRAILING, settingsPanelLayout.createSequentialGroup()
+                .addContainerGap()
+                .add(splitMain, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 456, Short.MAX_VALUE)
+                .addContainerGap())
+        );
 
         iconRelims.setIcon(new javax.swing.ImageIcon(getClass().getResource("/resources/image/logo.png"))); // NOI18N
 
-        jPanel1.setBackground(new java.awt.Color(255, 255, 255));
+        iconCompomics.setIcon(new javax.swing.ImageIcon(getClass().getResource("/resources/image/compomics.png"))); // NOI18N
 
-        org.jdesktop.layout.GroupLayout jPanel1Layout = new org.jdesktop.layout.GroupLayout(jPanel1);
-        jPanel1.setLayout(jPanel1Layout);
-        jPanel1Layout.setHorizontalGroup(
-            jPanel1Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(0, 637, Short.MAX_VALUE)
-        );
-        jPanel1Layout.setVerticalGroup(
-            jPanel1Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(0, 0, Short.MAX_VALUE)
-        );
-
-        org.jdesktop.layout.GroupLayout jpanHeadLayout = new org.jdesktop.layout.GroupLayout(jpanHead);
-        jpanHead.setLayout(jpanHeadLayout);
-        jpanHeadLayout.setHorizontalGroup(
-            jpanHeadLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(org.jdesktop.layout.GroupLayout.TRAILING, jpanHeadLayout.createSequentialGroup()
+        org.jdesktop.layout.GroupLayout backgroundPanelLayout = new org.jdesktop.layout.GroupLayout(backgroundPanel);
+        backgroundPanel.setLayout(backgroundPanelLayout);
+        backgroundPanelLayout.setHorizontalGroup(
+            backgroundPanelLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+            .add(backgroundPanelLayout.createSequentialGroup()
+                .add(28, 28, 28)
+                .add(iconRelims)
+                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .add(iconCompomics)
+                .add(51, 51, 51))
+            .add(backgroundPanelLayout.createSequentialGroup()
                 .addContainerGap()
-                .add(jpanHeadLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-                    .add(jpanHeadLayout.createSequentialGroup()
-                        .add(6, 6, 6)
-                        .add(jpanHeadLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.TRAILING, false)
-                            .add(jpanHeadLayout.createSequentialGroup()
-                                .add(iconRelims)
-                                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                .add(iconCompomics))
-                            .add(jpanHeadLayout.createSequentialGroup()
-                                .add(15, 15, 15)
-                                .add(jPanel1, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                                .add(15, 15, 15))))
-                    .add(org.jdesktop.layout.GroupLayout.TRAILING, jpanHeadLayout.createSequentialGroup()
-                        .add(24, 24, 24)
-                        .add(jSeparator2)))
-                .add(82, 82, 82))
-        );
-        jpanHeadLayout.setVerticalGroup(
-            jpanHeadLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(jpanHeadLayout.createSequentialGroup()
-                .add(jpanHeadLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-                    .add(jpanHeadLayout.createSequentialGroup()
-                        .addContainerGap()
-                        .add(iconRelims))
-                    .add(jpanHeadLayout.createSequentialGroup()
-                        .add(23, 23, 23)
-                        .add(iconCompomics)))
-                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                .add(jSeparator2, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 10, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                .add(24, 24, 24)
-                .add(jPanel1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .add(settingsPanel, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addContainerGap())
+        );
+        backgroundPanelLayout.setVerticalGroup(
+            backgroundPanelLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+            .add(backgroundPanelLayout.createSequentialGroup()
+                .addContainerGap()
+                .add(backgroundPanelLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+                    .add(iconRelims)
+                    .add(org.jdesktop.layout.GroupLayout.TRAILING, backgroundPanelLayout.createSequentialGroup()
+                        .add(iconCompomics)
+                        .add(20, 20, 20)))
+                .add(settingsPanel, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .add(12, 12, 12))
         );
 
         org.jdesktop.layout.GroupLayout layout = new org.jdesktop.layout.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(layout.createSequentialGroup()
-                .addContainerGap()
-                .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-                    .add(layout.createSequentialGroup()
-                        .add(jpanHead, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addContainerGap())
-                    .add(splitMain, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)))
+            .add(backgroundPanel, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(layout.createSequentialGroup()
-                .addContainerGap()
-                .add(jpanHead, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 174, Short.MAX_VALUE)
-                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                .add(splitMain, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 420, Short.MAX_VALUE)
-                .add(0, 0, 0))
+            .add(org.jdesktop.layout.GroupLayout.TRAILING, backgroundPanel, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         );
 
         pack();
@@ -416,12 +499,13 @@ public class RelimsNBGUI extends javax.swing.JFrame {
         java.awt.EventQueue.invokeLater(new Runnable() {
 
             public void run() {
-                new RelimsNBGUI().setVisible(true);
+                new RelimsNBGUI();
             }
         });
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JPanel backgroundPanel;
     private javax.swing.ButtonGroup btnGroupSource;
     private javax.swing.ButtonGroup btnGroupStrategy;
     private javax.swing.JButton btnStart;
@@ -430,10 +514,8 @@ public class RelimsNBGUI extends javax.swing.JFrame {
     private javax.swing.JLabel iconRelims;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
-    private javax.swing.JPanel jPanel1;
-    private javax.swing.JSeparator jSeparator2;
-    private javax.swing.JPanel jpanHead;
     private javax.swing.JPanel jpanMain;
+    private javax.swing.JPanel mainPanel;
     private javax.swing.JRadioButton rdbSourceMSLIMS;
     private javax.swing.JRadioButton rdbSourcePRIDE;
     private javax.swing.JRadioButton rdbStraight;
@@ -441,8 +523,11 @@ public class RelimsNBGUI extends javax.swing.JFrame {
     private javax.swing.JRadioButton rdbVarMOD;
     private javax.swing.JScrollPane scrlLogger;
     private javax.swing.JScrollPane scrlTable;
+    private javax.swing.JPanel settingsPanel;
     private javax.swing.JSplitPane splitMain;
     private javax.swing.JTabbedPane tabCore;
+    private javax.swing.JPanel tablePanel;
+    private javax.swing.JPanel tableTabPanel;
     private javax.swing.JTable tblProperties;
     private javax.swing.JTextArea txtLogger;
     // End of variables declaration//GEN-END:variables

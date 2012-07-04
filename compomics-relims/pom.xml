@@ -10,7 +10,7 @@
     <url>code.google.com/p/compomics-relims/</url>
     <!-- Set the version number for the whole project -->
     <properties>
-        <version.number>0.2</version.number>
+        <version.number>0.2.1</version.number>
     </properties>
     <!-- Licence -->
     <licenses>
@@ -37,9 +37,13 @@
         <resources>
             <resource>
                 <directory>src/main/resources/</directory>
+            </resource>
+            <resource>
+                <directory>./</directory>
                 <includes>
-                    <include>test.txt</include>
+                    <include>compomics-relims.properties</include>
                 </includes>
+                <filtering>true</filtering>
             </resource>
         </resources>
         <!-- Plugins -->
@@ -61,12 +65,14 @@
                 <configuration>
                     <archive>
                         <manifest>
+                            <addDefaultImplementationEntries>true</addDefaultImplementationEntries>
+                            <addDefaultSpecificationEntries>true</addDefaultSpecificationEntries>
                             <mainClass>com.compomics.relims.gui.RelimsIDEAGUI</mainClass>
                             <addClasspath>true</addClasspath>
                             <classpathPrefix>lib</classpathPrefix>
                         </manifest>
                     </archive>
-                    <outputDirectory>${project.build.directory}/compomics-relims-${project.version}</outputDirectory>
+                    <outputDirectory>${project.build.directory}/${project.artifactId}-${project.version}</outputDirectory>
                 </configuration>
             </plugin>
             <!-- Dependency plugin -->
@@ -81,7 +87,7 @@
                             <goal>copy-dependencies</goal>
                         </goals>
                         <configuration>
-                            <outputDirectory>${project.build.directory}/compomics-relims-${project.version}/lib
+                            <outputDirectory>${project.build.directory}/${project.artifactId}-${project.version}/lib
                             </outputDirectory>
                             <overWriteReleases>true</overWriteReleases>
                             <overWriteSnapshots>true</overWriteSnapshots>
@@ -102,11 +108,14 @@
                             <goal>copy-resources</goal>
                         </goals>
                         <configuration>
-                            <outputDirectory>${project.build.directory}/compomics-relims-${project.version}
+                            <outputDirectory>${project.build.directory}/${project.artifactId}-${project.version}/
                             </outputDirectory>
                             <resources>
                                 <resource>
-                                    <directory>src/main/resources/</directory>
+                                    <directory>./</directory>
+                                    <includes>
+                                        <include>resources/</include>
+                                    </includes>
                                 </resource>
                             </resources>
                         </configuration>
@@ -115,7 +124,7 @@
             </plugin>
         </plugins>
     </build>
-    <!-- Repositores -->
+
     <!-- Repositores -->
     <repositories>
         <!-- UGent Genesis Maven 1 repository -->
