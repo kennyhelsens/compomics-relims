@@ -5,19 +5,32 @@ import com.compomics.relims.conf.RelimsProperties;
 import com.compomics.relims.gui.model.ProjectSourceSelectionModel;
 import com.compomics.relims.gui.model.RelimsPropertiesTableModel;
 import com.compomics.relims.gui.model.StrategySelectionModel;
+import com.compomics.relims.gui.util.Properties;
+import com.compomics.util.examples.BareBonesBrowserLaunch;
+import com.compomics.util.gui.UtilitiesGUIDefaults;
 import java.awt.Toolkit;
 import org.apache.log4j.Logger;
 
 import javax.swing.table.TableColumnModel;
 import javax.swing.table.TableModel;
 import java.awt.event.ActionEvent;
+import java.io.BufferedReader;
+import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.net.UnknownHostException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import javax.swing.JOptionPane;
+import net.jimmc.jshortcut.JShellLink;
 
 /**
- * @author kennyhelsens
+ * The Relims GUI.
+ * 
+ * @author Kenny Helsens
+ * @author Harald Barsnes
  */
 public class RelimsNBGUI extends javax.swing.JFrame {
 
@@ -27,9 +40,16 @@ public class RelimsNBGUI extends javax.swing.JFrame {
     private RelimsJob iRelimsJob = null;
 
     /**
-     * Creates new form RelimsNBGUI
+     * Creates a new RelimsNBGUI.
      */
     public RelimsNBGUI() {
+
+        // check if a newer version is available on google code
+        checkForNewVersion(new Properties().getVersion());
+
+        // add desktop shortcut?
+        addShortcutAtDeskTop();
+
         initComponents();
 
         TextAreaAppender.setTextArea(txtLogger);
@@ -47,35 +67,135 @@ public class RelimsNBGUI extends javax.swing.JFrame {
         iProjectSourceSelectionModel = new ProjectSourceSelectionModel();
 
         /**
-         * Sets an UncaughtExceptionHandler and executes the thread by the ExecutorsService
+         * Sets an UncaughtExceptionHandler and executes the thread by the
+         * ExecutorsService
          */
         Thread.setDefaultUncaughtExceptionHandler(new MyUncaughtExceptionHandler());
-        
+
         // set the title of the frame and add the icon
         this.setIconImage(Toolkit.getDefaultToolkit().getImage(getClass().getResource("/resources/image/logo_small.png")));
-        
-        setTitle("Relims " + getVersion());
+
+        setTitle("Relims " + new Properties().getVersion());
         setLocationRelativeTo(null);
         setVisible(true);
     }
-    
-    /**
-     * Retrieves the version number set in the pom file.
-     *
-     * @return the version number of Relims.
-     */
-    public String getVersion() {
 
-        java.util.Properties p = new java.util.Properties();
+    /**
+     * Check if a newer version of Relims is available.
+     *
+     * @param currentVersion the version number of the currently running
+     * Relims
+     */
+    private static void checkForNewVersion(String currentVersion) {
 
         try {
-            InputStream is = this.getClass().getClassLoader().getResourceAsStream("compomics-relims.properties");
-            p.load(is);
+            boolean deprecatedOrDeleted = false;
+
+            URL downloadPage = new URL(
+                    "http://code.google.com/p/compomics-relims/downloads/detail?name=compmics-relims-" + currentVersion);
+
+            if ((java.net.HttpURLConnection) downloadPage.openConnection() != null) {
+
+                int respons = ((java.net.HttpURLConnection) downloadPage.openConnection()).getResponseCode();
+
+                // 404 means that the file no longer exists, which means that
+                // the running version is no longer available for download,
+                // which again means that a never version is available.
+                if (respons == 404) {
+                    deprecatedOrDeleted = true;
+                } else {
+
+                    // also need to check if the available running version has been
+                    // deprecated (but not deleted)
+                    BufferedReader in = new BufferedReader(
+                            new InputStreamReader(downloadPage.openStream()));
+
+                    String inputLine;
+
+                    while ((inputLine = in.readLine()) != null && !deprecatedOrDeleted) {
+                        if (inputLine.lastIndexOf("Deprecated") != -1
+                                && inputLine.lastIndexOf("Deprecated Downloads") == -1
+                                && inputLine.lastIndexOf("Deprecated downloads") == -1) {
+                            deprecatedOrDeleted = true;
+                        }
+                    }
+
+                    in.close();
+                }
+
+                // informs the user about an updated version is available, unless the user is running a beta version
+                if (deprecatedOrDeleted && currentVersion.lastIndexOf("beta") == -1) {
+                    int option = JOptionPane.showConfirmDialog(null,
+                            "A newer version of Relims is available.\n"
+                            + "Do you want to upgrade?",
+                            "Upgrade Available",
+                            JOptionPane.YES_NO_CANCEL_OPTION);
+                    if (option == JOptionPane.YES_OPTION) {
+                        BareBonesBrowserLaunch.openURL("http://compomics-relims.googlecode.com/");
+                        System.exit(0);
+                    } else if (option == JOptionPane.CANCEL_OPTION) {
+                        System.exit(0);
+                    }
+                }
+            }
+        } catch (UnknownHostException e) {
+            // ignore exception
+        } catch (MalformedURLException e) {
+            e.printStackTrace();
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
 
-        return p.getProperty("compomics-relims.version");
+    /**
+     * Ask the user if he/she wants to add a shortcut at the desktop.
+     */
+    private void addShortcutAtDeskTop() {
+
+        if (!new Properties().getJarFilePath().equalsIgnoreCase(".")
+                && System.getProperty("os.name").lastIndexOf("Windows") != -1
+                && new File(new Properties().getJarFilePath() + "/resources/conf/firstRun").exists()) {
+
+            // @TODO: add support for desktop icons in mac and linux??
+
+            // delete the firstRun file such that the user is not asked the next time around
+            new File(new Properties().getJarFilePath() + "/resources/conf/firstRun").delete();
+
+            int value = JOptionPane.showConfirmDialog(null,
+                    "Create a shortcut to Relims on the desktop?",
+                    "Create Desktop Shortcut?",
+                    JOptionPane.YES_NO_OPTION,
+                    JOptionPane.QUESTION_MESSAGE);
+
+            if (value == JOptionPane.YES_OPTION) {
+
+                String jarFilePath = new Properties().getJarFilePath();
+                String versionNumber = new Properties().getVersion();
+
+                if (!jarFilePath.equalsIgnoreCase(".")) {
+
+                    // remove the initial '/' at the start of the line
+                    if (jarFilePath.startsWith("\\") && !jarFilePath.startsWith("\\\\")) {
+                        jarFilePath = jarFilePath.substring(1);
+                    }
+
+                    String iconFileLocation = jarFilePath + "\\resources\\relims.ico";
+                    String jarFileLocation = jarFilePath + "\\compomics-relims-" + versionNumber + ".jar";
+
+                    try {
+                        JShellLink link = new JShellLink();
+                        link.setFolder(JShellLink.getDirectory("desktop"));
+                        link.setName("Relims " + versionNumber);
+                        link.setIconLocation(iconFileLocation);
+                        link.setPath(jarFileLocation);
+                        link.save();
+                    } catch (Exception e) {
+                        System.out.println("An error occurred when trying to create a desktop shortcut...");
+                        e.printStackTrace();
+                    }
+                }
+            }
+        }
     }
 
     /**
@@ -113,9 +233,14 @@ public class RelimsNBGUI extends javax.swing.JFrame {
         iconRelims = new javax.swing.JLabel();
         iconCompomics = new javax.swing.JLabel();
 
-        setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+        setDefaultCloseOperation(javax.swing.WindowConstants.DO_NOTHING_ON_CLOSE);
         setTitle("Relims");
         setBackground(new java.awt.Color(255, 255, 255));
+        addWindowListener(new java.awt.event.WindowAdapter() {
+            public void windowClosing(java.awt.event.WindowEvent evt) {
+                formWindowClosing(evt);
+            }
+        });
 
         backgroundPanel.setBackground(new java.awt.Color(255, 255, 255));
 
@@ -275,7 +400,7 @@ public class RelimsNBGUI extends javax.swing.JFrame {
                 .add(rdbSourceMSLIMS)
                 .add(3, 3, 3)
                 .add(rdbSourcePRIDE)
-                .addContainerGap(99, Short.MAX_VALUE))
+                .addContainerGap(105, Short.MAX_VALUE))
         );
 
         org.jdesktop.layout.GroupLayout jpanMainLayout = new org.jdesktop.layout.GroupLayout(jpanMain);
@@ -327,7 +452,7 @@ public class RelimsNBGUI extends javax.swing.JFrame {
             tablePanelLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
             .add(org.jdesktop.layout.GroupLayout.TRAILING, tablePanelLayout.createSequentialGroup()
                 .addContainerGap()
-                .add(scrlTable, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 273, Short.MAX_VALUE)
+                .add(scrlTable, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 279, Short.MAX_VALUE)
                 .addContainerGap())
         );
 
@@ -422,6 +547,16 @@ public class RelimsNBGUI extends javax.swing.JFrame {
         logger.debug(String.format("selected strategy %s", s));
     }//GEN-LAST:event_rdbStraightActionPerformed
 
+    /**
+     * Close the window and shut down the jvm.
+     *
+     * @param evt
+     */
+    private void formWindowClosing(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowClosing
+        dispose();
+        System.exit(0); // @TODO: should we do more here? like check if a process is running etc?
+    }//GEN-LAST:event_formWindowClosing
+
     private void rdbSourceMSLIMSActionPerformed(java.awt.event.ActionEvent evt) {
         String s = RelimsProperties.getRelimsSourceList()[0];
         iProjectSourceSelectionModel.setSelectedItem(s);
@@ -456,42 +591,18 @@ public class RelimsNBGUI extends javax.swing.JFrame {
         String lSearchStrategyID = iStrategySelectionModel.getSelectedItem().toString();
         String lProjectProviderID = iProjectSourceSelectionModel.getSelectedItem().toString();
 
-        iRelimsJob = new RelimsJob( lSearchStrategyID, lProjectProviderID);
+        iRelimsJob = new RelimsJob(lSearchStrategyID, lProjectProviderID);
         withinExecutor.submit(iRelimsJob);
 
     }
-
 
     /**
      * @param args the command line arguments
      */
     public static void main(String args[]) {
-        /*
-         * Set the Nimbus look and feel
-         */
-        //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
-        /*
-         * If Nimbus (introduced in Java SE 6) is not available, stay with the
-         * default look and feel. For details see
-         * http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html
-         */
-        try {
-            for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
-                if ("Nimbus".equals(info.getName())) {
-                    javax.swing.UIManager.setLookAndFeel(info.getClassName());
-                    break;
-                }
-            }
-        } catch (ClassNotFoundException ex) {
-            java.util.logging.Logger.getLogger(RelimsNBGUI.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (InstantiationException ex) {
-            java.util.logging.Logger.getLogger(RelimsNBGUI.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (IllegalAccessException ex) {
-            java.util.logging.Logger.getLogger(RelimsNBGUI.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (javax.swing.UnsupportedLookAndFeelException ex) {
-            java.util.logging.Logger.getLogger(RelimsNBGUI.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        }
-        //</editor-fold>
+        
+        // set the look and feel
+        UtilitiesGUIDefaults.setLookAndFeel();
 
         /*
          * Create and display the form
@@ -503,7 +614,6 @@ public class RelimsNBGUI extends javax.swing.JFrame {
             }
         });
     }
-
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JPanel backgroundPanel;
     private javax.swing.ButtonGroup btnGroupSource;

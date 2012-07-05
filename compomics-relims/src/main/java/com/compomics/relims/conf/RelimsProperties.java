@@ -2,12 +2,12 @@ package com.compomics.relims.conf;
 
 import com.compomics.omssa.xsd.UserMod;
 import com.compomics.relims.concurrent.Command;
+import com.compomics.relims.gui.util.Properties;
 import com.compomics.relims.model.guava.functions.SpeciesFinderFunction;
 import com.compomics.util.experiment.biology.PTMFactory;
 import com.google.common.base.Function;
 import com.google.common.base.Joiner;
 import com.google.common.collect.Lists;
-import com.google.common.io.Resources;
 import org.apache.commons.configuration.ConfigurationException;
 import org.apache.commons.configuration.PropertiesConfiguration;
 import org.apache.log4j.Logger;
@@ -16,39 +16,39 @@ import org.xmlpull.v1.XmlPullParserException;
 import javax.annotation.Nullable;
 import java.io.File;
 import java.io.IOException;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
- * This class is a
+ * This class contains the Relims properties.
+ * 
+ * @author Kenny Helsens
  */
 public class RelimsProperties {
 
     private static Logger logger = Logger.getLogger(RelimsProperties.class);
-
     private static PropertiesConfiguration config;
     private static File iWorkSpace = null;
     private static PTMFactory ptmFactory;
     public static PropertiesConfiguration iSearchGUIPropertiesConfiguration;
-    public static String iFolderSeparator = System.getProperty("file.separator");
+    public static final String iFolderSeparator = System.getProperty("file.separator");
 
     // -------------------------- STATIC BLOCKS --------------------------
-
     static {
         try {
-            URL lResource;
+            File lResource;
 
             int lOperatingSystem = Utilities.getOperatingSystem();
+            String jarFilePath = new Properties().getJarFilePath();
 
-            if(lOperatingSystem == Utilities.OS_MAC){
-                lResource = Resources.getResource("resources" + iFolderSeparator + "conf" + iFolderSeparator + "relims-mac.properties");
-            }else if(lOperatingSystem == Utilities.OS_WIN_OTHER){
-                lResource = Resources.getResource("resources" + iFolderSeparator + "conf" + iFolderSeparator + "relims-windows.properties");
-            }else{
-                lResource = Resources.getResource("resources" + iFolderSeparator + "conf" + iFolderSeparator + "relims.properties");
+            if (lOperatingSystem == Utilities.OS_MAC) {
+                lResource = new File(jarFilePath + iFolderSeparator + "resources" + iFolderSeparator + "conf" + iFolderSeparator + "relims-mac.properties");
+            } else if (lOperatingSystem == Utilities.OS_WIN_OTHER) {
+                lResource = new File(jarFilePath + iFolderSeparator + "resources" + iFolderSeparator + "conf" + iFolderSeparator + "relims-windows.properties");
+            } else {
+                lResource = new File(jarFilePath + iFolderSeparator + "resources" + iFolderSeparator + "conf" + iFolderSeparator + "relims.properties");
             }
 
             config = new PropertiesConfiguration(lResource);
@@ -59,7 +59,6 @@ public class RelimsProperties {
             logger.error(e.getMessage(), e);
         }
     }
-
 
     public static String getJavaExec() {
         return config.getString("java.home");
@@ -77,11 +76,9 @@ public class RelimsProperties {
         return config.getString("searchgui.jar");
     }
 
-
     public static File getWorkSpacePath() {
         return new File(config.getString("workspace.file"));
     }
-
 
     public static File getWorkSpace() {
         if (iWorkSpace == null) {
@@ -91,7 +88,6 @@ public class RelimsProperties {
         }
         return iWorkSpace;
     }
-
 
     public static File getTmpFile(String aID) throws IOException {
         if (iWorkSpace == null) {
@@ -119,8 +115,9 @@ public class RelimsProperties {
 
         File lModFile = new File(getSearchGuiConfFolder(), config.getString("searchgui.mods"));
         File lUserModFile = new File(getSearchGuiConfFolder(), config.getString("searchgui.usermods.default"));
+        
         try {
-            if(ptmFactory == null){
+            if (ptmFactory == null) {
                 ptmFactory = PTMFactory.getInstance();
             }
 
@@ -139,6 +136,7 @@ public class RelimsProperties {
             logger.error("error initializing OMSSA mods", e);
             logger.error(e.getMessage(), e);
         }
+        
         return PTMFactory.getInstance();
     }
 
@@ -154,9 +152,9 @@ public class RelimsProperties {
 
             try {
                 File lPropertiesFile = new File(getSearchGuiFolder(),
-                        iFolderSeparator + "resources" +
-                        iFolderSeparator + "conf" +
-                        iFolderSeparator + "default_SearchGUI.properties");
+                        iFolderSeparator + "resources"
+                        + iFolderSeparator + "conf"
+                        + iFolderSeparator + "default_SearchGUI.properties");
 
                 iSearchGUIPropertiesConfiguration = new PropertiesConfiguration(lPropertiesFile);
                 return iSearchGUIPropertiesConfiguration;
@@ -165,6 +163,7 @@ public class RelimsProperties {
                 logger.error(e.getMessage(), e);
             }
         }
+        
         return iSearchGUIPropertiesConfiguration;
     }
 
@@ -177,6 +176,7 @@ public class RelimsProperties {
         checkNotNull(lRelimsModIds);
 
         ArrayList<UserMod> lRelimsMods = new ArrayList<UserMod>();
+        
         for (String lRelimsModId : lRelimsModIds) {
             UserMod lRelimsMod = new UserMod();
             String lBase = "relims.mod." + lRelimsModId + ".";
@@ -214,6 +214,7 @@ public class RelimsProperties {
             logger.debug("workspace:" + getWorkSpace().getCanonicalPath());
             logger.debug("searchgui:" + getSearchGuiFolder());
             logger.debug("relims mods:" + Joiner.on(",").join(Lists.transform(getRelimsMods(), new Function<UserMod, Object>() {
+
                 public Object apply(@Nullable UserMod input) {
                     return input.getModificationName();
                 }
@@ -238,7 +239,6 @@ public class RelimsProperties {
     public static String getDbAdress() {
         return config.getString("db.ip");
     }
-
 
     public static int getMaxSucces() {
         return config.getInt("program.param.max.succes");
@@ -268,7 +268,6 @@ public class RelimsProperties {
         return config.getInt("predicate.project.spectrum.min");
     }
 
-
     public static int getMinimumNumberOfPeptides() {
         return config.getInt("predicate.project.peptide.min");
     }
@@ -278,7 +277,9 @@ public class RelimsProperties {
     }
 
     public static SpeciesFinderFunction.SPECIES getAllowedSpecies() {
+        
         String lSpecies = config.getString("predicate.project.species.type");
+        
         if (lSpecies.equals("drosphila")) {
             return SpeciesFinderFunction.SPECIES.DROSOPHILA;
 
@@ -314,7 +315,6 @@ public class RelimsProperties {
         return config.getStringArray("relims.db.ids");
     }
 
-
     public static String[] getRelimsClassList() {
         return config.getStringArray("relims.strategy.ids");
     }
@@ -341,16 +341,15 @@ public class RelimsProperties {
             lProjectIds.add(Long.parseLong(lProjectString));
 
         }
+        
         return lProjectIds;
     }
 
-
     public static Double getMSTolerancePPM() {
-        return config.getDouble("searchgui.ms1.tolerance.ppm");  //To change body of created methods use File | Settings | File Templates.
+        return config.getDouble("searchgui.ms1.tolerance.ppm");
     }
 
     public static Integer getMissedCleavages() {
-        return config.getInt("searchgui.missed.cleavages");  //To change body of created methods use File | Settings | File Templates.
+        return config.getInt("searchgui.missed.cleavages");
     }
 }
-

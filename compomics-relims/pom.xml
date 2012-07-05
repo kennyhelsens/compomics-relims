@@ -10,7 +10,7 @@
     <url>code.google.com/p/compomics-relims/</url>
     <!-- Set the version number for the whole project -->
     <properties>
-        <version.number>0.2.1</version.number>
+        <version.number>0.3.0-beta</version.number>
     </properties>
     <!-- Licence -->
     <licenses>
@@ -67,7 +67,7 @@
                         <manifest>
                             <addDefaultImplementationEntries>true</addDefaultImplementationEntries>
                             <addDefaultSpecificationEntries>true</addDefaultSpecificationEntries>
-                            <mainClass>com.compomics.relims.gui.RelimsIDEAGUI</mainClass>
+                            <mainClass>com.compomics.relims.gui.RelimsWrapper</mainClass>
                             <addClasspath>true</addClasspath>
                             <classpathPrefix>lib</classpathPrefix>
                         </manifest>
