@@ -41,14 +41,18 @@ public class RelimsProperties {
             File lResource;
 
             int lOperatingSystem = Utilities.getOperatingSystem();
-            String jarFilePath = new Properties().getJarFilePath();
+            String jarFilePath = new Properties().getJarFilePath() + iFolderSeparator;
+            
+            if (jarFilePath.startsWith(".")) {
+                jarFilePath = "";
+            }
 
             if (lOperatingSystem == Utilities.OS_MAC) {
-                lResource = new File(jarFilePath + iFolderSeparator + "resources" + iFolderSeparator + "conf" + iFolderSeparator + "relims-mac.properties");
+                lResource = new File(jarFilePath + "resources" + iFolderSeparator + "conf" + iFolderSeparator + "relims-mac.properties");
             } else if (lOperatingSystem == Utilities.OS_WIN_OTHER) {
-                lResource = new File(jarFilePath + iFolderSeparator + "resources" + iFolderSeparator + "conf" + iFolderSeparator + "relims-windows.properties");
+                lResource = new File(jarFilePath + "resources" + iFolderSeparator + "conf" + iFolderSeparator + "relims-windows.properties");
             } else {
-                lResource = new File(jarFilePath + iFolderSeparator + "resources" + iFolderSeparator + "conf" + iFolderSeparator + "relims.properties");
+                lResource = new File(jarFilePath + "resources" + iFolderSeparator + "conf" + iFolderSeparator + "relims.properties");
             }
 
             config = new PropertiesConfiguration(lResource);
