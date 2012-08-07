@@ -21,9 +21,7 @@ public class PrideProjectProvider extends ProjectProvider {
 
     public PrideProjectProvider() {
         super();
-
         iDataProvider = new PrideDataProvider();
-
         ApplicationContext lContext = ApplicationContextProvider.getInstance().getApplicationContext();
         iPrideService = (ExperimentService) lContext.getBean("experimentService");
     }
@@ -38,7 +36,6 @@ public class PrideProjectProvider extends ProjectProvider {
                 }
             });
         }
-
         return iExperimentIds;
     }
 

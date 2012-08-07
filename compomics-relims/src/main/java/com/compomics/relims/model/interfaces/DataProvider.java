@@ -1,5 +1,6 @@
 package com.compomics.relims.model.interfaces;
 
+import com.compomics.pride_asa_pipeline.model.AnalyzerData;
 import com.compomics.relims.model.beans.RelimsProjectBean;
 
 import java.io.File;
@@ -13,7 +14,7 @@ public interface DataProvider {
 
     public long getNumberOfSpectraForProject(long aProjectID);
 
-    public Set<Integer> getInstrumentsForProject(long aProjectID);
+    public Set<AnalyzerData> getInstrumentsForProject(long aProjectID);
 
     public Set<String> getProteinAccessionsForProject(long aProjectID);
 

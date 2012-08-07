@@ -3,9 +3,7 @@ package com.compomics.relims.model.guava.predicates;
 import com.compomics.relims.model.interfaces.DataProvider;
 import com.google.common.base.Predicate;
 
-import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashSet;
 import java.util.Vector;
 
 /**
@@ -24,16 +22,11 @@ public class PredicateManager {
 
 
     public PredicateManager(DataProvider aDataProvider) {
-        ArrayList lAllowedInstruments = new ArrayList();
-        lAllowedInstruments.add(8);
-        lAllowedInstruments.add(9);
-        lAllowedInstruments.add(10);
+        iInstrumentPredicate = new InstrumentPredicate(aDataProvider);
+//        iProjectSizePredicate = new ProjectSizePredicate(aDataProvider);
 
-        iProjectSizePredicate = new ProjectSizePredicate(aDataProvider);
-
-        iInstrumentPredicate = new InstrumentPredicate(new HashSet<Integer>(lAllowedInstruments));
-        iSpeciesPredicate = new SpeciesPredicate();
-        iSearchSetSizePredicate = new SearchSetSizePredicate();
+//        iSpeciesPredicate = new SpeciesPredicate();
+//        iSearchSetSizePredicate = new SearchSetSizePredicate();
 
     }
 

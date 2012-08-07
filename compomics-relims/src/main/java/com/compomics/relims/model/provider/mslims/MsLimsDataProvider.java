@@ -6,7 +6,10 @@ import com.compomics.mascotdatfile.util.mascot.ModificationList;
 import com.compomics.mslims.db.accessors.Spectrum_file;
 import com.compomics.mslims.util.fileio.MascotGenericFile;
 import com.compomics.omssa.xsd.UserMod;
+import com.compomics.pride_asa_pipeline.data.mapper.AnalyzerDataMapper;
+import com.compomics.pride_asa_pipeline.model.AnalyzerData;
 import com.compomics.relims.conf.RelimsProperties;
+import com.compomics.relims.exception.RelimsException;
 import com.compomics.relims.model.UserModConverter;
 import com.compomics.relims.model.beans.RelimsProjectBean;
 import com.compomics.relims.model.interfaces.DataProvider;
@@ -64,18 +67,40 @@ public class MsLimsDataProvider implements DataProvider {
         return lNumberOfSpectra;
     }
 
-    public Set<Integer> getInstrumentsForProject(long aProjectID) {
-        Set<Integer> lInstrumentIDSet = new HashSet<Integer>();
+    public Set<AnalyzerData> getInstrumentsForProject(long aProjectID) {
+        Set<AnalyzerData> lInstrumentIDSet = new HashSet<AnalyzerData>();
 
         try {
-            String lQuery = "select distinct l_instrumentid from spectrum as s where s.l_projectid=?";
+            String lQuery = "select distinct storageclassname from spectrum as s where s.l_projectid=?";
             PreparedStatement ps = ConnectionProvider.getConnection().prepareStatement(lQuery);
             ps.setLong(1, aProjectID);
 
             ResultSet lResultSet = ps.executeQuery();
             while (lResultSet.next()) {
-                int lInstrumentID = lResultSet.getInt(1);
-                lInstrumentIDSet.add(lInstrumentID);
+
+                String lStorageClassName = lResultSet.getString(1);
+
+                if (lStorageClassName.indexOf("QTOF") > 0) {
+                    // com.compomics.mslims.util.fileio.QTOFSpectrumStorageEngine
+                    lInstrumentIDSet.add(AnalyzerDataMapper.getAnalyzerDataByAnalyzerType("tof"));
+
+                } else if (lStorageClassName.indexOf("Ultraflex") > 0) {
+                    // com.compomics.mslims.util.fileio.UltraflexSpectrumStorageEngine
+                    lInstrumentIDSet.add(AnalyzerDataMapper.getAnalyzerDataByAnalyzerType("tof"));
+
+                } else if (lStorageClassName.indexOf("Esquire") > 0) {
+                    // com.compomics.mslims.util.fileio.EsquireSpectrumStorageEngine
+                    lInstrumentIDSet.add(AnalyzerDataMapper.getAnalyzerDataByAnalyzerType("iontrap"));
+
+                } else if (lStorageClassName.indexOf("Fourier") > 0) {
+                    // com.compomics.mslims.util.fileio.FourierSpectrumStorageEngine
+                    lInstrumentIDSet.add(AnalyzerDataMapper.getAnalyzerDataByAnalyzerType("ft"));
+
+                } else {
+                    throw new RelimsException(String.format("Failed to map mslims Instrument StorageEngine (%s) to a AnalyzerData instance!!", lStorageClassName));
+                }
+
+
             }
 
             lResultSet.close();
@@ -268,12 +293,44 @@ public class MsLimsDataProvider implements DataProvider {
         lAllMascotMods.addAll(lVarMods);
 
         List<UserMod> lUserModList = Lists.newArrayList();
-        for(Modification lMod : lAllMascotMods){
+        for (Modification lMod : lAllMascotMods) {
             UserMod lUserMod = UserModConverter.convert(lMod);
             lUserModList.add(lUserMod);
         }
 
         lRelimsProjectBean.setStandardModificationList(lUserModList);
+
+        // Set precursor and fragment errors
+        Set<AnalyzerData> lAnalyzerDataSet = getInstrumentsForProject(aProjectid);
+
+        double lPrecursorError = 0.0;
+        double lFragmentError = 0.0;
+        String lMassAnalyzer = "";
+
+        for (AnalyzerData lNext : lAnalyzerDataSet) {
+
+            String lNextMassAnalyzer = lNext.getAnalyzerFamily().name();
+            if(!lMassAnalyzer.equals("") && !lMassAnalyzer.equals(lNextMassAnalyzer)){
+                throw new RelimsException(
+                        String.format("There are multiple Mass Analyzers in this project!!\t\t" +
+                                "first:\t%s\tsecond:\t%s", lMassAnalyzer, lNextMassAnalyzer));
+            }
+
+            Double lNextPrecursorMassError = lNext.getPrecursorMassError();
+            if(lPrecursorError > 0.0 && lNextPrecursorMassError != lPrecursorError){
+                throw new RelimsException("There are multiple Mass Analyzers with different Precursor Mass errors for this project!!");
+            }
+            lPrecursorError = lNextPrecursorMassError;
+
+            Double lNextFragmentMassError = lNext.getFragmentMassError();
+            if(lFragmentError > 0.0 && lFragmentError == lNextFragmentMassError){
+                throw new RelimsException("There are multiple Mass Analyzers with different Fragment Mass errors for this project!!");
+            }
+            lFragmentError = lNextFragmentMassError;
+        }
+
+        lRelimsProjectBean.setPrecursorError(lPrecursorError);
+        lRelimsProjectBean.setFragmentError(lFragmentError);
 
         return lRelimsProjectBean;
     }

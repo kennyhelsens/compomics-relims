@@ -176,7 +176,7 @@
         <dependency>
             <groupId>eu.isas.peptideshaker</groupId>
             <artifactId>PeptideShaker</artifactId>
-            <version>0.17.2-beta</version>
+            <version>0.17.1</version>
         </dependency>
 
         <dependency>
@@ -191,12 +191,14 @@
             <artifactId>log4j</artifactId>
             <version>1.2.14</version>
         </dependency>
+
         <!-- This project makes use of convenience methods from google guava-->
         <dependency>
             <groupId>com.google.guava</groupId>
             <artifactId>guava</artifactId>
             <version>10.0.1</version>
         </dependency>
+
         <!--Apache commons configuration-->
         <dependency>
             <groupId>commons-configuration</groupId>
@@ -209,6 +211,7 @@
                 </exclusion>
             </exclusions>
         </dependency>
+
         <!--Apache commons configuration-->
         <dependency>
             <groupId>com.compomics</groupId>

@@ -7,12 +7,13 @@ import com.compomics.relims.gui.model.RelimsPropertiesTableModel;
 import com.compomics.relims.gui.model.StrategySelectionModel;
 import com.compomics.relims.gui.util.Properties;
 import com.compomics.util.examples.BareBonesBrowserLaunch;
-import com.compomics.util.gui.UtilitiesGUIDefaults;
-import java.awt.Toolkit;
+import net.jimmc.jshortcut.JShellLink;
 import org.apache.log4j.Logger;
 
+import javax.swing.*;
 import javax.swing.table.TableColumnModel;
 import javax.swing.table.TableModel;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.io.BufferedReader;
 import java.io.File;
@@ -23,8 +24,6 @@ import java.net.URL;
 import java.net.UnknownHostException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import javax.swing.JOptionPane;
-import net.jimmc.jshortcut.JShellLink;
 
 /**
  * The Relims GUI.
@@ -602,7 +601,7 @@ public class RelimsNBGUI extends javax.swing.JFrame {
     public static void main(String args[]) {
         
         // set the look and feel
-        UtilitiesGUIDefaults.setLookAndFeel();
+//        UtilitiesGUIDefaults.setLookAndFeel();
 
         /*
          * Create and display the form
