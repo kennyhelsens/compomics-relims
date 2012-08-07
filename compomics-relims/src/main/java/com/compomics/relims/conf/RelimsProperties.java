@@ -1,6 +1,7 @@
 package com.compomics.relims.conf;
 
 import com.compomics.omssa.xsd.UserMod;
+import com.compomics.pride_asa_pipeline.config.PropertiesConfigurationHolder;
 import com.compomics.relims.concurrent.Command;
 import com.compomics.relims.gui.util.Properties;
 import com.compomics.relims.model.guava.functions.SpeciesFinderFunction;
@@ -59,6 +60,13 @@ public class RelimsProperties {
 
             // Set the workspace for all future Commands to the SearchGUI folder
             Command.setWorkFolder(new File(getSearchGuiFolder() + iFolderSeparator));
+
+            // Override Pride-Asap properties
+            PropertiesConfigurationHolder lAsapProperties = PropertiesConfigurationHolder.getInstance();
+
+            lAsapProperties.setProperty("spectrum.limit", config.getBoolean("relims.asap.spectrum.limit"));
+            lAsapProperties.setProperty("spectrum.limit.size", config.getInt("relims.asap.spectrum.limit.size"));
+
         } catch (org.apache.commons.configuration.ConfigurationException e) {
             logger.error(e.getMessage(), e);
         }
@@ -355,5 +363,13 @@ public class RelimsProperties {
 
     public static Integer getMissedCleavages() {
         return config.getInt("searchgui.missed.cleavages");
+    }
+
+    public static Boolean appendPrideAsapAutomatic(){
+        return config.getBoolean("relims.asap.automatic.append");
+    }
+
+    public static String[] getAllowedInstruments(){
+        return config.getStringArray("predicate.project.instrument");
     }
 }
