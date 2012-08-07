@@ -20,6 +20,9 @@ public class RelimsProjectBean {
     private List<UserMod> iStandardModificationList = Lists.newArrayList();
     private List<UserMod> iExtraModificationList = Lists.newArrayList();
 
+    private double iPrecursorError = 1.0;
+    private double iFragmentError = 1.0;
+
     public RelimsProjectBean() {
     }
 
@@ -77,6 +80,22 @@ public class RelimsProjectBean {
         iProjectID = aProjectID;
     }
 
+    public void setFragmentError(double aFragmentError) {
+        iFragmentError = aFragmentError;
+    }
+
+    public void setPrecursorError(double aPrecursorError) {
+        iPrecursorError = aPrecursorError;
+    }
+
+    public double getFragmentError() {
+        return iFragmentError;
+    }
+
+    public double getPrecursorError() {
+        return iPrecursorError;
+    }
+
     @Override
     public String toString() {
         return "" + getProjectID();
@@ -95,6 +114,9 @@ public class RelimsProjectBean {
 
         lProjectBean.setFixedMatchedPTMs(getFixedMatchedPTMs());
         lProjectBean.setVariableMatchedPTMs(getVariableMatchedPTMs());
+
+        lProjectBean.setPrecursorError(getPrecursorError());
+        lProjectBean.setFragmentError(getFragmentError());
 
         return lProjectBean;
     }
