@@ -1,7 +1,8 @@
 package com.compomics.relims.playground;
 
-import com.compomics.relims.concurrent.SearchCommandGenerator;
-import com.compomics.relims.concurrent.SearchCommandVarMod;
+import com.compomics.relims.concurrent.SearchGUICommandGenerator;
+import com.compomics.relims.concurrent.SearchGUICommandVarMod;
+import com.compomics.relims.concurrent.SearchGUICommandGenerator;
 import com.compomics.relims.conf.RelimsProperties;
 import com.compomics.relims.model.beans.RelimsProjectBean;
 import com.compomics.relims.model.beans.SearchList;
@@ -37,25 +38,25 @@ public class SearchProcessorTester {
         RelimsProjectBean lProjectSetupBean = new RelimsProjectBean();
         lProjectSetupBean.setProjectID(0);
 
-        // simulate a SearchCommandGenerator
-        SearchCommandGenerator lSearchBean = new SearchCommandVarMod("test", lProjectSetupBean, lSpectrumFiles);
+        // simulate a SearchGUICommandGenerator
+        SearchGUICommandGenerator lSearchGUIBean = new SearchGUICommandVarMod("test", lProjectSetupBean, lSpectrumFiles);
 
-        lSearchBean.setSearchResultFolder(lFile.getParentFile());
+        lSearchGUIBean.setSearchResultFolder(lFile.getParentFile());
 
         // create a searchlist around this searchbean
         SearchList lSearchList = new SearchList();
-        lSearchList.add(lSearchBean);
+        lSearchList.add(lSearchGUIBean);
 
         // create a search processor using this searchbean
         PeptideShakerCLIInputBean lPeptideShakerCLIInputBean = new PeptideShakerCLIInputBean();
 
-        lPeptideShakerCLIInputBean.setInput(lSearchBean.getSearchResultFolder());
-        lPeptideShakerCLIInputBean.setOutput(lSearchBean.getSearchResultFolder());
+        lPeptideShakerCLIInputBean.setInput(lSearchGUIBean.getSearchResultFolder());
+        lPeptideShakerCLIInputBean.setOutput(lSearchGUIBean.getSearchResultFolder());
         lPeptideShakerCLIInputBean.setPSMFDR(1.0);
         lPeptideShakerCLIInputBean.setPeptideFDR(1.0);
         lPeptideShakerCLIInputBean.setProteinFDR(1.0);
-        lPeptideShakerCLIInputBean.setExperimentID(String.format("projectid_%d", lSearchBean.getProjectId()));
-        lPeptideShakerCLIInputBean.setSampleID(lSearchBean.getName());
+        lPeptideShakerCLIInputBean.setExperimentID(String.format("projectid_%d", lSearchGUIBean.getProjectId()));
+        lPeptideShakerCLIInputBean.setSampleID(lSearchGUIBean.getName());
 
         PeptideShakerCLI lPeptideShakerCLI = new PeptideShakerCLI(lPeptideShakerCLIInputBean);
         lPeptideShakerCLI.call();

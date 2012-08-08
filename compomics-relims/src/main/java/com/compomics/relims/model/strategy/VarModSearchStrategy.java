@@ -1,8 +1,9 @@
 package com.compomics.relims.model.strategy;
 
 import com.compomics.omssa.xsd.UserMod;
-import com.compomics.relims.concurrent.SearchCommandGenerator;
-import com.compomics.relims.concurrent.SearchCommandVarMod;
+import com.compomics.relims.concurrent.SearchGUICommandGenerator;
+import com.compomics.relims.concurrent.SearchGUICommandVarMod;
+import com.compomics.relims.concurrent.SearchGUICommandVarMod;
 import com.compomics.relims.conf.RelimsProperties;
 import com.compomics.relims.model.beans.RelimsProjectBean;
 import com.compomics.relims.model.beans.SearchList;
@@ -28,22 +29,22 @@ public class VarModSearchStrategy implements SearchStrategy {
         aRelimsProjectBean.setExtraModificationList(lRelimsMods);
 
         // First define a search without the relims modification.
-        SearchCommandGenerator lSearchBean = null;
-        lSearchBean = new SearchCommandVarMod("original_mod", aRelimsProjectBean, iSpectrumFiles);
+        SearchGUICommandGenerator lSearchGUIBean = null;
+        lSearchGUIBean = new SearchGUICommandVarMod("original_mod", aRelimsProjectBean, iSpectrumFiles);
 
-        aSearchList.add(lSearchBean);
+        aSearchList.add(lSearchGUIBean);
 
         // Then define searches for all extra relims modifications.
         for (UserMod lRelimsModification : lRelimsMods) {
             ArrayList<UserMod> lRelimsModList = new ArrayList<UserMod>();
             lRelimsModList.add(lRelimsModification);
 
-            lSearchBean = new SearchCommandVarMod(
+            lSearchGUIBean = new SearchGUICommandVarMod(
                     lRelimsModification,
                     aRelimsProjectBean,
                     iSpectrumFiles);
 
-            aSearchList.add(lSearchBean);
+            aSearchList.add(lSearchGUIBean);
         }
     }
 

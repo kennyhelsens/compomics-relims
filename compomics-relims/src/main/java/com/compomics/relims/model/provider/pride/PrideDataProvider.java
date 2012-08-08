@@ -58,7 +58,7 @@ public class PrideDataProvider implements DataProvider {
     }
 
     public File getSpectraForProject(long aProjectID) throws IOException {
-        return iPrideService.getSpectraAsMgfFile("" + aProjectID);
+        return iPrideService.getSpectrumCacheAsMgfFile("" + aProjectID, false);
     }
 
     public long getNumberOfSearchesForProject(long aProjectid) {
@@ -67,10 +67,16 @@ public class PrideDataProvider implements DataProvider {
 
     public RelimsProjectBean buildProjectBean(long aProjectid) {
 
+        // We will need to cache all spectra in order to run the asap pipeline.
+        // So lets cache them here.
+        iPrideService.buildSpectrumCacheForExperiment("" + aProjectid);
+
+
         RelimsProjectBean lRelimsProjectBean = new RelimsProjectBean();
         lRelimsProjectBean.setProjectID((int) aProjectid);
 
         Set<Modification> lModificationSet = null;
+
 
         logger.debug("estimating PTMs via inspecting the modified_sequence values of the PSMs");
         // Do not run PRIDE asap automatic, but retrieve the PTMs from the modified sequence values.

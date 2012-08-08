@@ -1,7 +1,7 @@
 package com.compomics.relims.model.strategy;
 
-import com.compomics.relims.concurrent.SearchCommandGenerator;
-import com.compomics.relims.concurrent.SearchCommandVarDb;
+import com.compomics.relims.concurrent.SearchGUICommandGenerator;
+import com.compomics.relims.concurrent.SearchGUICommandVarDb;
 import com.compomics.relims.conf.RelimsProperties;
 import com.compomics.relims.model.beans.RelimsProjectBean;
 import com.compomics.relims.model.beans.SearchList;
@@ -22,12 +22,12 @@ public class VarDBSearchStrategy implements SearchStrategy {
     private List<File> iSpectrumFiles = Lists.newArrayList();
 
     public void fill(SearchList aSearchList, RelimsProjectBean aRelimsProjectBean) {
-        SearchCommandGenerator lSearchBean = null;
+        SearchGUICommandGenerator lSearchGUIBean = null;
 
         String[] lDatabaseVarIDs = RelimsProperties.getDatabaseVarIDs();
         for (String lDatabaseVarID : lDatabaseVarIDs) {
-            lSearchBean = new SearchCommandVarDb(lDatabaseVarID, lDatabaseVarID, aRelimsProjectBean, iSpectrumFiles);
-            aSearchList.add(lSearchBean);
+            lSearchGUIBean = new SearchGUICommandVarDb(lDatabaseVarID, lDatabaseVarID, aRelimsProjectBean, iSpectrumFiles);
+            aSearchList.add(lSearchGUIBean);
         }
     }
 

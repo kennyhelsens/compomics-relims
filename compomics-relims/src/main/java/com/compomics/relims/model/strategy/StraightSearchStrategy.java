@@ -1,7 +1,7 @@
 package com.compomics.relims.model.strategy;
 
-import com.compomics.relims.concurrent.SearchCommandGenerator;
-import com.compomics.relims.concurrent.SearchCommandStraight;
+import com.compomics.relims.concurrent.SearchGUICommandGenerator;
+import com.compomics.relims.concurrent.SearchGUICommandStraight;
 import com.compomics.relims.model.beans.RelimsProjectBean;
 import com.compomics.relims.model.beans.SearchList;
 import com.compomics.relims.model.interfaces.SearchStrategy;
@@ -21,10 +21,10 @@ public class StraightSearchStrategy implements SearchStrategy {
     private List<File> iSpectrumFiles = Lists.newArrayList();
 
     public void fill(SearchList aSearchList, RelimsProjectBean aRelimsProjectBean) {
-        SearchCommandGenerator lSearchBean = null;
+        SearchGUICommandGenerator lSearchGUIBean = null;
 
-        lSearchBean = new SearchCommandStraight(aRelimsProjectBean, iSpectrumFiles);
-        aSearchList.add(lSearchBean);
+        lSearchGUIBean = new SearchGUICommandStraight(aRelimsProjectBean, iSpectrumFiles);
+        aSearchList.add(lSearchGUIBean);
 
     }
 

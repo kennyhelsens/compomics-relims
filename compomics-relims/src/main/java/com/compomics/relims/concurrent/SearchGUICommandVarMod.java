@@ -13,16 +13,16 @@ import java.util.List;
 /**
  * This class is a
  */
-public class SearchCommandVarMod extends SearchCommandGenerator {
-    private static Logger logger = Logger.getLogger(SearchCommandVarDb.class);
+public class SearchGUICommandVarMod extends SearchGUICommandGenerator {
+    private static Logger logger = Logger.getLogger(SearchGUICommandVarDb.class);
     private UserMod iUserMod = null;
 
-    public SearchCommandVarMod(UserMod aUserMod, RelimsProjectBean aRelimsProjectBean, List<File> aSpectrumFiles) {
+    public SearchGUICommandVarMod(UserMod aUserMod, RelimsProjectBean aRelimsProjectBean, List<File> aSpectrumFiles) {
         super(aUserMod.getModificationName(), aRelimsProjectBean, aSpectrumFiles);
         iUserMod = aUserMod;
     }
 
-    public SearchCommandVarMod(String aName, RelimsProjectBean aRelimsProjectBean, List<File> aSpectrumFiles) {
+    public SearchGUICommandVarMod(String aName, RelimsProjectBean aRelimsProjectBean, List<File> aSpectrumFiles) {
         super(aName, aRelimsProjectBean, aSpectrumFiles);
     }
 

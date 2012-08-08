@@ -24,7 +24,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * This class contains the Relims properties.
- * 
+ *
  * @author Kenny Helsens
  */
 public class RelimsProperties {
@@ -43,7 +43,7 @@ public class RelimsProperties {
 
             int lOperatingSystem = Utilities.getOperatingSystem();
             String jarFilePath = new Properties().getJarFilePath() + iFolderSeparator;
-            
+
             if (jarFilePath.startsWith(".")) {
                 jarFilePath = "";
             }
@@ -66,6 +66,7 @@ public class RelimsProperties {
 
             lAsapProperties.setProperty("spectrum.limit", config.getBoolean("relims.asap.spectrum.limit"));
             lAsapProperties.setProperty("spectrum.limit.size", config.getInt("relims.asap.spectrum.limit.size"));
+            lAsapProperties.setProperty("spectrum_peaks_cache.maximum_cache_size", config.getInt("spectrum_peaks_cache.maximum_cache_size"));
 
         } catch (org.apache.commons.configuration.ConfigurationException e) {
             logger.error(e.getMessage(), e);
@@ -76,16 +77,28 @@ public class RelimsProperties {
         return config.getString("java.home");
     }
 
+    public static String getPeptideShakerFolder() {
+        return config.getString("peptideshaker.directory");
+    }
+
+    public static String getPeptideShakerArchive() {
+        return config.getString("peptideshaker.jar");
+    }
+
+    public static String getPeptideShakerMemory() {
+        return config.getString("peptideshaker.heap.memory");
+    }
+
     public static String getSearchGuiFolder() {
         return config.getString("searchgui.directory");
     }
 
-    public static String getSearchGuiConfFolder() {
-        return config.getString("searchgui.directory") + iFolderSeparator + "resources" + iFolderSeparator + "conf";
-    }
-
     public static String getSearchGuiArchive() {
         return config.getString("searchgui.jar");
+    }
+
+    public static String getSearchGuiConfFolder() {
+        return config.getString("searchgui.directory") + iFolderSeparator + "resources" + iFolderSeparator + "conf";
     }
 
     public static File getWorkSpacePath() {
@@ -127,7 +140,7 @@ public class RelimsProperties {
 
         File lModFile = new File(getSearchGuiConfFolder(), config.getString("searchgui.mods"));
         File lUserModFile = new File(getSearchGuiConfFolder(), config.getString("searchgui.usermods.default"));
-        
+
         try {
             if (ptmFactory == null) {
                 ptmFactory = PTMFactory.getInstance();
@@ -148,7 +161,7 @@ public class RelimsProperties {
             logger.error("error initializing OMSSA mods", e);
             logger.error(e.getMessage(), e);
         }
-        
+
         return PTMFactory.getInstance();
     }
 
@@ -165,8 +178,8 @@ public class RelimsProperties {
             try {
                 File lPropertiesFile = new File(getSearchGuiFolder(),
                         iFolderSeparator + "resources"
-                        + iFolderSeparator + "conf"
-                        + iFolderSeparator + "default_SearchGUI.properties");
+                                + iFolderSeparator + "conf"
+                                + iFolderSeparator + "default_SearchGUI.properties");
 
                 iSearchGUIPropertiesConfiguration = new PropertiesConfiguration(lPropertiesFile);
                 return iSearchGUIPropertiesConfiguration;
@@ -175,7 +188,7 @@ public class RelimsProperties {
                 logger.error(e.getMessage(), e);
             }
         }
-        
+
         return iSearchGUIPropertiesConfiguration;
     }
 
@@ -183,12 +196,18 @@ public class RelimsProperties {
         return getSearchGuiFolder() + iFolderSeparator + getSearchGuiArchive();
     }
 
+
+    public static String getPeptideShakerArchivePath() {
+        return getPeptideShakerFolder() + iFolderSeparator + getPeptideShakerArchive();
+    }
+
+
     public static ArrayList<UserMod> getRelimsMods() {
         String[] lRelimsModIds = config.getStringArray("relims.mod.ids");
         checkNotNull(lRelimsModIds);
 
         ArrayList<UserMod> lRelimsMods = new ArrayList<UserMod>();
-        
+
         for (String lRelimsModId : lRelimsModIds) {
             UserMod lRelimsMod = new UserMod();
             String lBase = "relims.mod." + lRelimsModId + ".";
@@ -289,9 +308,9 @@ public class RelimsProperties {
     }
 
     public static SpeciesFinderFunction.SPECIES getAllowedSpecies() {
-        
+
         String lSpecies = config.getString("predicate.project.species.type");
-        
+
         if (lSpecies.equals("drosphila")) {
             return SpeciesFinderFunction.SPECIES.DROSOPHILA;
 
@@ -353,7 +372,7 @@ public class RelimsProperties {
             lProjectIds.add(Long.parseLong(lProjectString));
 
         }
-        
+
         return lProjectIds;
     }
 
@@ -361,11 +380,12 @@ public class RelimsProperties {
         return config.getInt("searchgui.missed.cleavages");
     }
 
-    public static Boolean appendPrideAsapAutomatic(){
+    public static Boolean appendPrideAsapAutomatic() {
         return config.getBoolean("relims.asap.automatic.append");
     }
 
-    public static String[] getAllowedInstruments(){
+    public static String[] getAllowedInstruments() {
         return config.getStringArray("predicate.project.instrument");
     }
+
 }

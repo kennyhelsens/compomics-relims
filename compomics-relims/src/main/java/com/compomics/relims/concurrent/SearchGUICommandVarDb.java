@@ -10,12 +10,12 @@ import java.util.List;
 /**
  * This class is a
  */
-public class SearchCommandVarDb extends SearchCommandGenerator {
-    private static Logger logger = Logger.getLogger(SearchCommandVarDb.class);
+public class SearchGUICommandVarDb extends SearchGUICommandGenerator {
+    private static Logger logger = Logger.getLogger(SearchGUICommandVarDb.class);
 
     private String iDbVarId = null;
 
-    public SearchCommandVarDb(String aName, String aDbVarId, RelimsProjectBean aRelimsProjectBean, List<File> aSpectrumFiles) {
+    public SearchGUICommandVarDb(String aName, String aDbVarId, RelimsProjectBean aRelimsProjectBean, List<File> aSpectrumFiles) {
         super(aName, aRelimsProjectBean, aSpectrumFiles);
         iDbVarId = aDbVarId;
     }

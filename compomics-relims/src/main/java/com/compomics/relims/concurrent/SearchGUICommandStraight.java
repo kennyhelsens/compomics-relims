@@ -10,10 +10,10 @@ import java.util.List;
 /**
  * This class is a
  */
-public class SearchCommandStraight extends SearchCommandGenerator {
-    private static Logger logger = Logger.getLogger(SearchCommandStraight.class);
+public class SearchGUICommandStraight extends SearchGUICommandGenerator {
+    private static Logger logger = Logger.getLogger(SearchGUICommandStraight.class);
 
-    public SearchCommandStraight(RelimsProjectBean aRelimsProjectBean, List<File> aSpectrumFiles) {
+    public SearchGUICommandStraight(RelimsProjectBean aRelimsProjectBean, List<File> aSpectrumFiles) {
         super("straight", aRelimsProjectBean, aSpectrumFiles);
     }
 

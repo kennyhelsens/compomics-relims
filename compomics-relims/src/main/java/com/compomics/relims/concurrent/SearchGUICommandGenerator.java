@@ -16,9 +16,9 @@ import java.util.List;
 /**
  * This class is a
  */
-public abstract class SearchCommandGenerator {
+public abstract class SearchGUICommandGenerator {
 
-    private static Logger logger = Logger.getLogger(SearchCommandGenerator.class);
+    private static Logger logger = Logger.getLogger(SearchGUICommandGenerator.class);
 
     private String iName = null;
     private RelimsProjectBean iRelimsProjectBean = null;
@@ -29,7 +29,7 @@ public abstract class SearchCommandGenerator {
     protected long iTimeStamp;
 
 
-    public SearchCommandGenerator(String aName, RelimsProjectBean aRelimsProjectBean, List<File> aSpectrumFiles) {
+    public SearchGUICommandGenerator(String aName, RelimsProjectBean aRelimsProjectBean, List<File> aSpectrumFiles) {
         try {
             iRelimsProjectBean = aRelimsProjectBean.clone();
         } catch (CloneNotSupportedException e) {

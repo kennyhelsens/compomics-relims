@@ -1,13 +1,15 @@
 package com.compomics.relims.concurrent;
 
 import com.compomics.relims.conf.RelimsProperties;
+import com.compomics.relims.model.beans.PeptideShakerJobBean;
 import com.compomics.relims.model.beans.RelimsProjectBean;
 import com.compomics.relims.model.beans.SearchList;
 import com.compomics.relims.model.guava.predicates.PredicateManager;
-import com.compomics.relims.model.interfaces.*;
+import com.compomics.relims.model.interfaces.DataProvider;
+import com.compomics.relims.model.interfaces.ModificationResolver;
+import com.compomics.relims.model.interfaces.ProjectRunner;
+import com.compomics.relims.model.interfaces.SearchStrategy;
 import com.google.common.base.Predicate;
-import eu.isas.peptideshaker.cmd.PeptideShakerCLI;
-import eu.isas.peptideshaker.cmd.PeptideShakerCLIInputBean;
 import org.apache.commons.configuration.ConfigurationException;
 import org.apache.log4j.Logger;
 
@@ -73,32 +75,37 @@ public class ProjectRunnerImpl extends Observable implements ProjectRunner {
 
             logger.debug(format("launching the searchlist with %d variants", lSearchCommandList.size()));
             for (Object lSearchCommand : lSearchCommandList) {
-                SearchCommandGenerator lSearch = (SearchCommandGenerator) lSearchCommand;
-                String lCommand = lSearch.generateCommand();
+                SearchGUICommandGenerator lSearchGUI = (SearchGUICommandGenerator) lSearchCommand;
+                String lCommand = lSearchGUI.generateCommand();
 
-                logger.debug(format("running search %s", lSearch.getName()));
+                String lSampleID = lSearchGUI.getName();
+                String lExperimentID = format("projectid_%d", lSearchGUI.getProjectId());
+                logger.debug(format("running search %s", lSampleID));
+                // Run searchgui
                 Command.run(lCommand);
 
                 logger.debug("processing the search results with PeptideShaker");
+                PeptideShakerJobBean lPeptideShakerJobBean = new PeptideShakerJobBean();
 
-                PeptideShakerCLIInputBean lPeptideShakerCLIInputBean = new PeptideShakerCLIInputBean();
+                lPeptideShakerJobBean.setOutFolder(lSearchGUI.getSearchResultFolder());
+                lPeptideShakerJobBean.setSearchGUIResultsFolder(lSearchGUI.getSearchResultFolder());
 
-                lPeptideShakerCLIInputBean.setInput(lSearch.getSearchResultFolder());
-                lPeptideShakerCLIInputBean.setOutput(lSearch.getSearchResultFolder());
-                lPeptideShakerCLIInputBean.setPSMFDR(1.0);
-                lPeptideShakerCLIInputBean.setPeptideFDR(1.0);
-                lPeptideShakerCLIInputBean.setProteinFDR(1.0);
-                lPeptideShakerCLIInputBean.setExperimentID(format("projectid_%d", lSearch.getProjectId()));
-                lPeptideShakerCLIInputBean.setSampleID(lSearch.getName());
+                lPeptideShakerJobBean.setPepfdr(1.0);
+                lPeptideShakerJobBean.setProtfdr(1.0);
+                lPeptideShakerJobBean.setPsmfdr(1.0);
 
-                PeptideShakerCLI lPeptideShakerCLI = new PeptideShakerCLI(lPeptideShakerCLIInputBean);
-                lPeptideShakerCLI.call();
+                lPeptideShakerJobBean.setAscore(false);
+
+
+                // Run PeptideShaker
+                Command.run(lPeptideShakerJobBean.getSearchGUICommandString());
+
 
                 logger.debug(format(
                         "finished PeptideShakerCLI on project '%s', sample '%s'",
-                        lPeptideShakerCLIInputBean.getExperimentID(),
-                        lPeptideShakerCLIInputBean.getSampleID()));
-
+                        lExperimentID,
+                        lSampleID)
+                );
             }
 
             synchronized (iRelimsProjectBean) {
