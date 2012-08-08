@@ -1,6 +1,7 @@
 package com.compomics.relims.model.beans;
 
 import com.compomics.relims.conf.RelimsProperties;
+import com.compomics.relims.conf.Utilities;
 import com.google.common.base.Joiner;
 import com.google.common.collect.Lists;
 import org.apache.log4j.Logger;
@@ -78,7 +79,12 @@ public class PeptideShakerJobBean {
             lClassPathEntries.add(lPeptideShakerArchivePath);
             lClassPathEntries.add(lPeptideShakerFolder);
 
-            lCommandParts.add(Joiner.on(":").join(lClassPathEntries));
+            if(Utilities.isWindows()){
+                lCommandParts.add("\"" + Joiner.on(";").join(lClassPathEntries) + "\"");
+            }else{
+                lCommandParts.add(Joiner.on(":").join(lClassPathEntries));
+            }
+
             lCommandParts.add("eu.isas.peptideshaker.cmd.PeptideShakerCLI");
 
             lCommandParts.add(ascore ? "" : "-ascore");
