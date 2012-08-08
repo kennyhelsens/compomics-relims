@@ -357,10 +357,6 @@ public class RelimsProperties {
         return lProjectIds;
     }
 
-    public static Double getMSTolerancePPM() {
-        return config.getDouble("searchgui.ms1.tolerance.ppm");
-    }
-
     public static Integer getMissedCleavages() {
         return config.getInt("searchgui.missed.cleavages");
     }

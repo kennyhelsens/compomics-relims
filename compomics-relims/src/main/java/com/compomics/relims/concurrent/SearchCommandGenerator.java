@@ -71,6 +71,7 @@ public abstract class SearchCommandGenerator {
         iSearchGuiConfiguration.setProperty("PRECURSOR_MASS_TOLERANCE", iRelimsProjectBean.getPrecursorError());
         iSearchGuiConfiguration.setProperty("FRAGMENT_MASS_TOLERANCE", iRelimsProjectBean.getFragmentError());
         iSearchGuiConfiguration.setProperty("MISSED_CLEAVAGES", RelimsProperties.getMissedCleavages());
+        iSearchGuiConfiguration.setProperty("PRECURSOR_MASS_TOLERANCE_UNIT", "Da");
 
         String lSearchDatabase = RelimsProperties.getDefaultSearchDatabase();
         logger.debug(String.format("setting DEFAULT fasta database '%s' to searchgui configuration", lSearchDatabase));
