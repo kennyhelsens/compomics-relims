@@ -19,6 +19,7 @@ import org.springframework.context.ApplicationContext;
 
 import java.io.File;
 import java.io.IOException;
+import java.sql.SQLException;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -67,9 +68,8 @@ public class PrideDataProvider implements DataProvider {
 
     public RelimsProjectBean buildProjectBean(long aProjectid) {
 
-        // We will need to cache all spectra in order to run the asap pipeline.
-        // So lets cache them here.
-        iPrideService.buildSpectrumCacheForExperiment("" + aProjectid);
+        // Helper method to load al the Spectra from Pride
+        loadSpectraFromPride(aProjectid);
 
 
         RelimsProjectBean lRelimsProjectBean = new RelimsProjectBean();
@@ -96,7 +96,7 @@ public class PrideDataProvider implements DataProvider {
             for (Modification lPrideAsapModification : lPrideAsapModifications) {
                 Modification lAsapModification = lPrideAsapModification;
 
-                if(lModificationSet.add(lAsapModification) == true){
+                if (lModificationSet.add(lAsapModification) == true) {
                     logger.debug(String.format("Pride-ASAP additionally resolved ", lAsapModification.getName()));
                 }
             }
@@ -135,6 +135,39 @@ public class PrideDataProvider implements DataProvider {
 
 
         return lRelimsProjectBean;
+    }
+
+
+    private void loadSpectraFromPride(long aProjectid) {
+        // Try maximum three times to get the spectra. Otherwise fail.
+        int i = 0;
+        boolean spectraRetrieved = false;
+        while (i < 3 && !spectraRetrieved) {
+
+            try {
+                iPrideService.buildSpectrumCacheForExperiment("" + aProjectid);
+                spectraRetrieved = true;
+
+                if (false) {
+                    // Hacky code, otherwise we cannot catch the SQLException ...
+                    throw new SQLException();
+                }
+
+            } catch (SQLException e) {
+                if(e.getMessage().contains("Already closed")){
+                    //retry!!
+                }else{
+                    throw new RelimsException(e);
+                }
+            }
+            i++;
+        }
+
+        if (!spectraRetrieved) {
+            throw new RelimsException(String.format("Failed to retrieve spectra for project %s", aProjectid));
+        }
+
+        logger.debug("");
     }
 
     public String toString() {
