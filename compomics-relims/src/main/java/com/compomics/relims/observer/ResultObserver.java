@@ -115,7 +115,7 @@ public class ResultObserver implements Observer {
                             logger.debug("Cancelling ");
                             iCurrentFuture.cancel(true);
                             iCurrentFuture = null;
-                        } else if(MaxFutureTime - lTimeSinceLastHeartbeat < 5000){
+                        } else if((MaxFutureTime - lTimeSinceLastHeartbeat) < 5000){
                             long lTimeLeftMinutes = (MaxFutureTime - lTimeSinceLastHeartbeat) / (1000 * 60);
                             logger.debug(String.format("Heartbeat : job has %s minutes left to complete", lTimeLeftMinutes));
                         }
