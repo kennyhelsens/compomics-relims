@@ -388,4 +388,15 @@ public class RelimsProperties {
         return config.getStringArray("predicate.project.instrument");
     }
 
+    public static int getMaxJobHours() {
+        return config.getInt("max.job.time.hours");
+    }
+
+    public static int getMaxJobMinutes() {
+        return config.getInt("max.job.time.minutes");
+    }
+
+    public static int getPollingTime() {
+        return config.getInt("max.job.time.polling.seconds");
+    }
 }

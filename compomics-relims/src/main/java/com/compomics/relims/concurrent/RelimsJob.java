@@ -1,7 +1,6 @@
 package com.compomics.relims.concurrent;
 
 import com.compomics.relims.conf.RelimsProperties;
-import com.compomics.relims.model.beans.RelimsProjectBean;
 import com.compomics.relims.model.guava.predicates.PredicateManager;
 import com.compomics.relims.model.interfaces.Closable;
 import com.compomics.relims.model.interfaces.DataProvider;
@@ -23,12 +22,11 @@ import java.util.concurrent.*;
  */
 public class RelimsJob implements Callable, Closable {
 
-    static private ExecutorService iService = Executors.newFixedThreadPool(1);
-
     private ResultObserver iResultObserver;
     private static Logger logger = Logger.getLogger(RelimsJob.class);
 
-    protected ProjectRunner iProjectRunner;
+    private ExecutorService iService = null;
+
     protected ProjectProvider iProjectProvider;
     protected PredicateManager iPredicateManager;
     private final String iSearchStrategyID;
@@ -37,7 +35,6 @@ public class RelimsJob implements Callable, Closable {
     public RelimsJob(String aSearchStrategyID, String aProjectProviderID) {
         iSearchStrategyID = aSearchStrategyID;
         try {
-            iProjectRunner = new ProjectRunnerImpl();
 
             Class lSourceClass = RelimsProperties.getRelimsSourceClass(aProjectProviderID);
             iProjectProvider = (ProjectProvider) lSourceClass.newInstance();
@@ -61,6 +58,8 @@ public class RelimsJob implements Callable, Closable {
 
     public Object call() {
 
+        initThreadExecutor();
+
         Collection<Long> lProjectIDList = iProjectProvider.getPreDefinedProjects();
 //        Collection<Long> lProjectIDList = iProjectProvider.getAllProjects();
         List<Future> lFutures = Lists.newArrayList();
@@ -72,23 +71,30 @@ public class RelimsJob implements Callable, Closable {
                 Class searchStrategyClass = RelimsProperties.getRelimsSearchStrategyClass(iSearchStrategyID);
                 SearchStrategy searchStrategy = (SearchStrategy) searchStrategyClass.newInstance();
 
-                RelimsProjectBean lRelimsProjectBean = iProjectProvider.getProject(lProjectID);
-                iProjectRunner.setProject(lRelimsProjectBean);
-                iProjectRunner.setPredicateManager(iPredicateManager);
-                iProjectRunner.setDataProvider(iProjectProvider.getDataProvider());
-                iProjectRunner.setModificationResolver(iProjectProvider.getModificationResolver());
-                iProjectRunner.setSearchStrategy(searchStrategy);
+                ProjectRunner lProjectRunner = new ProjectRunnerImpl();
 
-                Observable lObservable = (Observable) iProjectRunner;
+                lProjectRunner.setProjectID(lProjectID);
+                lProjectRunner.setProjectProvider(iProjectProvider);
+                lProjectRunner.setPredicateManager(iPredicateManager);
+                lProjectRunner.setSearchStrategy(searchStrategy);
+
+                Observable lObservable = (Observable) lProjectRunner;
                 lObservable.addObserver(iResultObserver);
 
-                Future<String> lFuture = iService.submit(iProjectRunner);
+                Future lFuture = iService.submit(lProjectRunner);
+                iResultObserver.setActiveFuture(lFuture);
 
-                String s = lFuture.get();
-            } catch (InterruptedException e) {
-                logger.error(e.getMessage(), e);
-            } catch (ExecutionException e) {
-                logger.error(e.getMessage(), e);
+                while (lFuture.isCancelled() == false && lFuture.isDone() == false) {
+                    // Do nothing.
+                }
+
+                if (lFuture.isCancelled()) {
+                    logger.info(String.format("Actively cancelled analysis of project %s. Continuing to next project.", lProjectID));
+                    initThreadExecutor();
+                } else if (lFuture.isDone()) {
+                    logger.info(String.format("Finished analysis of project %s.", lProjectID));
+                }
+
             } catch (ClassNotFoundException e) {
                 logger.error(e.getMessage(), e);
             } catch (InstantiationException e) {
@@ -100,12 +106,18 @@ public class RelimsJob implements Callable, Closable {
         return lFutures;
     }
 
+    private void initThreadExecutor() {
+        close();
+        iService = Executors.newSingleThreadExecutor();
+    }
+
 
     public void close() {
-        List<Runnable> lRunnables = iService.shutdownNow();
-        for (Runnable lRunnable : lRunnables) {
-            logger.debug("shutting down " + lRunnable.toString());
+        if (iService != null) {
+            List<Runnable> lRunnables = iService.shutdownNow();
+            for (Runnable lRunnable : lRunnables) {
+                logger.debug("shutting down " + lRunnable.toString());
+            }
         }
-        iService = Executors.newSingleThreadExecutor();
     }
 }

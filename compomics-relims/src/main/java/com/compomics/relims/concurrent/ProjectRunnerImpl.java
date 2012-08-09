@@ -9,6 +9,8 @@ import com.compomics.relims.model.interfaces.DataProvider;
 import com.compomics.relims.model.interfaces.ModificationResolver;
 import com.compomics.relims.model.interfaces.ProjectRunner;
 import com.compomics.relims.model.interfaces.SearchStrategy;
+import com.compomics.relims.model.provider.ProjectProvider;
+import com.compomics.relims.observer.ResultObserver;
 import com.google.common.base.Predicate;
 import org.apache.commons.configuration.ConfigurationException;
 import org.apache.log4j.Logger;
@@ -33,6 +35,8 @@ public class ProjectRunnerImpl extends Observable implements ProjectRunner {
     private SearchStrategy iSearchStrategy;
     private DataProvider iDataProvider;
     private ModificationResolver iModificationResolver;
+    private ProjectProvider iProjectProvider;
+    private long iProjectID;
 
 
     public void setPredicateManager(PredicateManager aPredicateManager) {
@@ -42,8 +46,13 @@ public class ProjectRunnerImpl extends Observable implements ProjectRunner {
     public String call() {
         try {
 
+            setDataProvider(iProjectProvider.getDataProvider());
+            setModificationResolver(iModificationResolver = iProjectProvider.getModificationResolver());
+
+            setProject(iRelimsProjectBean = iProjectProvider.getProject(iProjectID));
+
             long lProjectid = iRelimsProjectBean.getProjectID();
-            logger.debug("creating projectrunner for " + lProjectid);
+            logger.info("creating projectrunner for " + lProjectid);
 
             Collection<Predicate> lPredicates = iPredicateManager.createCollection(
                     PredicateManager.Types.INSTRUMENT
@@ -56,7 +65,7 @@ public class ProjectRunnerImpl extends Observable implements ProjectRunner {
             for (Predicate lProjectPredicate : lPredicates) {
                 boolean lResult = lProjectPredicate.apply(iRelimsProjectBean);
                 if (!lResult) {
-                    logger.debug("END " + lProjectid);
+                    logger.error("END " + lProjectid);
                     return "Premature end for project size";
                 }
             }
@@ -82,6 +91,8 @@ public class ProjectRunnerImpl extends Observable implements ProjectRunner {
                 String lExperimentID = format("projectid_%d", lSearchGUI.getProjectId());
                 logger.debug(format("running search %s", lSampleID));
                 // Run searchgui
+
+                ResultObserver.sendHeartBeat();
                 Command.run(lCommand);
 
                 logger.debug("processing the search results with PeptideShaker");
@@ -98,6 +109,7 @@ public class ProjectRunnerImpl extends Observable implements ProjectRunner {
 
 
                 // Run PeptideShaker
+                ResultObserver.sendHeartBeat();
                 Command.run(lPeptideShakerJobBean.getSearchGUICommandString());
 
 
@@ -122,6 +134,10 @@ public class ProjectRunnerImpl extends Observable implements ProjectRunner {
         return (format("SUCCES for project %d", iRelimsProjectBean.getProjectID()));
     }
 
+    public void setProjectProvider(ProjectProvider aProjectProvider) {
+        iProjectProvider = aProjectProvider;
+    }
+
 
     public void setProject(RelimsProjectBean aRelimsProjectBean) {
         iRelimsProjectBean = aRelimsProjectBean;
@@ -137,5 +153,9 @@ public class ProjectRunnerImpl extends Observable implements ProjectRunner {
 
     public void setModificationResolver(ModificationResolver aModificationResolver) {
         iModificationResolver = aModificationResolver;
+    }
+
+    public void setProjectID(long aProjectID) {
+        iProjectID = aProjectID;
     }
 }

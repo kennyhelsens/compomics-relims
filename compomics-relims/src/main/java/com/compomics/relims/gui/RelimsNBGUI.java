@@ -22,12 +22,10 @@ import java.io.InputStreamReader;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.UnknownHostException;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 
 /**
  * The Relims GUI.
- * 
+ *
  * @author Kenny Helsens
  * @author Harald Barsnes
  */
@@ -37,6 +35,7 @@ public class RelimsNBGUI extends javax.swing.JFrame {
     protected StrategySelectionModel iStrategySelectionModel = null;
     protected ProjectSourceSelectionModel iProjectSourceSelectionModel = null;
     private RelimsJob iRelimsJob = null;
+    protected RelimsJobStarter iRelimsJobStarter;
 
     /**
      * Creates a new RelimsNBGUI.
@@ -83,7 +82,7 @@ public class RelimsNBGUI extends javax.swing.JFrame {
      * Check if a newer version of Relims is available.
      *
      * @param currentVersion the version number of the currently running
-     * Relims
+     *                       Relims
      */
     private static void checkForNewVersion(String currentVersion) {
 
@@ -126,7 +125,7 @@ public class RelimsNBGUI extends javax.swing.JFrame {
                 if (deprecatedOrDeleted && currentVersion.lastIndexOf("beta") == -1) {
                     int option = JOptionPane.showConfirmDialog(null,
                             "A newer version of Relims is available.\n"
-                            + "Do you want to upgrade?",
+                                    + "Do you want to upgrade?",
                             "Upgrade Available",
                             JOptionPane.YES_NO_CANCEL_OPTION);
                     if (option == JOptionPane.YES_OPTION) {
@@ -356,67 +355,67 @@ public class RelimsNBGUI extends javax.swing.JFrame {
         org.jdesktop.layout.GroupLayout mainPanelLayout = new org.jdesktop.layout.GroupLayout(mainPanel);
         mainPanel.setLayout(mainPanelLayout);
         mainPanelLayout.setHorizontalGroup(
-            mainPanelLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(mainPanelLayout.createSequentialGroup()
-                .addContainerGap()
-                .add(mainPanelLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-                    .add(mainPanelLayout.createSequentialGroup()
-                        .add(mainPanelLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-                            .add(rdbStraight)
-                            .add(rdbVarMOD)
-                            .add(rdbVarDB)
-                            .add(jLabel2))
-                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED, 504, Short.MAX_VALUE)
-                        .add(btnStart)
-                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                        .add(btnStop))
-                    .add(mainPanelLayout.createSequentialGroup()
-                        .add(mainPanelLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-                            .add(rdbSourceMSLIMS)
-                            .add(rdbSourcePRIDE)
-                            .add(jLabel3))
-                        .add(0, 0, Short.MAX_VALUE)))
-                .addContainerGap())
+                mainPanelLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+                        .add(mainPanelLayout.createSequentialGroup()
+                                .addContainerGap()
+                                .add(mainPanelLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+                                        .add(mainPanelLayout.createSequentialGroup()
+                                                .add(mainPanelLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+                                                        .add(rdbStraight)
+                                                        .add(rdbVarMOD)
+                                                        .add(rdbVarDB)
+                                                        .add(jLabel2))
+                                                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED, 504, Short.MAX_VALUE)
+                                                .add(btnStart)
+                                                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                                                .add(btnStop))
+                                        .add(mainPanelLayout.createSequentialGroup()
+                                                .add(mainPanelLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+                                                        .add(rdbSourceMSLIMS)
+                                                        .add(rdbSourcePRIDE)
+                                                        .add(jLabel3))
+                                                .add(0, 0, Short.MAX_VALUE)))
+                                .addContainerGap())
         );
         mainPanelLayout.setVerticalGroup(
-            mainPanelLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(mainPanelLayout.createSequentialGroup()
-                .addContainerGap()
-                .add(mainPanelLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-                    .add(btnStart)
-                    .add(btnStop)
-                    .add(org.jdesktop.layout.GroupLayout.TRAILING, mainPanelLayout.createSequentialGroup()
-                        .add(jLabel2)
-                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.UNRELATED)
-                        .add(rdbVarMOD)
-                        .add(3, 3, 3)
-                        .add(rdbVarDB)
-                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                        .add(rdbStraight)))
-                .add(18, 18, 18)
-                .add(jLabel3)
-                .addPreferredGap(org.jdesktop.layout.LayoutStyle.UNRELATED)
-                .add(rdbSourceMSLIMS)
-                .add(3, 3, 3)
-                .add(rdbSourcePRIDE)
-                .addContainerGap(105, Short.MAX_VALUE))
+                mainPanelLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+                        .add(mainPanelLayout.createSequentialGroup()
+                                .addContainerGap()
+                                .add(mainPanelLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+                                        .add(btnStart)
+                                        .add(btnStop)
+                                        .add(org.jdesktop.layout.GroupLayout.TRAILING, mainPanelLayout.createSequentialGroup()
+                                                .add(jLabel2)
+                                                .addPreferredGap(org.jdesktop.layout.LayoutStyle.UNRELATED)
+                                                .add(rdbVarMOD)
+                                                .add(3, 3, 3)
+                                                .add(rdbVarDB)
+                                                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                                                .add(rdbStraight)))
+                                .add(18, 18, 18)
+                                .add(jLabel3)
+                                .addPreferredGap(org.jdesktop.layout.LayoutStyle.UNRELATED)
+                                .add(rdbSourceMSLIMS)
+                                .add(3, 3, 3)
+                                .add(rdbSourcePRIDE)
+                                .addContainerGap(105, Short.MAX_VALUE))
         );
 
         org.jdesktop.layout.GroupLayout jpanMainLayout = new org.jdesktop.layout.GroupLayout(jpanMain);
         jpanMain.setLayout(jpanMainLayout);
         jpanMainLayout.setHorizontalGroup(
-            jpanMainLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(jpanMainLayout.createSequentialGroup()
-                .addContainerGap()
-                .add(mainPanel, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addContainerGap())
+                jpanMainLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+                        .add(jpanMainLayout.createSequentialGroup()
+                                .addContainerGap()
+                                .add(mainPanel, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                .addContainerGap())
         );
         jpanMainLayout.setVerticalGroup(
-            jpanMainLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(jpanMainLayout.createSequentialGroup()
-                .addContainerGap()
-                .add(mainPanel, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addContainerGap())
+                jpanMainLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+                        .add(jpanMainLayout.createSequentialGroup()
+                                .addContainerGap()
+                                .add(mainPanel, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                .addContainerGap())
         );
 
         tabCore.addTab("Main", jpanMain);
@@ -426,50 +425,50 @@ public class RelimsNBGUI extends javax.swing.JFrame {
         tablePanel.setOpaque(false);
 
         tblProperties.setModel(new javax.swing.table.DefaultTableModel(
-            new Object [][] {
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null}
-            },
-            new String [] {
-                "Title 1", "Title 2", "Title 3", "Title 4"
-            }
+                new Object[][]{
+                        {null, null, null, null},
+                        {null, null, null, null},
+                        {null, null, null, null},
+                        {null, null, null, null}
+                },
+                new String[]{
+                        "Title 1", "Title 2", "Title 3", "Title 4"
+                }
         ));
         scrlTable.setViewportView(tblProperties);
 
         org.jdesktop.layout.GroupLayout tablePanelLayout = new org.jdesktop.layout.GroupLayout(tablePanel);
         tablePanel.setLayout(tablePanelLayout);
         tablePanelLayout.setHorizontalGroup(
-            tablePanelLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(tablePanelLayout.createSequentialGroup()
-                .addContainerGap()
-                .add(scrlTable, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 805, Short.MAX_VALUE)
-                .addContainerGap())
+                tablePanelLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+                        .add(tablePanelLayout.createSequentialGroup()
+                                .addContainerGap()
+                                .add(scrlTable, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 805, Short.MAX_VALUE)
+                                .addContainerGap())
         );
         tablePanelLayout.setVerticalGroup(
-            tablePanelLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(org.jdesktop.layout.GroupLayout.TRAILING, tablePanelLayout.createSequentialGroup()
-                .addContainerGap()
-                .add(scrlTable, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 279, Short.MAX_VALUE)
-                .addContainerGap())
+                tablePanelLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+                        .add(org.jdesktop.layout.GroupLayout.TRAILING, tablePanelLayout.createSequentialGroup()
+                                .addContainerGap()
+                                .add(scrlTable, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 279, Short.MAX_VALUE)
+                                .addContainerGap())
         );
 
         org.jdesktop.layout.GroupLayout tableTabPanelLayout = new org.jdesktop.layout.GroupLayout(tableTabPanel);
         tableTabPanel.setLayout(tableTabPanelLayout);
         tableTabPanelLayout.setHorizontalGroup(
-            tableTabPanelLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(tableTabPanelLayout.createSequentialGroup()
-                .addContainerGap()
-                .add(tablePanel, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addContainerGap())
+                tableTabPanelLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+                        .add(tableTabPanelLayout.createSequentialGroup()
+                                .addContainerGap()
+                                .add(tablePanel, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                .addContainerGap())
         );
         tableTabPanelLayout.setVerticalGroup(
-            tableTabPanelLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(tableTabPanelLayout.createSequentialGroup()
-                .addContainerGap()
-                .add(tablePanel, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addContainerGap())
+                tableTabPanelLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+                        .add(tableTabPanelLayout.createSequentialGroup()
+                                .addContainerGap()
+                                .add(tablePanel, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                .addContainerGap())
         );
 
         tabCore.addTab("Config", tableTabPanel);
@@ -480,18 +479,18 @@ public class RelimsNBGUI extends javax.swing.JFrame {
         org.jdesktop.layout.GroupLayout settingsPanelLayout = new org.jdesktop.layout.GroupLayout(settingsPanel);
         settingsPanel.setLayout(settingsPanelLayout);
         settingsPanelLayout.setHorizontalGroup(
-            settingsPanelLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(settingsPanelLayout.createSequentialGroup()
-                .addContainerGap()
-                .add(splitMain)
-                .addContainerGap())
+                settingsPanelLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+                        .add(settingsPanelLayout.createSequentialGroup()
+                                .addContainerGap()
+                                .add(splitMain)
+                                .addContainerGap())
         );
         settingsPanelLayout.setVerticalGroup(
-            settingsPanelLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(org.jdesktop.layout.GroupLayout.TRAILING, settingsPanelLayout.createSequentialGroup()
-                .addContainerGap()
-                .add(splitMain, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 456, Short.MAX_VALUE)
-                .addContainerGap())
+                settingsPanelLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+                        .add(org.jdesktop.layout.GroupLayout.TRAILING, settingsPanelLayout.createSequentialGroup()
+                                .addContainerGap()
+                                .add(splitMain, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 456, Short.MAX_VALUE)
+                                .addContainerGap())
         );
 
         iconRelims.setIcon(new javax.swing.ImageIcon(getClass().getResource("/resources/image/logo.png"))); // NOI18N
@@ -501,40 +500,40 @@ public class RelimsNBGUI extends javax.swing.JFrame {
         org.jdesktop.layout.GroupLayout backgroundPanelLayout = new org.jdesktop.layout.GroupLayout(backgroundPanel);
         backgroundPanel.setLayout(backgroundPanelLayout);
         backgroundPanelLayout.setHorizontalGroup(
-            backgroundPanelLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(backgroundPanelLayout.createSequentialGroup()
-                .add(28, 28, 28)
-                .add(iconRelims)
-                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .add(iconCompomics)
-                .add(51, 51, 51))
-            .add(backgroundPanelLayout.createSequentialGroup()
-                .addContainerGap()
-                .add(settingsPanel, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addContainerGap())
+                backgroundPanelLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+                        .add(backgroundPanelLayout.createSequentialGroup()
+                                .add(28, 28, 28)
+                                .add(iconRelims)
+                                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                .add(iconCompomics)
+                                .add(51, 51, 51))
+                        .add(backgroundPanelLayout.createSequentialGroup()
+                                .addContainerGap()
+                                .add(settingsPanel, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                .addContainerGap())
         );
         backgroundPanelLayout.setVerticalGroup(
-            backgroundPanelLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(backgroundPanelLayout.createSequentialGroup()
-                .addContainerGap()
-                .add(backgroundPanelLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-                    .add(iconRelims)
-                    .add(org.jdesktop.layout.GroupLayout.TRAILING, backgroundPanelLayout.createSequentialGroup()
-                        .add(iconCompomics)
-                        .add(20, 20, 20)))
-                .add(settingsPanel, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .add(12, 12, 12))
+                backgroundPanelLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+                        .add(backgroundPanelLayout.createSequentialGroup()
+                                .addContainerGap()
+                                .add(backgroundPanelLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+                                        .add(iconRelims)
+                                        .add(org.jdesktop.layout.GroupLayout.TRAILING, backgroundPanelLayout.createSequentialGroup()
+                                                .add(iconCompomics)
+                                                .add(20, 20, 20)))
+                                .add(settingsPanel, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                .add(12, 12, 12))
         );
 
         org.jdesktop.layout.GroupLayout layout = new org.jdesktop.layout.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
-            layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(backgroundPanel, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+                        .add(backgroundPanel, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         );
         layout.setVerticalGroup(
-            layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(org.jdesktop.layout.GroupLayout.TRAILING, backgroundPanel, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+                        .add(org.jdesktop.layout.GroupLayout.TRAILING, backgroundPanel, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         );
 
         pack();
@@ -581,25 +580,50 @@ public class RelimsNBGUI extends javax.swing.JFrame {
     }
 
     private void btnStopActionPerformed(ActionEvent aEvt) {
-        iRelimsJob.close();
+        if(iRelimsJobStarter != null){
+            iRelimsJobStarter.stop();
+        }
     }
 
     private void btnStartActionPerformed(ActionEvent aEvt) {
-        ExecutorService withinExecutor = Executors.newFixedThreadPool(1);
+        iRelimsJobStarter = new RelimsJobStarter();
+        iRelimsJobStarter.start();
+    }
 
-        String lSearchStrategyID = iStrategySelectionModel.getSelectedItem().toString();
-        String lProjectProviderID = iProjectSourceSelectionModel.getSelectedItem().toString();
 
-        iRelimsJob = new RelimsJob(lSearchStrategyID, lProjectProviderID);
-        withinExecutor.submit(iRelimsJob);
+    private class RelimsJobStarter implements Runnable {
 
+        private Thread updateThread;
+
+        public void run() {
+            String lSearchStrategyID = iStrategySelectionModel.getSelectedItem().toString();
+            String lProjectProviderID = iProjectSourceSelectionModel.getSelectedItem().toString();
+
+            iRelimsJob = new RelimsJob(lSearchStrategyID, lProjectProviderID);
+            Object lCall = iRelimsJob.call();
+            logger.debug(lCall.toString());
+        }
+
+        public void start() {
+            if (updateThread == null) {
+                updateThread = new Thread(this);
+                updateThread.start();
+            }
+        }
+
+        public void stop() {
+            if (updateThread != null) {
+                updateThread.stop();
+                updateThread = null;
+            }
+        }
     }
 
     /**
      * @param args the command line arguments
      */
     public static void main(String args[]) {
-        
+
         // set the look and feel
 //        UtilitiesGUIDefaults.setLookAndFeel();
 
@@ -613,6 +637,7 @@ public class RelimsNBGUI extends javax.swing.JFrame {
             }
         });
     }
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JPanel backgroundPanel;
     private javax.swing.ButtonGroup btnGroupSource;

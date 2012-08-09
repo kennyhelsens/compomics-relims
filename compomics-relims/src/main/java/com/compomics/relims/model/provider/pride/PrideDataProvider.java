@@ -13,6 +13,7 @@ import com.compomics.relims.conf.RelimsProperties;
 import com.compomics.relims.exception.RelimsException;
 import com.compomics.relims.model.beans.RelimsProjectBean;
 import com.compomics.relims.model.interfaces.DataProvider;
+import com.compomics.relims.observer.ResultObserver;
 import com.google.common.collect.Sets;
 import org.apache.log4j.Logger;
 import org.springframework.context.ApplicationContext;
@@ -68,7 +69,10 @@ public class PrideDataProvider implements DataProvider {
 
     public RelimsProjectBean buildProjectBean(long aProjectid) {
 
+        logger.info(String.format("retrieving all information for project %s", aProjectid));
+
         // Helper method to load al the Spectra from Pride
+        ResultObserver.sendHeartBeat();
         loadSpectraFromPride(aProjectid);
 
 
@@ -79,6 +83,7 @@ public class PrideDataProvider implements DataProvider {
 
 
         logger.debug("estimating PTMs via inspecting the modified_sequence values of the PSMs");
+        ResultObserver.sendHeartBeat();
         // Do not run PRIDE asap automatic, but retrieve the PTMs from the modified sequence values.
         lModificationSet = iModificationService.loadExperimentModifications(aProjectid);
         for (Modification lModification : lModificationSet) {
@@ -87,6 +92,7 @@ public class PrideDataProvider implements DataProvider {
 
         if (RelimsProperties.appendPrideAsapAutomatic()) {
             logger.debug("estimating PTMs via Pride-asap");
+            ResultObserver.sendHeartBeat();
             // Run PRIDE asap automatic mode
             ApplicationContext lContext = ApplicationContextProvider.getInstance().getApplicationContext();
             iAnnotator = (PrideSpectrumAnnotator) lContext.getBean("prideSpectrumAnnotator");
@@ -101,6 +107,7 @@ public class PrideDataProvider implements DataProvider {
                 }
             }
         }
+
 
         OmssaModiciationMarshaller marshaller = new OmssaModificationMarshallerImpl();
         UserModCollection lUserModCollection = marshaller.marshallModifications(lModificationSet);
