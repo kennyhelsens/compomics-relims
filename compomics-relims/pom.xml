@@ -72,7 +72,8 @@
                             <classpathPrefix>lib</classpathPrefix>
                         </manifest>
                     </archive>
-                    <outputDirectory>${project.build.directory}/${project.artifactId}-${project.version}</outputDirectory>
+                    <outputDirectory>${project.build.directory}/${project.artifactId}-${project.version}
+                    </outputDirectory>
                 </configuration>
             </plugin>
             <!-- Dependency plugin -->
@@ -238,6 +239,15 @@
             <groupId>com.compomics</groupId>
             <artifactId>omssa-xsd</artifactId>
             <version>0.3.1</version>
+        </dependency>
+
+
+        <dependency>
+            <groupId>redis.clients</groupId>
+            <artifactId>jedis</artifactId>
+            <version>2.0.0</version>
+            <type>jar</type>
+            <scope>compile</scope>
         </dependency>
 
     </dependencies>

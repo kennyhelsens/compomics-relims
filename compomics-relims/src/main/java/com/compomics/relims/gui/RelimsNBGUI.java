@@ -54,6 +54,7 @@ public class RelimsNBGUI extends javax.swing.JFrame {
         logger.debug("initialized GUI");
         logger.debug("setting listeners");
 
+
         TableModel lTableModel = new RelimsPropertiesTableModel();
         this.tblProperties.setModel(lTableModel);
 

@@ -31,13 +31,10 @@ public class PrideDataProvider implements DataProvider {
 
     private static Logger logger = Logger.getLogger(PrideDataProvider.class);
     private ExperimentService iPrideService;
-    private ModificationService iModificationService;
-    PrideSpectrumAnnotator iAnnotator;
 
     public PrideDataProvider() {
         ApplicationContext lContext = ApplicationContextProvider.getInstance().getApplicationContext();
         iPrideService = (ExperimentService) lContext.getBean("experimentService");
-        iModificationService = (ModificationService) lContext.getBean("modificationService");
     }
 
     public long getNumberOfSpectraForProject(long aProjectID) {
@@ -70,35 +67,37 @@ public class PrideDataProvider implements DataProvider {
     public RelimsProjectBean buildProjectBean(long aProjectid) {
 
         logger.info(String.format("retrieving all information for project %s", aProjectid));
+        ApplicationContext lContext = ApplicationContextProvider.getInstance().getApplicationContext();
+
 
         // Helper method to load al the Spectra from Pride
-        ResultObserver.sendHeartBeat();
         loadSpectraFromPride(aProjectid);
 
 
         RelimsProjectBean lRelimsProjectBean = new RelimsProjectBean();
         lRelimsProjectBean.setProjectID((int) aProjectid);
 
-        Set<Modification> lModificationSet = null;
+        Set<Modification> lModificationSet = Sets.newHashSet();
 
 
         logger.debug("estimating PTMs via inspecting the modified_sequence values of the PSMs");
         ResultObserver.sendHeartBeat();
         // Do not run PRIDE asap automatic, but retrieve the PTMs from the modified sequence values.
-        lModificationSet = iModificationService.loadExperimentModifications(aProjectid);
+        ModificationService lModificationService = (ModificationService) lContext.getBean("modificationService");
+
+//        lModificationSet = lModificationService.loadExperimentModifications(aProjectid);
         for (Modification lModification : lModificationSet) {
             logger.debug(String.format("Resolved PTM '%s' with mass '%f' from modified sequence", lModification.getName(), lModification.getMassShift()));
         }
 
         if (RelimsProperties.appendPrideAsapAutomatic()) {
             logger.debug("estimating PTMs via Pride-asap");
-            ResultObserver.sendHeartBeat();
             // Run PRIDE asap automatic mode
-            ApplicationContext lContext = ApplicationContextProvider.getInstance().getApplicationContext();
-            iAnnotator = (PrideSpectrumAnnotator) lContext.getBean("prideSpectrumAnnotator");
-            iAnnotator.annotate(String.valueOf(aProjectid));
+            PrideSpectrumAnnotator lSpectrumAnnotator;
+            lSpectrumAnnotator = (PrideSpectrumAnnotator) lContext.getBean("prideSpectrumAnnotator");
+            lSpectrumAnnotator.annotate(String.valueOf(aProjectid));
 
-            Set<Modification> lPrideAsapModifications = iModificationService.getUsedModifications(iAnnotator.getSpectrumAnnotatorResult());
+            Set<Modification> lPrideAsapModifications = lModificationService.getUsedModifications(lSpectrumAnnotator.getSpectrumAnnotatorResult());
             for (Modification lPrideAsapModification : lPrideAsapModifications) {
                 Modification lAsapModification = lPrideAsapModification;
 
@@ -162,10 +161,10 @@ public class PrideDataProvider implements DataProvider {
                 }
 
             } catch (SQLException e) {
-                logger.debug(String.format("catched sqlexception while loading spectrum from Pride (attempt %s/%s)", (i+1), 3));
-                if(e.getMessage().contains("Already closed")){
+                logger.debug(String.format("catched sqlexception while loading spectrum from Pride (attempt %s/%s)", (i + 1), 3));
+                if (e.getMessage().contains("Already closed")) {
                     //retry!!
-                }else{
+                } else {
                     throw new RelimsException(e);
                 }
             }

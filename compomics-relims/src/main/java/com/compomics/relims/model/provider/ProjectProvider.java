@@ -5,7 +5,10 @@ import com.compomics.relims.exception.RelimsException;
 import com.compomics.relims.model.beans.RelimsProjectBean;
 import com.compomics.relims.model.interfaces.DataProvider;
 import com.compomics.relims.model.interfaces.ModificationResolver;
+import com.compomics.relims.model.interfaces.ProjectListProvider;
 import com.compomics.relims.model.provider.mslims.ModificationResolverImpl;
+import com.compomics.relims.model.provider.projectlist.ProjectListProviderLocal;
+import com.compomics.relims.model.provider.projectlist.ProjectListProviderRedis;
 import org.apache.log4j.Logger;
 
 import java.util.Collection;
@@ -31,8 +34,15 @@ public abstract class ProjectProvider {
     };
 
 
-    public Collection<Long> getPreDefinedProjects() {
-        return RelimsProperties.getPredifinedProjects();
+    public ProjectListProvider getPreDefinedProjects() {
+
+        ProjectListProvider result = null;
+        if(RelimsProperties.useProjectListFromRedis()){
+            result = new ProjectListProviderRedis();
+        }else{
+            result = new ProjectListProviderLocal();
+        }
+        return result;
     }
 
     public RelimsProjectBean getProject(long aProjectid) {

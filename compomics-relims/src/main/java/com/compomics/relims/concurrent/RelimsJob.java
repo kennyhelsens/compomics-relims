@@ -2,20 +2,19 @@ package com.compomics.relims.concurrent;
 
 import com.compomics.relims.conf.RelimsProperties;
 import com.compomics.relims.model.guava.predicates.PredicateManager;
-import com.compomics.relims.model.interfaces.Closable;
-import com.compomics.relims.model.interfaces.DataProvider;
-import com.compomics.relims.model.interfaces.ProjectRunner;
-import com.compomics.relims.model.interfaces.SearchStrategy;
+import com.compomics.relims.model.interfaces.*;
 import com.compomics.relims.model.provider.ProjectProvider;
 import com.compomics.relims.observer.ResultObserver;
 import com.google.common.collect.Lists;
 import org.apache.log4j.Logger;
 
 import java.io.IOException;
-import java.util.Collection;
 import java.util.List;
 import java.util.Observable;
-import java.util.concurrent.*;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 
 /**
  * This class is a
@@ -60,12 +59,12 @@ public class RelimsJob implements Callable, Closable {
 
         initThreadExecutor();
 
-        Collection<Long> lProjectIDList = iProjectProvider.getPreDefinedProjects();
+        ProjectListProvider lPreDefinedProjects = iProjectProvider.getPreDefinedProjects();
 //        Collection<Long> lProjectIDList = iProjectProvider.getAllProjects();
         List<Future> lFutures = Lists.newArrayList();
 
-        for (Long lProjectID : lProjectIDList) {
-
+        Long lProjectID = -1l;
+        while ((lProjectID = lPreDefinedProjects.nextProjectID()) != -1) {
             try {
 
                 Class searchStrategyClass = RelimsProperties.getRelimsSearchStrategyClass(iSearchStrategyID);

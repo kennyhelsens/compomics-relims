@@ -21,6 +21,9 @@ public class TextAreaAppender extends ConsoleAppender {
     static private ExecutorService iService = Executors.newSingleThreadExecutor();
 
     static private Deque iMessages = new LinkedList();
+
+    static long MAX_SIZE = 1000;
+
     /**
      * Set the target JTextArea for the logging information to appear.
      */
@@ -33,6 +36,7 @@ public class TextAreaAppender extends ConsoleAppender {
      * JTextArea.
      */
     public synchronized void append(LoggingEvent loggingEvent) {
+
         final String message = this.layout.format(loggingEvent);
         iMessages.addFirst(message);
         final String lContent = Joiner.on("").join(iMessages);
@@ -41,6 +45,10 @@ public class TextAreaAppender extends ConsoleAppender {
                 jTextArea.setText(lContent);
             }
         });
+
+        if(iMessages.size() > MAX_SIZE){
+            iMessages.removeLast();
+        }
 
         // Keep the ResultObserver notified when new messages arrive.
         ResultObserver.sendHeartBeat();

@@ -67,6 +67,8 @@ public class RelimsProperties {
             lAsapProperties.setProperty("spectrum.limit", config.getBoolean("relims.asap.spectrum.limit"));
             lAsapProperties.setProperty("spectrum.limit.size", config.getInt("relims.asap.spectrum.limit.size"));
             lAsapProperties.setProperty("spectrum_peaks_cache.maximum_cache_size", config.getInt("spectrum_peaks_cache.maximum_cache_size"));
+            lAsapProperties.setProperty("spectrumannotator.annotate_modified_identifications_only", true);
+
 
         } catch (org.apache.commons.configuration.ConfigurationException e) {
             logger.error(e.getMessage(), e);
@@ -370,9 +372,7 @@ public class RelimsProperties {
 
         for (String lProjectString : lProjectStrings) {
             lProjectIds.add(Long.parseLong(lProjectString));
-
         }
-
         return lProjectIds;
     }
 
@@ -399,4 +399,18 @@ public class RelimsProperties {
     public static int getPollingTime() {
         return config.getInt("max.job.time.polling.seconds");
     }
+
+    public static boolean useProjectListFromRedis(){
+        return config.getBoolean("relims.project.redis");
+    }
+
+    public static String getRedisServer(){
+        return config.getString("relims.project.redis.server");
+    }
+
+    public static String getRedisProjectKey(){
+        return config.getString("relims.project.redis.key");
+    }
+
+
 }
