@@ -141,8 +141,9 @@ public class PrideDataProvider implements DataProvider {
     private void loadSpectraFromPride(long aProjectid) {
         // Try maximum three times to get the spectra. Otherwise fail.
         int i = 0;
+        int max = 3;
         boolean spectraRetrieved = false;
-        while (i < 3 && !spectraRetrieved) {
+        while (i < max && !spectraRetrieved) {
 
             try {
                 iPrideService.buildSpectrumCacheForExperiment("" + aProjectid);
@@ -154,6 +155,7 @@ public class PrideDataProvider implements DataProvider {
                 }
 
             } catch (SQLException e) {
+                logger.debug(String.format("catched sqlexception while loading spectrum from Pride (attempt %s/%s)", (i+1), 3));
                 if(e.getMessage().contains("Already closed")){
                     //retry!!
                 }else{
@@ -164,7 +166,9 @@ public class PrideDataProvider implements DataProvider {
         }
 
         if (!spectraRetrieved) {
-            throw new RelimsException(String.format("Failed to retrieve spectra for project %s", aProjectid));
+            String lMessage = String.format("Failed to retrieve spectra for project %s", aProjectid);
+            logger.debug(lMessage);
+            throw new RelimsException(lMessage);
         }
 
         logger.debug("");
