@@ -1,5 +1,6 @@
 package com.compomics.relims.gui;
 
+import com.compomics.relims.observer.ResultObserver;
 import com.google.common.base.Joiner;
 import org.apache.log4j.ConsoleAppender;
 import org.apache.log4j.spi.LoggingEvent;
@@ -40,5 +41,8 @@ public class TextAreaAppender extends ConsoleAppender {
                 jTextArea.setText(lContent);
             }
         });
+
+        // Keep the ResultObserver notified when new messages arrive.
+        ResultObserver.sendHeartBeat();
     }
 }

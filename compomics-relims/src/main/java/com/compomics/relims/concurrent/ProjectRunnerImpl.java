@@ -89,13 +89,13 @@ public class ProjectRunnerImpl extends Observable implements ProjectRunner {
 
                 String lSampleID = lSearchGUI.getName();
                 String lExperimentID = format("projectid_%d", lSearchGUI.getProjectId());
-                logger.debug(format("running search %s", lSampleID));
+                logger.info(format("running search %s", lSampleID));
                 // Run searchgui
 
                 ResultObserver.sendHeartBeat();
                 Command.run(lCommand);
 
-                logger.debug("processing the search results with PeptideShaker");
+                logger.info("processing the search results with PeptideShaker");
                 PeptideShakerJobBean lPeptideShakerJobBean = new PeptideShakerJobBean();
 
                 lPeptideShakerJobBean.setOutFolder(lSearchGUI.getSearchResultFolder());
