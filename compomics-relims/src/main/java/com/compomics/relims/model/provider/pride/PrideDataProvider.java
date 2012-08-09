@@ -85,7 +85,7 @@ public class PrideDataProvider implements DataProvider {
         // Do not run PRIDE asap automatic, but retrieve the PTMs from the modified sequence values.
         ModificationService lModificationService = (ModificationService) lContext.getBean("modificationService");
 
-//        lModificationSet = lModificationService.loadExperimentModifications(aProjectid);
+        lModificationSet = lModificationService.loadExperimentModifications(aProjectid);
         for (Modification lModification : lModificationSet) {
             logger.debug(String.format("Resolved PTM '%s' with mass '%f' from modified sequence", lModification.getName(), lModification.getMassShift()));
         }
