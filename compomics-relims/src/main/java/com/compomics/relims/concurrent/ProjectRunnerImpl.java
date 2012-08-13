@@ -92,6 +92,8 @@ public class ProjectRunnerImpl extends Observable implements ProjectRunner {
                 logger.info(format("running search %s", lSampleID));
                 // Run searchgui
 
+                RelimsProperties.getPeptideShakerResultsFolder();
+
                 ResultObserver.sendHeartBeat();
                 Command.run(lCommand);
 

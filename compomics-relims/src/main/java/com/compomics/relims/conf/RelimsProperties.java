@@ -413,4 +413,7 @@ public class RelimsProperties {
     }
 
 
+    public static String getPeptideShakerResultsFolder() {
+        return config.getString("peptideshaker.export");
+    }
 }
