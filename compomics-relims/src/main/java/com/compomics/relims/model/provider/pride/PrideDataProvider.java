@@ -1,11 +1,11 @@
 package com.compomics.relims.model.provider.pride;
 
 import com.compomics.omssa.xsd.UserModCollection;
+import com.compomics.pride_asa_pipeline.logic.PrideSpectrumAnnotator;
+import com.compomics.pride_asa_pipeline.logic.modification.OmssaModificationMarshaller;
+import com.compomics.pride_asa_pipeline.logic.modification.impl.OmssaModificationMarshallerImpl;
 import com.compomics.pride_asa_pipeline.model.AnalyzerData;
 import com.compomics.pride_asa_pipeline.model.Modification;
-import com.compomics.pride_asa_pipeline.modification.OmssaModiciationMarshaller;
-import com.compomics.pride_asa_pipeline.modification.impl.OmssaModificationMarshallerImpl;
-import com.compomics.pride_asa_pipeline.pipeline.PrideSpectrumAnnotator;
 import com.compomics.pride_asa_pipeline.service.ExperimentService;
 import com.compomics.pride_asa_pipeline.service.ModificationService;
 import com.compomics.pride_asa_pipeline.spring.ApplicationContextProvider;
@@ -22,6 +22,7 @@ import java.io.File;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 
 /**
@@ -97,7 +98,10 @@ public class PrideDataProvider implements DataProvider {
             lSpectrumAnnotator = (PrideSpectrumAnnotator) lContext.getBean("prideSpectrumAnnotator");
             lSpectrumAnnotator.annotate(String.valueOf(aProjectid));
 
-            Set<Modification> lPrideAsapModifications = lModificationService.getUsedModifications(lSpectrumAnnotator.getSpectrumAnnotatorResult());
+            Map<Modification, Integer> lPrideAsapModificationsMap = lModificationService.getUsedModifications(lSpectrumAnnotator.getSpectrumAnnotatorResult());
+
+            Set<Modification>lPrideAsapModifications = lPrideAsapModificationsMap.keySet();
+
             for (Modification lPrideAsapModification : lPrideAsapModifications) {
                 Modification lAsapModification = lPrideAsapModification;
 
@@ -108,7 +112,7 @@ public class PrideDataProvider implements DataProvider {
         }
 
 
-        OmssaModiciationMarshaller marshaller = new OmssaModificationMarshallerImpl();
+        OmssaModificationMarshaller marshaller = new OmssaModificationMarshallerImpl();
         UserModCollection lUserModCollection = marshaller.marshallModifications(lModificationSet);
 
         lRelimsProjectBean.setStandardModificationList(lUserModCollection);

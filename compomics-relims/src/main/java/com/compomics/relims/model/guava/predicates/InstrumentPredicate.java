@@ -65,11 +65,22 @@ public class InstrumentPredicate implements Predicate<RelimsProjectBean> {
                     }
                 }
             }
+
             // check for orbitrap
             if(lAnalyzerData.getAnalyzerFamily().equals(AnalyzerData.ANALYZER_FAMILY.TOF)){
                 for (String lAllowedInstrumentID : iAllowedInstrumentIDs) {
                     if(lAllowedInstrumentID.toLowerCase().equals("tof")){
                         logger.debug("accept mass analyzer 'tof'");
+                        accept = true;
+                    }
+                }
+            }
+
+            // check for UNKNOWNN instrument
+            if(lAnalyzerData.getAnalyzerFamily().equals(AnalyzerData.ANALYZER_FAMILY.UNKNOWN)){
+                for (String lAllowedInstrumentID : iAllowedInstrumentIDs) {
+                    if(lAllowedInstrumentID.toLowerCase().equals("unknown")){
+                        logger.debug("accept mass analyzer 'unknown'");
                         accept = true;
                     }
                 }

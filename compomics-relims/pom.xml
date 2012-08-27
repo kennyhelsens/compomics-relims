@@ -4,100 +4,114 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.compomics</groupId>
     <artifactId>compomics-relims</artifactId>
-    <packaging>jar</packaging>
     <version>${version.number}</version>
+    <packaging>jar</packaging>
     <name>compomics-relims</name>
     <url>code.google.com/p/compomics-relims/</url>
-    <!-- Set the version number for the whole project -->
-    <properties>
-        <version.number>0.3.0-beta</version.number>
-    </properties>
-    <!-- Licence -->
     <licenses>
         <license>
             <name>The Apache Software License, Version 2.0</name>
             <url>LICENSE-2.0.txt</url>
         </license>
     </licenses>
-    <!-- Developers -->
-    <developers>
-        <developer>
-            <name>Kenny Helsens</name>
-            <id>kenny</id>
-            <email>kenny.helsens@ugent.be</email>
-            <organization>Computational Omics and Systems Biology Group, VIB Department of Medical Protein Research,
-                UGent, Belgium
-            </organization>
-        </developer>
+    <properties>
+        <version.number>0.3.0-beta</version.number>
+    </properties>
+    <dependencies>
+        <dependency>
+            <groupId>com.compomics</groupId>
+            <artifactId>utilities</artifactId>
+            <version>3.6.14</version>
+        </dependency>
+        <dependency>
+            <groupId>com.compomics.acromics</groupId>
+            <artifactId>acromics-core</artifactId>
+            <version>0.2.1</version>
+        </dependency>
+        <dependency>
+            <groupId>com.compomics</groupId>
+            <artifactId>ms-lims</artifactId>
+            <version>7.6.2</version>
+            <exclusions>
+                <exclusion>
+                    <artifactId>mysql</artifactId>
+                    <groupId>mysql-connector-java</groupId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>com.compomics</groupId>
+            <artifactId>omssa-xsd</artifactId>
+            <version>0.3.1</version>
+        </dependency>
+        <dependency>
+            <groupId>com.compomics</groupId>
+            <artifactId>pride-asa-pipeline</artifactId>
+            <version>1.2-SNAPSHOT</version>
+        </dependency>
 
-    </developers>
-    <!-- Build -->
+        <dependency>
+            <groupId>com.google.guava</groupId>
+            <artifactId>guava</artifactId>
+            <version>10.0.1</version>
+        </dependency>
+        <dependency>
+            <groupId>commons-configuration</groupId>
+            <artifactId>commons-configuration</artifactId>
+            <version>1.4</version>
+            <exclusions>
+                <exclusion>
+                    <artifactId>xerces</artifactId>
+                    <groupId>xerces</groupId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>eu.isas.peptideshaker</groupId>
+            <artifactId>PeptideShaker</artifactId>
+            <version>0.17.3</version>
+        </dependency>
+        <dependency>
+            <groupId>log4j</groupId>
+            <artifactId>log4j</artifactId>
+            <version>1.2.14</version>
+        </dependency>
+        <dependency>
+            <groupId>mysql</groupId>
+            <artifactId>mysql-connector-java</artifactId>
+            <version>5.1.6</version>
+        </dependency>
+        <dependency>
+            <groupId>redis.clients</groupId>
+            <artifactId>jedis</artifactId>
+            <version>2.0.0</version>
+            <scope>compile</scope>
+            <type>jar</type>
+        </dependency>
+    </dependencies>
     <build>
-        <!-- Copy the resources required during building -->
         <resources>
             <resource>
                 <directory>src/main/resources/</directory>
             </resource>
             <resource>
                 <directory>./</directory>
+                <filtering>true</filtering>
                 <includes>
                     <include>compomics-relims.properties</include>
                 </includes>
-                <filtering>true</filtering>
             </resource>
         </resources>
-        <!-- Plugins -->
         <plugins>
-            <!-- Compiler plugin -->
             <plugin>
                 <artifactId>maven-compiler-plugin</artifactId>
                 <configuration>
+                    <debug>true</debug>
+                    <showDeprecation>true</showDeprecation>
                     <source>1.5</source>
                     <target>1.5</target>
-                    <showDeprecation>true</showDeprecation>
-                    <debug>true</debug>
                 </configuration>
             </plugin>
-            <!-- Jar plugin -->
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-jar-plugin</artifactId>
-                <configuration>
-                    <archive>
-                        <manifest>
-                            <addDefaultImplementationEntries>true</addDefaultImplementationEntries>
-                            <addDefaultSpecificationEntries>true</addDefaultSpecificationEntries>
-                            <mainClass>com.compomics.relims.gui.RelimsWrapper</mainClass>
-                            <addClasspath>true</addClasspath>
-                            <classpathPrefix>lib</classpathPrefix>
-                        </manifest>
-                    </archive>
-                    <outputDirectory>${project.build.directory}/${project.artifactId}-${project.version}
-                    </outputDirectory>
-                </configuration>
-            </plugin>
-            <!-- Dependency plugin -->
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-dependency-plugin</artifactId>
-                <executions>
-                    <execution>
-                        <id>copy-dependencies</id>
-                        <phase>package</phase>
-                        <goals>
-                            <goal>copy-dependencies</goal>
-                        </goals>
-                        <configuration>
-                            <outputDirectory>${project.build.directory}/${project.artifactId}-${project.version}/lib
-                            </outputDirectory>
-                            <overWriteReleases>true</overWriteReleases>
-                            <overWriteSnapshots>true</overWriteSnapshots>
-                            <excludeTransitive>false</excludeTransitive>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
-            <!-- Resources plugin -->
             <plugin>
                 <artifactId>maven-resources-plugin</artifactId>
                 <version>2.3</version>
@@ -105,9 +119,6 @@
                     <execution>
                         <id>copy-resources</id>
                         <phase>package</phase>
-                        <goals>
-                            <goal>copy-resources</goal>
-                        </goals>
                         <configuration>
                             <outputDirectory>${project.build.directory}/${project.artifactId}-${project.version}/
                             </outputDirectory>
@@ -120,17 +131,15 @@
                                 </resource>
                             </resources>
                         </configuration>
-                    </execution>
-
-                    <execution>
-                        <id>copy-resources-to-classes</id>
-                        <phase>compile</phase>
                         <goals>
                             <goal>copy-resources</goal>
                         </goals>
+                    </execution>
+                    <execution>
+                        <id>copy-resources-to-classes</id>
+                        <phase>compile</phase>
                         <configuration>
-                            <outputDirectory>${project.build.directory}/classes/
-                            </outputDirectory>
+                            <outputDirectory>${project.build.directory}/classes/</outputDirectory>
                             <resources>
                                 <resource>
                                     <directory>./</directory>
@@ -140,131 +149,85 @@
                                 </resource>
                             </resources>
                         </configuration>
+                        <goals>
+                            <goal>copy-resources</goal>
+                        </goals>
                     </execution>
                 </executions>
             </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-dependency-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>copy-dependencies</id>
+                        <phase>package</phase>
+                        <configuration>
+                            <excludeTransitive>false</excludeTransitive>
+                            <outputDirectory>${project.build.directory}/${project.artifactId}-${project.version}/lib
+                            </outputDirectory>
+                            <overWriteReleases>true</overWriteReleases>
+                            <overWriteSnapshots>true</overWriteSnapshots>
+                        </configuration>
+                        <goals>
+                            <goal>copy-dependencies</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-jar-plugin</artifactId>
+                <configuration>
+                    <archive>
+                        <manifest>
+                            <addClasspath>true</addClasspath>
+                            <addDefaultImplementationEntries>true</addDefaultImplementationEntries>
+                            <addDefaultSpecificationEntries>true</addDefaultSpecificationEntries>
+                            <classpathPrefix>lib</classpathPrefix>
+                            <mainClass>com.compomics.relims.gui.RelimsWrapper</mainClass>
+                        </manifest>
+                    </archive>
+                    <outputDirectory>${project.build.directory}/${project.artifactId}-${project.version}
+                    </outputDirectory>
+                </configuration>
+            </plugin>
         </plugins>
     </build>
-
-    <!-- Repositores -->
     <repositories>
-        <!-- UGent Genesis Maven 1 repository -->
         <repository>
             <id>genesis-maven-repository</id>
+            <layout>legacy</layout>
             <name>Genesis repository</name>
             <url>http://genesis.UGent.be/maven</url>
-            <layout>legacy</layout>
         </repository>
-        <!-- UGent Genesis Maven 2 repository -->
         <repository>
             <id>genesis-maven2-repository</id>
+            <layout>default</layout>
             <name>Genesis maven2 repository</name>
             <url>http://genesis.UGent.be/maven2</url>
-            <layout>default</layout>
         </repository>
     </repositories>
-    <!-- Dependencies -->
-    <dependencies>
-
-        <!--Apache commons configuration-->
-        <dependency>
-            <groupId>com.compomics</groupId>
-            <artifactId>pride-asa-pipeline</artifactId>
-            <version>1.1-SNAPSHOT</version>
-        </dependency>
-
-        <!--Apache commons configuration-->
-        <dependency>
-            <groupId>eu.isas.peptideshaker</groupId>
-            <artifactId>PeptideShaker</artifactId>
-            <version>0.17.3</version>
-        </dependency>
-
-        <dependency>
-            <groupId>mysql</groupId>
-            <artifactId>mysql-connector-java</artifactId>
-            <version>5.1.6</version>
-        </dependency>
-
-
-        <dependency>
-            <groupId>log4j</groupId>
-            <artifactId>log4j</artifactId>
-            <version>1.2.14</version>
-        </dependency>
-
-        <!-- This project makes use of convenience methods from google guava-->
-        <dependency>
-            <groupId>com.google.guava</groupId>
-            <artifactId>guava</artifactId>
-            <version>10.0.1</version>
-        </dependency>
-
-        <!--Apache commons configuration-->
-        <dependency>
-            <groupId>commons-configuration</groupId>
-            <artifactId>commons-configuration</artifactId>
-            <version>1.4</version>
-            <exclusions>
-                <exclusion>
-                    <artifactId>xerces</artifactId>
-                    <groupId>xerces</groupId>
-                </exclusion>
-            </exclusions>
-        </dependency>
-
-        <!--Apache commons configuration-->
-        <dependency>
-            <groupId>com.compomics</groupId>
-            <artifactId>ms-lims</artifactId>
-            <version>7.6.2</version>
-            <exclusions>
-                <exclusion>
-                    <artifactId>mysql</artifactId>
-                    <groupId>mysql-connector-java</groupId>
-                </exclusion>
-            </exclusions>
-        </dependency>
-
-        <!--Apache commons configuration-->
-        <dependency>
-            <groupId>com.compomics.acromics</groupId>
-            <artifactId>acromics-core</artifactId>
-            <version>0.2.1</version>
-        </dependency>
-
-
-        <!--Apache commons configuration-->
-        <dependency>
-            <groupId>com.compomics</groupId>
-            <artifactId>omssa-xsd</artifactId>
-            <version>0.3.1</version>
-        </dependency>
-
-
-        <dependency>
-            <groupId>redis.clients</groupId>
-            <artifactId>jedis</artifactId>
-            <version>2.0.0</version>
-            <type>jar</type>
-            <scope>compile</scope>
-        </dependency>
-
-    </dependencies>
-    <!-- The deployment maven2 repository-->
     <distributionManagement>
         <repository>
             <id>genesis-maven2-repo</id>
             <name>Genesis Maven Repository</name>
             <url>scp://genesis.ugent.be/home/maven/public_html/maven2</url>
         </repository>
-
-        <!--         use the following if you're not using a snapshot version. -->
         <snapshotRepository>
             <id>genesis-maven2-repo</id>
             <name>Genesis Maven Repository</name>
             <url>scp://genesis.ugent.be/home/maven/public_html/maven2</url>
         </snapshotRepository>
-
     </distributionManagement>
+    <developers>
+        <developer>
+            <email>kenny.helsens@ugent.be</email>
+            <id>kenny</id>
+            <name>Kenny Helsens</name>
+            <organization>Computational Omics and Systems Biology Group, VIB Department of Medical Protein Research,
+                UGent, Belgium
+            </organization>
+        </developer>
+    </developers>
 </project>

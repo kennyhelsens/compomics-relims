@@ -1,5 +1,7 @@
 package com.compomics.relims.concurrent;
 
+import com.compomics.pride_asa_pipeline.logic.PrideSpectrumAnnotator;
+import com.compomics.pride_asa_pipeline.spring.ApplicationContextProvider;
 import com.compomics.relims.conf.RelimsProperties;
 import com.compomics.relims.model.guava.predicates.PredicateManager;
 import com.compomics.relims.model.interfaces.*;
@@ -7,6 +9,7 @@ import com.compomics.relims.model.provider.ProjectProvider;
 import com.compomics.relims.observer.ResultObserver;
 import com.google.common.collect.Lists;
 import org.apache.log4j.Logger;
+import org.springframework.context.ApplicationContext;
 
 import java.io.IOException;
 import java.util.List;
@@ -25,6 +28,7 @@ public class RelimsJob implements Callable, Closable {
     private static Logger logger = Logger.getLogger(RelimsJob.class);
 
     private ExecutorService iService = null;
+
 
     protected ProjectProvider iProjectProvider;
     protected PredicateManager iPredicateManager;
@@ -118,5 +122,13 @@ public class RelimsJob implements Callable, Closable {
                 logger.debug("shutting down " + lRunnable.toString());
             }
         }
+
+        // Remove remaining resources
+        ApplicationContext applicationContext = ApplicationContextProvider.getInstance().getApplicationContext();
+
+        PrideSpectrumAnnotator lSpectrumAnnotator;
+        lSpectrumAnnotator = (PrideSpectrumAnnotator) applicationContext.getBean("prideSpectrumAnnotator");
+        lSpectrumAnnotator.clearTmpResources();
+
     }
 }

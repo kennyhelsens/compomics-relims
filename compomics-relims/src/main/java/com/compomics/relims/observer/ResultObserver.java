@@ -1,9 +1,12 @@
 package com.compomics.relims.observer;
 
+import com.compomics.pride_asa_pipeline.logic.PrideSpectrumAnnotator;
+import com.compomics.pride_asa_pipeline.spring.ApplicationContextProvider;
 import com.compomics.relims.conf.RelimsProperties;
 import com.compomics.relims.model.interfaces.Closable;
 import com.google.common.io.Files;
 import org.apache.log4j.Logger;
+import org.springframework.context.ApplicationContext;
 
 import java.io.BufferedWriter;
 import java.io.File;
@@ -18,6 +21,8 @@ import java.util.concurrent.Future;
  */
 public class ResultObserver implements Observer {
     private static Logger logger = Logger.getLogger(ResultObserver.class);
+    ApplicationContext applicationContext = ApplicationContextProvider.getInstance().getApplicationContext();
+
 
     private Closable iClosable = null;
 
@@ -43,6 +48,12 @@ public class ResultObserver implements Observer {
             synchronized (this) {
                 iCounter++;
                 logger.debug("PROJECT SUCCES COUNT " + iCounter + "(" + o.toString() + ").");
+
+                // Clean MGF resources after project success
+                PrideSpectrumAnnotator lSpectrumAnnotator;
+                lSpectrumAnnotator = (PrideSpectrumAnnotator) applicationContext.getBean("prideSpectrumAnnotator");
+                lSpectrumAnnotator.clearTmpResources();
+
             }
 
             if (iCounter >= RelimsProperties.getMaxSucces()) {
@@ -115,7 +126,7 @@ public class ResultObserver implements Observer {
                             logger.debug("Cancelling ");
                             iCurrentFuture.cancel(true);
                             iCurrentFuture = null;
-                        } else if((MaxFutureTime - lTimeSinceLastHeartbeat) < 5000){
+                        } else if ((MaxFutureTime - lTimeSinceLastHeartbeat) < 5000) {
                             long lTimeLeftMinutes = (MaxFutureTime - lTimeSinceLastHeartbeat) / (1000 * 60);
                             logger.debug(String.format("Heartbeat : job has %s minutes left to complete", lTimeLeftMinutes));
                         }
