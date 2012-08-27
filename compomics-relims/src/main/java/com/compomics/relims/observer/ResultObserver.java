@@ -147,7 +147,7 @@ public class ResultObserver implements Observer {
 
         public void stop() {
             if (updateThread != null) {
-                updateThread.stop();
+                updateThread.interrupt();
                 updateThread = null;
             }
         }
