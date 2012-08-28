@@ -113,6 +113,7 @@ public class ResultObserver implements Observer {
                     if (iCurrentFuture != null) {
                         // Only do something is a Future is running.
                         long lTimeSinceLastHeartbeat = System.currentTimeMillis() - iTimeLastHeartbeat;
+                        System.out.println(String.format("last heartbeat : %s min ago", lTimeSinceLastHeartbeat));
 
                         if (lTimeSinceLastHeartbeat > MaxFutureTime) {
                             logger.debug(String.format("Cancelling job  - timeout after missing heartbeat for %s minutes", lTimeSinceLastHeartbeat));
