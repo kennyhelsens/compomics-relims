@@ -112,7 +112,7 @@ public class ProjectRunnerImpl extends Observable implements ProjectRunner {
 
                 // Run PeptideShaker
                 ResultObserver.sendHeartBeat();
-                Command.run(lPeptideShakerJobBean.getSearchGUICommandString());
+                Command.run(lPeptideShakerJobBean.getPeptideShakerCommandString());
 
 
                 logger.debug(format(

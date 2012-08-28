@@ -29,6 +29,8 @@ public class RelimsJob implements Callable, Closable {
 
     private ExecutorService iService = null;
 
+    private ApplicationContext applicationContext = ApplicationContextProvider.getInstance().getApplicationContext();
+
 
     protected ProjectProvider iProjectProvider;
     protected PredicateManager iPredicateManager;
@@ -91,12 +93,18 @@ public class RelimsJob implements Callable, Closable {
                     // Do nothing.
                 }
 
+
                 if (lFuture.isCancelled()) {
                     logger.info(String.format("Actively cancelled analysis of project %s. Continuing to next project.", lProjectID));
                     initThreadExecutor();
                 } else if (lFuture.isDone()) {
                     logger.info(String.format("Finished analysis of project %s.", lProjectID));
                 }
+
+                // Clean MGF resources after project success
+                PrideSpectrumAnnotator lSpectrumAnnotator;
+                lSpectrumAnnotator = (PrideSpectrumAnnotator) applicationContext.getBean("prideSpectrumAnnotator");
+                lSpectrumAnnotator.clearTmpResources();
 
             } catch (ClassNotFoundException e) {
                 logger.error(e.getMessage(), e);

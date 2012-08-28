@@ -65,7 +65,7 @@ public class PeptideShakerJobBean {
         searchGUIResultsFolder = aSearchGUIResultsFolder;
     }
 
-    public String getSearchGUICommandString() {
+    public String getPeptideShakerCommandString() {
         Collection<String> lCommandParts = Lists.newArrayList();
         try {
             String lPeptideShakerArchivePath = RelimsProperties.getPeptideShakerArchivePath();
