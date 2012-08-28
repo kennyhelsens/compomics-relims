@@ -1,6 +1,7 @@
 package com.compomics.relims.observer;
 
 import com.compomics.relims.conf.RelimsProperties;
+import com.compomics.relims.model.guava.functions.DoubleRounderFunction;
 import com.compomics.relims.model.interfaces.Closable;
 import com.google.common.io.Files;
 import org.apache.log4j.Logger;
@@ -107,13 +108,14 @@ public class ResultObserver implements Observer {
         }
 
         public void run() {
+            DoubleRounderFunction lRounder = new DoubleRounderFunction(1);
             while (true) {
                 try {
                     Thread.sleep(updateInterval);
                     if (iCurrentFuture != null) {
                         // Only do something is a Future is running.
                         long lTimeSinceLastHeartbeat = System.currentTimeMillis() - iTimeLastHeartbeat;
-                        System.out.println(String.format("last heartbeat : %s min ago", lTimeSinceLastHeartbeat));
+                        System.out.println(String.format("last heartbeat : %s min ago", lRounder.apply((double) lTimeSinceLastHeartbeat / 60000)));
 
                         if (lTimeSinceLastHeartbeat > MaxFutureTime) {
                             logger.debug(String.format("Cancelling job  - timeout after missing heartbeat for %s minutes", lTimeSinceLastHeartbeat));
