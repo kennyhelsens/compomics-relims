@@ -614,7 +614,7 @@ public class RelimsNBGUI extends javax.swing.JFrame {
 
         public void stop() {
             if (updateThread != null) {
-                updateThread.stop();
+                updateThread.interrupt();
                 updateThread = null;
             }
         }
