@@ -2,6 +2,7 @@ package com.compomics.relims.model.provider.projectlist;
 
 import com.compomics.relims.conf.RelimsProperties;
 import com.compomics.relims.model.interfaces.ProjectListProvider;
+import redis.clients.jedis.Jedis;
 import redis.clients.jedis.JedisPool;
 import redis.clients.jedis.JedisPoolConfig;
 
@@ -26,11 +27,15 @@ public class ProjectListProviderRedis implements ProjectListProvider {
      * @return
      */
     public long nextProjectID() {
-        String lRpop = jedisPool.getResource().lpop(projectKey);
-        if(lRpop == null){
+        Jedis jedis = jedisPool.getResource();
+        String item = jedis.lpop(projectKey);
+        jedisPool.returnResource(jedis);
+
+        if(item == null){
             return -1;
         }else{
-            return Long.parseLong(lRpop);
+            return Long.parseLong(item);
         }
+
     }
 }
