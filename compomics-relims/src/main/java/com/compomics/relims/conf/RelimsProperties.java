@@ -47,6 +47,7 @@ public class RelimsProperties {
             if (jarFilePath.startsWith(".")) {
                 jarFilePath = "";
             }
+            jarFilePath = "E:\\java\\compomics-relims-svn-new\\compomics-relims\\";
 
             if (lOperatingSystem == Utilities.OS_MAC) {
                 lResource = new File(jarFilePath + "resources" + iFolderSeparator + "conf" + iFolderSeparator + "relims-mac.properties");
@@ -418,5 +419,9 @@ public class RelimsProperties {
 
     public static String getPeptideShakerResultsFolder() {
         return config.getString("peptideshaker.export");
+    }
+
+    public static double getFDR() {
+        return config.getDouble("peptideshaker.export.fdr");
     }
 }

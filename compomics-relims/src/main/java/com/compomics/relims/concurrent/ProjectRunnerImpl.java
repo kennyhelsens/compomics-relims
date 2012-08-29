@@ -103,9 +103,10 @@ public class ProjectRunnerImpl extends Observable implements ProjectRunner {
                 lPeptideShakerJobBean.setOutFolder(lSearchGUI.getSearchResultFolder());
                 lPeptideShakerJobBean.setSearchGUIResultsFolder(lSearchGUI.getSearchResultFolder());
 
-                lPeptideShakerJobBean.setPepfdr(1.0);
-                lPeptideShakerJobBean.setProtfdr(1.0);
-                lPeptideShakerJobBean.setPsmfdr(1.0);
+                double lFDR = RelimsProperties.getFDR();
+                lPeptideShakerJobBean.setPepfdr(lFDR);
+                lPeptideShakerJobBean.setProtfdr(lFDR);
+                lPeptideShakerJobBean.setPsmfdr(lFDR);
 
                 lPeptideShakerJobBean.setAscore(false);
 
