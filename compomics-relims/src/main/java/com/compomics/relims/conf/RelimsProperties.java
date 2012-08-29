@@ -69,6 +69,7 @@ public class RelimsProperties {
             lAsapProperties.setProperty("spectrum.limit.size", config.getInt("relims.asap.spectrum.limit.size"));
             lAsapProperties.setProperty("spectrum_peaks_cache.maximum_cache_size", config.getInt("spectrum_peaks_cache.maximum_cache_size"));
             lAsapProperties.setProperty("spectrumannotator.annotate_modified_identifications_only", true);
+            lAsapProperties.setProperty("results_path_tmp_max", config.getInt("relims.results_path_tmp_max"));
 
             lAsapProperties.setProperty("results_path", config.getString("relims.asap.results"));
             lAsapProperties.setProperty("results_path_tmp", config.getString("relims.asap.results.tmp"));
