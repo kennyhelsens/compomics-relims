@@ -108,6 +108,8 @@ public class ProjectRunnerImpl extends Observable implements ProjectRunner {
                 lPeptideShakerJobBean.setPepfdr(lFDR);
                 lPeptideShakerJobBean.setProtfdr(lFDR);
                 lPeptideShakerJobBean.setPsmfdr(lFDR);
+                lPeptideShakerJobBean.setSampleName(lSampleID);
+                lPeptideShakerJobBean.setExperimentName(lExperimentID);
 
                 lPeptideShakerJobBean.setAscore(false);
 

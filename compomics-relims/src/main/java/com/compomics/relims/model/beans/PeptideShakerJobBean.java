@@ -35,6 +35,8 @@ public class PeptideShakerJobBean {
     private double pepfdr = 1.0;
     private double protfdr = 1.0;
     private double psmfdr = 1.0;
+    private String exp = "default_exp";
+    private String sample  = "default_sample";
 
 
     public void setAscore(boolean aAscore) {
@@ -63,6 +65,14 @@ public class PeptideShakerJobBean {
 
     public void setSearchGUIResultsFolder(File aSearchGUIResultsFolder) {
         searchGUIResultsFolder = aSearchGUIResultsFolder;
+    }
+
+    public void setExperimentName(String aExp) {
+        exp = aExp;
+    }
+
+    public void setSampleName(String aSample) {
+        sample = aSample;
     }
 
     public String getPeptideShakerCommandString() {
@@ -100,6 +110,12 @@ public class PeptideShakerJobBean {
 
             lCommandParts.add("-psm");
             lCommandParts.add(String.valueOf(psmfdr));
+
+            lCommandParts.add("-experiment");
+            lCommandParts.add(exp);
+
+            lCommandParts.add("-sample");
+            lCommandParts.add(sample);
 
             lCommandParts.add("-search_gui_results");
             lCommandParts.add(searchGUIResultsFolder.getCanonicalPath());

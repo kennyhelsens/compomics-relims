@@ -47,7 +47,7 @@ public class RelimsProperties {
             if (jarFilePath.startsWith(".")) {
                 jarFilePath = "";
             }
-            jarFilePath = "E:\\java\\compomics-relims-svn-new\\compomics-relims\\";
+//            jarFilePath = "E:\\java\\compomics-relims-svn-new\\compomics-relims\\";
 
             if (lOperatingSystem == Utilities.OS_MAC) {
                 lResource = new File(jarFilePath + "resources" + iFolderSeparator + "conf" + iFolderSeparator + "relims-mac.properties");
