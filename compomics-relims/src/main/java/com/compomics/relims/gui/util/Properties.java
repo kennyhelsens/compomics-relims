@@ -43,20 +43,39 @@ public class Properties {
     public String getJarFilePath() {
         String path = getClass().getResource("Properties.class").getPath();
 
-        if (path.lastIndexOf("/compomics-relims") != -1) {
-            path = path.substring(5, path.lastIndexOf("/compomics-relims-"));
-//            path = path.substring(0, path.lastIndexOf("/compomics-relims"));
-            path = path.replace("%20", " ");
-            path = path.replace("%5b", "[");
-            path = path.replace("%5d", "]");
 
-            if (System.getProperty("os.name").lastIndexOf("Windows") != -1) {
-                path = path.replace("/", "\\");
+        if (path.matches(".*jar.*")) {
+            // Working with a jar file!
+            if (path.lastIndexOf("/compomics-relims") != -1) {
+//            path = path.substring(5, path.lastIndexOf("/compomics-relims"));
+                path = path.substring(0, path.lastIndexOf("/compomics-relims"));
+                path = path.replace("%20", " ");
+                path = path.replace("%5b", "[");
+                path = path.replace("%5d", "]");
+
+                if (System.getProperty("os.name").lastIndexOf("Windows") != -1) {
+                    path = path.replace("/", "\\");
+                }
+            } else {
+                path = ".";
             }
         } else {
-            path = ".";
-        }
+            // Working from IDE!
+            // Working with a jar file!
+            if (path.lastIndexOf("/compomics-relims") != -1) {
+                //            path = path.substring(5, path.lastIndexOf("/compomics-relims"));
+                path = path.substring(0, path.lastIndexOf("/compomics-relims") + 17);
+                path = path.replace("%20", " ");
+                path = path.replace("%5b", "[");
+                path = path.replace("%5d", "]");
 
+                if (System.getProperty("os.name").lastIndexOf("Windows") != -1) {
+                    path = path.replace("/", "\\");
+                }
+            } else {
+                path = ".";
+            }
+        }
         return path;
     }
 }
