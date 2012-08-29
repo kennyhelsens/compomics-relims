@@ -92,7 +92,6 @@ public class ProjectRunnerImpl extends Observable implements ProjectRunner {
                 logger.info(format("running search %s", lSampleID));
                 // Run searchgui
 
-                RelimsProperties.getPeptideShakerResultsFolder();
 
                 ResultObserver.sendHeartBeat();
                 Command.run(lCommand);
@@ -100,7 +99,9 @@ public class ProjectRunnerImpl extends Observable implements ProjectRunner {
                 logger.info("processing the search results with PeptideShaker");
                 PeptideShakerJobBean lPeptideShakerJobBean = new PeptideShakerJobBean();
 
-                lPeptideShakerJobBean.setOutFolder(lSearchGUI.getSearchResultFolder());
+                File lPeptideShakerResultsFolder = new File(RelimsProperties.getPeptideShakerResultsFolder());
+
+                lPeptideShakerJobBean.setOutFolder(lPeptideShakerResultsFolder);
                 lPeptideShakerJobBean.setSearchGUIResultsFolder(lSearchGUI.getSearchResultFolder());
 
                 double lFDR = RelimsProperties.getFDR();
