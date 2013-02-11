@@ -1,6 +1,5 @@
 package com.compomics.relims.gui;
 
-import com.compomics.relims.observer.ResultObserver;
 import com.google.common.base.Joiner;
 import org.apache.log4j.ConsoleAppender;
 import org.apache.log4j.spi.LoggingEvent;
@@ -49,8 +48,5 @@ public class TextAreaAppender extends ConsoleAppender {
         if(iMessages.size() > MAX_SIZE){
             iMessages.removeLast();
         }
-
-        // Keep the ResultObserver notified when new messages arrive.
-        ResultObserver.sendHeartBeat();
     }
 }

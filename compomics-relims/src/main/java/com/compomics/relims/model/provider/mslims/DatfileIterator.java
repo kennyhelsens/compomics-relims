@@ -6,6 +6,9 @@ import com.compomics.mascotdatfile.util.mascot.factory.MascotDatfileFactory;
 import com.compomics.mslims.db.accessors.Datfile;
 import com.compomics.peptizer.util.fileio.ConnectionManager;
 import com.compomics.peptizer.util.iterators.MsLimsIterationUnit;
+import com.compomics.relims.exception.RelimsException;
+import com.compomics.relims.observer.Checkpoint;
+import com.compomics.relims.observer.ProgressManager;
 import org.apache.log4j.Logger;
 
 import java.io.IOException;
@@ -15,40 +18,39 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.logging.Level;
 
 /**
  * This class is a
  */
 public class DatfileIterator implements Iterator<MascotDatfileInf> {
+
     private static Logger logger = Logger.getLogger(DatfileIterator.class);
-
-
     /**
-     * An arraylist with the iterationunits that must be fetched by this iterator.
+     * An arraylist with the iterationunits that must be fetched by this
+     * iterator.
      */
     protected ArrayList<MsLimsIterationUnit> iIterationUnits = null;
-
     /**
      * The currect iterationunit as an instance field.
      */
     private MsLimsIterationUnit iCurrentIterationUnit;
-
     /**
      * The index of the currect iterationunit.
      */
     private int iIterationUnitIndex = 0;
-
     /**
      * The MascotDatfile parsing type to be used.
      */
     private MascotDatfileType iMascotDatfileType = MascotDatfileType.INDEX;
-
+    private PreparedStatement ps;
+    private ResultSet rs;
 
     /**
      * Iterate over the peptide identifications from a ms_lims project.
      *
      * @param aConnection java.sql.connection instance to an ms_lims database.
-     * @param aProjectID  long identifying the project.
+     * @param aProjectID long identifying the project.
      */
     public DatfileIterator(Connection aConnection, long aProjectID) {
         ConnectionManager.getInstance().setConnection(aConnection);
@@ -56,7 +58,6 @@ public class DatfileIterator implements Iterator<MascotDatfileInf> {
         construct();
         logger.debug("created iterator from datfile " + iIterationUnitIndex + " to " + iIterationUnits.size());
     }
-
 
     /**
      * Moves to the next file of the folder.
@@ -92,9 +93,13 @@ public class DatfileIterator implements Iterator<MascotDatfileInf> {
 
             } catch (SQLException e) {
                 logger.error(e.getMessage(), e);  //To change body of catch statement use File | Settings | File Templates.
+                ProgressManager.setState(Checkpoint.FAILED, e);;
+                throw new RelimsException();
 
             } catch (IOException e) {
                 logger.error(e.getMessage(), e);
+                ProgressManager.setState(Checkpoint.FAILED, e);;
+                throw new RelimsException();
             }
         }
         return lMascotDatfileInf;
@@ -109,12 +114,10 @@ public class DatfileIterator implements Iterator<MascotDatfileInf> {
         return iIterationUnitIndex < iIterationUnits.size();
     }
 
-
     public void remove() {
         throw new IllegalAccessError("The remove method is not implemented on the DatfileIterator.");
         // not implemented.
     }
-
 
     /**
      * Getter for property 'mascotDatfileType'.
@@ -125,12 +128,12 @@ public class DatfileIterator implements Iterator<MascotDatfileInf> {
         return iMascotDatfileType;
     }
 
-
     /**
      * Build the iteration units for an ms_lims iterator.
      *
-     * @param aRs ResultSet with three columns <br><br><b>1.</b> datfileid<br><b>2.</b> identificationid<br><b>3.</b>
-     *            MS/MS spectrum filename
+     * @param aRs ResultSet with three columns <br><br><b>1.</b>
+     * datfileid<br><b>2.</b> identificationid<br><b>3.</b> MS/MS spectrum
+     * filename
      * @throws SQLException
      */
     protected void buildIterationUnits(final ResultSet aRs) throws SQLException {
@@ -182,25 +185,22 @@ public class DatfileIterator implements Iterator<MascotDatfileInf> {
         } else {
             iIterationUnits.add(unit);
         }
-
-
-        logger.debug("DEBUG mode, only loading 5 datfiles!!");
-        iIterationUnitIndex = iIterationUnits.size() - 5;
-        if (iIterationUnitIndex < 0) {
-            iIterationUnitIndex = 0;
-        }
-
+        //  logger.debug("DEBUG mode, only loading 5 datfiles!!");
+        //  iIterationUnitIndex =   iIterationUnits.size()- 5;
+        iIterationUnitIndex = 0;
+        /*   if (iIterationUnitIndex < 0) {
+         iIterationUnitIndex = 0;
+         }*/
         // Close fence post, Add the last unit as well!
     }
-
     /**
      * The project that must be iterated.
      */
     private long iProjectID;
 
-
     /**
-     * Constructs the ProjectIterator upon construction. A long[] with datfile identifiers will thereby be creaed.
+     * Constructs the ProjectIterator upon construction. A long[] with datfile
+     * identifiers will thereby be created.
      */
     private void construct() {
 
@@ -208,17 +208,30 @@ public class DatfileIterator implements Iterator<MascotDatfileInf> {
         try {
             String lQuery =
                     "Select i.l_datfileid, i.datfile_query, i.identificationid from identification as i, spectrum as s where i.l_spectrumid=s.spectrumid and s.l_projectid=" + iProjectID + " order by i.l_datfileid";
-
             Connection lConnection = ConnectionManager.getInstance().getConnection();
-            PreparedStatement ps = lConnection.prepareStatement(lQuery);
-            ResultSet rs = ps.executeQuery();
+            ps = lConnection.prepareStatement(lQuery);
+            rs = ps.executeQuery();
 
             buildIterationUnits(rs);
             // All user information from the query was transformed into IterationUnit's, the construction is completed.
             ps.close();
-
-        } catch (SQLException e) {
+        } catch (Exception e) {
             logger.error(e.getMessage(), e);  //To change body of catch statement use File | Settings | File Templates.
+        } finally {
+            if (ps != null) {
+                try {
+                    ps.close();
+                } catch (SQLException ex) {
+                    ps = null;
+                }
+                if (rs != null) {
+                    try {
+                        rs.close();
+                    } catch (SQLException ex) {
+                        rs = null;
+                    }
+                }
+            }
         }
     }
 }

@@ -20,8 +20,8 @@ package com.compomics.relims.conf;
  * License along with this library; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
  */
-
-
+import com.compomics.relims.observer.Checkpoint;
+import com.compomics.relims.observer.ProgressManager;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.KeyEvent;
@@ -31,145 +31,121 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.text.BreakIterator;
 import java.util.*;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  * Contribution from NetBeans: Issue #319-swingx. <p>
  * <p/>
- * PENDING: need to reconcile with OS, JVM... added as-is
- * because needed the shortcut handling to fix #
+ * PENDING: need to reconcile with OS, JVM... added as-is because needed the
+ * shortcut handling to fix #
  *
  * @author apple
  */
 public class Utilities {
+
     private Utilities() {
     }
-
     private static final int CTRL_WILDCARD_MASK = 32768;
     private static final int ALT_WILDCARD_MASK = CTRL_WILDCARD_MASK * 2;
-
     /**
      * Operating system is Windows NT.
      */
     public static final int OS_WINNT = 1 << 0;
-
     /**
      * Operating system is Windows 95.
      */
     public static final int OS_WIN95 = OS_WINNT << 1;
-
     /**
      * Operating system is Windows 98.
      */
     public static final int OS_WIN98 = OS_WIN95 << 1;
-
     /**
      * Operating system is Solaris.
      */
     public static final int OS_SOLARIS = OS_WIN98 << 1;
-
     /**
      * Operating system is Linux.
      */
     public static final int OS_LINUX = OS_SOLARIS << 1;
-
     /**
      * Operating system is HP-UX.
      */
     public static final int OS_HP = OS_LINUX << 1;
-
     /**
      * Operating system is IBM AIX.
      */
     public static final int OS_AIX = OS_HP << 1;
-
     /**
      * Operating system is SGI IRIX.
      */
     public static final int OS_IRIX = OS_AIX << 1;
-
     /**
      * Operating system is Sun OS.
      */
     public static final int OS_SUNOS = OS_IRIX << 1;
-
     /**
      * Operating system is Compaq TRU64 Unix
      */
     public static final int OS_TRU64 = OS_SUNOS << 1;
-
     /**
      * Operating system is OS/2.
      */
     public static final int OS_OS2 = OS_TRU64 << 2;
-
     /**
      * Operating system is Mac.
      */
     public static final int OS_MAC = OS_OS2 << 1;
-
     /**
      * Operating system is Windows 2000.
      */
     public static final int OS_WIN2000 = OS_MAC << 1;
-
     /**
      * Operating system is Compaq OpenVMS
      */
     public static final int OS_VMS = OS_WIN2000 << 1;
-
     /**
      * Operating system is one of the Windows variants but we don't know which
      * one it is
      */
     public static final int OS_WIN_OTHER = OS_VMS << 1;
-
     /**
      * Operating system is unknown.
      */
     public static final int OS_OTHER = OS_WIN_OTHER << 1;
-
     /**
      * Operating system is FreeBSD
      *
      * @since 4.50
      */
     public static final int OS_FREEBSD = OS_OTHER << 1;
-
     /**
      * A mask for Windows platforms.
      */
     public static final int OS_WINDOWS_MASK = OS_WINNT | OS_WIN95 | OS_WIN98 | OS_WIN2000 | OS_WIN_OTHER;
-
     /**
      * A mask for Unix platforms.
      */
-    public static final int OS_UNIX_MASK = OS_SOLARIS | OS_LINUX | OS_HP | OS_AIX | OS_IRIX | OS_SUNOS | OS_TRU64 |
-            OS_MAC | OS_FREEBSD;
-
+    public static final int OS_UNIX_MASK = OS_SOLARIS | OS_LINUX | OS_HP | OS_AIX | OS_IRIX | OS_SUNOS | OS_TRU64
+            | OS_MAC | OS_FREEBSD;
     /**
      * A height of the windows's taskbar
      */
     public static final int TYPICAL_WINDOWS_TASKBAR_HEIGHT = 27;
-
     /**
      * A height of the Mac OS X's menu
      */
     private static final int TYPICAL_MACOSX_MENU_HEIGHT = 24;
-
     private static int operatingSystem = -1;
-
     /**
-     * reference to map that maps allowed key names to their values (String, Integer)
-     * and reference to map for mapping of values to their names
+     * reference to map that maps allowed key names to their values (String,
+     * Integer) and reference to map for mapping of values to their names
      */
     private static Reference<Object> namesAndValues;
 
     /**
      * Get the operating system on which NetBeans is running.
      *
-     * @return one of the <code>OS_*</code> constants (such as {@link #OS_WINNT})
+     * @return one of the <code>OS_*</code> constants (such as
+     * {@link #OS_WINNT})
      */
     public static int getOperatingSystem() {
         if (operatingSystem == -1) {
@@ -189,8 +165,7 @@ public class Utilities {
                 operatingSystem = OS_SOLARIS;
             } else if (osName.startsWith("SunOS")) { // NOI18N
                 operatingSystem = OS_SOLARIS;
-            }
-            // JDK 1.4 b2 defines os.name for me as "Redhat Linux" -jglick
+            } // JDK 1.4 b2 defines os.name for me as "Redhat Linux" -jglick
             else if (osName.endsWith("Linux")) { // NOI18N
                 operatingSystem = OS_LINUX;
             } else if ("HP-UX".equals(osName)) { // NOI18N
@@ -223,17 +198,19 @@ public class Utilities {
     /**
      * Test whether NetBeans is running on some variant of Windows.
      *
-     * @return <code>true</code> if Windows, <code>false</code> if some other manner of operating system
+     * @return <code>true</code> if Windows, <code>false</code> if some other
+     * manner of operating system
      */
     public static boolean isWindows() {
         return (getOperatingSystem() & OS_WINDOWS_MASK) != 0;
     }
 
     /**
-     * Test whether NetBeans is running on some variant of Unix.
-     * Linux is included as well as the commercial vendors, and Mac OS X.
+     * Test whether NetBeans is running on some variant of Unix. Linux is
+     * included as well as the commercial vendors, and Mac OS X.
      *
-     * @return <code>true</code> some sort of Unix, <code>false</code> if some other manner of operating system
+     * @return <code>true</code> some sort of Unix, <code>false</code> if some
+     * other manner of operating system
      */
     public static boolean isUnix() {
         return (getOperatingSystem() & OS_UNIX_MASK) != 0;
@@ -249,12 +226,12 @@ public class Utilities {
     }
 
     /**
-     * Finds out the monitor where the user currently has the input focus.
-     * This method is usually used to help the client code to figure out on
-     * which monitor it should place newly created windows/frames/dialogs.
+     * Finds out the monitor where the user currently has the input focus. This
+     * method is usually used to help the client code to figure out on which
+     * monitor it should place newly created windows/frames/dialogs.
      *
      * @return the GraphicsConfiguration of the monitor which currently has the
-     *         input focus
+     * input focus
      */
     private static GraphicsConfiguration getCurrentGraphicsConfiguration() {
         Component focusOwner = KeyboardFocusManager.getCurrentKeyboardFocusManager().getFocusOwner();
@@ -270,8 +247,8 @@ public class Utilities {
 
     /**
      * Returns the usable area of the screen where applications can place its
-     * windows.  The method subtracts from the screen the area of taskbars,
-     * system menus and the like.  The screen this method applies to is the one
+     * windows. The method subtracts from the screen the area of taskbars,
+     * system menus and the like. The screen this method applies to is the one
      * which is considered current, ussually the one where the current input
      * focus is.
      *
@@ -284,7 +261,7 @@ public class Utilities {
 
     /**
      * Returns the usable area of the screen where applications can place its
-     * windows.  The method subtracts from the screen the area of taskbars,
+     * windows. The method subtracts from the screen the area of taskbars,
      * system menus and the like.
      *
      * @param gconf the GraphicsConfiguration of the monitor
@@ -312,7 +289,8 @@ public class Utilities {
                     bounds.height -= (bounds.y + Integer.parseInt(st.nextToken()));
                     bounds.width -= (bounds.x + Integer.parseInt(st.nextToken()));
                 } catch (NumberFormatException ex) {
-                    Logger.getAnonymousLogger().log(Level.WARNING, null, ex);
+                    ProgressManager.setState(Checkpoint.FAILED);;
+                    Thread.currentThread().interrupt();
                 }
             }
 
@@ -335,20 +313,19 @@ public class Utilities {
             bounds.height -= (insets.top + insets.bottom);
             bounds.width -= (insets.left + insets.right);
         } catch (Exception ex) {
-            Logger.getAnonymousLogger().log(Level.WARNING, null, ex);
+            ProgressManager.setState(Checkpoint.FAILED);;
+            Thread.currentThread().interrupt();
         }
 
         return bounds;
     }
 
-
     /**
      * Initialization of the names and values
      *
-     * @return array of two hashmaps first maps
-     *         allowed key names to their values (String, Integer)
-     *         and second
-     *         hashtable for mapping of values to their names (Integer, String)
+     * @return array of two hashmaps first maps allowed key names to their
+     * values (String, Integer) and second hashtable for mapping of values to
+     * their names (Integer, String)
      */
     private static synchronized HashMap[] initNameAndValues() {
         if (namesAndValues != null) {
@@ -384,7 +361,7 @@ public class Utilities {
 
                     try {
                         int numb = fields[i].getInt(null);
-                        Integer value = new Integer(numb);
+                        Integer value = Integer.valueOf(numb);
                         names.put(name, value);
                         values.put(value, name);
                     } catch (IllegalArgumentException ex) {
@@ -416,7 +393,8 @@ public class Utilities {
      * Converts a Swing key stroke descriptor to a familiar Emacs-like name.
      *
      * @param stroke key description
-     * @return name of the key (e.g. <code>CS-F1</code> for control-shift-function key one)
+     * @return name of the key (e.g. <code>CS-F1</code> for
+     * control-shift-function key one)
      * @see #stringToKey
      */
     public static String keyToString(KeyStroke stroke) {
@@ -429,7 +407,7 @@ public class Utilities {
 
         HashMap[] namesAndValues = initNameAndValues();
 
-        String c = (String) namesAndValues[1].get(new Integer(stroke.getKeyCode()));
+        String c = (String) namesAndValues[1].get(Integer.valueOf(stroke.getKeyCode()));
 
         if (c == null) {
             sb.append(stroke.getKeyChar());
@@ -442,43 +420,42 @@ public class Utilities {
 
     /**
      * Construct a new key description from a given universal string
-     * description.
-     * Provides mapping between Emacs-like textual key descriptions and the
+     * description. Provides mapping between Emacs-like textual key descriptions
+     * and the
      * <code>KeyStroke</code> object used in Swing.
      * <p/>
      * This format has following form:
-     * <P><code>[C][A][S][M]-<em>identifier</em></code>
-     * <p>Where:
-     * <UL>
-     * <LI> <code>C</code> stands for the Control key
-     * <LI> <code>A</code> stands for the Alt key
-     * <LI> <code>S</code> stands for the Shift key
-     * <LI> <code>M</code> stands for the Meta key
-     * </UL>
-     * The format also supports two wildcard codes, to support differences in
-     * platforms.  These are the preferred choices for registering keystrokes,
-     * since platform conflicts will automatically be handled:
-     * <UL>
-     * <LI> <code>D</code> stands for the default menu accelerator - the Control
-     * key on most platforms, the Command (meta) key on Macintosh</LI>
-     * <LI> <code>O</code> stands for the alternate accelerator - the Alt key on
-     * most platforms, the Ctrl key on Macintosh (Macintosh uses Alt as a
-     * secondary shift key for composing international characters - if you bind
-     * Alt-8 to an action, a mac user with a French keyboard will not be able
-     * to type the <code>[</code> character, which is a significant handicap</LI>
-     * </UL>
-     * If you use the wildcard characters, and specify a key which will conflict
+     * <P><code>[C][A][S][M]-<em>identifier</em></code> <p>Where: <UL> <LI>
+     * <code>C</code> stands for the Control key <LI>
+     * <code>A</code> stands for the Alt key <LI>
+     * <code>S</code> stands for the Shift key <LI>
+     * <code>M</code> stands for the Meta key </UL> The format also supports two
+     * wildcard codes, to support differences in platforms. These are the
+     * preferred choices for registering keystrokes, since platform conflicts
+     * will automatically be handled: <UL> <LI>
+     * <code>D</code> stands for the default menu accelerator - the Control key
+     * on most platforms, the Command (meta) key on Macintosh</LI> <LI>
+     * <code>O</code> stands for the alternate accelerator - the Alt key on most
+     * platforms, the Ctrl key on Macintosh (Macintosh uses Alt as a secondary
+     * shift key for composing international characters - if you bind Alt-8 to
+     * an action, a mac user with a French keyboard will not be able to type the
+     * <code>[</code> character, which is a significant handicap</LI> </UL> If
+     * you use the wildcard characters, and specify a key which will conflict
      * with keys the operating system consumes, it will be mapped to whichever
      * choice can work - for example, on Macintosh, Command-Q is always consumed
-     * by the operating system, so <code>D-Q</code> will always map to Control-Q.
+     * by the operating system, so
+     * <code>D-Q</code> will always map to Control-Q.
      * <p/>
-     * Every modifier before the hyphen must be pressed.
-     * <em>identifier</EM> can be any text constant from {@link java.awt.event.KeyEvent} but
-     * without the leading <code>VK_</code> characters. So {@link java.awt.event.KeyEvent#VK_ENTER} is described as
+     * Every modifier before the hyphen must be pressed. <em>identifier</EM> can
+     * be any text constant from {@link java.awt.event.KeyEvent} but without the
+     * leading
+     * <code>VK_</code> characters. So {@link java.awt.event.KeyEvent#VK_ENTER}
+     * is described as
      * <code>ENTER</code>.
      *
      * @param s the string with the description of the key
-     * @return key description object, or <code>null</code> if the string does not represent any valid key
+     * @return key description object, or <code>null</code> if the string does
+     * not represent any valid key
      */
     public static KeyStroke stringToKey(String s) {
         StringTokenizer st = new StringTokenizer(s.toUpperCase(Locale.ENGLISH), "-", true); // NOI18N
@@ -490,7 +467,7 @@ public class Utilities {
         int lastModif = -1;
 
         try {
-            for (; ; ) {
+            for (;;) {
                 String el = st.nextToken();
 
                 // required key
@@ -559,8 +536,8 @@ public class Utilities {
      */
     private static int getMenuShortCutKeyMask() {
         if (GraphicsEnvironment.isHeadless()) {
-            return ((getOperatingSystem() & OS_MAC) != 0) ?
-                    KeyEvent.META_MASK : KeyEvent.CTRL_MASK;
+            return ((getOperatingSystem() & OS_MAC) != 0)
+                    ? KeyEvent.META_MASK : KeyEvent.CTRL_MASK;
         }
 
         return Toolkit.getDefaultToolkit().getMenuShortcutKeyMask();
@@ -582,14 +559,18 @@ public class Utilities {
         //them, so CTRL should not be remapped for these
         if (isOnlyMeta) {
             return (key != KeyEvent.VK_H) && (key != KeyEvent.VK_SPACE) && (key != KeyEvent.VK_TAB);
-        } else return !((key == KeyEvent.VK_D) && isMeta && isAlt);
+        } else {
+            return !((key == KeyEvent.VK_D) && isMeta && isAlt);
+        }
     }
 
     /**
-     * Convert a space-separated list of Emacs-like key binding names to a list of Swing key strokes.
+     * Convert a space-separated list of Emacs-like key binding names to a list
+     * of Swing key strokes.
      *
      * @param s the string with keys
-     * @return array of key strokes, or <code>null</code> if the string description is not valid
+     * @return array of key strokes, or <code>null</code> if the string
+     * description is not valid
      * @see #stringToKey
      */
     public static KeyStroke[] stringToKeys(String s) {
@@ -614,7 +595,7 @@ public class Utilities {
     /**
      * Adds characters for modifiers to the buffer.
      *
-     * @param buf   buffer to add to
+     * @param buf buffer to add to
      * @param modif modifiers to add (KeyEvent.XXX_MASK)
      * @return true if something has been added
      */
@@ -699,12 +680,14 @@ public class Utilities {
     }
 
     /**
-     * Convert an array of objects to an array of primitive types.
-     * E.g. an <code>Integer[]</code> would be changed to an <code>int[]</code>.
+     * Convert an array of objects to an array of primitive types. E.g. an
+     * <code>Integer[]</code> would be changed to an
+     * <code>int[]</code>.
      *
      * @param array the wrapper array
      * @return a primitive array
-     * @throws IllegalArgumentException if the array element type is not a primitive wrapper
+     * @throws IllegalArgumentException if the array element type is not a
+     * primitive wrapper
      */
     public static Object toPrimitiveArray(Object[] array) {
         if (array instanceof Integer[]) {
@@ -712,8 +695,9 @@ public class Utilities {
             int i;
             int k = array.length;
 
-            for (i = 0; i < k; i++)
+            for (i = 0; i < k; i++) {
                 r[i] = (array[i] == null) ? 0 : ((Integer) array[i]).intValue();
+            }
 
             return r;
         }
@@ -723,8 +707,9 @@ public class Utilities {
             int i;
             int k = array.length;
 
-            for (i = 0; i < k; i++)
+            for (i = 0; i < k; i++) {
                 r[i] = (array[i] != null) && ((Boolean) array[i]).booleanValue();
+            }
 
             return r;
         }
@@ -734,8 +719,9 @@ public class Utilities {
             int i;
             int k = array.length;
 
-            for (i = 0; i < k; i++)
+            for (i = 0; i < k; i++) {
                 r[i] = (array[i] == null) ? 0 : ((Byte) array[i]).byteValue();
+            }
 
             return r;
         }
@@ -745,8 +731,9 @@ public class Utilities {
             int i;
             int k = array.length;
 
-            for (i = 0; i < k; i++)
+            for (i = 0; i < k; i++) {
                 r[i] = (array[i] == null) ? 0 : ((Character) array[i]).charValue();
+            }
 
             return r;
         }
@@ -756,8 +743,9 @@ public class Utilities {
             int i;
             int k = array.length;
 
-            for (i = 0; i < k; i++)
+            for (i = 0; i < k; i++) {
                 r[i] = (array[i] == null) ? 0 : ((Double) array[i]).doubleValue();
+            }
 
             return r;
         }
@@ -767,8 +755,9 @@ public class Utilities {
             int i;
             int k = array.length;
 
-            for (i = 0; i < k; i++)
+            for (i = 0; i < k; i++) {
                 r[i] = (array[i] == null) ? 0 : ((Float) array[i]).floatValue();
+            }
 
             return r;
         }
@@ -778,8 +767,9 @@ public class Utilities {
             int i;
             int k = array.length;
 
-            for (i = 0; i < k; i++)
+            for (i = 0; i < k; i++) {
                 r[i] = (array[i] == null) ? 0 : ((Long) array[i]).longValue();
+            }
 
             return r;
         }
@@ -789,8 +779,9 @@ public class Utilities {
             int i;
             int k = array.length;
 
-            for (i = 0; i < k; i++)
+            for (i = 0; i < k; i++) {
                 r[i] = (array[i] == null) ? 0 : ((Short) array[i]).shortValue();
+            }
 
             return r;
         }
@@ -799,12 +790,14 @@ public class Utilities {
     }
 
     /**
-     * Convert an array of primitive types to an array of objects.
-     * E.g. an <code>int[]</code> would be turned into an <code>Integer[]</code>.
+     * Convert an array of primitive types to an array of objects. E.g. an
+     * <code>int[]</code> would be turned into an
+     * <code>Integer[]</code>.
      *
      * @param array the primitive array
      * @return a wrapper array
-     * @throws IllegalArgumentException if the array element type is not primitive
+     * @throws IllegalArgumentException if the array element type is not
+     * primitive
      */
     public static Object[] toObjectArray(Object array) {
         if (array instanceof Object[]) {
@@ -816,8 +809,9 @@ public class Utilities {
             int k = ((int[]) array).length;
             Integer[] r = new Integer[k];
 
-            for (i = 0; i < k; i++)
-                r[i] = new Integer(((int[]) array)[i]);
+            for (i = 0; i < k; i++) {
+                r[i] = Integer.valueOf(((int[]) array)[i]);
+            }
 
             return r;
         }
@@ -827,8 +821,9 @@ public class Utilities {
             int k = ((boolean[]) array).length;
             Boolean[] r = new Boolean[k];
 
-            for (i = 0; i < k; i++)
+            for (i = 0; i < k; i++) {
                 r[i] = ((boolean[]) array)[i] ? Boolean.TRUE : Boolean.FALSE;
+            }
 
             return r;
         }
@@ -838,8 +833,9 @@ public class Utilities {
             int k = ((byte[]) array).length;
             Byte[] r = new Byte[k];
 
-            for (i = 0; i < k; i++)
-                r[i] = new Byte(((byte[]) array)[i]);
+            for (i = 0; i < k; i++) {
+                r[i] = Byte.valueOf(((byte[]) array)[i]);
+            }
 
             return r;
         }
@@ -849,8 +845,9 @@ public class Utilities {
             int k = ((char[]) array).length;
             Character[] r = new Character[k];
 
-            for (i = 0; i < k; i++)
-                r[i] = new Character(((char[]) array)[i]);
+            for (i = 0; i < k; i++) {
+                r[i] = Character.valueOf(((char[]) array)[i]);
+            }
 
             return r;
         }
@@ -860,8 +857,9 @@ public class Utilities {
             int k = ((double[]) array).length;
             Double[] r = new Double[k];
 
-            for (i = 0; i < k; i++)
+            for (i = 0; i < k; i++) {
                 r[i] = new Double(((double[]) array)[i]);
+            }
 
             return r;
         }
@@ -871,8 +869,9 @@ public class Utilities {
             int k = ((float[]) array).length;
             Float[] r = new Float[k];
 
-            for (i = 0; i < k; i++)
+            for (i = 0; i < k; i++) {
                 r[i] = new Float(((float[]) array)[i]);
+            }
 
             return r;
         }
@@ -882,8 +881,9 @@ public class Utilities {
             int k = ((long[]) array).length;
             Long[] r = new Long[k];
 
-            for (i = 0; i < k; i++)
-                r[i] = new Long(((long[]) array)[i]);
+            for (i = 0; i < k; i++) {
+                r[i] = Long.valueOf(((long[]) array)[i]);
+            }
 
             return r;
         }
@@ -893,8 +893,9 @@ public class Utilities {
             int k = ((short[]) array).length;
             Short[] r = new Short[k];
 
-            for (i = 0; i < k; i++)
-                r[i] = new Short(((short[]) array)[i]);
+            for (i = 0; i < k; i++) {
+                r[i] = Short.valueOf(((short[]) array)[i]);
+            }
 
             return r;
         }
@@ -905,15 +906,16 @@ public class Utilities {
     /**
      * Wrap multi-line strings (and get the individual lines).
      *
-     * @param original       the original string to wrap
-     * @param width          the maximum width of lines
-     * @param breakIterator  breaks original to chars, words, sentences, depending on what instance you provide.
-     * @param removeNewLines if <code>true</code>, any newlines in the original string are ignored
+     * @param original the original string to wrap
+     * @param width the maximum width of lines
+     * @param breakIterator breaks original to chars, words, sentences,
+     * depending on what instance you provide.
+     * @param removeNewLines if <code>true</code>, any newlines in the original
+     * string are ignored
      * @return the lines after wrapping
      */
     public static String[] wrapStringToArray(
-            String original, int width, BreakIterator breakIterator, boolean removeNewLines
-    ) {
+            String original, int width, BreakIterator breakIterator, boolean removeNewLines) {
         if (original.length() == 0) {
             return new String[]{original};
         }

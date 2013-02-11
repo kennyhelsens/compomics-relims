@@ -6,15 +6,16 @@ import com.compomics.relims.model.UserModsFile;
 import com.compomics.relims.model.beans.RelimsProjectBean;
 import com.compomics.relims.model.guava.functions.OMSSAXSDModificationMatchFunction;
 import com.compomics.relims.model.interfaces.ModificationResolver;
+import com.compomics.relims.observer.Checkpoint;
+import com.compomics.relims.observer.ProgressManager;
 import com.compomics.util.experiment.biology.PTM;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
-import org.apache.log4j.Logger;
-
 import java.io.File;
 import java.io.IOException;
 import java.util.HashSet;
 import java.util.List;
+import org.apache.log4j.Logger;
 
 /**
  * This class is a
@@ -22,16 +23,11 @@ import java.util.List;
 public class ModificationResolverImpl implements ModificationResolver {
 
     private static Logger logger = Logger.getLogger(ModificationResolverImpl.class);
-
     private static OMSSAXSDModificationMatchFunction iOMSSAXSDModificationMatcher = new OMSSAXSDModificationMatchFunction();
-
     protected HashSet<String> iFixedMatchedPTMStrings = null;
     protected HashSet<String> iVariableMatchedPTMStrings = null;
-
     protected UserModsFile iUserModsFile = null;
-
     private RelimsProjectBean iRelimsProjectBean = null;
-
 
     public void resolveModificationList(RelimsProjectBean aRelimsProjectBean) {
         iRelimsProjectBean = aRelimsProjectBean;
@@ -68,8 +64,8 @@ public class ModificationResolverImpl implements ModificationResolver {
             }
         }
 
-        int lMatchCount = iFixedMatchedPTMStrings.size() + iVariableMatchedPTMStrings.size();
-        int lOriginalCount = lAllModifications.size();
+//        int lMatchCount = iFixedMatchedPTMStrings.size() + iVariableMatchedPTMStrings.size();
+//        int lOriginalCount = lAllModifications.size();
 
         // Persist the so-far unknown usermods in the PTMFactory.
         boolean lBuildUserMods = false;
@@ -101,7 +97,6 @@ public class ModificationResolverImpl implements ModificationResolver {
         persistUserMods(RelimsProperties.getSearchGuiUserModFile());
     }
 
-
     public void persistUserMods(File aFile) {
         if (aFile.exists()) {
             aFile.delete();
@@ -111,6 +106,9 @@ public class ModificationResolverImpl implements ModificationResolver {
             iUserModsFile.write(aFile);
         } catch (IOException e) {
             logger.error(e.getMessage(), e);
+            ProgressManager.setState(Checkpoint.FAILED,e);;
+            Thread.currentThread().interrupt();
+            return;
         }
         iRelimsProjectBean.setUserModsFile(iUserModsFile);
     }

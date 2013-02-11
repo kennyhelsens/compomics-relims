@@ -5,6 +5,8 @@ import com.compomics.pride_asa_pipeline.config.PropertiesConfigurationHolder;
 import com.compomics.relims.concurrent.Command;
 import com.compomics.relims.gui.util.Properties;
 import com.compomics.relims.model.guava.functions.SpeciesFinderFunction;
+import com.compomics.relims.observer.Checkpoint;
+import com.compomics.relims.observer.ProgressManager;
 import com.compomics.util.experiment.biology.PTMFactory;
 import com.google.common.base.Function;
 import com.google.common.base.Joiner;
@@ -21,6 +23,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static com.google.common.base.Preconditions.checkNotNull;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
 
 /**
  * This class contains the Relims properties.
@@ -29,38 +33,79 @@ import static com.google.common.base.Preconditions.checkNotNull;
  */
 public class RelimsProperties {
 
+    /**
+     * Plain logger
+     */
     private static Logger logger = Logger.getLogger(RelimsProperties.class);
+    /**
+     * config stores the configurations from the file
+     */
     private static PropertiesConfiguration config;
-    private static File iWorkSpace = null;
+    //TODO : not sure if these searchguiproperties should stay...they are called in a different manner now
+    private static PropertiesConfiguration searchGUIPropertiesConfiguration;
+    /**
+     * The workspace is project dependent and will be generated at the start of
+     * a project
+     */
+    private static File workSpace = null;
+    /**
+     * Resolver/container for the PTM's ---> TODO : NEED TO BE STORED IN THE
+     * SEARCHPARAMETER, NEXT TO PRIDE-ASA-SUGGESTIONS?
+     */
     private static PTMFactory ptmFactory;
-    public static PropertiesConfiguration iSearchGUIPropertiesConfiguration;
-    public static final String iFolderSeparator = System.getProperty("file.separator");
-
+    /**
+     * the folderSeparator is system-dependent...
+     */
+    public static final String folderSeparator = System.getProperty("file.separator");
+    /**
+     * the results will all be placed in a user-specific folder. Therefor, all
+     * "normal" relims projects that are not run via the automatic setup, will
+     * be placed in a folder called "default"
+     */
+    public String userID = "default";
+    /**
+     * A ProgressManager to store the state of the project and monitor it
+     */
+    private static ProgressManager progressManager = ProgressManager.getInstance();
     // -------------------------- STATIC BLOCKS --------------------------
+
     static {
         try {
             File lResource;
-
             int lOperatingSystem = Utilities.getOperatingSystem();
-            String jarFilePath = new Properties().getJarFilePath() + iFolderSeparator;
-
+            String jarFilePath = new Properties().getJarFilePath() + folderSeparator;
             if (jarFilePath.startsWith(".")) {
                 jarFilePath = "";
             }
 //            jarFilePath = "E:\\java\\compomics-relims-svn-new\\compomics-relims\\";
 
-            if (lOperatingSystem == Utilities.OS_MAC) {
-                lResource = new File(jarFilePath + "resources" + iFolderSeparator + "conf" + iFolderSeparator + "relims-mac.properties");
-            } else if (lOperatingSystem == Utilities.OS_WIN_OTHER) {
-                lResource = new File(jarFilePath + "resources" + iFolderSeparator + "conf" + iFolderSeparator + "relims-windows.properties");
-            } else {
-                lResource = new File(jarFilePath + "resources" + iFolderSeparator + "conf" + iFolderSeparator + "relims.properties");
-            }
+            File locatorFile = new File(".");
+            String path = locatorFile.getAbsolutePath().toString();
+            path = path.substring(0, path.length() - 1);
 
+            if (lOperatingSystem == Utilities.OS_MAC) {
+                path = path + "configuration/relims-mac.properties";
+                //path = path.replace(":", iFolderSeparator);
+                System.out.println(path);
+            } else if (lOperatingSystem == Utilities.OS_WIN_OTHER) {
+                path = path + "configuration/relims-windows.properties";
+                //  path = path.replace(":", iFolderSeparator);
+                System.out.println(path);
+            } else {
+                path = path + "configuration/relims.properties";
+                //path = path.replace(":", iFolderSeparator);
+                System.out.println(path);
+            }
+            lResource = new File(path);
+            if (lResource.exists()) {
+                System.out.println("Found relimsproperties");
+            }
             config = new PropertiesConfiguration(lResource);
 
             // Set the workspace for all future Commands to the SearchGUI folder
-            Command.setWorkFolder(new File(getSearchGuiFolder() + iFolderSeparator));
+
+            Command.setWorkFolder(new File(getSearchGuiFolder() + folderSeparator));
+
 
             // Override Pride-Asap properties
             PropertiesConfigurationHolder lAsapProperties = PropertiesConfigurationHolder.getInstance();
@@ -70,14 +115,20 @@ public class RelimsProperties {
             lAsapProperties.setProperty("spectrum_peaks_cache.maximum_cache_size", config.getInt("spectrum_peaks_cache.maximum_cache_size"));
             lAsapProperties.setProperty("spectrumannotator.annotate_modified_identifications_only", true);
             lAsapProperties.setProperty("results_path_tmp_max", config.getInt("relims.results_path_tmp_max"));
-
             lAsapProperties.setProperty("results_path", config.getString("relims.asap.results"));
             lAsapProperties.setProperty("results_path_tmp", config.getString("relims.asap.results.tmp"));
 
 
-        } catch (org.apache.commons.configuration.ConfigurationException e) {
+        } catch (Exception e) {
+            e.printStackTrace();
             logger.error(e.getMessage(), e);
+            progressManager.setState(Checkpoint.FAILED, e);;
+            Thread.currentThread().interrupt();
         }
+    }
+
+    public static String getRepositoryPath() {
+        return config.getString("remote.relims.repository");
     }
 
     public static String getJavaExec() {
@@ -105,36 +156,70 @@ public class RelimsProperties {
     }
 
     public static String getSearchGuiConfFolder() {
-        return config.getString("searchgui.directory") + iFolderSeparator + "resources" + iFolderSeparator + "conf";
+        return config.getString("searchgui.directory") + folderSeparator + "resources" + folderSeparator + "conf";
     }
 
     public static File getWorkSpacePath() {
-        return new File(config.getString("workspace.file"));
+        try {
+            //make the directory if ot does not exist yet 
+            File tempFile = new File(config.getString("workspace.file") + "/" + config.getString("workspace.userID"));
+            tempFile.mkdir();
+            return tempFile;
+        } catch (Exception e) {
+            return null;
+        }
+    }
+
+    public static String getUserID() {
+        return config.getString("workspace.userID");
+    }
+
+    public static void setUserID(String userID) {
+        if (userID.isEmpty()) {
+            config.setProperty("workspace.userID", "default");
+        }
+        config.setProperty("workspace.userID", userID);
+    }
+
+    public static File createWorkSpace(long projectID, String projectSource) {
+        //            iWorkSpace = Files.createTempDir();
+        //todo ake a nicer format for the analysis...Milliseconds = not telling much
+        // iWorkSpace = new File(getWorkSpacePath(), String.valueOf(System.currentTimeMillis()));
+        StringBuilder fileName = new StringBuilder();
+        Calendar date = Calendar.getInstance();
+        SimpleDateFormat dateformatter = new SimpleDateFormat("ddMMyyyy_hhmmss");
+        fileName.append("").append(projectID).append("_");
+        fileName.append(projectSource).append("_");
+        fileName.append(dateformatter.format(date.getTime()));
+        workSpace = new File(getWorkSpacePath(), fileName.toString());
+        workSpace.mkdir();
+        RelimsVariableManager.setSearchResultFolder(workSpace.getAbsolutePath().toString());
+        return workSpace;
+    }
+
+    public static File createWorkSpace() {
+        workSpace = getWorkSpacePath();
+        return workSpace;
     }
 
     public static File getWorkSpace() {
-        if (iWorkSpace == null) {
-//            iWorkSpace = Files.createTempDir();
-            iWorkSpace = new File(getWorkSpacePath(), String.valueOf(System.currentTimeMillis()));
-            iWorkSpace.mkdir();
-        }
-        return iWorkSpace;
+        return workSpace;
     }
 
     public static File getTmpFile(String aID) throws IOException {
-        if (iWorkSpace == null) {
-            iWorkSpace = getWorkSpace();
+        if (workSpace == null) {
+            workSpace = getWorkSpace();
         }
-        File lFile = new File(iWorkSpace, aID + ".tmp");
+        File lFile = new File(workSpace, aID + ".tmp");
         lFile.createNewFile();
         return lFile;
     }
 
     public static File getTmpFile(String aID, boolean aTimeStamp) throws IOException {
-        if (iWorkSpace == null) {
-            iWorkSpace = getWorkSpace();
+        if (workSpace == null) {
+            workSpace = getWorkSpace();
         }
-        File lFile = new File(iWorkSpace, aID + "_" + System.currentTimeMillis() + ".tmp");
+        File lFile = new File(workSpace, aID + "_" + System.currentTimeMillis() + ".tmp");
         lFile.createNewFile();
         return lFile;
     }
@@ -164,9 +249,13 @@ public class RelimsProperties {
         } catch (IOException e) {
             logger.error("error initializing OMSSA mods", e);
             logger.error(e.getMessage(), e);
+            progressManager.setState(Checkpoint.FAILED, e);;
+            Thread.currentThread().interrupt();
         } catch (XmlPullParserException e) {
             logger.error("error initializing OMSSA mods", e);
             logger.error(e.getMessage(), e);
+            progressManager.setState(Checkpoint.FAILED, e);;
+            Thread.currentThread().interrupt();
         }
 
         return PTMFactory.getInstance();
@@ -180,34 +269,34 @@ public class RelimsProperties {
     }
 
     public static PropertiesConfiguration getDefaultSearchGuiConfiguration() {
-        if (iSearchGUIPropertiesConfiguration == null) {
+        if (searchGUIPropertiesConfiguration == null) {
 
             try {
                 File lPropertiesFile = new File(getSearchGuiFolder(),
-                        iFolderSeparator + "resources"
-                                + iFolderSeparator + "conf"
-                                + iFolderSeparator + "default_SearchGUI.properties");
+                        folderSeparator + "resources"
+                        + folderSeparator + "conf"
+                        + folderSeparator + "default_SearchGUI.properties");
 
-                iSearchGUIPropertiesConfiguration = new PropertiesConfiguration(lPropertiesFile);
-                return iSearchGUIPropertiesConfiguration;
+                searchGUIPropertiesConfiguration = new PropertiesConfiguration(lPropertiesFile);
+                return searchGUIPropertiesConfiguration;
 
             } catch (ConfigurationException e) {
                 logger.error(e.getMessage(), e);
+                progressManager.setState(Checkpoint.FAILED, e);;
+                Thread.currentThread().interrupt();
             }
         }
 
-        return iSearchGUIPropertiesConfiguration;
+        return searchGUIPropertiesConfiguration;
     }
 
     public static String getSearchGuiArchivePath() {
-        return getSearchGuiFolder() + iFolderSeparator + getSearchGuiArchive();
+        return getSearchGuiFolder() + folderSeparator + getSearchGuiArchive();
     }
-
 
     public static String getPeptideShakerArchivePath() {
-        return getPeptideShakerFolder() + iFolderSeparator + getPeptideShakerArchive();
+        return getPeptideShakerFolder() + folderSeparator + getPeptideShakerArchive();
     }
-
 
     public static ArrayList<UserMod> getRelimsMods() {
         String[] lRelimsModIds = config.getStringArray("relims.mod.ids");
@@ -246,19 +335,21 @@ public class RelimsProperties {
     }
 
     public static void logSettings() {
+        createWorkSpace();
         try {
             logger.debug("using omssa:" + String.valueOf(useOmssa()));
             logger.debug("using tandem:" + String.valueOf(useTandem()));
             logger.debug("workspace:" + getWorkSpace().getCanonicalPath());
             logger.debug("searchgui:" + getSearchGuiFolder());
             logger.debug("relims mods:" + Joiner.on(",").join(Lists.transform(getRelimsMods(), new Function<UserMod, Object>() {
-
                 public Object apply(@Nullable UserMod input) {
                     return input.getModificationName();
                 }
             })));
         } catch (IOException e) {
             logger.error(e.getMessage(), e);
+            progressManager.setState(Checkpoint.FAILED, e);;
+            Thread.currentThread().interrupt();
         }
     }
 
@@ -341,6 +432,14 @@ public class RelimsProperties {
         }
     }
 
+    public static String getControllerIP() {
+        return config.getString("remote.relims.controller.ip");
+    }
+
+    public static int getControllerPort() {
+        return config.getInt("remote.relims.controller.port");
+    }
+
     public static String getDatabaseFilename(String aDbVarID) {
         return config.getString("relims.db." + aDbVarID + ".file");
     }
@@ -405,18 +504,17 @@ public class RelimsProperties {
         return config.getInt("max.job.time.polling.seconds");
     }
 
-    public static boolean useProjectListFromRedis(){
+    public static boolean useProjectListFromRedis() {
         return config.getBoolean("relims.project.redis");
     }
 
-    public static String getRedisServer(){
+    public static String getRedisServer() {
         return config.getString("relims.project.redis.server");
     }
 
-    public static String getRedisProjectKey(){
+    public static String getRedisProjectKey() {
         return config.getString("relims.project.redis.key");
     }
-
 
     public static String getPeptideShakerResultsFolder() {
         return config.getString("peptideshaker.export");
@@ -424,5 +522,17 @@ public class RelimsProperties {
 
     public static double getFDR() {
         return config.getDouble("peptideshaker.export.fdr");
+    }
+
+    public static String getPrideMGFSource() {
+        return config.getString("pride.MGF.source");
+    }
+
+    public static String getLocalPrideXMLRepository() {
+        return config.getString("pride.prideXML.repository");
+    }
+
+    public static void setAppendPrideAsapAutomatic(boolean b) {
+        config.setProperty("relims.asap.automatic.append", b);
     }
 }

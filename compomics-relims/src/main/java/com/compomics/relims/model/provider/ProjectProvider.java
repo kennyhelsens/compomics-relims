@@ -18,7 +18,7 @@ import java.util.Collection;
  */
 public abstract class ProjectProvider {
 
-    protected static Logger logger = Logger.getLogger(ProjectProvider.class);
+    protected final static Logger logger = Logger.getLogger(ProjectProvider.class);
     protected DataProvider iDataProvider = null;
     protected ModificationResolver iModificationResolver = null;
 

@@ -9,7 +9,7 @@ import java.util.List;
 /**
  * This class is a
  */
-public class RelimsProjectBean {
+public class RelimsProjectBean implements Cloneable{
 
     private long iProjectID = -1;
 

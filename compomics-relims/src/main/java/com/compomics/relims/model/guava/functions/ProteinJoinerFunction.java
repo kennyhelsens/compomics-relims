@@ -1,5 +1,7 @@
 package com.compomics.relims.model.guava.functions;
 
+import com.compomics.relims.observer.Checkpoint;
+import com.compomics.relims.observer.ProgressManager;
 import com.google.common.base.Function;
 import com.google.common.base.Joiner;
 import com.google.common.collect.Lists;
@@ -19,15 +21,14 @@ import java.util.ArrayList;
  * This class is a
  */
 public class ProteinJoinerFunction implements Function<ArrayList<String>, String> {
+
     Joiner lJoiner = Joiner.on("||");
     private static Logger logger = Logger.getLogger(ProteinJoinerFunction.class);
-
     private static FastHashMap iProteinMap;
-
     private boolean isPeptideStartIncluded = false;
     private String iCurrentPeptide = null;
-
-
+    private static ProgressManager progressManager = ProgressManager.getInstance();
+    
     public String apply(@Nullable ArrayList<String> input) {
         if (isPeptideStartIncluded) {
             ArrayList<String> lNewList = Lists.newArrayList();
@@ -91,8 +92,12 @@ public class ProteinJoinerFunction implements Function<ArrayList<String>, String
 
         } catch (FileNotFoundException e) {
             logger.error(e.getMessage(), e);
+            progressManager.setState(Checkpoint.FAILED,e);;
+            Thread.currentThread().interrupt();
         } catch (IOException e) {
             logger.error(e.getMessage(), e);
+            progressManager.setState(Checkpoint.FAILED,e);;
+            Thread.currentThread().interrupt();
         }
 
     }

@@ -1,5 +1,7 @@
 package com.compomics.relims.gui;
 
+import com.compomics.relims.observer.Checkpoint;
+import com.compomics.relims.observer.ProgressManager;
 import com.compomics.util.gui.UtilitiesGUIDefaults;
 import java.io.*;
 import javax.swing.JOptionPane;
@@ -21,6 +23,8 @@ public class RelimsWrapper {
      * file.
      */
     private String jarFileName = "compomics-relims-";
+    private FileWriter f;
+    private InputStreamReader isr;
 
     /**
      * Starts the launcher by calling the launch method. Use this as the main
@@ -35,6 +39,8 @@ public class RelimsWrapper {
             launch();
         } catch (Exception e) {
             e.printStackTrace();
+            ProgressManager.setState(Checkpoint.FAILED, e);;
+            Thread.currentThread().interrupt();
         }
     }
 
@@ -75,8 +81,12 @@ public class RelimsWrapper {
 
             } catch (FileNotFoundException ex) {
                 ex.printStackTrace();
+                ProgressManager.setState(Checkpoint.FAILED);
+                Thread.currentThread().interrupt();
             } catch (IOException ex) {
                 ex.printStackTrace();
+                ProgressManager.setState(Checkpoint.FAILED);
+                Thread.currentThread().interrupt();
             }
         } else {
             options = "-Xms128M -Xmx768M";
@@ -144,7 +154,7 @@ public class RelimsWrapper {
             Process p = Runtime.getRuntime().exec(cmdLine);
 
             InputStream stderr = p.getErrorStream();
-            InputStreamReader isr = new InputStreamReader(stderr);
+            isr = new InputStreamReader(stderr);
             BufferedReader br = new BufferedReader(isr);
 
             temp = "<ERROR>\n\n";
@@ -183,7 +193,7 @@ public class RelimsWrapper {
 
             if (error) {
                 File logFile = new File("resources/conf", "Relims.log");
-                FileWriter f = new FileWriter(logFile, true);
+                f = new FileWriter(logFile, true);
                 f.write("\n\n" + temp + "\n\n");
                 f.close();
 
@@ -207,6 +217,13 @@ public class RelimsWrapper {
 
             t.printStackTrace();
             System.exit(0);
+        } finally {
+            if (isr != null) {
+                isr = null;
+            }
+            if (f != null) {
+                f = null;
+            }
         }
     }
 
@@ -234,6 +251,8 @@ public class RelimsWrapper {
             p.load(is);
         } catch (IOException e) {
             e.printStackTrace();
+            ProgressManager.setState(Checkpoint.FAILED, e);;
+            Thread.currentThread().interrupt();
         }
 
         return p.getProperty("compomics-relims.version");

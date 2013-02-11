@@ -25,4 +25,6 @@ public interface DataProvider {
     public long getNumberOfSearchesForProject(long aProjectid);
 
     public RelimsProjectBean buildProjectBean(long aProjectid);
+
+    public boolean isProjectValuable(String ExperimentID);
 }

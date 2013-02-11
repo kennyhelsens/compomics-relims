@@ -1,10 +1,10 @@
 package com.compomics.relims.model.guava.functions;
 
+import static com.compomics.relims.model.guava.functions.SpeciesFinderFunction.SPECIES.*;
+import com.compomics.relims.observer.Checkpoint;
+import com.compomics.relims.observer.ProgressManager;
 import com.google.common.base.Function;
 import com.google.common.collect.Sets;
-import org.apache.log4j.Logger;
-
-import javax.annotation.Nullable;
 import java.io.BufferedReader;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -14,18 +14,20 @@ import java.net.URL;
 import java.net.URLConnection;
 import java.util.HashMap;
 import java.util.Set;
-
-import static com.compomics.relims.model.guava.functions.SpeciesFinderFunction.SPECIES.*;
+import javax.annotation.Nullable;
+import org.apache.log4j.Logger;
 
 /**
  * This class is a
  */
 public class SpeciesFinderFunction implements Function<Set<String>, SpeciesFinderFunction.SPECIES> {
-
+    private static ProgressManager progressManager = ProgressManager.getInstance();
     public double iExpectedMatchFrequency;
 
-    public enum SPECIES {HUMAN, YEAST, MOUSE, RAT, DROSOPHILA, OTHER, NA, MIX}
+    public enum SPECIES {
 
+        HUMAN, YEAST, MOUSE, RAT, DROSOPHILA, OTHER, NA, MIX
+    }
     private static Logger logger = Logger.getLogger(SpeciesFinderFunction.class);
     private HashMap<SPECIES, Integer> iSpeciesCounter;
 
@@ -42,18 +44,17 @@ public class SpeciesFinderFunction implements Function<Set<String>, SpeciesFinde
     }
 
     /**
-     * Returns the result of applying this function to {@code input}. This method is <i>generally
-     * expected</i>, but not absolutely required, to have the following properties:
+     * Returns the result of applying this function to {@code input}. This
+     * method is <i>generally expected</i>, but not absolutely required, to have
+     * the following properties:
      * <p/>
-     * <ul>
-     * <li>Its execution does not cause any observable side effects.
+     * <ul> <li>Its execution does not cause any observable side effects.
      * <li>The computation is <i>consistent with equals</i>; that is, {@link com.google.common.base.Objects#equal
      * Objects.equal}{@code (a, b)} implies that {@code Objects.equal(function.apply(a),
-     * function.apply(b))}.
-     * </ul>
+     * function.apply(b))}. </ul>
      *
-     * @throws NullPointerException if {@code input} is null and this function does not accept null
-     *                              arguments
+     * @throws NullPointerException if {@code input} is null and this function
+     * does not accept null arguments
      */
     public SpeciesFinderFunction.SPECIES apply(@Nullable Set<String> input) {
 
@@ -97,11 +98,15 @@ public class SpeciesFinderFunction implements Function<Set<String>, SpeciesFinde
 
             } catch (MalformedURLException e) {
                 logger.error(e.getMessage(), e);
+                progressManager.setState(Checkpoint.FAILED,e);;
+                Thread.currentThread().interrupt();
             } catch (FileNotFoundException e) {
                 // When the URL cannot be opened, the accession could not be found!
                 iSpeciesCounter.put(NA, iSpeciesCounter.get(NA) + 1);
             } catch (IOException e) {
                 logger.error(e.getMessage(), e);
+                progressManager.setState(Checkpoint.FAILED,e);;
+                Thread.currentThread().interrupt();
             }
 
         }
@@ -182,5 +187,3 @@ public class SpeciesFinderFunction implements Function<Set<String>, SpeciesFinde
 
     }
 }
-
-

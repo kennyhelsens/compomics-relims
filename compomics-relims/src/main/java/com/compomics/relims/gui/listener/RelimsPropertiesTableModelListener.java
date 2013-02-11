@@ -31,7 +31,7 @@ public class RelimsPropertiesTableModelListener implements TableModelListener {
             if(lFirstRow != lSecondRow){
                 throw new RelimsException("Only one property can be updated at a time!!");
             }
-            int lColumn = aTableModelEvent.getColumn();
+           // int lColumn = aTableModelEvent.getColumn();
             String lKey = model.getValueAt(lFirstRow, 0).toString();
             String lValue = model.getValueAt(lFirstRow, 1).toString();
 

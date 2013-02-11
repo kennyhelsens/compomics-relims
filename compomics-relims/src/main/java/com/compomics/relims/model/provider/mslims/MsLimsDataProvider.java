@@ -14,6 +14,8 @@ import com.compomics.relims.model.UserModConverter;
 import com.compomics.relims.model.beans.RelimsProjectBean;
 import com.compomics.relims.model.interfaces.DataProvider;
 import com.compomics.relims.model.provider.ConnectionProvider;
+import com.compomics.relims.observer.Checkpoint;
+import com.compomics.relims.observer.ProgressManager;
 import com.google.common.base.Joiner;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
@@ -28,6 +30,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.*;
+import java.util.logging.Level;
 
 /**
  * This class is a
@@ -40,18 +43,21 @@ public class MsLimsDataProvider implements DataProvider {
     public static MsLimsDataProvider getInstance() {
         return ourInstance;
     }
+    private ResultSet lResultSet;
+    private PreparedStatement prs;
 
     public long getNumberOfSpectraForProject(long aProjectID) {
         long lNumberOfSpectra = 0;
+        Statement ps = null;
+        ResultSet lResultSet = null;
 
         try {
             String lQuery = "select count(distinct spectrumid) from spectrum as s where s.l_projectid=" + aProjectID;
 
             logger.debug("QUERY - " + lQuery.replaceAll("\\?", "" + aProjectID));
-
-            Statement ps = ConnectionProvider.getConnection().createStatement();
+            ps = ConnectionProvider.getConnection().createStatement();
             ps.execute(lQuery);
-            ResultSet lResultSet = ps.getResultSet();
+            lResultSet = ps.getResultSet();
 
             lResultSet.next();
             lNumberOfSpectra = lResultSet.getLong(1);
@@ -61,24 +67,45 @@ public class MsLimsDataProvider implements DataProvider {
 
             return lNumberOfSpectra;
 
-        } catch (SQLException e) {
+        } catch (Exception e) {
             logger.error(e.getMessage(), e);
+            ProgressManager.setState(Checkpoint.FAILED, e);;
+            Thread.currentThread().interrupt();
+            if (lResultSet != null) {
+                try {
+                    lResultSet.close();
+                } catch (SQLException ex) {
+                    lResultSet = null;
+                }
+            }
+            if (ps != null) {
+                try {
+                    ps.close();
+                } catch (SQLException ex) {
+                    ps = null;
+                }
+            }
         }
         return lNumberOfSpectra;
     }
 
     public Set<AnalyzerData> getInstrumentsForProject(long aProjectID) {
         Set<AnalyzerData> lInstrumentIDSet = new HashSet<AnalyzerData>();
-
+        PreparedStatement ps = null;
+        ResultSet lResultSet = null;
         try {
-            String lQuery = "select distinct storageclassname from spectrum as s where s.l_projectid=?";
-            PreparedStatement ps = ConnectionProvider.getConnection().prepareStatement(lQuery);
+            String lQuery = "select distinct storageclassname from instrument as s,spectrum as sp where s.instrumentID = sp.l_InstrumentID and sp.l_projectid=?";
+            ps = ConnectionProvider.getConnection().prepareStatement(lQuery);
             ps.setLong(1, aProjectID);
 
-            ResultSet lResultSet = ps.executeQuery();
+            lResultSet = ps.executeQuery();
             while (lResultSet.next()) {
 
                 String lStorageClassName = lResultSet.getString(1);
+//TODO modify
+                if (lStorageClassName == null) {
+                    lStorageClassName = "com.compomics.Esquire";
+                }
 
                 if (lStorageClassName.indexOf("QTOF") > 0) {
                     // com.compomics.mslims.util.fileio.QTOFSpectrumStorageEngine
@@ -106,8 +133,24 @@ public class MsLimsDataProvider implements DataProvider {
             lResultSet.close();
             ps.close();
 
-        } catch (SQLException e) {
+        } catch (Exception e) {
+            if (lResultSet != null) {
+                try {
+                    lResultSet.close();
+                } catch (SQLException ex) {
+                    lResultSet = null;
+                }
+            }
+            if (ps != null) {
+                try {
+                    ps.close();
+                } catch (SQLException ex) {
+                    ps = null;
+                }
+            }
             logger.error(e.getMessage(), e);
+            ProgressManager.setState(Checkpoint.FAILED, e);;
+            Thread.currentThread().interrupt();
         }
 
         return lInstrumentIDSet;
@@ -118,20 +161,36 @@ public class MsLimsDataProvider implements DataProvider {
 
         try {
             String lQuery = "select distinct accession from identification as i, spectrum as s where i.l_spectrumid=s.spectrumid and s.l_projectid=?";
-            PreparedStatement ps = ConnectionProvider.getConnection().prepareStatement(lQuery);
-            ps.setLong(1, aProjectID);
+            prs = ConnectionProvider.getConnection().prepareStatement(lQuery);
+            prs.setLong(1, aProjectID);
 
-            ResultSet lResultSet = ps.executeQuery();
+            lResultSet = prs.executeQuery();
             while (lResultSet.next()) {
                 String lAccession = lResultSet.getString(1);
                 lAccessionSet.add(lAccession);
             }
 
             lResultSet.close();
-            ps.close();
+            prs.close();
 
         } catch (SQLException e) {
             logger.error(e.getMessage(), e);
+            ProgressManager.setState(Checkpoint.FAILED, e);;
+            Thread.currentThread().interrupt();
+            if (lResultSet != null) {
+                try {
+                    lResultSet.close();
+                } catch (SQLException ex) {
+                    lResultSet = null;
+                }
+            }
+            if (prs != null) {
+                try {
+                    lResultSet.close();
+                } catch (SQLException ex) {
+                    lResultSet = null;
+                }
+            }
         }
 
         return lAccessionSet;
@@ -139,13 +198,13 @@ public class MsLimsDataProvider implements DataProvider {
 
     public long getNumberOfPeptidesForProject(long aProjectID) {
         long lNumberOfPeptides = 0;
-
+        PreparedStatement ps = null;
+        ResultSet lResultSet = null;
         try {
             String lQuery = "select count(distinct sequence) from identification as i, spectrum as s where i.l_spectrumid=s.spectrumid and s.l_projectid=?";
-            PreparedStatement ps = ConnectionProvider.getConnection().prepareStatement(lQuery);
+            ps = ConnectionProvider.getConnection().prepareStatement(lQuery);
             ps.setLong(1, aProjectID);
-
-            ResultSet lResultSet = ps.executeQuery();
+            lResultSet = ps.executeQuery();
             lResultSet.next();
             lNumberOfPeptides = lResultSet.getLong(1);
 
@@ -154,8 +213,24 @@ public class MsLimsDataProvider implements DataProvider {
 
             return lNumberOfPeptides;
 
-        } catch (SQLException e) {
+        } catch (Exception e) {
+            if (lResultSet != null) {
+                try {
+                    lResultSet.close();
+                } catch (SQLException ex) {
+                    lResultSet = null;
+                }
+            }
+            if (ps != null) {
+                try {
+                    ps.close();
+                } catch (SQLException ex) {
+                    ps = null;
+                }
+            }
             logger.error(e.getMessage(), e);
+            ProgressManager.setState(Checkpoint.FAILED, e);;
+            Thread.currentThread().interrupt();
         }
         return lNumberOfPeptides;
     }
@@ -174,12 +249,12 @@ public class MsLimsDataProvider implements DataProvider {
             lMaxSpectra = Integer.MAX_VALUE;
         }
 
-        File output = new File(RelimsProperties.getWorkSpace(), "mergefile_" + aProjectID + ".mgf");
+        File output = new File(RelimsProperties.getWorkSpace(), aProjectID + ".mgf");
         logger.debug("getting all spectra from project " + aProjectID + " in a local file " + output.getCanonicalPath());
 
 
         try {
-            // Construct the query.
+            // Construct the query.NASTY 
             StringBuffer query = new StringBuffer("select distinct(spectrumid), filename from spectrum where l_projectid=");
             query.append(aProjectID);
 
@@ -199,9 +274,9 @@ public class MsLimsDataProvider implements DataProvider {
             query = new StringBuffer(Spectrum_file.getBasicSelect());
             String lSpectrumIdJoiner = Joiner.on(",").join(lSpectrumids.keySet());
             query.append(" where l_spectrumid in (" + lSpectrumIdJoiner + ")");
+            String queryString = query.toString();
 
-
-            ps = ConnectionProvider.getConnection().prepareStatement(query.toString());
+            ps = ConnectionProvider.getConnection().prepareStatement(queryString);
             rs = ps.executeQuery();
 
             Vector<String> lSpectrumFiles = new Vector<String>();
@@ -237,6 +312,9 @@ public class MsLimsDataProvider implements DataProvider {
 
         } catch (SQLException e) {
             logger.error(e.getMessage(), e);
+            e.printStackTrace();
+            ProgressManager.setState(Checkpoint.FAILED, e);;
+            Thread.currentThread().interrupt();
         } catch (IOException e) {
             ConnectionProvider.initiate();
 
@@ -250,13 +328,13 @@ public class MsLimsDataProvider implements DataProvider {
     public long getNumberOfSearchesForProject(long aProjectid) {
 
         long lNumberOfSearches = 0;
-
+        PreparedStatement ps = null;
+        ResultSet lResultSet = null;
         try {
             String lQuery = "select count(distinct title) from identification as i, spectrum as s where i.l_spectrumid=s.spectrumid and s.l_projectid=?";
-            PreparedStatement ps = ConnectionProvider.getConnection().prepareStatement(lQuery);
+            ps = ConnectionProvider.getConnection().prepareStatement(lQuery);
             ps.setLong(1, aProjectid);
-
-            ResultSet lResultSet = ps.executeQuery();
+            lResultSet = ps.executeQuery();
             lResultSet.next();
             lNumberOfSearches = lResultSet.getLong(1);
 
@@ -265,8 +343,25 @@ public class MsLimsDataProvider implements DataProvider {
 
             return lNumberOfSearches;
 
-        } catch (SQLException e) {
+        } catch (Exception e) {
             logger.error(e.getMessage(), e);
+            ProgressManager.setState(Checkpoint.FAILED, e);;
+            Thread.currentThread().interrupt();
+        } finally {
+            if (lResultSet != null) {
+                try {
+                    lResultSet.close();
+                } catch (SQLException ex) {
+                    lResultSet = null;
+                }
+            }
+            if (ps != null) {
+                try {
+                    ps.close();
+                } catch (SQLException ex) {
+                    ps = null;
+                }
+            }
         }
         return lNumberOfSearches;
     }
@@ -310,20 +405,20 @@ public class MsLimsDataProvider implements DataProvider {
         for (AnalyzerData lNext : lAnalyzerDataSet) {
 
             String lNextMassAnalyzer = lNext.getAnalyzerFamily().name();
-            if(!lMassAnalyzer.equals("") && !lMassAnalyzer.equals(lNextMassAnalyzer)){
+            if (!lMassAnalyzer.equals("") && !lMassAnalyzer.equals(lNextMassAnalyzer)) {
                 throw new RelimsException(
-                        String.format("There are multiple Mass Analyzers in this project!!\t\t" +
-                                "first:\t%s\tsecond:\t%s", lMassAnalyzer, lNextMassAnalyzer));
+                        String.format("There are multiple Mass Analyzers in this project!!\t\t"
+                        + "first:\t%s\tsecond:\t%s", lMassAnalyzer, lNextMassAnalyzer));
             }
 
             Double lNextPrecursorMassError = lNext.getPrecursorMassError();
-            if(lPrecursorError > 0.0 && lNextPrecursorMassError != lPrecursorError){
+            if (lPrecursorError > 0.0 && lNextPrecursorMassError != lPrecursorError) {
                 throw new RelimsException("There are multiple Mass Analyzers with different Precursor Mass errors for this project!!");
             }
             lPrecursorError = lNextPrecursorMassError;
 
             Double lNextFragmentMassError = lNext.getFragmentMassError();
-            if(lFragmentError > 0.0 && lFragmentError == lNextFragmentMassError){
+            if (lFragmentError > 0.0 && lFragmentError == lNextFragmentMassError) {
                 throw new RelimsException("There are multiple Mass Analyzers with different Fragment Mass errors for this project!!");
             }
             lFragmentError = lNextFragmentMassError;
@@ -339,6 +434,8 @@ public class MsLimsDataProvider implements DataProvider {
         return "MsLimsDataProvider";
     }
 
+    @Override
+    public boolean isProjectValuable(String experimentID) {
+        return true;
+    }
 }
-
-

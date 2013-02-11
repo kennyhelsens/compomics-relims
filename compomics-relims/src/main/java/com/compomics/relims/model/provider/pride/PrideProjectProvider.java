@@ -25,7 +25,7 @@ public class PrideProjectProvider extends ProjectProvider {
         ApplicationContext lContext = ApplicationContextProvider.getInstance().getApplicationContext();
         iPrideService = (ExperimentService) lContext.getBean("experimentService");
     }
-
+   
     public Collection<Long> getAllProjects() {
         if (iExperimentIds == null) {
             Map<String, String> lAllExperimentsMap = iPrideService.findAllExperimentAccessions();

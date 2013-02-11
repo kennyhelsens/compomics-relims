@@ -3,8 +3,9 @@ package com.compomics.relims.model.provider.mslims;
 import com.compomics.mslims.db.accessors.Project;
 import com.compomics.relims.model.provider.ConnectionProvider;
 import com.compomics.relims.model.provider.ProjectProvider;
+import com.compomics.relims.observer.Checkpoint;
+import com.compomics.relims.observer.ProgressManager;
 import com.google.common.collect.Lists;
-
 import java.sql.SQLException;
 import java.util.Collection;
 import java.util.List;
@@ -30,10 +31,11 @@ public class MsLimsProjectProvider extends ProjectProvider {
             }
         } catch (SQLException e) {
             logger.error(e.getMessage(), e);
+            ProgressManager.setState(Checkpoint.FAILED,e);;
+            Thread.currentThread().interrupt();
         }
         return lAllProjectIds;
     }
-
 
     public Collection<Long> getRandomProjects(int lSize) {
         List<Long> lAllProjects = this.getAllProjects();
@@ -45,6 +47,4 @@ public class MsLimsProjectProvider extends ProjectProvider {
         }
         return lRandomProjects;
     }
-
-
 }

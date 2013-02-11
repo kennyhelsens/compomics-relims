@@ -6,13 +6,9 @@ import com.compomics.relims.gui.model.ProjectSourceSelectionModel;
 import com.compomics.relims.gui.model.RelimsPropertiesTableModel;
 import com.compomics.relims.gui.model.StrategySelectionModel;
 import com.compomics.relims.gui.util.Properties;
+import com.compomics.relims.observer.Checkpoint;
+import com.compomics.relims.observer.ProgressManager;
 import com.compomics.util.examples.BareBonesBrowserLaunch;
-import net.jimmc.jshortcut.JShellLink;
-import org.apache.log4j.Logger;
-
-import javax.swing.*;
-import javax.swing.table.TableColumnModel;
-import javax.swing.table.TableModel;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.io.BufferedReader;
@@ -22,6 +18,11 @@ import java.io.InputStreamReader;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.UnknownHostException;
+import javax.swing.*;
+import javax.swing.table.TableColumnModel;
+import javax.swing.table.TableModel;
+import net.jimmc.jshortcut.JShellLink;
+import org.apache.log4j.Logger;
 
 /**
  * The Relims GUI.
@@ -54,7 +55,6 @@ public class RelimsNBGUI extends javax.swing.JFrame {
         logger.debug("initialized GUI");
         logger.debug("setting listeners");
 
-
         TableModel lTableModel = new RelimsPropertiesTableModel();
         this.tblProperties.setModel(lTableModel);
 
@@ -82,8 +82,7 @@ public class RelimsNBGUI extends javax.swing.JFrame {
     /**
      * Check if a newer version of Relims is available.
      *
-     * @param currentVersion the version number of the currently running
-     *                       Relims
+     * @param currentVersion the version number of the currently running Relims
      */
     private static void checkForNewVersion(String currentVersion) {
 
@@ -126,7 +125,7 @@ public class RelimsNBGUI extends javax.swing.JFrame {
                 if (deprecatedOrDeleted && currentVersion.lastIndexOf("beta") == -1) {
                     int option = JOptionPane.showConfirmDialog(null,
                             "A newer version of Relims is available.\n"
-                                    + "Do you want to upgrade?",
+                            + "Do you want to upgrade?",
                             "Upgrade Available",
                             JOptionPane.YES_NO_CANCEL_OPTION);
                     if (option == JOptionPane.YES_OPTION) {
@@ -140,9 +139,13 @@ public class RelimsNBGUI extends javax.swing.JFrame {
         } catch (UnknownHostException e) {
             // ignore exception
         } catch (MalformedURLException e) {
-            e.printStackTrace();
+            logger.error(e.getMessage(), e);
+            ProgressManager.setState(Checkpoint.FAILED,e);;
+            Thread.currentThread().interrupt();
         } catch (IOException e) {
-            e.printStackTrace();
+            logger.error(e.getMessage(), e);
+            ProgressManager.setState(Checkpoint.FAILED,e);;
+            Thread.currentThread().interrupt();
         }
     }
 
@@ -581,16 +584,16 @@ public class RelimsNBGUI extends javax.swing.JFrame {
     }
 
     private void btnStopActionPerformed(ActionEvent aEvt) {
-        if(iRelimsJobStarter != null){
+        if (iRelimsJobStarter != null) {
             iRelimsJobStarter.stop();
         }
     }
 
     private void btnStartActionPerformed(ActionEvent aEvt) {
         iRelimsJobStarter = new RelimsJobStarter();
+        RelimsProperties.logSettings();
         iRelimsJobStarter.start();
     }
-
 
     private class RelimsJobStarter implements Runnable {
 
@@ -632,13 +635,11 @@ public class RelimsNBGUI extends javax.swing.JFrame {
          * Create and display the form
          */
         java.awt.EventQueue.invokeLater(new Runnable() {
-
             public void run() {
                 new RelimsNBGUI();
             }
         });
     }
-
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JPanel backgroundPanel;
     private javax.swing.ButtonGroup btnGroupSource;
