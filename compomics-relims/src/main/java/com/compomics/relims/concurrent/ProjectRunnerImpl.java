@@ -139,8 +139,8 @@ public class ProjectRunnerImpl extends Observable implements ProjectRunner {
     //Prepare and run the searchgui job (different pathways to do so)
     private boolean prepareSearchGUIFromScratch() throws IOException, ConfigurationException {
         spectrumFile = null;
-        searchResultFolder = RelimsProperties.getWorkSpace();
-        RelimsVariableManager.setSearchResultFolder(searchResultFolder.getAbsolutePath().toString());
+        searchResultFolder = new File(RelimsVariableManager.getResultsFolder());
+        //  RelimsVariableManager.setSearchResultFolder(searchResultFolder.getAbsolutePath().toString());
         setDataProvider(projectProvider.getDataProvider());
         // GET THE SPECTRA FILE         
         System.out.println("Aquiring spectra. This stage may take a long period of time...");
@@ -176,7 +176,7 @@ public class ProjectRunnerImpl extends Observable implements ProjectRunner {
                     searchGUIJobBean = new SearchGUIJobBean("" + lProjectid, projectProvider.toString(), relimsProjectBean, spectrumFile);
                     List<File> lSpectrumFileList = new ArrayList<>();
                     lSpectrumFileList.add(spectrumFile);
-                    searchGUIJobBean.setSearchResultFolder(RelimsProperties.getWorkSpace());
+                    searchGUIJobBean.setSearchResultFolder(new File(RelimsVariableManager.getResultsFolder()));
                     searchGUIJobBean.setiName(lProjectid + "");
                     searchGUIJobBean.setiRelimsProjectBean(relimsProjectBean);
                     searchGUIJobBean.setiSpectrumFiles(lSpectrumFileList);
@@ -210,8 +210,9 @@ public class ProjectRunnerImpl extends Observable implements ProjectRunner {
 
     private boolean prepareSearchGUIFromFiles() throws IOException, ConfigurationException {
         try {
-            searchResultFolder = RelimsProperties.getWorkSpace();
-            RelimsVariableManager.setSearchResultFolder(searchResultFolder.getAbsolutePath().toString());
+            searchResultFolder = new File(RelimsVariableManager.getResultsFolder());
+            //  RelimsVariableManager.setResultsFolder(searchResultFolder.getAbsolutePath().toString());
+            // RelimsVariableManager.setSearchResultFolder(searchResultFolder.getAbsolutePath().toString());
             RelimsVariableManager.setProjectID(projectID);
             long lProjectid = projectID;
 
@@ -225,7 +226,7 @@ public class ProjectRunnerImpl extends Observable implements ProjectRunner {
                 searchGUIJobBean = new SearchGUIJobBean("" + lProjectid, projectProvider.toString(), repositoryParametersFile, spectrumFile);
                 List<File> lSpectrumFileList = new ArrayList<>();
                 lSpectrumFileList.add(spectrumFile);
-                searchGUIJobBean.setSearchResultFolder(RelimsProperties.getWorkSpace());
+                searchGUIJobBean.setSearchResultFolder(new File(RelimsVariableManager.getResultsFolder()));
                 searchGUIJobBean.setiName(lProjectid + "");
                 searchGUIJobBean.setiSpectrumFiles(lSpectrumFileList);
                 searchGUIJobBean.setParametersFile(repositoryParametersFile);
@@ -252,8 +253,9 @@ public class ProjectRunnerImpl extends Observable implements ProjectRunner {
 
     private boolean prepareSearchGUIFromClientInput(SearchParameters searchParameters) throws IOException, ConfigurationException {
         try {
-            searchResultFolder = RelimsProperties.getWorkSpace();
-            RelimsVariableManager.setSearchResultFolder(searchResultFolder.getAbsolutePath().toString());
+            searchResultFolder = new File(RelimsVariableManager.getResultsFolder());
+            //  RelimsVariableManager.setResultsFolder(searchResultFolder.getAbsolutePath().toString());
+            // RelimsVariableManager.setSearchResultFolder(searchResultFolder.getAbsolutePath().toString());
             RelimsVariableManager.setProjectID(projectID);
             long lProjectid = projectID;
 
@@ -266,7 +268,7 @@ public class ProjectRunnerImpl extends Observable implements ProjectRunner {
                 searchGUIJobBean = new SearchGUIJobBean("" + lProjectid, projectProvider.toString(), repositoryParametersFile, spectrumFile);
                 List<File> lSpectrumFileList = new ArrayList<>();
                 lSpectrumFileList.add(spectrumFile);
-                searchGUIJobBean.setSearchResultFolder(RelimsProperties.getWorkSpace());
+                searchGUIJobBean.setSearchResultFolder(new File(RelimsVariableManager.getResultsFolder()));
                 searchGUIJobBean.setiName(lProjectid + "");
                 searchGUIJobBean.setiSpectrumFiles(lSpectrumFileList);
                 searchGUIJobBean.setSearchParameters(searchParameters);
@@ -336,7 +338,7 @@ public class ProjectRunnerImpl extends Observable implements ProjectRunner {
                 System.out.println("Finished PeptideShaker for experiment : " + experimentID);
 
                 //Check if the CPS file exists
-                if (new File(searchResultFolder.getAbsolutePath().toString() + "/" + projectID + ".cps").exists()) {
+                if (new File(RelimsVariableManager.getResultsFolder() + "/" + projectID + ".cps").exists()) {
                     //store the files in the local repository, mainly so that pride doesn't need to be re-run next time
                     storeInRepository();
                     return true;
@@ -347,6 +349,10 @@ public class ProjectRunnerImpl extends Observable implements ProjectRunner {
                     } else {
                         RepositoryManager.storeFlagInRepository("FAILED", "pride", new File(RelimsVariableManager.getSearchResultFolder()), projectID);
                         System.out.println("Stored sourcefiles (MGF / SearchParameters) to PRIDE repository");
+                    }
+                    //delete the resultfolder
+                    if (progressManager.getEndState() != Checkpoint.CLASSICRELIMS) {
+                        FileGrabber.deleteResultFolder();
                     }
                     return false;
                 }
@@ -370,8 +376,7 @@ public class ProjectRunnerImpl extends Observable implements ProjectRunner {
                     logger.error("There was no parameters-file in the folder to be run...");
                     System.out.println("There was no parameters-file in the folder to be run...");
                 }
-                //delete the resultfolder
-                FileGrabber.deleteResultFolder();
+
                 return false;
             }
         } else {
@@ -382,17 +387,18 @@ public class ProjectRunnerImpl extends Observable implements ProjectRunner {
 
     @Override
     public String call() {
-        String provider = null;
+        String provider = "mslims";
         boolean runPeptideshaker;
         try {
             //if appendPrideAsapAutomatic = off (selected option in client) --> use only the searchparameters given by
             //the client
+            if (projectProvider.getClass().toString().contains("mslims")) {
+                provider = "mslims";
+            } else {
+                provider = "pride";
+            }
+            RelimsVariableManager.setResultsFolder(RelimsProperties.createWorkSpace(projectID, provider).getAbsolutePath());
             if (RelimsProperties.appendPrideAsapAutomatic()) {
-                if (projectProvider.getClass().toString().contains("mslims")) {
-                    provider = "mslims";
-                } else {
-                    provider = "pride";
-                }
                 if (!RepositoryManager.hasBeenRun(provider, projectID)) {
                     System.out.println("Project was not located in repository. Building from scratch...");
                     runPeptideshaker = prepareSearchGUIFromScratch();
@@ -408,7 +414,9 @@ public class ProjectRunnerImpl extends Observable implements ProjectRunner {
                 preparePeptideShaker();
             } else {
                 System.out.println("Aborting peptideshaker process");
-                FileGrabber.deleteResultFolder();
+                if (progressManager.getEndState() != Checkpoint.CLASSICRELIMS) {
+                    FileGrabber.deleteResultFolder();
+                }
                 return "";
             }
         } catch (Exception e) {
@@ -422,8 +430,11 @@ public class ProjectRunnerImpl extends Observable implements ProjectRunner {
                 progressManager.setState(Checkpoint.FAILED, e);;
             }
         } finally {
-            if (progressManager.getEndState() == Checkpoint.FAILED || progressManager.getEndState() == Checkpoint.PRIDEFAILURE) {
-                FileGrabber.deleteResultFolder();
+            //nullcheck to prevent standalone relims to delete its folders
+            if (RelimsVariableManager.getClassicMode()) {
+                if (progressManager.getEndState() == Checkpoint.FAILED || progressManager.getEndState() == Checkpoint.PRIDEFAILURE) {
+                    FileGrabber.deleteResultFolder();
+                }
             }
         }
         return "";

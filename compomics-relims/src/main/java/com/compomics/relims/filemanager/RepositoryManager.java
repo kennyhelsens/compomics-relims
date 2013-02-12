@@ -129,7 +129,7 @@ public class RepositoryManager {
         File repositoryDirectory;
 
         try {
-            File resultFolder = new File(RelimsVariableManager.getSearchResultFolder());
+            File resultFolder = new File(RelimsVariableManager.getResultsFolder());
 
             if (provider.contains("mslims")) {
                 repositoryDirectory = repositoryMSLIMS;

@@ -106,12 +106,14 @@ public class FileGrabber {
     }
 
     public static void deleteResultFolder() {
-        File resultFolder = RelimsProperties.getWorkSpace();
-        try {
-            FileUtils.deleteDirectory(resultFolder);
-        } catch (FileNotFoundException e) {
-        } catch (IOException ex) {
-            System.out.println("Could not delete the resultsfolder");
+        if (!RelimsVariableManager.getClassicMode()) {
+            File resultFolder = RelimsProperties.getWorkSpace();
+            try {
+                FileUtils.deleteDirectory(resultFolder);
+            } catch (FileNotFoundException e) {
+            } catch (IOException ex) {
+                System.out.println("Could not delete the resultsfolder");
+            }
         }
     }
 
@@ -120,6 +122,10 @@ public class FileGrabber {
         File dir = new File(RelimsProperties.getLocalPrideXMLRepository());
         FileFilter fileFilter = new WildcardFileFilter(wildCardFilterString);
         File[] files = dir.listFiles(fileFilter);
-        return files[0];
+        if (files != null) {
+            return files[0];
+        } else {
+            return null;
+        }
     }
 }

@@ -93,7 +93,7 @@ public class PrideDataProvider implements DataProvider {
                     System.out.println("Could not convert " + aProjectid);
                     ProgressManager.setEndState(Checkpoint.PRIDEFAILURE);
                     return null;
-                }else{
+                } else {
                     return returningFile;
                 }
             }
@@ -113,17 +113,16 @@ public class PrideDataProvider implements DataProvider {
                 System.out.println("Saving mgf file to : " + destinationFile.getAbsolutePath().toString());
                 returningFile = destinationFile;
             } else {
-                System.out.println("Could not locate : " + destinationFile.getAbsolutePath().toString());
+                // System.out.println("Could not locate : " + destinationFile.getAbsolutePath().toString());
                 System.out.println("Returning pride-generated-mgf file");
                 MGFFile = getMGFFromPride(aProjectid);
                 returningFile = MGFFile;
-                FileUtils.copyFile(MGFFile, destinationFile);
             }
         } catch (Exception e) {
             System.out.println("The Pride provider could not load an MGF-file.");
             logger.error(e);
             //e.printStackTrace();
-            ProgressManager.setState(Checkpoint.FAILED, e);
+            ProgressManager.setEndState(Checkpoint.PRIDEFAILURE);
             System.out.println("Pride caused a failure :" + e);
             return returningFile;
         } finally {
@@ -132,6 +131,7 @@ public class PrideDataProvider implements DataProvider {
     }
 
     public File getSpectraForProjectFromPrideXML(long aProjectid) throws IOException {
+
         prideXMLConverter = PrideXMLToMGFConverter.getInstance();
         File destinationFile;
         File MGFFile;
@@ -261,14 +261,20 @@ public class PrideDataProvider implements DataProvider {
         int i = 0;
         int max = 3;
         File MGF = null;
+        File returningFile = null;
         boolean spectraRetrieved = false;
         while (i < max && !spectraRetrieved) {
 
             try {
                 MGF = iPrideService.getSpectrumCacheAsMgfFile("" + aProjectid, true);
                 if (MGF.length() > 0) {
+                    // copy the MGF into the resultfolder to ensure it's not blocked by concurrency
+                    returningFile = new File(RelimsVariableManager.getResultsFolder() + "/" + aProjectid + ".mgf");
+                    FileUtils.copyFile(MGF, returningFile);
                     spectraRetrieved = true;
                 } else {
+                    System.out.println("The provider's MGF is empty...");
+                    progressManager.setState(Checkpoint.PRIDEFAILURE);
                     spectraRetrieved = false;
                 }
                 if (!spectraRetrieved) {
@@ -292,7 +298,7 @@ public class PrideDataProvider implements DataProvider {
             logger.debug(lMessage);
             throw new RelimsException(lMessage);
         }
-        return MGF;
+        return returningFile;
 
     }
 

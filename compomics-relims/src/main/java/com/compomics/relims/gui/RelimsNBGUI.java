@@ -95,7 +95,6 @@ public class RelimsNBGUI extends javax.swing.JFrame {
             if ((java.net.HttpURLConnection) downloadPage.openConnection() != null) {
 
                 int respons = ((java.net.HttpURLConnection) downloadPage.openConnection()).getResponseCode();
-
                 // 404 means that the file no longer exists, which means that
                 // the running version is no longer available for download,
                 // which again means that a never version is available.

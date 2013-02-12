@@ -63,23 +63,23 @@ public class RelimsJob implements Callable, Closable {
      * A ProgressManager to store the state of the project and monitor it
      */
     private ProgressManager progressManager = ProgressManager.getInstance();
-
+    
     public RelimsJob(String aSearchStrategyID, String aProjectProviderID) {
         //Initialize the progressmanager
         ProgressManager.setUp();
-
+        
         try {
             Class lSourceClass = RelimsProperties.getRelimsSourceClass(aProjectProviderID);
             projectProvider = (ProjectProvider) lSourceClass.newInstance();
             DataProvider lDataProvider = projectProvider.getDataProvider();
             predicateManager = new PredicateManager(lDataProvider);
-
+            
         } catch (ClassNotFoundException | InstantiationException | IllegalAccessException e) {
             logger.error(e.getMessage(), e);
             e.printStackTrace();
         }
     }
-
+    
     public RelimsJob(String aSearchStrategyID, String aProjectProviderID, long aProjectID, long aTaskID, int aworkerPort, SearchParameters searchParameters, Boolean usePrideAsa) {
         Thread.setDefaultUncaughtExceptionHandler(new RelimsExceptionHandler());
         progressManager.setUp();
@@ -114,10 +114,10 @@ public class RelimsJob implements Callable, Closable {
             progressManager.setState(Checkpoint.FAILED);;
         }
     }
-
+    
     @Override
     public Object call() {
-
+        
         initThreadExecutor();
         RepositoryManager.initializeRepository();
         Thread.setDefaultUncaughtExceptionHandler(new RelimsExceptionHandler());
@@ -137,27 +137,29 @@ public class RelimsJob implements Callable, Closable {
                 return relimsResultObjects;
             }
         } else {
+            RelimsVariableManager.setClassicMode(true);
             runClassicRelims();
             return lFutures;
         }
-
-
+        
+        
     }
-
+    
     private void runClassicRelims() {
         //Run relims as it used to be ran ...
         Thread.setDefaultUncaughtExceptionHandler(new RelimsExceptionHandler());
+        RelimsVariableManager.setClassicMode(true);
         progressManager.setUp();
         Long lProjectID;
         ProjectListProvider lPreDefinedProjects = projectProvider.getPreDefinedProjects();
-        RelimsVariableManager.setSearchResultFolder(RelimsProperties.getWorkSpace().getAbsolutePath().toString());
+        RelimsVariableManager.setResultsFolder(" ");
         while ((lProjectID = lPreDefinedProjects.nextProjectID()) != -1) {
             try {
                 // Class searchStrategyClass = RelimsProperties.getRelimsSearchStrategyClass(iSearchStrategyID);
                 // SearchStrategy searchStrategy = (SearchStrategy) searchStrategyClass.newInstance();
 
                 ProjectRunner lProjectRunner = new ProjectRunnerImpl();
-
+                
                 lProjectRunner.setProjectID(lProjectID);
                 lProjectRunner.setProjectProvider(projectProvider);
                 lProjectRunner.setPredicateManager(predicateManager);
@@ -165,15 +167,15 @@ public class RelimsJob implements Callable, Closable {
 
                 Observable lObservable = (Observable) lProjectRunner;
                 Future lFuture = executorService.submit(lProjectRunner);
-
+                
                 while (lFuture.isCancelled() == false && lFuture.isDone() == false) {
                     // Do nothing.
                 }
-
+                
                 if (lFuture.isCancelled()) {
                     logger.debug(String.format("Actively cancelled analysis of project %s. Continuing to next project.", lProjectID));
                     initThreadExecutor();
-
+                    
                 } else if (lFuture.isDone()) {
                     logger.debug(String.format("Finished analysis of project %s.", lProjectID));
                 }
@@ -186,9 +188,12 @@ public class RelimsJob implements Callable, Closable {
             }
         }
     }
-
+    
     private Checkpoint runRelims(long lProjectID) {
+        //   RelimsVariableManager.setResultsFolder(RelimsProperties.createWorkSpace().getAbsolutePath().toString());
         Thread.setDefaultUncaughtExceptionHandler(workingServerErrorHandler);
+        RelimsVariableManager.setClassicMode(false);
+        RelimsVariableManager.setResultsFolder(" ");
         try {
             ProjectRunner lProjectRunner = new ProjectRunnerImpl();
             lProjectRunner.setProjectID(lProjectID);
@@ -200,7 +205,7 @@ public class RelimsJob implements Callable, Closable {
                 while (lFuture.isCancelled() == false && lFuture.isDone() == false) {
                     // Do nothing.
                 }
-
+                
                 if (lFuture.isCancelled()) {
                     logger.debug(String.format("Actively cancelled analysis of project %s. Continuing to next project.", lProjectID));
                     initThreadExecutor();
@@ -235,14 +240,14 @@ public class RelimsJob implements Callable, Closable {
             }
             return progressManager.getEndState();
         }
-
+        
     }
-
+    
     private void initThreadExecutor() {
         close();
         executorService = Executors.newSingleThreadExecutor();
     }
-
+    
     @Override
     public void close() {
         if (executorService != null) {

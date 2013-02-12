@@ -46,9 +46,9 @@ public class PeptideShakerJobBean {
         this.projectId = projectId;
         this.searchParameters = searchParameters;
         this.spectra = spectra;
-        this.jobDirectory = RelimsProperties.getWorkSpace();
+        this.jobDirectory = new File(RelimsVariableManager.getResultsFolder());
 //Save the SearchParameters in temporary file with the project...
-        this.identificationFiles = FileGrabber.getIdentificationFiles(jobDirectory.getAbsolutePath().toString());
+        this.identificationFiles = FileGrabber.getIdentificationFiles(RelimsVariableManager.getResultsFolder() + "/");
     }
 
     public PeptideShakerJobBean(long projectId) {

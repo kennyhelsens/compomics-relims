@@ -78,6 +78,7 @@ public class RelimsVariableManager {
     //public RelimsVariableManager(File propFolder)  {
     //this.repositoryFolder = propFolder;
     //}
+    private static boolean classicMode;
 
     public static void initialize() {
         workSpace = RelimsProperties.getWorkSpace().getAbsolutePath();
@@ -200,7 +201,6 @@ public class RelimsVariableManager {
      public static void setWorkerPort(int workerport) {
      RelimsVariableManager.workerport = workerport;
      }*/
-    
     public static void setSearchParameters(SearchParameters searchParameters) {
         RelimsVariableManager.searchParameters = searchParameters;
     }
@@ -215,5 +215,13 @@ public class RelimsVariableManager {
 
     public static List<ConversionError> getConversionErrorList() {
         return RelimsVariableManager.errorList;
+    }
+
+    public static boolean getClassicMode() {
+        return RelimsVariableManager.classicMode;
+    }
+
+    public static void setClassicMode(boolean classicMode) {
+        RelimsVariableManager.classicMode = classicMode;
     }
 }
