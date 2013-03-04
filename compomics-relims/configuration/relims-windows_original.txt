@@ -1,0 +1,143 @@
+searchgui.jar SearchGUI-1.11.0-beta.jar
+searchgui.mods = searchGUI_mods.xml
+searchgui.usermods = searchGUI_usermods.xml
+searchgui.usermods.default = searchGUI_usermods_default.xml
+
+peptideshaker.jar = PeptideShaker-0.19.0-beta.jar
+peptideshaker.heap.memory = 10000m
+peptideshaker.export.fdr = 5.0
+
+
+# define which search engines to use.
+searchgui.engine.omssa = TRUE
+searchgui.engine.tandem = TRUE
+
+# define a list of projects
+# relims.projects.list=814,883,885,897,898,1016,1032,1051,1052,1063,1071,1078,1083,1085,1122,1143,1148,1149,1199,1200,1201,1202,1203,1204,1205,1206,1211,1233,1234,1236,1237,1269,1399,1400,1461,1474,1499,1500,1503,1512,1513
+# relims.projects.list = 2850,3803,1687,2653,1744,8862,8241,10424,1731,3865,2966,3754,9043,8240,8277,8236,9021,15408,10425,9039,15469,1760,3783,1932,8603,10885,8228,8282,8243,17690,3861,12337,8207,9088,8622,8238,8379,8235,3779,8371,8286,15381,8369,8458,8491,9007,9310,9090,8234,1984,8494,8439,10421,8230,15346,8611,3814,9095,15399,8178,2803,8899,8684,1797,9071,3644,9060,2723,9002,3816,15451,2855,8296,8680,8982,9303,8278,2765,8202,8454,8936,8474,9333,10045,2002,8233,3641,9086,9035,15361,1986,8313,2801,10422,8495,3834,1996,3712
+relims.projects.list = 2,3,2811,2850,3803,1687,2653,1744,8862,8241,10424
+#relims.projects.list = 2811,2850,3803,1687
+
+relims.project.redis = FALSE
+relims.project.redis.server = covm01.ugent.be
+relims.project.redis.key = relims:ptmfdr
+
+relims.results_path_tmp_max = 10
+
+# Set the maximum time a Job can take. This also tries to handle hanging threads.
+max.job.time.hours = 0
+max.job.time.minutes = 90
+max.job.time.polling.seconds = 60
+
+
+#
+#db.ip=covm05.ugent.be
+#db.user=kenny
+#db.pass=kenny
+#db.name=projects
+
+db.ip = muppet03.ugent.be
+db.user = kenny
+db.pass = 435743783
+db.name = projects
+
+program.param.max.succes = 50
+program.param.attempt.count = 50
+program.param.spectrum.limit.boolean = TRUE
+program.param.spectrum.limit.count = 1000
+
+# predicate parameters
+predicate.project.spectrum.min = 10000
+predicate.project.peptide.min = 1000
+
+# allowed species:
+#drosphila, human, yeast, mouse, rat, mixture
+predicate.project.species.type = human
+predicate.project.species.size = 100
+
+# allowed instruments: allowed: ft, orbitrap, iontrap, tof, unknown
+predicate.project.instrument = orbitrap,ft,iontrap,tof,unknown
+
+
+
+# Define the possible relims runners
+relims.strategy.ids = modvar,dbvar,straight
+relims.strategy.class.modvar = com.compomics.relims.model.strategy.VarModSearchStrategy
+relims.strategy.class.dbvar = com.compomics.relims.model.strategy.VarDBSearchStrategy
+relims.strategy.class.straight = com.compomics.relims.model.strategy.StraightSearchStrategy
+
+# Define the possible relims sources
+relims.source.ids = mslims,pride
+relims.source.class.mslims = com.compomics.relims.model.provider.mslims.MsLimsProjectProvider
+relims.source.class.pride = com.compomics.relims.model.provider.pride.PrideProjectProvider
+
+
+# Properties for the extra modifications.
+relims.mod.ids = DA
+#relims.mod.ids=DA,HA,NE,5HT
+
+relims.mod.DA.mass = 136.05243
+relims.mod.DA.locationtype = 0
+relims.mod.DA.location = N
+relims.mod.DA.fixed = FALSE
+
+relims.mod.HA.mass = 94.053098
+relims.mod.HA.locationtype = 0
+relims.mod.HA.location = N
+relims.mod.HA.fixed = FALSE
+
+relims.mod.NE.mass = 152.047345
+relims.mod.NE.locationtype = 0
+relims.mod.NE.location = N
+relims.mod.NE.fixed = FALSE
+
+relims.mod.5HT.mass = 159.068414
+relims.mod.5HT.locationtype = 0
+relims.mod.5HT.location = N
+relims.mod.5HT.fixed = FALSE
+
+
+
+searchgui.missed.cleavages = 1
+
+
+# If set to TRUE, the relims will use Pride-asap to make an educated guess for the PTMs that were used in the project
+# If set to FALSE, then relims will run a Query to the Pride database, and guess which PTMs were used from the modified sequences from the PRIDE database.
+relims.asap.automatic.append = TRUE
+
+# Use asap spectrum limit to load limited set of MSMS-Spectra for debuggin ends
+relims.asap.spectrum.limit = TRUE
+relims.asap.spectrum.limit.size = 1000
+
+spectrum_peaks_cache.maximum_cache_size = 200000
+
+# Properties for the extra db searches identifications.
+#relims.db.ids=DB_OR, DB_VAR
+relims.db.ids = DB_OR
+
+relims.db.DB_OR.file = C:\\Users\\Kenneth\\Documents\\NetBeansProjects\\Utils\\PeptideShaker\\peptide-shaker_test_filestest.fasta
+relims.db.DB_OR.name = lincRNA
+#relims.db.DB_OR.file=E:\\db\\nick_tis_mm_20120225_CONCAT.fas
+#relims.db.DB_OR.name=nick_tis
+
+#relims.db.DB_VAR.file=/Users/kennyhelsens/Proteomics/Projects/1201/1201_lincrna/sp_plus_linc_CONCAT.fas
+#relims.db.DB_VAR.name=lincRNA
+
+
+# define the default fasta database
+searchgui.fasta.default = C:\\Users\\Kenneth\\Documents\\NetBeansProjects\\Relims_Clean\\Re_Lims\\peptide-shaker_test_files\\test.fasta
+#searchgui.fasta.default=E:\\db\\sp_plus_linc_concatenated_target_decoy.fasta
+#searchgui.fasta.default=E:\\db\\nick_tis_mm_20120225.fas
+
+workspace.file = C:\\Users\\Kenneth\\Documents\\NetBeansProjects\\RemoteRelims\\data\\Relims
+workspace.userID = default
+
+java.home = C:\\Program Files\\Java\\jre7\\bin\\java.exe
+
+searchgui.directory = C:\\Users\\Kenneth\\Documents\\NetBeansProjects\\Relims_Clean\\Re_Lims\\SearchGUI-1.10.4_windows
+peptideshaker.directory = C:\\Users\\Kenneth\\Documents\\NetBeansProjects\\Relims_Clean\\Re_Lims\\PeptideShaker-0.18.3
+
+peptideshaker.export = C:\\Users\\Kenneth\\Documents\\NetBeansProjects\\RemoteRelims\\data\\Export
+
+relims.asap.results = C:\\Users\\Kenneth\\Documents\\NetBeansProjects\\RemoteRelims\\data\\Export\\mgf
+relims.asap.results.tmp = C:\\Users\\Kenneth\\Documents\\NetBeansProjects\\RemoteRelims\\data\\Export\\mgf\\tmp
