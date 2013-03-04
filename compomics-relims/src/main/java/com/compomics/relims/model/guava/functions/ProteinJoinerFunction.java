@@ -1,7 +1,7 @@
 package com.compomics.relims.model.guava.functions;
 
-import com.compomics.relims.observer.Checkpoint;
-import com.compomics.relims.observer.ProgressManager;
+import com.compomics.relims.manager.progressmanager.Checkpoint;
+import com.compomics.relims.manager.progressmanager.ProgressManager;
 import com.google.common.base.Function;
 import com.google.common.base.Joiner;
 import com.google.common.collect.Lists;

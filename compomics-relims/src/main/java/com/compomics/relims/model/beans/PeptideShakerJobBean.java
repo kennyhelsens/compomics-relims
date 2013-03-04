@@ -2,8 +2,8 @@ package com.compomics.relims.model.beans;
 
 import com.compomics.relims.concurrent.Command;
 import com.compomics.relims.conf.RelimsProperties;
-import com.compomics.relims.filemanager.FileGrabber;
-import com.compomics.relims.conf.RelimsVariableManager;
+import com.compomics.relims.manager.filemanager.FileManager;
+import com.compomics.relims.manager.variablemanager.RelimsVariableManager;
 import org.apache.log4j.Logger;
 
 import java.io.File;
@@ -34,7 +34,7 @@ public class PeptideShakerJobBean {
     private String spectrumFolder = null;
     private final long projectId;
     private StringBuilder PSCommandLine;
-    private File searchParameters;
+    private File searchParametersFile;
     private File spectra;
     private File jobDirectory;
     private List<String> identifications;
@@ -44,11 +44,11 @@ public class PeptideShakerJobBean {
     public PeptideShakerJobBean(long projectId, File searchParameters, File spectra) {
         System.out.println("Collecting PeptideShaker parameters");
         this.projectId = projectId;
-        this.searchParameters = searchParameters;
+        this.searchParametersFile = searchParameters;
         this.spectra = spectra;
         this.jobDirectory = new File(RelimsVariableManager.getResultsFolder());
 //Save the SearchParameters in temporary file with the project...
-        this.identificationFiles = FileGrabber.getIdentificationFiles(RelimsVariableManager.getResultsFolder() + "/");
+        this.identificationFiles = FileManager.getIdentificationFiles(RelimsVariableManager.getResultsFolder() + "/");
     }
 
     public PeptideShakerJobBean(long projectId) {
@@ -104,7 +104,7 @@ public class PeptideShakerJobBean {
     }
 
     public ArrayList<String> getPeptideShakerCommandString() {
-        ArrayList<String> PSCommandLine = new ArrayList<>();
+        ArrayList<String> PSCommandLine = new ArrayList<String>();
 
         //Check if the MGF file is more than 0kb ---> can occur after PRIDE.XML conversion
 
@@ -125,9 +125,15 @@ public class PeptideShakerJobBean {
             PSCommandLine.add(" -spectrum_files ");
             PSCommandLine.add(this.spectra.getAbsolutePath().toString());
             PSCommandLine.add(" -search_params ");
-            PSCommandLine.add(this.searchParameters.getAbsolutePath().toString());
+            PSCommandLine.add(this.searchParametersFile.getAbsolutePath().toString());
             PSCommandLine.add(" -out ");
             PSCommandLine.add(jobDirectory.getAbsolutePath().toString() + "/" + RelimsVariableManager.getProjectId() + ".cps");
+
+            //Requested by Uniprot
+            PSCommandLine.add(" -out_txt_2 ");
+            PSCommandLine.add(jobDirectory.getAbsolutePath().toString());
+
+
             System.err.println("");
             System.err.println("PEPTIDESHAKERCOMMAND");
             for (String aParam : PSCommandLine) {
@@ -144,7 +150,7 @@ public class PeptideShakerJobBean {
 
         psCommandLine = getPeptideShakerCommandString();
         if (psCommandLine != null) {
-            File peptideShakerFolder = new File(RelimsProperties.getPeptideShakerArchivePath().replace(RelimsProperties.getPeptideShakerArchive(), ""));
+            File peptideShakerFolder = new File(RelimsProperties.getPeptideShakerArchivePath()).getParentFile();
             Command.setWorkFolder(peptideShakerFolder);
             StringBuilder totalCommandLine = new StringBuilder();
             for (String aCmd : psCommandLine) {
@@ -156,4 +162,8 @@ public class PeptideShakerJobBean {
             return 1; //System exit value of 1 means a failed process
         }
     }
+    
+    
+    
+    
 }

@@ -1,7 +1,7 @@
 package com.compomics.relims.model.provider;
 
 import com.compomics.relims.conf.RelimsProperties;
-import com.compomics.relims.exception.RelimsException;
+import com.compomics.relims.manager.processmanager.processguard.RelimsException;
 import com.compomics.relims.model.beans.RelimsProjectBean;
 import com.compomics.relims.model.interfaces.DataProvider;
 import com.compomics.relims.model.interfaces.ModificationResolver;

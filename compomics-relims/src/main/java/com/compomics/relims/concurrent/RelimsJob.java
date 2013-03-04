@@ -3,15 +3,17 @@ package com.compomics.relims.concurrent;
 import com.compomics.pride_asa_pipeline.logic.PrideSpectrumAnnotator;
 import com.compomics.pride_asa_pipeline.spring.ApplicationContextProvider;
 import com.compomics.relims.conf.RelimsProperties;
-import com.compomics.relims.exception.RelimsException;
-import com.compomics.relims.exception.RelimsExceptionHandler;
-import com.compomics.relims.conf.RelimsVariableManager;
-import com.compomics.relims.filemanager.RepositoryManager;
+import com.compomics.relims.manager.variablemanager.RelimsVariableManager;
+import com.compomics.relims.manager.processmanager.processguard.RelimsException;
+import com.compomics.relims.manager.processmanager.processguard.RelimsExceptionHandler;
+import com.compomics.relims.manager.filemanager.RepositoryManager;
 import com.compomics.relims.model.guava.predicates.PredicateManager;
 import com.compomics.relims.model.interfaces.*;
 import com.compomics.relims.model.provider.ProjectProvider;
-import com.compomics.relims.observer.Checkpoint;
-import com.compomics.relims.observer.ProgressManager;
+import com.compomics.relims.model.provider.mslims.MsLimsProjectProvider;
+import com.compomics.relims.model.provider.pride.PrideProjectProvider;
+import com.compomics.relims.manager.progressmanager.Checkpoint;
+import com.compomics.relims.manager.progressmanager.ProgressManager;
 import com.compomics.util.experiment.identification.SearchParameters;
 import com.google.common.collect.Lists;
 import java.util.List;
@@ -58,53 +60,47 @@ public class RelimsJob implements Callable, Closable {
     /**
      * Custom exceptionhandler for all relims-errors
      */
-    private RelimsExceptionHandler workingServerErrorHandler;
+    private RelimsExceptionHandler relimsErrorHandler;
     /**
      * A ProgressManager to store the state of the project and monitor it
      */
     private ProgressManager progressManager = ProgressManager.getInstance();
-    
+
     public RelimsJob(String aSearchStrategyID, String aProjectProviderID) {
         //Initialize the progressmanager
         ProgressManager.setUp();
-        
-        try {
-            Class lSourceClass = RelimsProperties.getRelimsSourceClass(aProjectProviderID);
-            projectProvider = (ProjectProvider) lSourceClass.newInstance();
-            DataProvider lDataProvider = projectProvider.getDataProvider();
-            predicateManager = new PredicateManager(lDataProvider);
-            
-        } catch (ClassNotFoundException | InstantiationException | IllegalAccessException e) {
-            logger.error(e.getMessage(), e);
-            e.printStackTrace();
+        if (aProjectProviderID.toUpperCase().contains("PRIDE")) {
+            projectProvider = new PrideProjectProvider();
+        } else {
+            projectProvider = new MsLimsProjectProvider();
         }
+        DataProvider lDataProvider = projectProvider.getDataProvider();
+        predicateManager = new PredicateManager(lDataProvider);
     }
-    
-    public RelimsJob(String aSearchStrategyID, String aProjectProviderID, long aProjectID, long aTaskID, int aworkerPort, SearchParameters searchParameters, Boolean usePrideAsa) {
+
+    public RelimsJob(String aSearchStrategyID, String aProjectProviderID, long aProjectID, long aTaskID, int aworkerPort, SearchParameters searchParameters, Boolean usePrideAsap) {
         Thread.setDefaultUncaughtExceptionHandler(new RelimsExceptionHandler());
         progressManager.setUp();
-        // needed to notify the controller about the task...
+
+        if (aProjectProviderID.toUpperCase().contains("PRIDE")) {
+            projectProvider = new PrideProjectProvider();
+        } else {
+            projectProvider = new MsLimsProjectProvider();
+        }
         //Check if the repository contains the MGF/parameters...
         try {
-            //   RelimsVariableManager.setTaskID(aTaskID);
-            // RelimsVariableManager.setWorkerPort(aworkerPort);
-            RelimsVariableManager.setResultsFolder(RelimsProperties.createWorkSpace(aProjectID, aProjectProviderID.toUpperCase()).getAbsolutePath().toString());
-            // TODO ONLY USE THE SEARCHPARAMETERS FROM MSLIMS/PRIDE FOR NOW?
-            if (usePrideAsa == null) {
-                usePrideAsa = false;
+            if (usePrideAsap == null) {
+                usePrideAsap = false;
             }
-            if (!usePrideAsa) {
+            if (!usePrideAsap) {
                 RelimsProperties.setAppendPrideAsapAutomatic(false);
                 RelimsVariableManager.setSearchParameters(searchParameters);
             }
-//            iSearchStrategyID = aSearchStrategyID;
             this.projectID = aProjectID;
             progressManager.setState(Checkpoint.LOADINGPROVIDERS);
-            Class lSourceClass = RelimsProperties.getRelimsSourceClass(aProjectProviderID);
-            projectProvider = (ProjectProvider) lSourceClass.newInstance();
             DataProvider lDataProvider = projectProvider.getDataProvider();
             predicateManager = new PredicateManager(lDataProvider);
-        } catch (RelimsException | ClassNotFoundException | InstantiationException | IllegalAccessException e) {
+        } catch (RelimsException e) {
             logger.error(e.getMessage(), e);
             e.printStackTrace();
             progressManager.setState(Checkpoint.FAILED, e);;
@@ -114,15 +110,14 @@ public class RelimsJob implements Callable, Closable {
             progressManager.setState(Checkpoint.FAILED);;
         }
     }
-    
+
     @Override
     public Object call() {
-        
+
         initThreadExecutor();
         RepositoryManager.initializeRepository();
         Thread.setDefaultUncaughtExceptionHandler(new RelimsExceptionHandler());
         progressManager.setUp();
-        //Collection<Long> lProjectIDList = iProjectProvider.getAllProjects();
         List<Future> lFutures = Lists.newArrayList();
         Object[] relimsResultObjects = new Object[]{Checkpoint.FAILED, RelimsVariableManager.getSearchParameters()};
         if (this.projectID != -1) {
@@ -141,12 +136,10 @@ public class RelimsJob implements Callable, Closable {
             runClassicRelims();
             return lFutures;
         }
-        
-        
     }
-    
+
     private void runClassicRelims() {
-        //Run relims as it used to be ran ...
+        //Run relims as it used to be run ...
         Thread.setDefaultUncaughtExceptionHandler(new RelimsExceptionHandler());
         RelimsVariableManager.setClassicMode(true);
         progressManager.setUp();
@@ -157,9 +150,7 @@ public class RelimsJob implements Callable, Closable {
             try {
                 // Class searchStrategyClass = RelimsProperties.getRelimsSearchStrategyClass(iSearchStrategyID);
                 // SearchStrategy searchStrategy = (SearchStrategy) searchStrategyClass.newInstance();
-
                 ProjectRunner lProjectRunner = new ProjectRunnerImpl();
-                
                 lProjectRunner.setProjectID(lProjectID);
                 lProjectRunner.setProjectProvider(projectProvider);
                 lProjectRunner.setPredicateManager(predicateManager);
@@ -167,15 +158,15 @@ public class RelimsJob implements Callable, Closable {
 
                 Observable lObservable = (Observable) lProjectRunner;
                 Future lFuture = executorService.submit(lProjectRunner);
-                
+
                 while (lFuture.isCancelled() == false && lFuture.isDone() == false) {
                     // Do nothing.
                 }
-                
+
                 if (lFuture.isCancelled()) {
                     logger.debug(String.format("Actively cancelled analysis of project %s. Continuing to next project.", lProjectID));
                     initThreadExecutor();
-                    
+
                 } else if (lFuture.isDone()) {
                     logger.debug(String.format("Finished analysis of project %s.", lProjectID));
                 }
@@ -188,10 +179,10 @@ public class RelimsJob implements Callable, Closable {
             }
         }
     }
-    
+
     private Checkpoint runRelims(long lProjectID) {
         //   RelimsVariableManager.setResultsFolder(RelimsProperties.createWorkSpace().getAbsolutePath().toString());
-        Thread.setDefaultUncaughtExceptionHandler(workingServerErrorHandler);
+        Thread.setDefaultUncaughtExceptionHandler(relimsErrorHandler);
         RelimsVariableManager.setClassicMode(false);
         RelimsVariableManager.setResultsFolder(" ");
         try {
@@ -205,13 +196,17 @@ public class RelimsJob implements Callable, Closable {
                 while (lFuture.isCancelled() == false && lFuture.isDone() == false) {
                     // Do nothing.
                 }
-                
+
                 if (lFuture.isCancelled()) {
                     logger.debug(String.format("Actively cancelled analysis of project %s. Continuing to next project.", lProjectID));
                     initThreadExecutor();
                     progressManager.setState(Checkpoint.FAILED);;
                 } else if (lFuture.isDone()) {
-                    if (progressManager.getState() == Checkpoint.FAILED) {
+                    if (progressManager.getState() == Checkpoint.FAILED
+                            || progressManager.getState() == Checkpoint.PRIDEFAILURE
+                            || progressManager.getState() == Checkpoint.SEARCHGUIFAILURE
+                            || progressManager.getState() == Checkpoint.PEPTIDESHAKERFAILURE
+                            || progressManager.getState() == Checkpoint.TIMEOUTFAILURE) {
                         logger.debug(String.format("Failed analysis of project %s.", lProjectID));
                     } else {
                         logger.debug(String.format("Finished analysis of project %s.", lProjectID));
@@ -230,9 +225,11 @@ public class RelimsJob implements Callable, Closable {
             // Clean MGF resources after project success
             // in finally block because it can't fail anymore...if it fails, then it's the cleanup...
             try {
+                //cleanup pride
                 PrideSpectrumAnnotator lSpectrumAnnotator;
                 lSpectrumAnnotator = (PrideSpectrumAnnotator) applicationContext.getBean("prideSpectrumAnnotator");
                 lSpectrumAnnotator.clearTmpResources();
+                //TODO cleanup others
             } catch (Exception e) {
                 logger.error("An error occurred during cleanup...");
                 logger.error(e);
@@ -240,14 +237,14 @@ public class RelimsJob implements Callable, Closable {
             }
             return progressManager.getEndState();
         }
-        
+
     }
-    
+
     private void initThreadExecutor() {
         close();
         executorService = Executors.newSingleThreadExecutor();
     }
-    
+
     @Override
     public void close() {
         if (executorService != null) {
@@ -256,13 +253,7 @@ public class RelimsJob implements Callable, Closable {
                 logger.debug("shutting down " + lRunnable.toString());
             }
         }
-        /*
-         // Remove remaining resources
-         applicationContext = ApplicationContextProvider.getInstance().getApplicationContext();
-
-         PrideSpectrumAnnotator lSpectrumAnnotator;
-         lSpectrumAnnotator = (PrideSpectrumAnnotator) applicationContext.getBean("prideSpectrumAnnotator");
-         lSpectrumAnnotator.clearTmpResources();
-         */
+        //TODO : CLEANUP HERE? Remove unnecessary files from repository/results folder
+        //Analyze results perhaps?
     }
 }

@@ -2,19 +2,22 @@ package com.compomics.relims.model.beans;
 
 import com.compomics.relims.concurrent.Command;
 import com.compomics.relims.conf.RelimsProperties;
-import com.compomics.relims.conf.RelimsVariableManager;
-import com.compomics.relims.observer.ProgressManager;
+import com.compomics.relims.manager.variablemanager.RelimsVariableManager;
+import com.compomics.relims.manager.progressmanager.ProgressManager;
 import com.compomics.util.experiment.biology.Enzyme;
 import com.compomics.util.experiment.biology.EnzymeFactory;
 import com.compomics.util.experiment.biology.PTMFactory;
 import com.compomics.util.experiment.identification.SearchParameters;
+import com.compomics.util.experiment.massspectrometry.Charge;
 import com.compomics.util.preferences.ModificationProfile;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.logging.Level;
+import no.uib.jsparklines.data.XYDataPoint;
 import org.apache.commons.configuration.ConfigurationException;
 import org.apache.commons.configuration.PropertiesConfiguration;
 import org.apache.log4j.Logger;
@@ -32,7 +35,7 @@ public class SearchGUIJobBean {
     private String iName = null;
     private RelimsProjectBean iRelimsProjectBean = null;
     private File iSearchResultFolder = null;
-    private List<File> iSpectrumFiles = new ArrayList<>();
+    private List<File> iSpectrumFiles = new ArrayList<File>();
     protected PropertiesConfiguration iSearchGuiConfiguration;
     protected long iTimeStamp;
     private ArrayList<String> searchGUICommandLine;
@@ -55,8 +58,6 @@ public class SearchGUIJobBean {
         } catch (Exception e) {
             logger.error(e.getMessage(), e);
         }
-
-
     }
 
     public SearchGUIJobBean(String aName, String provider, RelimsProjectBean aRelimsProjectBean, List<File> aSpectrumFiles) {
@@ -126,7 +127,7 @@ public class SearchGUIJobBean {
 
     public ArrayList<String> generateCommand() throws IOException, ConfigurationException {
 
-        searchGUICommandLine = new ArrayList<>();
+        searchGUICommandLine = new ArrayList<String>();
 
         //the actual command
         searchGUICommandLine.clear();
@@ -176,14 +177,18 @@ public class SearchGUIJobBean {
         if (searchParametersRepositoryFile.exists()) {
             try {
                 searchParameters = SearchParameters.getIdentificationParameters(searchParametersRepositoryFile);
+                searchParameters.setFastaFile(new File(RelimsProperties.getDefaultSearchDatabase()));
             } catch (FileNotFoundException ex) {
                 java.util.logging.Logger.getLogger(SearchGUIJobBean.class.getName()).log(Level.SEVERE, null, ex);
-            } catch (IOException | ClassNotFoundException ex) {
+            } catch (IOException ex) {
+                java.util.logging.Logger.getLogger(SearchGUIJobBean.class.getName()).log(Level.SEVERE, null, ex);
+            } catch (ClassNotFoundException ex) {
                 java.util.logging.Logger.getLogger(SearchGUIJobBean.class.getName()).log(Level.SEVERE, null, ex);
             }
         } else {
             try {
                 searchParameters = new SearchParameters();// this should be default..;
+                searchParameters.setFastaFile(new File(RelimsProperties.getDefaultSearchDatabase()));
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -237,6 +242,7 @@ public class SearchGUIJobBean {
             //Set the database (fasta)
             searchParameters.setFastaFile(new File(RelimsProperties.getDefaultSearchDatabase()));
             logger.debug(String.format("setting DEFAULT fasta database '%s' to searchgui configuration", RelimsProperties.getDefaultSearchDatabase()));
+            validate(searchParameters);
         }
         System.out.println("Searchparameters were loaded");
         try {
@@ -246,9 +252,97 @@ public class SearchGUIJobBean {
             logger.debug("Loaded parameters...");
         } catch (FileNotFoundException ex) {
             ex.printStackTrace();
-        } catch (IOException | ClassNotFoundException ex) {
+        } catch (IOException ex) {
+            ex.printStackTrace();
+        } catch (ClassNotFoundException ex) {
             ex.printStackTrace();
         }
+    }
+
+    private void validate(SearchParameters searchParameters) {
+        //ENZYME
+        if (searchParameters.getEnzyme() == null) {
+            logger.debug("Enzyme was null!");
+            searchParameters.setEnzyme(enzymeFactory.getEnzyme("Trypsin"));
+        }
+        logger.debug("Using enzyme : " + searchParameters.getEnzyme());
+
+
+        if (searchParameters.getFastaFile() == null) {
+            logger.debug("Fasta was null!");
+            searchParameters.setFastaFile(new File(RelimsProperties.getDefaultSearchDatabase()));
+        }
+        logger.debug("Using Fasta : " + searchParameters.getFastaFile().getName());
+
+
+        if (searchParameters.getFractionMolecularWeightRanges() == null) {
+            logger.debug("Fraction Molecular Weight Range was null!");
+            searchParameters.setFractionMolecularWeightRanges(new HashMap<String, XYDataPoint>());
+        }
+        logger.debug("Using Fraction Molecular Weight Range : " + searchParameters.getFractionMolecularWeightRanges());
+
+
+        if (searchParameters.getFragmentIonAccuracy() == null) {
+            logger.debug("Fragment Ion Accuracy was null");
+            searchParameters.setFragmentIonAccuracy(0.0);
+        }
+        logger.debug("Using Fragment Ion Accuracy : " + searchParameters.getFractionMolecularWeightRanges());
+
+        if (searchParameters.getHitListLength() == null) {
+            logger.debug("Hitlist length was null!");
+            searchParameters.setHitListLength(0);
+        }
+        logger.debug("Using Hitlist length : " + searchParameters.getHitListLength());
+
+        if (searchParameters.getIonSearched1() == null) {
+            logger.debug("Ion 1 was null!");
+            searchParameters.setIonSearched1("");
+        }
+        logger.debug("Using Ion 1 searched : " + searchParameters.getIonSearched1());
+        if (searchParameters.getIonSearched2() == null) {
+            logger.debug("Ion 2 was null!");
+            searchParameters.setIonSearched2("");
+        }
+
+        logger.debug("Using Ion 2 searched : " + searchParameters.getIonSearched2());
+
+        if (searchParameters.getMaxEValue() == null) {
+            logger.debug("Max E-value was null!");
+            searchParameters.setMaxEValue(0.0);
+        }
+
+        logger.debug("Using Max E-value : " + searchParameters.getMaxEValue());
+
+        if (searchParameters.getMaxPeptideLength() == null) {
+            logger.debug("Max peptide length was null!");
+            searchParameters.setMaxPeptideLength(0);
+        }
+
+        logger.debug("Using Max Peptide Length : " + searchParameters.getMaxPeptideLength());
+
+        if (searchParameters.getModificationProfile() == null) {
+            logger.debug("Mod-profile was null!");
+            searchParameters.setModificationProfile(new ModificationProfile());
+        }
+
+        ArrayList<String> modList = searchParameters.getModificationProfile().getAllModifications();
+
+        logger.debug("Using Mod-profile : ");
+        for (String aMod : modList) {
+            logger.debug("Modification : " + aMod);
+        }
+
+        if (searchParameters.getnMissedCleavages() == null) {
+            logger.debug("Missed Cleavages was null!");
+            searchParameters.setnMissedCleavages(0);
+        }
+        logger.debug("Using Missed Cleavages : " + searchParameters.getnMissedCleavages());
+
+        if (searchParameters.getPrecursorAccuracy() == null) {
+            logger.debug("Precursor Accuracy was null!");
+            searchParameters.setPrecursorAccuracy(0.0);
+        }
+        logger.debug("Using Precursor Accuracy : " + searchParameters.getPrecursorAccuracy());
     }
 
     protected void prepare() {
@@ -279,7 +373,9 @@ public class SearchGUIJobBean {
             searchParameters.setFastaFile(new File(RelimsProperties.getDefaultSearchDatabase()));
         } catch (FileNotFoundException ex) {
             ex.printStackTrace();
-        } catch (IOException | ClassNotFoundException ex) {
+        } catch (IOException ex) {
+            ex.printStackTrace();
+        } catch (ClassNotFoundException ex) {
             ex.printStackTrace();
         }
     }
@@ -297,6 +393,5 @@ public class SearchGUIJobBean {
         logger.debug(totalCommandLine.toString());
         System.out.println(totalCommandLine.toString());
         return Command.call(totalCommandLine.toString());
-
     }
 }

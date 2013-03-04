@@ -20,8 +20,8 @@ package com.compomics.relims.conf;
  * License along with this library; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
  */
-import com.compomics.relims.observer.Checkpoint;
-import com.compomics.relims.observer.ProgressManager;
+import com.compomics.relims.manager.progressmanager.Checkpoint;
+import com.compomics.relims.manager.progressmanager.ProgressManager;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.KeyEvent;

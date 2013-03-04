@@ -1,8 +1,8 @@
 package com.compomics.relims.model.provider;
 
 import static com.compomics.relims.conf.RelimsProperties.*;
-import com.compomics.relims.observer.Checkpoint;
-import com.compomics.relims.observer.ProgressManager;
+import com.compomics.relims.manager.progressmanager.Checkpoint;
+import com.compomics.relims.manager.progressmanager.ProgressManager;
 import java.sql.Connection;
 import java.sql.Driver;
 import java.sql.SQLException;

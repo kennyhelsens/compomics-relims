@@ -6,9 +6,9 @@ import com.compomics.mascotdatfile.util.mascot.factory.MascotDatfileFactory;
 import com.compomics.mslims.db.accessors.Datfile;
 import com.compomics.peptizer.util.fileio.ConnectionManager;
 import com.compomics.peptizer.util.iterators.MsLimsIterationUnit;
-import com.compomics.relims.exception.RelimsException;
-import com.compomics.relims.observer.Checkpoint;
-import com.compomics.relims.observer.ProgressManager;
+import com.compomics.relims.manager.processmanager.processguard.RelimsException;
+import com.compomics.relims.manager.progressmanager.Checkpoint;
+import com.compomics.relims.manager.progressmanager.ProgressManager;
 import org.apache.log4j.Logger;
 
 import java.io.IOException;

@@ -4,24 +4,279 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.compomics</groupId>
     <artifactId>compomics-relims</artifactId>
-    <version>0.3.4-beta</version>
     <packaging>jar</packaging>
+    <version>1.0-beta</version>
     <name>compomics-relims</name>
     <url>code.google.com/p/compomics-relims/</url>
+
+    <!-- Licence -->
     <licenses>
         <license>
             <name>The Apache Software License, Version 2.0</name>
-            <url>LICENSE-2.0.txt</url>
+            <url>http://www.apache.org/licenses/LICENSE-2.0</url>
         </license>
     </licenses>
-    <properties>
-        <version.number>0.3.3</version.number>
-    </properties>
+
+
+    <!-- Developers -->
+    <developers>
+        <developer>
+            <email>kenneth.verheggen@ugent.be</email>
+            <id>kenneth</id>
+            <name>Kenneth Verheggen</name>
+            <organization>Computational Omics and Systems Biology Group, VIB Department of Medical Protein Research,
+                UGent, Belgium
+            </organization>
+        </developer>
+        <developer>
+            <email>kenny.helsens@ugent.be</email>
+            <id>kenny</id>
+            <name>Kenny Helsens</name>
+            <organization>Computational Omics and Systems Biology Group, VIB Department of Medical Protein Research,
+                UGent, Belgium
+            </organization>
+        </developer>
+    </developers>
+
+
+    <!-- Build -->
+    <build>
+        <!-- Copy the resources required during building -->
+        
+        <resources>
+            <resource>
+                <directory>src/main/resources</directory>
+                <filtering>true</filtering>
+                <includes>
+                    <include>compomics-relims.properties</include>
+                </includes>
+            </resource>
+            <resource>
+                <directory>src/main/resources</directory>
+                <filtering>false</filtering>
+                <excludes>
+                    <exclude>compomics-relims.properties</exclude>
+                </excludes>
+            </resource>
+        </resources>
+
+        <!-- Extensions -->
+        <extensions>
+            <extension>
+                <groupId>org.apache.maven.wagon</groupId>
+                <artifactId>wagon-ssh</artifactId>
+                <version>1.0-beta-2</version>
+            </extension>
+        </extensions>
+
+        <!-- Plugins -->
+        <plugins>
+            <!-- Compiler plugin -->
+            <plugin>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>2.5</version>
+                <configuration>
+                    <source>1.7</source>
+                    <target>1.7</target>
+                    <showDeprecation>true</showDeprecation>
+                    <debug>true</debug>
+                </configuration>
+            </plugin>
+
+            <!-- Jar plugin -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-jar-plugin</artifactId>
+                <version>2.4</version>
+                <configuration>
+                    <archive>
+                        <manifest>
+                            <addDefaultImplementationEntries>true</addDefaultImplementationEntries>
+                            <addDefaultSpecificationEntries>true</addDefaultSpecificationEntries>
+                            <mainClass>com.compomics.relims.gui.RelimsNBGUI</mainClass>
+                            <addClasspath>true</addClasspath>
+                            <classpathPrefix>lib</classpathPrefix>
+                        </manifest>
+                    </archive>
+                    <outputDirectory>${project.build.directory}/${project.name}-${project.version}
+                    </outputDirectory>
+                </configuration>
+            </plugin>
+
+            <!-- Dependency plugin -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-dependency-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>copy-dependencies</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>copy-dependencies</goal>
+                        </goals>
+                        <configuration>
+                            <outputDirectory>
+                                ${project.build.directory}/${project.name}-${project.version}/lib
+                            </outputDirectory>
+                            <overWriteReleases>true</overWriteReleases>
+                            <overWriteSnapshots>true</overWriteSnapshots>
+                            <excludeTransitive>false</excludeTransitive>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <!-- Resources plugin -->
+            <plugin>
+                <artifactId>maven-resources-plugin</artifactId>
+                <version>2.3</version>
+                <executions>
+                    <!-- Copy main resources to test resources before testing.  -->
+                    <execution>
+                        <id>copy-test-resources</id>
+                        <phase>generate-test-resources</phase>
+                        <goals>
+                            <goal>copy-resources</goal>
+                        </goals>
+                        <configuration>
+                            <overwrite>true</overwrite>
+                            <outputDirectory>src/test/resources</outputDirectory>
+                            <resources>
+                                <resource>
+                                    <directory>src/main/resources</directory>
+                                </resource>
+                            </resources>
+                        </configuration>
+                    </execution>
+
+                    <!-- Copy the resources -->
+                    <execution>
+                        <id>copy-package-resources</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>copy-resources</goal>
+                        </goals>
+                        <configuration>
+                            <outputDirectory>${project.build.directory}/${project.name}-${project.version}/
+                            </outputDirectory>
+                            <resources>
+                                <resource>
+                                    <directory>./</directory>
+                                    <includes>
+                                        <include>resources/</include>
+                                        <include>README.txt</include>
+                                    </includes>
+                                </resource>
+                            </resources>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <!-- Create javadoc on build -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-javadoc-plugin</artifactId>
+                <version>2.6.1</version>
+                <executions>
+                    <execution>
+                        <id>attach-javadocs</id>
+                        <goals>
+                            <goal>jar</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <!-- Pack sources on build -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-source-plugin</artifactId>
+                <version>2.1.1</version>
+                <executions>
+                    <execution>
+                        <id>attach-sources</id>
+                        <phase>verify</phase>
+                        <goals>
+                            <goal>jar-no-fork</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            
+            <!-- Zip the jar file and the dependencies -->
+            <plugin>
+                <artifactId>maven-assembly-plugin</artifactId>
+                <version>2.3</version>
+                <configuration>
+                    <descriptors>
+                        <descriptor>src/main/assembly/zip.xml</descriptor>
+                    </descriptors>
+                    <appendAssemblyId>false</appendAssemblyId>
+                </configuration>
+                <executions>
+                    <execution>
+                        <id>make-assembly</id>
+                        <!-- this is used for inheritance merges -->
+                        <phase>package</phase>
+                        <!-- append to the packaging phase. -->
+                        <goals>
+                            <goal>single</goal>
+                            <!-- goals == mojos -->
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+
+        </plugins>
+    </build>
+
+
+    <!-- Repositores -->
+    <repositories>
+
+        <!-- UGent Genesis Maven 2 repository -->
+        <repository>
+            <id>genesis-maven2-repository</id>
+            <name>Genesis maven2 repository</name>
+            <url>http://genesis.UGent.be/maven2</url>
+            <layout>default</layout>
+        </repository>
+
+        <!-- EBI repository -->
+        <repository>
+            <id>ebi-repo</id>
+            <name>The EBI internal repository</name>
+            <url>http://www.ebi.ac.uk/~maven/m2repo</url>
+            <releases>
+                <enabled>true</enabled>
+            </releases>
+            <snapshots>
+                <enabled>false</enabled>
+            </snapshots>
+        </repository>
+
+        <!-- EBI snapshot repository -->
+        <repository>
+            <id>ebi-snapshot-repo</id>
+            <name>The EBI internal snapshot repository</name>
+            <url>http://www.ebi.ac.uk/~maven/m2repo_snapshots</url>
+            <releases>
+                <enabled>false</enabled>
+            </releases>
+            <snapshots>
+                <enabled>true</enabled>
+            </snapshots>
+        </repository>
+    </repositories>
+
+
+    <!-- Dependencies -->
     <dependencies>
         <dependency>
             <groupId>com.compomics</groupId>
             <artifactId>utilities</artifactId>
-            <version>3.10.54</version>
+            <version>3.11.10</version>
         </dependency>
         <dependency>
             <groupId>com.compomics.acromics</groupId>
@@ -47,8 +302,13 @@
         </dependency>
         <dependency>
             <groupId>com.compomics</groupId>
+            <artifactId>PrideXMLValidator</artifactId>
+            <version>0.3</version>
+        </dependency>
+        <dependency>
+            <groupId>com.compomics</groupId>
             <artifactId>pride-asa-pipeline</artifactId>
-            <version>1.3.1</version>
+            <version>1.3.3</version>
         </dependency>
         <dependency>
             <groupId>com.google.guava</groupId>
@@ -69,7 +329,7 @@
         <dependency>
             <groupId>eu.isas.peptideshaker</groupId>
             <artifactId>PeptideShaker</artifactId>
-            <version>0.19.0.4-beta</version>
+            <version>0.19.1-beta</version>
             <type>jar</type>
         </dependency>
         <dependency>
@@ -102,205 +362,19 @@
         </dependency>
         <dependency>
             <groupId>com.compomics</groupId>
-            <artifactId>PrideXMLValidator</artifactId>
-            <version>1.0-SNAPSHOT</version>
+            <artifactId>remoterelimscontrolserver</artifactId>
+            <version>1.1</version>
             <type>jar</type>
         </dependency>
     </dependencies>
-    <build>
-        <resources>
-            <resource>
-                <directory>src/main/resources/</directory>
-            </resource>
-                   
-                   
-            <resource>
-                <directory>src/main/resources</directory>
-                <filtering>true</filtering>
-                <includes>
-                    <include>**/compomics-relims.properties</include>
-                </includes>
-            </resource>
-            
-            <resource>
-                <directory>src/main/resources</directory>
-                <filtering>false</filtering>
-                <excludes>
-                    <exclude>**/compomics-relims.properties</exclude>
-                </excludes>
-            </resource>
-        </resources> 
 
-        <extensions> 
-            <extension> 
-                <groupId>org.apache.maven.wagon</groupId> 
-                <artifactId>wagon-ssh</artifactId> 
-                <version>2.2</version> 
-            </extension> 
-        </extensions>
-
-        <plugins>
-            <plugin>
-                <artifactId>maven-compiler-plugin</artifactId>
-                <configuration>
-                    <debug>true</debug>
-                    <showDeprecation>true</showDeprecation>
-                    <source>1.7</source>
-                    <target>1.7</target>
-                </configuration>
-            </plugin>
-            <plugin>
-                <artifactId>maven-resources-plugin</artifactId>
-                <version>2.3</version>
-                <executions>
-                    <execution>
-                        <id>copy-resources</id>
-                        <phase>package</phase>
-                        <configuration>
-                            <outputDirectory>${project.build.directory}/${project.artifactId}-${project.version}/
-                            </outputDirectory>
-                            
-                            <resources>
-                                <resource>
-                                    <directory>./</directory>
-                                    <includes>
-                                        <include>resources/</include>
-                                    </includes>
-                                </resource>
-      
-                            </resources>
-                        </configuration>
-                        <goals>
-                            <goal>copy-resources</goal>
-                        </goals>
-                    </execution>
-                    <execution>
-                        <id>copy-resources-to-classes</id>
-                        <phase>compile</phase>
-                        <configuration>
-                            <outputDirectory>${project.build.directory}/classes/</outputDirectory>
-                            <resources>
-                                <resource>
-                                    <directory>./</directory>
-                                    <includes>
-                                        <include>resources/</include>
-                                    </includes>
-                                </resource>
-                            </resources>
-                        </configuration>
-                        <goals>
-                            <goal>copy-resources</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-dependency-plugin</artifactId>
-                <executions>
-                    <execution>
-                        <id>copy-dependencies</id>
-                        <phase>package</phase>
-                        <configuration>
-                            <excludeTransitive>false</excludeTransitive>
-                            <outputDirectory>${project.build.directory}/${project.artifactId}-${project.version}/lib
-                            </outputDirectory>
-                            <overWriteReleases>true</overWriteReleases>
-                            <overWriteSnapshots>true</overWriteSnapshots>
-                        </configuration>
-                        <goals>
-                            <goal>copy-dependencies</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-jar-plugin</artifactId>
-                <configuration>
-                    <archive>
-                        <manifest>
-                            <addClasspath>true</addClasspath>
-                            <addDefaultImplementationEntries>true</addDefaultImplementationEntries>
-                            <addDefaultSpecificationEntries>true</addDefaultSpecificationEntries>
-                            <classpathPrefix>lib</classpathPrefix>
-                            <mainClass>com.compomics.relims.gui.RelimsWrapper</mainClass>
-                        </manifest>
-                    </archive>
-                    <outputDirectory>${project.build.directory}/${project.artifactId}-${project.version}
-                    </outputDirectory>
-                </configuration>
-            </plugin>
-        </plugins>
-    </build>
-    <repositories>
-        <!-- EBI repository -->
-        <repository>
-            <id>ebi-repo</id>
-            <name>The EBI internal repository</name>
-            <url>http://www.ebi.ac.uk/~maven/m2repo</url>
-            <releases>
-                <enabled>true</enabled>
-            </releases>
-            <snapshots>
-                <enabled>false</enabled>
-            </snapshots>
-        </repository>
-
-        <!-- EBI snapshot repository -->
-        <repository>
-            <id>ebi-snapshot-repo</id>
-            <name>The EBI internal snapshot repository</name>
-            <url>http://www.ebi.ac.uk/~maven/m2repo_snapshots</url>
-            <releases>
-                <enabled>false</enabled>
-            </releases>
-            <snapshots>
-                <enabled>true</enabled>
-            </snapshots>
-        </repository>
-
-        <repository>
-            <id>genesis-maven-repository</id>
-            <layout>legacy</layout>
-            <name>Genesis repository</name>
-            <url>http://genesis.UGent.be/maven</url>
-        </repository>
-        <repository>
-            <id>genesis-maven2-repository</id>
-            <layout>default</layout>
-            <name>Genesis maven2 repository</name>
-            <url>http://genesis.UGent.be/maven2</url>
-        </repository>
-    </repositories>
+    <!-- The deployment maven2 repository-->
     <distributionManagement>
         <repository>
             <id>genesis-maven2-repo</id>
             <name>Genesis Maven Repository</name>
             <url>scp://genesis.ugent.be/home/maven/public_html/maven2</url>
         </repository>
-        <snapshotRepository>
-            <id>genesis-maven2-repo</id>
-            <name>Genesis Maven Repository</name>
-            <url>scp://genesis.ugent.be/home/maven/public_html/maven2</url>
-        </snapshotRepository>
     </distributionManagement>
-    <developers>
-        <developer>
-            <email>kenneth.verheggen@ugent.be</email>
-            <id>kenneth</id>
-            <name>Kenneth Verheggen</name>
-            <organization>Computational Omics and Systems Biology Group, VIB Department of Medical Protein Research,
-                UGent, Belgium
-            </organization>
-        </developer>
-        <developer>
-            <email>kenny.helsens@ugent.be</email>
-            <id>kenny</id>
-            <name>Kenny Helsens</name>
-            <organization>Computational Omics and Systems Biology Group, VIB Department of Medical Protein Research,
-                UGent, Belgium
-            </organization>
-        </developer>
-    </developers>
+
 </project>

@@ -1,8 +1,8 @@
 package com.compomics.relims.model.guava.functions;
 
 import static com.compomics.relims.model.guava.functions.SpeciesFinderFunction.SPECIES.*;
-import com.compomics.relims.observer.Checkpoint;
-import com.compomics.relims.observer.ProgressManager;
+import com.compomics.relims.manager.progressmanager.Checkpoint;
+import com.compomics.relims.manager.progressmanager.ProgressManager;
 import com.google.common.base.Function;
 import com.google.common.collect.Sets;
 import java.io.BufferedReader;

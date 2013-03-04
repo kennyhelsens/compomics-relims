@@ -1,9 +1,9 @@
 package com.compomics.relims.concurrent;
 
 import com.compomics.acromics.process.CommandThread;
-import com.compomics.relims.exception.CommandExceptionGuard;
-import com.compomics.relims.observer.Checkpoint;
-import com.compomics.relims.observer.ProgressManager;
+import com.compomics.relims.manager.processmanager.processguard.CommandExceptionGuard;
+import com.compomics.relims.manager.progressmanager.Checkpoint;
+import com.compomics.relims.manager.progressmanager.ProgressManager;
 import java.io.*;
 import org.apache.log4j.Logger;
 
@@ -46,7 +46,6 @@ public class Command {
                 long startTime = System.currentTimeMillis();
                 logger.debug("Running process:\t" + aCommand);
                 Process processus = Runtime.getRuntime().exec(aCommand, null, workFolder);
-
                 errorGuard = new CommandExceptionGuard(processus);
                 boolean errorless = (Boolean) errorGuard.call();
                 if (errorless) {

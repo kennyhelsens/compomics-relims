@@ -1,12 +1,14 @@
 package com.compomics.relims.conf;
 
+import com.compomics.relims.manager.variablemanager.RelimsVariableManager;
 import com.compomics.omssa.xsd.UserMod;
 import com.compomics.pride_asa_pipeline.config.PropertiesConfigurationHolder;
 import com.compomics.relims.concurrent.Command;
-import com.compomics.relims.gui.util.Properties;
+import com.compomics.relims.modes.gui.util.Properties;
 import com.compomics.relims.model.guava.functions.SpeciesFinderFunction;
-import com.compomics.relims.observer.Checkpoint;
-import com.compomics.relims.observer.ProgressManager;
+import com.compomics.relims.manager.progressmanager.Checkpoint;
+import com.compomics.relims.manager.progressmanager.ProgressManager;
+import com.compomics.relims.manager.processmanager.gearbox.enums.PriorityLevel;
 import com.compomics.util.experiment.biology.PTMFactory;
 import com.google.common.base.Function;
 import com.google.common.base.Joiner;
@@ -57,6 +59,16 @@ public class RelimsProperties {
      * the folderSeparator is system-dependent...
      */
     public static final String folderSeparator = System.getProperty("file.separator");
+
+    public static PriorityLevel getPriority() {
+
+        String level = config.getString("process.priority");
+        if (level == null) {
+            return PriorityLevel.BELOW_NORMAL;
+        } else {
+            return PriorityLevel.valueOf(level);
+        }
+    }
     /**
      * the results will all be placed in a user-specific folder. Therefor, all
      * "normal" relims projects that are not run via the automatic setup, will
@@ -77,39 +89,30 @@ public class RelimsProperties {
             if (jarFilePath.startsWith(".")) {
                 jarFilePath = "";
             }
-//            jarFilePath = "E:\\java\\compomics-relims-svn-new\\compomics-relims\\";
 
             File locatorFile = new File(".");
             String path = locatorFile.getAbsolutePath().toString();
             path = path.substring(0, path.length() - 1);
 
             if (lOperatingSystem == Utilities.OS_MAC) {
-                path = path + "configuration/relims-mac.properties";
-                //path = path.replace(":", iFolderSeparator);
-                System.out.println(path);
+                path = path + "configuration" + folderSeparator + "relims-mac.properties";
             } else if (lOperatingSystem == Utilities.OS_WIN_OTHER) {
-                path = path + "configuration/relims-windows.properties";
-                //  path = path.replace(":", iFolderSeparator);
-                System.out.println(path);
+                path = path + "configuration" + folderSeparator + "relims-windows.properties";
             } else {
-                path = path + "configuration/relims.properties";
-                //path = path.replace(":", iFolderSeparator);
-                System.out.println(path);
+                path = path + "configuration" + folderSeparator + "relims.properties";
             }
             lResource = new File(path);
             if (lResource.exists()) {
-                System.out.println("Found relimsproperties");
+                logger.debug("Found relimsproperties");
             }
             config = new PropertiesConfiguration(lResource);
 
-            // Set the workspace for all future Commands to the SearchGUI folder
+            // Set the workspace for all future Commands to the SearchGUI  --> this is overkill...
 
             Command.setWorkFolder(new File(getSearchGuiFolder() + folderSeparator));
 
-
             // Override Pride-Asap properties
             PropertiesConfigurationHolder lAsapProperties = PropertiesConfigurationHolder.getInstance();
-
             lAsapProperties.setProperty("spectrum.limit", config.getBoolean("relims.asap.spectrum.limit"));
             lAsapProperties.setProperty("spectrum.limit.size", config.getInt("relims.asap.spectrum.limit.size"));
             lAsapProperties.setProperty("spectrum_peaks_cache.maximum_cache_size", config.getInt("spectrum_peaks_cache.maximum_cache_size"));
@@ -117,13 +120,11 @@ public class RelimsProperties {
             lAsapProperties.setProperty("results_path_tmp_max", config.getInt("relims.results_path_tmp_max"));
             lAsapProperties.setProperty("results_path", config.getString("relims.asap.results"));
             lAsapProperties.setProperty("results_path_tmp", config.getString("relims.asap.results.tmp"));
-
-
         } catch (Exception e) {
             e.printStackTrace();
             logger.error(e.getMessage(), e);
             progressManager.setState(Checkpoint.FAILED, e);;
-            Thread.currentThread().interrupt();
+            //TODO set default values?
         }
     }
 
@@ -534,5 +535,13 @@ public class RelimsProperties {
 
     public static void setAppendPrideAsapAutomatic(boolean b) {
         config.setProperty("relims.asap.automatic.append", b);
+    }
+
+    public static boolean getPrideDataSource() {
+        return config.getBoolean("relims.asap.datasource.xml");
+    }
+
+    public static void setPrideDataSource(boolean b) {
+        config.setProperty("relims.asap.datasource.xml", b);
     }
 }
