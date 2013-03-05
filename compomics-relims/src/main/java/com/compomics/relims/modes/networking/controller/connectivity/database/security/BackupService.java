@@ -76,7 +76,7 @@ public class BackupService implements Runnable {
             formattedDate = new SimpleDateFormat("yyyy-MM-dd HH-mm-ss").format(date);
             backupdirectory = dbLocation + "/backups/";
             File backupDirectoryFile = new File(backupdirectory);
-            File originalDatabase = new File(RelimsProperties.getTaskDatabaseLocation().getAbsolutePath() + "/" + RelimsProperties.getTaskDatabaseName() + ".db");
+            File originalDatabase = new File(dbLocation + "/" + RelimsProperties.getTaskDatabaseName() + ".db");
             backupDirectoryFile.mkdirs();
             FileUtils.copyFileToDirectory(originalDatabase, backupDirectoryFile);
             System.out.println("Backed up databases to " + backupdirectory);
