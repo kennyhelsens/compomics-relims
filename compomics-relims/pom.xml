@@ -5,7 +5,7 @@
     <groupId>com.compomics</groupId>
     <artifactId>compomics-relims</artifactId>
     <packaging>jar</packaging>
-    <version>1.0-beta</version>
+    <version>0.9-beta</version>
     <name>compomics-relims</name>
     <url>code.google.com/p/compomics-relims/</url>
 
@@ -358,12 +358,6 @@
             <groupId>net.jimmc</groupId>
             <artifactId>jshortcut</artifactId>
             <version>0.4-oberzalek</version>
-            <type>jar</type>
-        </dependency>
-        <dependency>
-            <groupId>com.compomics</groupId>
-            <artifactId>remoterelimscontrolserver</artifactId>
-            <version>1.1</version>
             <type>jar</type>
         </dependency>
     </dependencies>
