@@ -25,6 +25,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Observable;
 import org.apache.commons.configuration.ConfigurationException;
+import org.apache.commons.io.FileUtils;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 
@@ -146,6 +147,8 @@ public class ProjectRunnerImpl extends Observable implements ProjectRunner {
         spectrumFile = dataProvider.getSpectraForProject(projectID);
         if (dataProvider.isProjectValuable("" + projectID) && spectrumFile != null) {
             logger.debug("Aquired spectra !");
+            //copy spectrumFile to the resultfolder to save it on filesystem!
+            FileUtils.copyFile(spectrumFile, new File(searchResultFolder + "/" + projectID + ".mgf"), true);
             logger.debug("Attempting to get modifications");
             setModificationResolver(modificationResolver = projectProvider.getModificationResolver());
             logger.debug("Building projectbean");

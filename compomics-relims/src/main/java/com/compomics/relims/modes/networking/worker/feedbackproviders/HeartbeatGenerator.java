@@ -40,17 +40,22 @@ public class HeartbeatGenerator implements Runnable {
         while (true) {
             try {
                 try {
-                    sock = new Socket(serverHostname, serverPort);
+                    sock = new Socket(RelimsProperties.getControllerIP(), RelimsProperties.getControllerPort());
                     sockInput = new ObjectInputStream(sock.getInputStream());
                     sockOutput = new ObjectOutputStream(sock.getOutputStream());
                 } catch (IOException e) {
                     e.printStackTrace();
                     logger.error("Server could not be reached...Retrying...");
                 }
-
                 try {
                     if (sockOutput == null) {
                         System.out.println("The socket Output is null");
+                        if (RelimsProperties.getControllerIP() == null) {
+                            System.out.println("IP is null");
+                        }
+                        if (RelimsProperties.getControllerPort() == 0) {
+                            System.out.println("IP is null");
+                        }
                     } else {
                         if (ResourceManager.getWorkerPort() != 0) {
                             sockOutput.writeInt(2);
