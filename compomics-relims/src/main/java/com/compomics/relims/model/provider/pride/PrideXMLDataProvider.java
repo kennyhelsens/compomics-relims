@@ -45,7 +45,7 @@ public class PrideXMLDataProvider implements DataProvider {
     
     public PrideXMLDataProvider() {
         ApplicationContext lContext = ApplicationContextProvider.getInstance().getApplicationContext();
-        iPrideService = (PrideXmlExperimentService) lContext.getBean("experimentService");
+        iPrideService = (PrideXmlExperimentService) lContext.getBean("prideXmlExperimentService");
     }
 
     public long getNumberOfSpectraForProject(long aProjectID) {
@@ -127,7 +127,7 @@ public class PrideXMLDataProvider implements DataProvider {
 
         // Do not run PRIDE asap automatic, but retrieve the PTMs from the modified sequence values.
 
-        PrideXmlModificationService lModificationService = (PrideXmlModificationService) lContext.getBean("modificationService");
+        PrideXmlModificationService lModificationService = (PrideXmlModificationService) lContext.getBean("prideXmlModificationService");
         lModificationSet = lModificationService.loadExperimentModifications();
 
         for (Modification lModification : lModificationSet) {
@@ -139,7 +139,7 @@ public class PrideXMLDataProvider implements DataProvider {
             logger.debug("estimating PTMs via Pride-asap");
             // Run PRIDE asap automatic mode
             PrideXmlSpectrumAnnotator lSpectrumAnnotator;
-            lSpectrumAnnotator = (PrideXmlSpectrumAnnotator) lContext.getBean("prideSpectrumAnnotator");
+            lSpectrumAnnotator = (PrideXmlSpectrumAnnotator) lContext.getBean("prideXmlSpectrumAnnotator");
             try {
                 lSpectrumAnnotator.initIdentifications(xmlFile);
                 if (lSpectrumAnnotator.getIdentifications().getCompleteIdentifications().isEmpty()) {

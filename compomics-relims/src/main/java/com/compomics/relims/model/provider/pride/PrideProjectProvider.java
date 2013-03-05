@@ -25,12 +25,15 @@ public class PrideProjectProvider extends ProjectProvider {
         //Read relimsproperties to get the xml or web version  
         if (RelimsProperties.getPrideDataSource()) {
             iDataProvider = new PrideXMLDataProvider();
+            ApplicationContext lContext = ApplicationContextProvider.getInstance().getApplicationContext();
+            iPrideService = (ExperimentService) lContext.getBean("prideXmlExperimentService");
         } else {
             iDataProvider = new PrideDataProvider();
+            ApplicationContext lContext = ApplicationContextProvider.getInstance().getApplicationContext();
+            iPrideService = (ExperimentService) lContext.getBean("dbExperimentService");
         }
 
-        ApplicationContext lContext = ApplicationContextProvider.getInstance().getApplicationContext();
-        iPrideService = (ExperimentService) lContext.getBean("experimentService");
+
     }
 
     public Collection<Long> getAllProjects() {

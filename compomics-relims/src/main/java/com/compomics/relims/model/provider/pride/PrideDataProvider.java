@@ -48,7 +48,7 @@ public class PrideDataProvider implements DataProvider {
 
     public PrideDataProvider() {
         ApplicationContext lContext = ApplicationContextProvider.getInstance().getApplicationContext();
-        iPrideService = (DbExperimentService) lContext.getBean("experimentService");
+        iPrideService = (DbExperimentService) lContext.getBean("dbExperimentService");
     }
 
     public long getNumberOfSpectraForProject(long aProjectID) {
@@ -123,7 +123,7 @@ public class PrideDataProvider implements DataProvider {
 
         // Do not run PRIDE asap automatic, but retrieve the PTMs from the modified sequence values.
 
-        DbModificationService lModificationService = (DbModificationService) lContext.getBean("modificationService");
+        DbModificationService lModificationService = (DbModificationService) lContext.getBean("dbModificationService");
         lModificationSet = lModificationService.loadExperimentModifications(aProjectid);
 
         for (Modification lModification : lModificationSet) {
