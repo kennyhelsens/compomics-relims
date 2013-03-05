@@ -126,16 +126,22 @@ public class PeptideShakerJobBean {
             PSCommandLine.add(this.spectra.getAbsolutePath().toString());
             PSCommandLine.add(" -search_params ");
             PSCommandLine.add(this.searchParametersFile.getAbsolutePath().toString());
-            PSCommandLine.add(" -out ");
-            PSCommandLine.add(jobDirectory.getAbsolutePath().toString() + "/" + RelimsVariableManager.getProjectId() + ".cps");
-
+            if (RelimsProperties.getPeptideShakerCPSOutput()) {
+                PSCommandLine.add(" -out ");
+                PSCommandLine.add(jobDirectory.getAbsolutePath().toString() + "/" + RelimsVariableManager.getProjectId() + ".cps");
+            }
+            //Required for R
+            if (RelimsProperties.getPeptideShakerTSVOutput()) {
+                PSCommandLine.add(" -out_txt_1 ");
+                PSCommandLine.add(jobDirectory.getAbsolutePath().toString());
+            }
             //Requested by Uniprot
-            PSCommandLine.add(" -out_txt_2 ");
-            PSCommandLine.add(jobDirectory.getAbsolutePath().toString());
-
-
+            if (RelimsProperties.getPeptideShakerUniprotOutput()) {
+                PSCommandLine.add(" -out_txt_2 ");
+                PSCommandLine.add(jobDirectory.getAbsolutePath().toString());
+            }
             System.err.println("");
-            System.err.println("PEPTIDESHAKERCOMMAND");
+            logger.debug("PEPTIDESHAKERCOMMAND");
             for (String aParam : PSCommandLine) {
                 System.err.print(aParam);
             }
@@ -162,8 +168,4 @@ public class PeptideShakerJobBean {
             return 1; //System exit value of 1 means a failed process
         }
     }
-    
-    
-    
-    
 }

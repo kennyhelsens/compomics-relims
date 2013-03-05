@@ -1,7 +1,7 @@
 package com.compomics.relims.model.provider.pride;
 
 import com.compomics.omssa.xsd.UserModCollection;
-import com.compomics.pride_asa_pipeline.logic.PrideSpectrumAnnotator;
+import com.compomics.pride_asa_pipeline.logic.PrideXmlSpectrumAnnotator;
 import com.compomics.pride_asa_pipeline.logic.modification.OmssaModificationMarshaller;
 import com.compomics.pride_asa_pipeline.logic.modification.impl.OmssaModificationMarshallerImpl;
 import com.compomics.pride_asa_pipeline.model.AnalyzerData;
@@ -10,7 +10,6 @@ import com.compomics.pride_asa_pipeline.service.PrideXmlExperimentService;
 import com.compomics.pride_asa_pipeline.service.PrideXmlModificationService;
 import com.compomics.pride_asa_pipeline.spring.ApplicationContextProvider;
 import com.compomics.pridexmltomgfconverter.errors.enums.ConversionError;
-import com.compomics.pridexmltomgfconverter.tools.PrideXMLToMGFConverter;
 import com.compomics.relims.conf.RelimsProperties;
 import com.compomics.relims.manager.variablemanager.RelimsVariableManager;
 import com.compomics.relims.manager.processmanager.processguard.RelimsException;
@@ -24,12 +23,10 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.sql.SQLException;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import org.apache.commons.io.FileUtils;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.springframework.context.ApplicationContext;
@@ -43,9 +40,9 @@ public class PrideXMLDataProvider implements DataProvider {
     private PrideXmlExperimentService iPrideService;
     RelimsProjectBean iRelimsProjectBean = new RelimsProjectBean();
     private ProgressManager progressManager = ProgressManager.getInstance();
-    private PrideXMLToMGFConverter prideXMLConverter;
     private FileManager fileGrabber = FileManager.getInstance();
-
+    private ApplicationContext applicationContext = ApplicationContextProvider.getInstance().getApplicationContext();
+    
     public PrideXMLDataProvider() {
         ApplicationContext lContext = ApplicationContextProvider.getInstance().getApplicationContext();
         iPrideService = (PrideXmlExperimentService) lContext.getBean("experimentService");
@@ -79,10 +76,8 @@ public class PrideXMLDataProvider implements DataProvider {
 
     @Override
     public File getSpectraForProject(long aProjectid) throws IOException {
-
-        prideXMLConverter = PrideXMLToMGFConverter.getInstance();
         File destinationFile;
-        File MGFFile;
+        File MGFFile = null;
         File returningFile = null;
         File prideXMLFile;
         List<ConversionError> errorList;
@@ -93,7 +88,7 @@ public class PrideXMLDataProvider implements DataProvider {
             if (prideXMLFile != null) {
                 destinationFile = new File(RelimsVariableManager.getResultsFolder() + "/" + aProjectid + ".mgf");
                 //Save the MGF file in the resultFolder          
-                errorList = prideXMLConverter.extractMGFFromPrideXML(prideXMLFile, destinationFile);
+                errorList = iPrideService.getSpectraAsMgf(prideXMLFile, destinationFile);
                 //Get the errorList and store it in the results later
 
                 RelimsVariableManager.setConversionErrorList(errorList);
@@ -140,17 +135,18 @@ public class PrideXMLDataProvider implements DataProvider {
         }
 
         if (RelimsProperties.appendPrideAsapAutomatic()) {
+            File xmlFile = fileGrabber.getPrideXML(aProjectid);
             logger.debug("estimating PTMs via Pride-asap");
             // Run PRIDE asap automatic mode
-            PrideSpectrumAnnotator lSpectrumAnnotator;
-            lSpectrumAnnotator = (PrideSpectrumAnnotator) lContext.getBean("prideSpectrumAnnotator");
+            PrideXmlSpectrumAnnotator lSpectrumAnnotator;
+            lSpectrumAnnotator = (PrideXmlSpectrumAnnotator) lContext.getBean("prideSpectrumAnnotator");
             try {
-                lSpectrumAnnotator.initIdentifications(String.valueOf(aProjectid));
+                lSpectrumAnnotator.initIdentifications(xmlFile);
                 if (lSpectrumAnnotator.getIdentifications().getCompleteIdentifications().isEmpty()) {
                     //ProgressManager.setState(Checkpoint.PRIDEFAILURE);
                     logger.error("Pride found no usefull identifications.");
                 }
-                lSpectrumAnnotator.annotate(String.valueOf(aProjectid));
+                lSpectrumAnnotator.annotate(xmlFile);
             } catch (Exception e) {
                 System.out.println(e);
                 logger.error(e.getMessage());
@@ -199,6 +195,10 @@ public class PrideXMLDataProvider implements DataProvider {
         }
         logger.setLevel(Level.DEBUG);
         logger.debug("Retrieved searchparameters from remote Pride");
+                        // Clean MGF resources after project success
+                PrideXmlSpectrumAnnotator lSpectrumAnnotator;
+                lSpectrumAnnotator = (PrideXmlSpectrumAnnotator) applicationContext.getBean("prideSpectrumAnnotator");
+                lSpectrumAnnotator.clearTmpResources();
         return lRelimsProjectBean;
     }
 

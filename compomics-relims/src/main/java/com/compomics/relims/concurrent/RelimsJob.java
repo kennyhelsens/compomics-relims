@@ -170,10 +170,7 @@ public class RelimsJob implements Callable, Closable {
                 } else if (lFuture.isDone()) {
                     logger.debug(String.format("Finished analysis of project %s.", lProjectID));
                 }
-                // Clean MGF resources after project success
-                PrideSpectrumAnnotator lSpectrumAnnotator;
-                lSpectrumAnnotator = (PrideSpectrumAnnotator) applicationContext.getBean("prideSpectrumAnnotator");
-                lSpectrumAnnotator.clearTmpResources();
+
             } catch (Exception e) {
                 logger.error(e.getMessage(), e);
             }

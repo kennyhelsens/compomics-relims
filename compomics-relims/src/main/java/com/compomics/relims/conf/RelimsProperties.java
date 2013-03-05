@@ -43,6 +43,7 @@ public class RelimsProperties {
      * config stores the configurations from the file
      */
     private static PropertiesConfiguration config;
+    private static String prefix;
     //TODO : not sure if these searchguiproperties should stay...they are called in a different manner now
     private static PropertiesConfiguration searchGUIPropertiesConfiguration;
     /**
@@ -69,6 +70,43 @@ public class RelimsProperties {
             return PriorityLevel.valueOf(level);
         }
     }
+
+    public static int getBackupInterval() {
+        return config.getInt("relims.networking.db.backupInterval");
+    }
+
+    public static int getMaxBackups() {
+        return config.getInt("relims.networking.db.maxBackups");
+    }
+
+    public static String getTaskDatabaseFramework() {
+        return config.getString("relims.networking.db.framework");
+    }
+
+    public static void setDbPrefix(String dbName) {
+        RelimsProperties.prefix = dbName;
+    }
+
+    public static String getPassword() {
+        return config.getString("workspace.password");
+    }
+
+    public static String getDbPrefix() {
+        if (getTaskDatabaseDriver().toLowerCase().contains("derby")) {
+            return getTaskDatabaseName() + ".";
+
+        } else {
+            return "";
+        }
+    }
+
+    public static File getConfigFolder() {
+        return RelimsProperties.configFolder;
+    }
+
+    public static void setConfigFolder(String location) {
+        RelimsProperties.configFolder = new File(location);
+    }
     /**
      * the results will all be placed in a user-specific folder. Therefor, all
      * "normal" relims projects that are not run via the automatic setup, will
@@ -81,7 +119,7 @@ public class RelimsProperties {
     private static ProgressManager progressManager = ProgressManager.getInstance();
     // -------------------------- STATIC BLOCKS --------------------------
 
-    static {
+    public static void initialize() {
         try {
             File lResource;
             int lOperatingSystem = Utilities.getOperatingSystem();
@@ -95,17 +133,19 @@ public class RelimsProperties {
             path = path.substring(0, path.length() - 1);
 
             if (lOperatingSystem == Utilities.OS_MAC) {
-                path = path + "configuration" + folderSeparator + "relims-mac.properties";
+                path = path + "resources" + folderSeparator + "conf" + folderSeparator + "relims-mac.properties";
             } else if (lOperatingSystem == Utilities.OS_WIN_OTHER) {
-                path = path + "configuration" + folderSeparator + "relims-windows.properties";
+                path = path + "resources" + folderSeparator + "conf" + folderSeparator + "relims-windows.properties";
             } else {
-                path = path + "configuration" + folderSeparator + "relims.properties";
+                path = path + "resources" + folderSeparator + "conf" + folderSeparator + "relims.properties";
             }
             lResource = new File(path);
             if (lResource.exists()) {
                 logger.debug("Found relimsproperties");
+                config = new PropertiesConfiguration(lResource);
+                configFolder = new File(lResource.getParent());
             }
-            config = new PropertiesConfiguration(lResource);
+
 
             // Set the workspace for all future Commands to the SearchGUI  --> this is overkill...
 
@@ -433,14 +473,6 @@ public class RelimsProperties {
         }
     }
 
-    public static String getControllerIP() {
-        return config.getString("remote.relims.controller.ip");
-    }
-
-    public static int getControllerPort() {
-        return config.getInt("remote.relims.controller.port");
-    }
-
     public static String getDatabaseFilename(String aDbVarID) {
         return config.getString("relims.db." + aDbVarID + ".file");
     }
@@ -544,4 +576,67 @@ public class RelimsProperties {
     public static void setPrideDataSource(boolean b) {
         config.setProperty("relims.asap.datasource.xml", b);
     }
+
+    public static String getTaskDatabaseName() {
+        return config.getString("relims.networking.db.name");
+    }
+
+    public static String getTaskDatabasePassword() {
+        return config.getString("relims.networking.db.password");
+    }
+
+    public static File getTaskDatabaseLocation() {
+        String location = config.getString("relims.networking.db.location");
+        return new File(location);
+    }
+
+    public static String getTaskDatabaseProtocol() {
+        return config.getString("relims.networking.db.protocol");
+    }
+
+    public static String getTaskDatabaseDriver() {
+        return config.getString("relims.networking.db.driver");
+    }
+
+    public static int getTaskDatabaseMaxClients() {
+        try {
+            return Integer.parseInt(config.getString("relims.networking.db.maxWaitingClients"));
+        } catch (NumberFormatException ex) {
+            return 100;
+        }
+    }
+
+    public static String getControllerIP() {
+        return config.getString("relims.networking.controller.IP");
+    }
+
+    public static boolean getPeptideShakerCPSOutput() {
+        return config.getBoolean("peptideshaker.export.cps");
+    }
+
+  public static boolean getPeptideShakerTSVOutput() {
+        return config.getBoolean("peptideshaker.export.tsv");
+    }
+
+   public static boolean getPeptideShakerUniprotOutput() {
+        return config.getBoolean("peptideshaker.export.uniprot");
+    }
+
+    public static int getControllerPort() {
+        try {
+            return Integer.parseInt(config.getString("relims.networking.controller.port"));
+        } catch (NumberFormatException ex) {
+            return 6789;
+        }
+    }
+
+    public static int getWorkerPort() {
+        try {
+            return Integer.parseInt(config.getString("relims.networking.worker.port"));
+        } catch (NumberFormatException ex) {
+            return 11554;
+        }
+
+    }
+    private static File configFolder;
 }

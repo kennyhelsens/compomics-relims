@@ -2,6 +2,7 @@ package com.compomics.relims.model.provider.pride;
 
 import com.compomics.omssa.xsd.UserModCollection;
 import com.compomics.pride_asa_pipeline.logic.PrideSpectrumAnnotator;
+import com.compomics.pride_asa_pipeline.logic.PrideXmlSpectrumAnnotator;
 import com.compomics.pride_asa_pipeline.logic.modification.OmssaModificationMarshaller;
 import com.compomics.pride_asa_pipeline.logic.modification.impl.OmssaModificationMarshallerImpl;
 import com.compomics.pride_asa_pipeline.model.AnalyzerData;
@@ -43,6 +44,7 @@ public class PrideDataProvider implements DataProvider {
     private ProgressManager progressManager = ProgressManager.getInstance();
     private PrideXMLToMGFConverter prideXMLConverter;
     private FileManager fileGrabber = FileManager.getInstance();
+    private ApplicationContext applicationContext = ApplicationContextProvider.getInstance().getApplicationContext();
 
     public PrideDataProvider() {
         ApplicationContext lContext = ApplicationContextProvider.getInstance().getApplicationContext();
@@ -188,6 +190,9 @@ public class PrideDataProvider implements DataProvider {
         }
         logger.setLevel(Level.DEBUG);
         logger.debug("Retrieved searchparameters from remote Pride");
+        PrideSpectrumAnnotator lSpectrumAnnotator;
+        lSpectrumAnnotator = (PrideSpectrumAnnotator) applicationContext.getBean("prideSpectrumAnnotator");
+        lSpectrumAnnotator.clearTmpResources();
         return lRelimsProjectBean;
     }
 
@@ -195,17 +200,13 @@ public class PrideDataProvider implements DataProvider {
         // Try maximum three times to get the spectra. Otherwise fail.
         int i = 0;
         int max = 3;
-        File MGF = null;
-        File returningFile = null;
+        File MGFFile = new File(RelimsVariableManager.getResultsFolder() + "/" + aProjectid + ".mgf");
         boolean spectraRetrieved = false;
         while (i < max && !spectraRetrieved) {
             try {
                 logger.debug("Getting mgf from pride: attempt " + i + "from " + max);
-                MGF = iPrideService.getSpectraAsMgfFile("" + aProjectid, true);
-                if (MGF.length() > 0) {
-                    // copy the MGF into the resultfolder to ensure it's not blocked by concurrency
-                    returningFile = new File(RelimsVariableManager.getResultsFolder() + "/" + aProjectid + ".mgf");
-                    FileUtils.copyFile(MGF, returningFile);
+                iPrideService.getSpectraAsMgfFile("" + aProjectid, MGFFile, true);
+                if (MGFFile.length() > 0) {
                     spectraRetrieved = true;
                     logger.debug("Succeeded in retrieving MGF file from pride");
                 } else {
@@ -217,7 +218,6 @@ public class PrideDataProvider implements DataProvider {
                     // Hacky code, otherwise we cannot catch the SQLException ...
                     throw new SQLException("Error retrieving data from database");
                 }
-
             } catch (Exception e) {
                 if (e instanceof SQLException) {
                     logger.error(String.format("Encountered sqlexception while loading spectrum from Pride (attempt %s/%s)", (i + 1), 3));
@@ -238,7 +238,7 @@ public class PrideDataProvider implements DataProvider {
             logger.debug(lMessage);
             throw new RelimsException(lMessage);
         }
-        return returningFile;
+        return MGFFile;
 
     }
 
