@@ -87,9 +87,7 @@ public class HeartbeatGenerator implements Runnable {
     @Override
     public void run() {
         try {
-            String hostname = serverHostname;
-            int port = serverPort;
-            HeartbeatGenerator client = new HeartbeatGenerator(hostname, port, data);
+            HeartbeatGenerator client = new HeartbeatGenerator(RelimsProperties.getControllerIP(), RelimsProperties.getControllerPort(), data);
             client.sendHeartbeat();
         } catch (NullPointerException ex) {
         } catch (IOException ex) {
