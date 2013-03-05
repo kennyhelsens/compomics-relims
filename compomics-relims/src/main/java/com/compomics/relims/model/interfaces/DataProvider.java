@@ -27,4 +27,6 @@ public interface DataProvider {
     public RelimsProjectBean buildProjectBean(long aProjectid);
 
     public boolean isProjectValuable(String ExperimentID);
+
+    public void clearResources();
 }

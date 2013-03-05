@@ -438,4 +438,10 @@ public class MsLimsDataProvider implements DataProvider {
     public boolean isProjectValuable(String experimentID) {
         return true;
     }
+    
+    
+    @Override
+    public void clearResources() {
+        //TODO code for cleanup operations
+    }
 }

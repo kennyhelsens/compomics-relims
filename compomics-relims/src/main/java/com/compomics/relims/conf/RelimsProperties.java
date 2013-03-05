@@ -160,6 +160,7 @@ public class RelimsProperties {
             lAsapProperties.setProperty("results_path_tmp_max", config.getInt("relims.results_path_tmp_max"));
             lAsapProperties.setProperty("results_path", config.getString("relims.asap.results"));
             lAsapProperties.setProperty("results_path_tmp", config.getString("relims.asap.results.tmp"));
+            
         } catch (Exception e) {
             e.printStackTrace();
             logger.error(e.getMessage(), e);

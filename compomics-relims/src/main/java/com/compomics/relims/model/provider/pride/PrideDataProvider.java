@@ -284,4 +284,9 @@ public class PrideDataProvider implements DataProvider {
             }
         }
     }
+
+    @Override
+    public void clearResources() {
+        //TODO code for cleanup operations
+    }
 }

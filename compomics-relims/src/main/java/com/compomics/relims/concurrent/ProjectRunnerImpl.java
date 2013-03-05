@@ -200,6 +200,7 @@ public class ProjectRunnerImpl extends Observable implements ProjectRunner {
                 logger.error(e.getCause());
                 progressManager.setState(Checkpoint.FAILED, e);
             } finally {
+                dataProvider.clearResources();
                 return true;
             }
         } else {

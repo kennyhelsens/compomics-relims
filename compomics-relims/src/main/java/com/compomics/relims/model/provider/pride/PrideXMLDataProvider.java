@@ -42,12 +42,17 @@ public class PrideXMLDataProvider implements DataProvider {
     private ProgressManager progressManager = ProgressManager.getInstance();
     private FileManager fileGrabber = FileManager.getInstance();
     private ApplicationContext applicationContext = ApplicationContextProvider.getInstance().getApplicationContext();
-    
+    private PrideXmlSpectrumAnnotator lSpectrumAnnotator;
+
     public PrideXMLDataProvider() {
         ApplicationContext lContext = ApplicationContextProvider.getInstance().getApplicationContext();
         iPrideService = (PrideXmlExperimentService) lContext.getBean("prideXmlExperimentService");
     }
 
+    public void clearResources(){
+         lSpectrumAnnotator.clearTmpResources();
+    }
+    
     public long getNumberOfSpectraForProject(long aProjectID) {
         return iPrideService.getNumberOfSpectra();
     }
@@ -116,36 +121,47 @@ public class PrideXMLDataProvider implements DataProvider {
         logger.debug(String.format("retrieving searchparameters and modifications for project %s", aProjectid));
         logger.debug("warning, if this is the first time the project is run, it might take a considerable amount of time to retrieve the suggested searchparameters...");
         logger.setLevel(Level.ERROR);
+
+
         ApplicationContext lContext = ApplicationContextProvider.getInstance().getApplicationContext();
 
         RelimsProjectBean lRelimsProjectBean = new RelimsProjectBean();
-        lRelimsProjectBean.setProjectID((int) aProjectid);
-
-        Set<Modification> lModificationSet = Sets.newHashSet();
-
-        logger.debug("estimating PTMs via inspecting the modified_sequence values of the PSMs");
-
-        // Do not run PRIDE asap automatic, but retrieve the PTMs from the modified sequence values.
-
-        PrideXmlModificationService lModificationService = (PrideXmlModificationService) lContext.getBean("prideXmlModificationService");
-        lModificationSet = lModificationService.loadExperimentModifications();
-
-        for (Modification lModification : lModificationSet) {
-            logger.debug(String.format("Resolved PTM '%s' with mass '%f' from modified sequence", lModification.getName(), lModification.getMassShift()));
-        }
 
         if (RelimsProperties.appendPrideAsapAutomatic()) {
             File xmlFile = fileGrabber.getPrideXML(aProjectid);
             logger.debug("estimating PTMs via Pride-asap");
             // Run PRIDE asap automatic mode
-            PrideXmlSpectrumAnnotator lSpectrumAnnotator;
+        
             lSpectrumAnnotator = (PrideXmlSpectrumAnnotator) lContext.getBean("prideXmlSpectrumAnnotator");
+            PrideXmlModificationService lModificationService = (PrideXmlModificationService) lContext.getBean("prideXmlModificationService");
+
+
+            lRelimsProjectBean.setProjectID((int) aProjectid);
+
+            Set<Modification> lModificationSet = Sets.newHashSet();
+
+            logger.debug("estimating PTMs via inspecting the modified_sequence values of the PSMs");
+
+            // Do not run PRIDE asap automatic, but retrieve the PTMs from the modified sequence values.
+
+
+
+
+
             try {
                 lSpectrumAnnotator.initIdentifications(xmlFile);
+
                 if (lSpectrumAnnotator.getIdentifications().getCompleteIdentifications().isEmpty()) {
                     //ProgressManager.setState(Checkpoint.PRIDEFAILURE);
                     logger.error("Pride found no usefull identifications.");
                 }
+
+                for (Modification lModification : lModificationSet) {
+                    logger.debug(String.format("Resolved PTM '%s' with mass '%f' from modified sequence", lModification.getName(), lModification.getMassShift()));
+                }
+                lModificationSet = lModificationService.loadExperimentModifications();
+
+
                 lSpectrumAnnotator.annotate(xmlFile);
             } catch (Exception e) {
                 System.out.println(e);
@@ -195,10 +211,10 @@ public class PrideXMLDataProvider implements DataProvider {
         }
         logger.setLevel(Level.DEBUG);
         logger.debug("Retrieved searchparameters from remote Pride");
-                        // Clean MGF resources after project success
-                PrideXmlSpectrumAnnotator lSpectrumAnnotator;
-                lSpectrumAnnotator = (PrideXmlSpectrumAnnotator) applicationContext.getBean("prideSpectrumAnnotator");
-                lSpectrumAnnotator.clearTmpResources();
+        // Clean MGF resources after project success
+        PrideXmlSpectrumAnnotator lSpectrumAnnotator;
+        lSpectrumAnnotator = (PrideXmlSpectrumAnnotator) applicationContext.getBean("prideXmlSpectrumAnnotator");
+       
         return lRelimsProjectBean;
     }
 
