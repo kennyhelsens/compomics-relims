@@ -58,15 +58,16 @@ class TaskHandler implements Runnable {
                         taskRunner.launch();
                     } catch (Exception e) {
                         TaskReciever.locked = false;
-                        e.printStackTrace();
                     } finally {
                         //close input?
                     }
                 }
             } catch (EOFException eof) {
-                logger.error(eof);
+                logger.debug("Error : " + eof);
+                eof.printStackTrace();
             } catch (IOException ex) {
-                logger.error(ex);
+                logger.debug("Error : " + ex);
+                ex.printStackTrace();
             } catch (ClassNotFoundException ex) {
                 if (!ex.toString().contains("Connection reset")) {
                     ex.printStackTrace();

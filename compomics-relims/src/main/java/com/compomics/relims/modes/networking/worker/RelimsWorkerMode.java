@@ -26,8 +26,11 @@ public class RelimsWorkerMode {
     public static Map<String, Object> cliArgumentMap = new HashMap<String, Object>();
 
     public static void main(String[] args) {
-        Logger.getRootLogger().setLevel(Level.ERROR);
+
         RelimsProperties.initialize();
+        if (RelimsProperties.getDebugMode()) {
+            Logger.getRootLogger().setLevel(Level.ERROR);
+        }
         try {
             workerPort = RelimsProperties.getWorkerPort();
             for (int i = 0; i < args.length; i++) {

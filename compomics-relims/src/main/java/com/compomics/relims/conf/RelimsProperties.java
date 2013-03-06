@@ -71,6 +71,10 @@ public class RelimsProperties {
         }
     }
 
+    public static boolean getDebugMode(){
+        return config.getBoolean("relims.debugmode");
+    }
+    
     public static int getBackupInterval() {
         return config.getInt("relims.networking.db.backupInterval");
     }

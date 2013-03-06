@@ -20,8 +20,10 @@ public class RelimsClientMode {
     private final static Logger logger = Logger.getLogger(MainClientGUI.class);
 
     public static void main(String args[]) {
-             Logger.getRootLogger().setLevel(Level.ERROR);
-         RelimsProperties.initialize();
+        RelimsProperties.initialize();
+        if (RelimsProperties.getDebugMode()) {
+            Logger.getRootLogger().setLevel(Level.ERROR);
+        }
 //        ClientLoginGUI cLGui = new ClientLoginGUI();
         String intermediateClient = RelimsProperties.getUserID();
         MainClientGUI gui = new MainClientGUI(intermediateClient);

@@ -27,8 +27,10 @@ public class RelimsControllerMode {
     private static ExecutorService bootingService;
 
     public static void main(String[] args) {
-        Logger.getRootLogger().setLevel(Level.ERROR);
         RelimsProperties.initialize();
+        if (RelimsProperties.getDebugMode()) {
+            Logger.getRootLogger().setLevel(Level.ERROR);
+        }
         dds = DatabaseService.getInstance();
         bs = BackupService.getInstance();
         classLogger = Logger.getLogger(RelimsControllerMode.class);
