@@ -226,8 +226,11 @@ public class SearchGUIJobBean {
             // Set other parameters (defaults)
 
             try {
-                File enzymesFile = new File(RelimsProperties.getSearchGuiConfFolder() + "/searchGUI_enzymes.xml");
+                File enzymesFile = new File(RelimsProperties.getSearchGuiFolder() + "/resources/conf/searchGUI_enzymes.xml");
                 enzymeFactory.importEnzymes(enzymesFile);
+                if (iRelimsProjectBean.getEnzyme() != null) {
+                    Enzyme enzyme = iRelimsProjectBean.getEnzyme();
+                }
                 Enzyme enzyme = enzymeFactory.getEnzyme("Trypsin");
                 searchParameters.setEnzyme(enzyme);
             } catch (Exception ex) {

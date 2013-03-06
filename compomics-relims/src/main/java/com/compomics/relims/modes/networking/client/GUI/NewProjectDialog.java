@@ -40,7 +40,7 @@ public class NewProjectDialog extends javax.swing.JDialog {
     private SearchParameters searchParameters;
     private javax.swing.JRadioButton selectedStrategy;
     private javax.swing.JRadioButton selectedSource;
-    String currentUser = "default";
+    String currentUser = "admin";
     Boolean includeFinishedProjects = true;
     public static final String MODIFICATION_SEPARATOR = "//";
     public static SearchParameters loadedSearchParameters;
@@ -48,8 +48,8 @@ public class NewProjectDialog extends javax.swing.JDialog {
     private String controllerIP = null;
 
     public NewProjectDialog(String currentUser, String IP, int port, String source, String strategy) {
-        this.port = port;
-        this.controllerIP = IP;
+        this.port = RelimsProperties.getControllerPort();
+        this.controllerIP = RelimsProperties.getControllerIP();
         currentUser = currentUser;
         initComponents();
         this.setTitle("New Taskcontainer");
@@ -760,16 +760,13 @@ public class NewProjectDialog extends javax.swing.JDialog {
             //TODO MOVE TO LOGIN
             //  String IP = IPfield.getText();
             //   String port = portField.getText();
-            int ports = 6789;
-
+       
             //making relimsJob object
 
             boolean allowToPass = true;
 
             for (int i = 0; i < rightModel.getSize(); i++) {
-
                 ProjectListEntry aProject = (ProjectListEntry) rightModel.elementAt(i);
-
                 tasksForServer.addJob(aProject.getProjectIDAsString(), aProject.getProjectTitle());
                 if (aProject.getProjectIDAsString().length() > 50) {
                     allowToPass = false;
@@ -780,13 +777,14 @@ public class NewProjectDialog extends javax.swing.JDialog {
             }
 
             if (allowToPass) {
-                ServerConnector connector = new ServerConnector();
+                ServerConnector connector = new ServerConnector();   
                 connector.setConnectionParameters(controllerIP, port);
                 try {
                     Map<Long, Long> generatedTaskIDs = connector.SendToServer(tasksForServer);
                     logger.debug("Recieved TaskIDs from controlserver...");
                     connector.resetConnectionParameters();
                 } catch (IOException ex) {
+                    ex.printStackTrace();
                     connector.resetConnectionParameters();
                 }
             } else {

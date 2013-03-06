@@ -27,6 +27,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import org.apache.commons.io.FileUtils;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.springframework.context.ApplicationContext;
@@ -49,10 +50,10 @@ public class PrideXMLDataProvider implements DataProvider {
         iPrideService = (PrideXmlExperimentService) lContext.getBean("prideXmlExperimentService");
     }
 
-    public void clearResources(){
-         lSpectrumAnnotator.clearTmpResources();
+    public void clearResources() {
+        lSpectrumAnnotator.clearTmpResources();
     }
-    
+
     public long getNumberOfSpectraForProject(long aProjectID) {
         return iPrideService.getNumberOfSpectra();
     }
@@ -81,9 +82,7 @@ public class PrideXMLDataProvider implements DataProvider {
 
     @Override
     public File getSpectraForProject(long aProjectid) throws IOException {
-        File destinationFile;
-        File MGFFile = null;
-        File returningFile = null;
+        File destinationFile = null;
         File prideXMLFile;
         List<ConversionError> errorList;
         try {
@@ -95,15 +94,14 @@ public class PrideXMLDataProvider implements DataProvider {
                 //Save the MGF file in the resultFolder          
                 errorList = iPrideService.getSpectraAsMgf(prideXMLFile, destinationFile);
                 //Get the errorList and store it in the results later
-
                 RelimsVariableManager.setConversionErrorList(errorList);
-                if (destinationFile != null) {
-                    returningFile = destinationFile;
-                } else {
+                if (destinationFile == null) {
                     logger.error("The Pride provider could not load an MGF-file.");
                     // try to get it from other source = good idea?
                 }
-                //   FileUtils.copyFile(MGFFile, destinationFile);
+                for (ConversionError anError : errorList) {
+                    logger.error(anError.getDescription());
+                }
             }
         } catch (Exception e) {
             logger.error(e);
@@ -111,7 +109,7 @@ public class PrideXMLDataProvider implements DataProvider {
             ProgressManager.setState(Checkpoint.FAILED, e);
             logger.error("Pride caused a failure :" + e);
         } finally {
-            return returningFile;
+            return destinationFile;
         }
     }
 
@@ -131,7 +129,7 @@ public class PrideXMLDataProvider implements DataProvider {
             File xmlFile = fileGrabber.getPrideXML(aProjectid);
             logger.debug("estimating PTMs via Pride-asap");
             // Run PRIDE asap automatic mode
-        
+
             lSpectrumAnnotator = (PrideXmlSpectrumAnnotator) lContext.getBean("prideXmlSpectrumAnnotator");
             PrideXmlModificationService lModificationService = (PrideXmlModificationService) lContext.getBean("prideXmlModificationService");
 
@@ -214,7 +212,7 @@ public class PrideXMLDataProvider implements DataProvider {
         // Clean MGF resources after project success
         PrideXmlSpectrumAnnotator lSpectrumAnnotator;
         lSpectrumAnnotator = (PrideXmlSpectrumAnnotator) applicationContext.getBean("prideXmlSpectrumAnnotator");
-       
+
         return lRelimsProjectBean;
     }
 

@@ -16,8 +16,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
-
-
 /**
  *
  * @author Kenneth
@@ -85,9 +83,11 @@ public class ServerConnector {
                 isAvailable = (boolean) input.readBoolean();
                 loading = false;
             } catch (IOException IOExc) {
+                IOExc.printStackTrace();
                 loading = false;
             }
             if (!loading) {
+                logger.debug("Tasks were sent !");
                 socketConnection.close();
                 break;
             }

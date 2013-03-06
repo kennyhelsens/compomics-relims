@@ -147,8 +147,6 @@ public class ProjectRunnerImpl extends Observable implements ProjectRunner {
         spectrumFile = dataProvider.getSpectraForProject(projectID);
         if (dataProvider.isProjectValuable("" + projectID) && spectrumFile != null) {
             logger.debug("Aquired spectra !");
-            //copy spectrumFile to the resultfolder to save it on filesystem!
-            FileUtils.copyFile(spectrumFile, new File(searchResultFolder + "/" + projectID + ".mgf"), true);
             logger.debug("Attempting to get modifications");
             setModificationResolver(modificationResolver = projectProvider.getModificationResolver());
             logger.debug("Building projectbean");

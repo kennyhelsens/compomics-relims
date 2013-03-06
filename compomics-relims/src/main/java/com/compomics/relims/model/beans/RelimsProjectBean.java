@@ -2,6 +2,7 @@ package com.compomics.relims.model.beans;
 
 import com.compomics.omssa.xsd.UserMod;
 import com.compomics.relims.model.UserModsFile;
+import com.compomics.util.experiment.biology.Enzyme;
 import com.google.common.collect.Lists;
 
 import java.util.List;
@@ -9,33 +10,29 @@ import java.util.List;
 /**
  * This class is a
  */
-public class RelimsProjectBean implements Cloneable{
+public class RelimsProjectBean implements Cloneable {
 
     private long iProjectID = -1;
-
     private UserModsFile iUserModsFile = new UserModsFile();
-
     private List<String> iVariableMatchedPTMs = Lists.newArrayList();
     private List<String> iFixedMatchedPTMs = Lists.newArrayList();
     private List<UserMod> iStandardModificationList = Lists.newArrayList();
     private List<UserMod> iExtraModificationList = Lists.newArrayList();
-
     private double iPrecursorError = 1.0;
     private double iFragmentError = 1.0;
 
     public RelimsProjectBean() {
     }
 
-    public List<UserMod> getStandardModificationList(){
+    public List<UserMod> getStandardModificationList() {
         return iStandardModificationList;
     }
 
-    public List<UserMod> getExtraModificationList(){
+    public List<UserMod> getExtraModificationList() {
         return iExtraModificationList;
     }
 
-
-    public void setStandardModificationList(List<UserMod> aStandardModificationList){
+    public void setStandardModificationList(List<UserMod> aStandardModificationList) {
         iStandardModificationList.clear();
         iStandardModificationList.addAll(aStandardModificationList);
     }
@@ -44,7 +41,6 @@ public class RelimsProjectBean implements Cloneable{
         iExtraModificationList.clear();
         iExtraModificationList.addAll(aExtraModificationList);
     }
-
 
     public List<String> getVariableMatchedPTMs() {
         return iVariableMatchedPTMs;
@@ -119,5 +115,10 @@ public class RelimsProjectBean implements Cloneable{
         lProjectBean.setFragmentError(getFragmentError());
 
         return lProjectBean;
+    }
+
+    public Enzyme getEnzyme() {
+        //TODO GET ENZYME FROM PRIDE 
+        return null;
     }
 }
