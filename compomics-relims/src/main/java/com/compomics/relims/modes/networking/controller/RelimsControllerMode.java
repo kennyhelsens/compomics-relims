@@ -12,6 +12,7 @@ import com.compomics.relims.modes.networking.controller.connectivity.workerpool.
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
+import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 
 /**
@@ -26,6 +27,7 @@ public class RelimsControllerMode {
     private static ExecutorService bootingService;
 
     public static void main(String[] args) {
+        Logger.getRootLogger().setLevel(Level.ERROR);
         RelimsProperties.initialize();
         dds = DatabaseService.getInstance();
         bs = BackupService.getInstance();

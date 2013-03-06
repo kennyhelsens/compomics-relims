@@ -49,12 +49,12 @@ public class HeartbeatGenerator implements Runnable {
                 }
                 try {
                     if (sockOutput == null) {
-                        System.out.println("The socket Output is null");
+                        logger.error("The socket Output is null");
                         if (RelimsProperties.getControllerIP() == null) {
-                            System.out.println("IP is null");
+                              logger.error("IP is null");
                         }
                         if (RelimsProperties.getControllerPort() == 0) {
-                            System.out.println("IP is null");
+                              logger.error("port is null");
                         }
                     } else {
                         if (ResourceManager.getWorkerPort() != 0) {

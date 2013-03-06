@@ -773,7 +773,6 @@ public class NewProjectDialog extends javax.swing.JDialog {
                     logger.error("The input for this projectID was too long : " + rightModel.elementAt(i).toString() + " ...");
                     break;
                 }
-
             }
 
             if (allowToPass) {

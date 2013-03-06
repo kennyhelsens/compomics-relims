@@ -11,6 +11,7 @@ import com.compomics.relims.modes.networking.worker.taskreciever.TaskReciever;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
+import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 
 /**
@@ -25,6 +26,7 @@ public class RelimsWorkerMode {
     public static Map<String, Object> cliArgumentMap = new HashMap<String, Object>();
 
     public static void main(String[] args) {
+        Logger.getRootLogger().setLevel(Level.ERROR);
         RelimsProperties.initialize();
         try {
             workerPort = RelimsProperties.getWorkerPort();

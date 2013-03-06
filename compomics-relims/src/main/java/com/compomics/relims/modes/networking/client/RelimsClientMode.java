@@ -8,6 +8,7 @@ import com.compomics.relims.conf.RelimsProperties;
 import com.compomics.relims.modes.networking.client.GUI.MainClientGUI;
 import java.util.HashMap;
 import java.util.Map;
+import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 
 /**
@@ -19,6 +20,7 @@ public class RelimsClientMode {
     private final static Logger logger = Logger.getLogger(MainClientGUI.class);
 
     public static void main(String args[]) {
+             Logger.getRootLogger().setLevel(Level.ERROR);
          RelimsProperties.initialize();
 //        ClientLoginGUI cLGui = new ClientLoginGUI();
         String intermediateClient = RelimsProperties.getUserID();
