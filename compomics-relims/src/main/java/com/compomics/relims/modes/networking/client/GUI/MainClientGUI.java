@@ -4,7 +4,12 @@ import com.compomics.relims.conf.RelimsProperties;
 import com.compomics.relims.modes.networking.client.connectivity.connectors.ServerConnector;
 import com.compomics.relims.modes.networking.controller.connectivity.taskobjects.TaskContainer;
 import com.compomics.util.experiment.identification.SearchParameters;
-import java.awt.Component;
+import org.apache.commons.io.FileUtils;
+import org.apache.log4j.Logger;
+
+import javax.swing.*;
+import javax.swing.table.DefaultTableModel;
+import java.awt.*;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.io.File;
@@ -13,13 +18,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
-import javax.swing.DefaultListModel;
-import javax.swing.UIManager;
-import javax.swing.UIManager.LookAndFeelInfo;
-import javax.swing.UnsupportedLookAndFeelException;
-import javax.swing.table.DefaultTableModel;
-import org.apache.commons.io.FileUtils;
-import org.apache.log4j.Logger;
 
 public class MainClientGUI extends javax.swing.JFrame {
 
@@ -120,21 +118,23 @@ public class MainClientGUI extends javax.swing.JFrame {
         }
 
         //set look and feel
-        try {
-            for (LookAndFeelInfo info : UIManager.getInstalledLookAndFeels()) {
-                if ("Nimbus".equals(info.getName())) {
-                    UIManager.setLookAndFeel(info.getClassName());
-                    break;
+        if (System.getProperty("os.name").lastIndexOf("Windows") != -1) {
+            try {
+                for (UIManager.LookAndFeelInfo info : UIManager.getInstalledLookAndFeels()) {
+                    if ("Nimbus".equals(info.getName())) {
+                        UIManager.setLookAndFeel(info.getClassName());
+                        break;
+                    }
                 }
+            } catch (UnsupportedLookAndFeelException e) {
+                //handle exception
+            } catch (ClassNotFoundException e) {
+                // handle exception
+            } catch (InstantiationException e) {
+                // handle exception
+            } catch (IllegalAccessException e) {
+                // handle exception
             }
-        } catch (UnsupportedLookAndFeelException e) {
-            //handle exception
-        } catch (ClassNotFoundException e) {
-            // handle exception
-        } catch (InstantiationException e) {
-            // handle exception
-        } catch (IllegalAccessException e) {
-            // handle exception
         }
 
         this.setVisible(true);
