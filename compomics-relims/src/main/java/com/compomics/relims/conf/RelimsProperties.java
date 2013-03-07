@@ -1,14 +1,14 @@
 package com.compomics.relims.conf;
 
-import com.compomics.relims.manager.variablemanager.RelimsVariableManager;
 import com.compomics.omssa.xsd.UserMod;
 import com.compomics.pride_asa_pipeline.config.PropertiesConfigurationHolder;
 import com.compomics.relims.concurrent.Command;
-import com.compomics.relims.modes.gui.util.Properties;
-import com.compomics.relims.model.guava.functions.SpeciesFinderFunction;
+import com.compomics.relims.manager.processmanager.gearbox.enums.PriorityLevel;
 import com.compomics.relims.manager.progressmanager.Checkpoint;
 import com.compomics.relims.manager.progressmanager.ProgressManager;
-import com.compomics.relims.manager.processmanager.gearbox.enums.PriorityLevel;
+import com.compomics.relims.manager.variablemanager.RelimsVariableManager;
+import com.compomics.relims.model.guava.functions.SpeciesFinderFunction;
+import com.compomics.relims.modes.gui.util.Properties;
 import com.compomics.util.experiment.biology.PTMFactory;
 import com.google.common.base.Function;
 import com.google.common.base.Joiner;
@@ -21,12 +21,12 @@ import org.xmlpull.v1.XmlPullParserException;
 import javax.annotation.Nullable;
 import java.io.File;
 import java.io.IOException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.List;
 
 import static com.google.common.base.Preconditions.checkNotNull;
-import java.text.SimpleDateFormat;
-import java.util.Calendar;
 
 /**
  * This class contains the Relims properties.
@@ -132,9 +132,11 @@ public class RelimsProperties {
                 jarFilePath = "";
             }
 
-            File locatorFile = new File(".");
-            String path = locatorFile.getAbsolutePath().toString();
-            path = path.substring(0, path.length() - 1);
+//            File locatorFile = new File(".");
+//            String path = locatorFile.getAbsolutePath().toString();
+//            path = path.substring(0, path.length() - 1);
+
+            String path = jarFilePath;
 
             if (lOperatingSystem == Utilities.OS_MAC) {
                 path = path + "resources" + folderSeparator + "conf" + folderSeparator + "relims-mac.properties";
