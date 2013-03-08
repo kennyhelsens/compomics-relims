@@ -178,17 +178,19 @@ public class SearchGUIJobBean {
             try {
                 searchParameters = SearchParameters.getIdentificationParameters(searchParametersRepositoryFile);
                 searchParameters.setFastaFile(new File(RelimsProperties.getDefaultSearchDatabase()));
+                logger.debug("USING FASTA : " + searchParameters.getFastaFile().getAbsolutePath());
             } catch (FileNotFoundException ex) {
-                java.util.logging.Logger.getLogger(SearchGUIJobBean.class.getName()).log(Level.SEVERE, null, ex);
+                logger.error(ex);
             } catch (IOException ex) {
-                java.util.logging.Logger.getLogger(SearchGUIJobBean.class.getName()).log(Level.SEVERE, null, ex);
+                logger.error(ex);
             } catch (ClassNotFoundException ex) {
-                java.util.logging.Logger.getLogger(SearchGUIJobBean.class.getName()).log(Level.SEVERE, null, ex);
+                logger.error(ex);
             }
         } else {
             try {
                 searchParameters = new SearchParameters();// this should be default..;
                 searchParameters.setFastaFile(new File(RelimsProperties.getDefaultSearchDatabase()));
+                logger.debug("USING FASTA : " + searchParameters.getFastaFile().getAbsolutePath());
             } catch (Exception e) {
                 e.printStackTrace();
             }
