@@ -4,7 +4,6 @@
  */
 package com.compomics.relims.manager.processmanager.processguard;
 
-
 import com.compomics.relims.conf.RelimsProperties;
 import com.compomics.relims.manager.progressmanager.Checkpoint;
 import com.compomics.relims.manager.progressmanager.ProgressManager;
@@ -89,7 +88,7 @@ public class CommandExceptionGuard extends Thread implements Callable {
         while (errorless && !this.isInterrupted()) {
             Thread priorityThread = new Thread(new PrioritySetter());
             priorityThread.start();
-            
+
             try {
                 while ((line = processOutputStream.readLine()) != null) {
                     if (!line.isEmpty() || !line.equals("")) {
@@ -153,38 +152,18 @@ public class CommandExceptionGuard extends Thread implements Callable {
                 priority = RelimsProperties.getPriority();
                 boolean found = false;
                 logger.debug("Waiting for Omssa");
-                while (!isProcessRunning("omssacl.exe")) {
+                while (!manager.isOmssaRunning()) {
                     Thread.sleep(500);
                 }
-                manager.addProcess("omssacl.exe");
                 manager.setPriority(priority);
-                manager.removeProcess("omssacl.exe");
                 logger.debug("Waiting for xTandem");
-
-                while (!isProcessRunning("tandem.exe")) {
+                while (!manager.isXTandemRunning()) {
                     Thread.sleep(500);
                 }
-                manager.addProcess("tandem.exe");
                 manager.setPriority(priority);
-                manager.removeProcess("xTandem.exe");
             } catch (Exception ex) {
                 logger.error(ex);
             }
-        }
-
-        public boolean isProcessRunning(String serviceName) throws Exception {
-
-            Process p = Runtime.getRuntime().exec("TASKLIST");
-            BufferedReader reader = new BufferedReader(new InputStreamReader(
-                    p.getInputStream()));
-            String line;
-            while ((line = reader.readLine()) != null) {
-                if (line.contains(serviceName)) {
-                    return true;
-                }
-            }
-            return false;
-
         }
     }
 }

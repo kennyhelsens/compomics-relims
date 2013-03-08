@@ -4,12 +4,11 @@
  */
 package com.compomics.relims.manager.processmanager.gearbox;
 
-
-
-
 import com.compomics.relims.manager.processmanager.gearbox.enums.PriorityLevel;
 import com.compomics.relims.manager.processmanager.gearbox.interfaces.ProcessManager;
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
 
 /**
  *
@@ -18,6 +17,8 @@ import java.io.IOException;
 public class MacProcessManager extends MainProcessManager implements ProcessManager {
 
     public MacProcessManager() {
+        processList.add("omssacl");
+        processList.add("tandem");
     }
 
     @Override
@@ -64,5 +65,34 @@ public class MacProcessManager extends MainProcessManager implements ProcessMana
         for (String aProcessName : processNames) {
             killProcess(aProcessName);
         }
+    }
+
+    @Override
+    public boolean isProcessRunning(String serviceName) {
+        try {
+            //in other words, is the PID in the tasklist ! 
+            Process process = Runtime.getRuntime().exec("$(pidof " + serviceName + ")");
+            BufferedReader br = new BufferedReader(new InputStreamReader(process.getInputStream()));
+            String ps = br.readLine();
+            try {
+                int pid = Integer.valueOf(ps);
+                return true;
+            } catch (NumberFormatException e) {
+                return false;
+            }
+        } catch (IOException ex) {
+            logger.error(ex);
+            return false;
+        }
+    }
+
+    @Override
+    public boolean isOmssaRunning() {
+        return isProcessRunning("omssacl");
+    }
+
+    @Override
+    public boolean isXTandemRunning() {
+        return isProcessRunning("xTandem");
     }
 }

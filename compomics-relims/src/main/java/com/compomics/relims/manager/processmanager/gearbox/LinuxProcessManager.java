@@ -6,9 +6,13 @@ package com.compomics.relims.manager.processmanager.gearbox;
 
 import com.compomics.relims.manager.processmanager.gearbox.enums.PriorityLevel;
 import com.compomics.relims.manager.processmanager.gearbox.interfaces.ProcessManager;
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  *
@@ -17,14 +21,13 @@ import java.util.List;
 public class LinuxProcessManager extends MainProcessManager implements ProcessManager {
 
     public LinuxProcessManager() {
+        processList.add("omssacl");
+        processList.add("tandem");
     }
 
     @Override
     public boolean setPriority(PriorityLevel priority) {
 
-        List<String> processList = new ArrayList<String>();
-        processList.add("omssacl");
-        processList.add("tandem");
         for (String processName : processList) {
             try {
                 Runtime.getRuntime().exec("renice " + priority.getLinuxCode() + "  $(pidof " + processName + ")");
@@ -62,4 +65,34 @@ public class LinuxProcessManager extends MainProcessManager implements ProcessMa
             killProcess(aProcessName);
         }
     }
+
+    @Override
+    public boolean isProcessRunning(String serviceName) {
+        try {
+            //in other words, is the PID in the tasklist ! 
+            Process process = Runtime.getRuntime().exec("$(pidof " + serviceName + ")");
+            BufferedReader br = new BufferedReader(new InputStreamReader(process.getInputStream()));
+            String ps = br.readLine();
+            try {
+                int pid = Integer.valueOf(ps);
+                return true;
+            } catch (NumberFormatException e) {
+                return false;
+            }
+        } catch (IOException ex) {
+            logger.error(ex);
+            return false;
+        }
+    }
+    
+       @Override
+    public boolean isOmssaRunning() {
+        return isProcessRunning("omssacl");
+    }
+
+    @Override
+    public boolean isXTandemRunning() {
+        return isProcessRunning("xTandem");
+    }
+    
 }

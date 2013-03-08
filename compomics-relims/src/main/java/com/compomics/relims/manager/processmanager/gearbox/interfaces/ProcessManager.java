@@ -29,4 +29,12 @@ public interface ProcessManager {
     void killProcess(String processName);
 
     void killProcesses(String[] processNames);
+    
+    boolean isProcessRunning(String processName);
+    
+    boolean isOmssaRunning();
+    
+    boolean isXTandemRunning();
+    
+    
 }

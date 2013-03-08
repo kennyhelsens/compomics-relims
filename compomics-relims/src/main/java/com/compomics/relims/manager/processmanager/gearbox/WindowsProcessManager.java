@@ -6,7 +6,9 @@ package com.compomics.relims.manager.processmanager.gearbox;
 
 import com.compomics.relims.manager.processmanager.gearbox.enums.PriorityLevel;
 import com.compomics.relims.manager.processmanager.gearbox.interfaces.ProcessManager;
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
 
 /**
  *
@@ -15,6 +17,8 @@ import java.io.IOException;
 public class WindowsProcessManager extends MainProcessManager implements ProcessManager {
 
     public WindowsProcessManager() {
+        processList.add("omssacl.exe");
+        processList.add("tandem.exe");
     }
 
     @Override
@@ -53,7 +57,6 @@ public class WindowsProcessManager extends MainProcessManager implements Process
     @Override
     public void killProcess(String processName) {
         try {
-            Runtime.getRuntime().exec("taskkill " + processName);
             Runtime.getRuntime().exec("taskkill /PID " + processName);
         } catch (IOException ex) {
             logger.error("Could not kill for process with name : " + processName);
@@ -65,5 +68,39 @@ public class WindowsProcessManager extends MainProcessManager implements Process
         for (String aProcessName : processNames) {
             killProcess(aProcessName);
         }
+    }
+
+    @Override
+    public boolean isProcessRunning(String serviceName) {
+        try {
+            //in other words, is the PID in the tasklist ! 
+            Process process = Runtime.getRuntime().exec("wmic process where name='" + serviceName + "' get /handle");
+            BufferedReader br = new BufferedReader(new InputStreamReader(process.getInputStream()));
+            try {
+                String ps = br.readLine();
+                if (ps.equalsIgnoreCase("handle")) {
+                    ps = br.readLine();
+                    int pid = Integer.valueOf(ps);
+                    return true;
+                } else {
+                    return false;
+                }
+            } catch (NumberFormatException e) {
+                return false;
+            }
+        } catch (IOException ex) {
+            logger.error(ex);
+            return false;
+        }
+    }
+
+    @Override
+    public boolean isOmssaRunning() {
+        return isProcessRunning("omssacl.exe");
+    }
+
+    @Override
+    public boolean isXTandemRunning() {
+        return isProcessRunning("xTandem.exe");
     }
 }

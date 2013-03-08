@@ -51,4 +51,5 @@ public abstract class MainProcessManager {
     public void removeProcesses(String[] processNames) {
         processList.removeAll(Arrays.asList(processNames));
     }
+  
 }
