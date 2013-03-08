@@ -23,18 +23,12 @@ public class LinuxProcessManager extends MainProcessManager implements ProcessMa
     public boolean setPriority(PriorityLevel priority) {
 
         List<String> processList = new ArrayList<String>();
-        processList.add("notepad.exe");
-
+        processList.add("omssacl");
+        processList.add("tandem");
         for (String processName : processList) {
             try {
-                try {
-                    int PID = Integer.parseInt(processName);
-                    Runtime.getRuntime().exec("renice " + priority.getLinuxCode() + " " + PID);
-                    logger.debug("Changed process with " + PID + " to priority : " + priority);
-                } catch (NumberFormatException NFE) {
-                    Runtime.getRuntime().exec("renice " + priority.getLinuxCode() + "  $(pidof process_name)");
-                    logger.debug("Changed " + processName + " to priority : " + priority);
-                }
+                Runtime.getRuntime().exec("renice " + priority.getLinuxCode() + "  $(pidof " + processName + ")");
+                logger.debug("Changed " + processName + " to priority : " + priority);
             } catch (IOException ex) {
                 logger.error("Could not change priority for process with name : " + processName);
             }

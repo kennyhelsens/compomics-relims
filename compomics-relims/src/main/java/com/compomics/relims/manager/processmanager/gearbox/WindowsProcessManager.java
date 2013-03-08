@@ -4,11 +4,9 @@
  */
 package com.compomics.relims.manager.processmanager.gearbox;
 
-
 import com.compomics.relims.manager.processmanager.gearbox.enums.PriorityLevel;
 import com.compomics.relims.manager.processmanager.gearbox.interfaces.ProcessManager;
 import java.io.IOException;
-
 
 /**
  *
@@ -25,15 +23,8 @@ public class WindowsProcessManager extends MainProcessManager implements Process
         for (String processName : processList) {
             try {
                 //in case off ints (=PID)
-                try {
-                    int PID = Integer.parseInt(processName);
-                    Runtime.getRuntime().exec("wmic process where processid='" + PID + "' CALL setpriority " + priority.getWindowsCode());
-                    logger.debug("Changed process with " + PID + " to priority : " + priority);
-                } catch (NumberFormatException NFE) {
-                    Runtime.getRuntime().exec("wmic process where name='" + processName + "' CALL setpriority " + priority.getWindowsCode());
-                    logger.debug("Changed " + processName + " to priority : " + priority);
-                }
-
+                Runtime.getRuntime().exec("wmic process where name='" + processName + "' CALL setpriority " + priority.getWindowsCode());
+                logger.debug("Changed " + processName + " to priority : " + priority);
             } catch (IOException ex) {
                 logger.error("Could not change priority for process with name : " + processName);
             } finally {
