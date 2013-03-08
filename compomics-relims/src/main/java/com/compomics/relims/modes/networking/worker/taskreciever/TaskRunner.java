@@ -94,7 +94,7 @@ public class TaskRunner {
                     ResourceManager.setConversionErrors(conversionErrorList);
                 }
                 ResourceManager.setFinishState(endState);
-            } catch (Exception e) {
+            } catch (Throwable e) {
                 e.printStackTrace();
                 ResourceManager.setTaskTime(System.currentTimeMillis() - ResourceManager.getTaskTime());
                 endState = Checkpoint.FAILED;

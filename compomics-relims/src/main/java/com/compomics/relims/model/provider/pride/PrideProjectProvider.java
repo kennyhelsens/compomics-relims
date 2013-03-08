@@ -1,6 +1,8 @@
 package com.compomics.relims.model.provider.pride;
 
+import com.compomics.pride_asa_pipeline.service.DbExperimentService;
 import com.compomics.pride_asa_pipeline.service.ExperimentService;
+import com.compomics.pride_asa_pipeline.service.PrideXmlExperimentService;
 import com.compomics.pride_asa_pipeline.spring.ApplicationContextProvider;
 import com.compomics.relims.conf.RelimsProperties;
 import com.compomics.relims.model.provider.ProjectProvider;
@@ -26,11 +28,11 @@ public class PrideProjectProvider extends ProjectProvider {
         if (RelimsProperties.getPrideDataSource()) {
             iDataProvider = new PrideXMLDataProvider();
             ApplicationContext lContext = ApplicationContextProvider.getInstance().getApplicationContext();
-            iPrideService = (ExperimentService) lContext.getBean("prideXmlExperimentService");
+            iPrideService = (PrideXmlExperimentService) lContext.getBean("prideXmlExperimentService");
         } else {
             iDataProvider = new PrideDataProvider();
             ApplicationContext lContext = ApplicationContextProvider.getInstance().getApplicationContext();
-            iPrideService = (ExperimentService) lContext.getBean("dbExperimentService");
+            iPrideService = (DbExperimentService) lContext.getBean("dbExperimentService");
         }
 
 

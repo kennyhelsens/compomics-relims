@@ -142,10 +142,6 @@ public class PrideXMLDataProvider implements DataProvider {
 
             // Do not run PRIDE asap automatic, but retrieve the PTMs from the modified sequence values.
 
-
-
-
-
             try {
                 lSpectrumAnnotator.initIdentifications(xmlFile);
 

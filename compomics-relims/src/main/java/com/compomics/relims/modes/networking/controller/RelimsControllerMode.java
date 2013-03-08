@@ -28,7 +28,7 @@ public class RelimsControllerMode {
 
     public static void main(String[] args) {
         RelimsProperties.initialize();
-        if (RelimsProperties.getDebugMode()) {
+        if (!RelimsProperties.getDebugMode()) {
             Logger.getRootLogger().setLevel(Level.ERROR);
         }
         dds = DatabaseService.getInstance();

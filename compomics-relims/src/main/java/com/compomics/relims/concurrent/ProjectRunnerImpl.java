@@ -146,7 +146,6 @@ public class ProjectRunnerImpl extends Observable implements ProjectRunner {
         logger.debug(format("loading MS/MS spectra for project %s from %s", projectID, dataProvider.toString()));
         spectrumFile = dataProvider.getSpectraForProject(projectID);
         if (dataProvider.isProjectValuable("" + projectID) && spectrumFile != null) {
-            logger.debug("Aquired spectra !");
             logger.debug("Attempting to get modifications");
             setModificationResolver(modificationResolver = projectProvider.getModificationResolver());
             logger.debug("Building projectbean");
