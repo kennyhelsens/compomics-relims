@@ -8,10 +8,11 @@ import com.compomics.util.experiment.biology.Enzyme;
 import com.compomics.util.experiment.biology.EnzymeFactory;
 import com.compomics.util.experiment.biology.PTMFactory;
 import com.compomics.util.experiment.identification.SearchParameters;
-import com.compomics.util.experiment.massspectrometry.Charge;
 import com.compomics.util.preferences.ModificationProfile;
+import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -173,11 +174,12 @@ public class SearchGUIJobBean {
     protected void createSearchParametersFile() {
 
         File searchParametersRepositoryFile = new File(RelimsVariableManager.getSearchResultFolder() + "/SearchGUI.parameters");
-
+        File fastaFile = new File(RelimsProperties.getDefaultSearchDatabase());
+        makeBlastDB(fastaFile);
         if (searchParametersRepositoryFile.exists()) {
             try {
                 searchParameters = SearchParameters.getIdentificationParameters(searchParametersRepositoryFile);
-                searchParameters.setFastaFile(new File(RelimsProperties.getDefaultSearchDatabase()));
+                searchParameters.setFastaFile(fastaFile);
                 logger.debug("USING FASTA : " + searchParameters.getFastaFile().getAbsolutePath());
             } catch (FileNotFoundException ex) {
                 logger.error(ex);
@@ -189,7 +191,7 @@ public class SearchGUIJobBean {
         } else {
             try {
                 searchParameters = new SearchParameters();// this should be default..;
-                searchParameters.setFastaFile(new File(RelimsProperties.getDefaultSearchDatabase()));
+                searchParameters.setFastaFile(fastaFile);
                 logger.debug("USING FASTA : " + searchParameters.getFastaFile().getAbsolutePath());
             } catch (Exception e) {
                 e.printStackTrace();
@@ -238,15 +240,12 @@ public class SearchGUIJobBean {
             } catch (Exception ex) {
                 ex.printStackTrace();
             }
-
+            searchParameters.setFastaFile(fastaFile);
             searchParameters.setPrecursorAccuracy(iRelimsProjectBean.getPrecursorError());
             searchParameters.setFragmentIonAccuracy(iRelimsProjectBean.getFragmentError());
             searchParameters.setnMissedCleavages(RelimsProperties.getMissedCleavages());
             // Precursor
             searchParameters.setPrecursorAccuracyType(SearchParameters.PrecursorAccuracyType.DA);
-            //Set the database (fasta)
-            searchParameters.setFastaFile(new File(RelimsProperties.getDefaultSearchDatabase()));
-            logger.debug(String.format("setting DEFAULT fasta database '%s' to searchgui configuration", RelimsProperties.getDefaultSearchDatabase()));
             validate(searchParameters);
         }
         System.out.println("Searchparameters were loaded");
@@ -261,6 +260,132 @@ public class SearchGUIJobBean {
             ex.printStackTrace();
         } catch (ClassNotFoundException ex) {
             ex.printStackTrace();
+        }
+    }
+
+    private void makeBlastDB(File fasta) {
+        File tempBatch = null;
+        if (needsFormatting(fasta)) {
+            logger.info("The fasta file needs formatting for OMSSA...");
+            ProcessBuilder processBuilder = new ProcessBuilder();
+            //find the makeblastDB tool...
+            String osName = null;
+            if (System.getProperty("os.name").toLowerCase().contains("windows")) {
+                osName = "windows";
+            } else if (System.getProperty("os.name").toLowerCase().contains("mac")) {
+                osName = "mac";
+            } else if (System.getProperty("os.name").toLowerCase().contains("mac")) {
+                osName = "windows";
+            } else {
+                logger.error("Unsupported operating system !");
+            }
+
+            //MAKE A BATCH FILE !!!!
+            try {
+                tempBatch = makeBlastDbBatch();
+                ProcessBuilder pb = new ProcessBuilder(tempBatch.getAbsolutePath());
+                Process process = pb.start();
+                int exitStatus = process.waitFor();
+                if (process.exitValue() == 0) {
+                    logger.debug("Fastafile was successfully formatted !");
+                }
+            } catch (Exception ex) {
+                ex.printStackTrace();
+                logger.error(ex);
+            } finally {
+                if (tempBatch != null) {
+                    if (tempBatch.exists()) {
+                        tempBatch.delete();
+                        logger.debug("Cleaned up temporary batch file...");
+                    }
+                    try {
+                        Runtime.getRuntime().exec("cd " + RelimsProperties.getSearchGuiFolder());
+                        logger.debug("Returning to searchgui folder");
+                    } catch (IOException ex) {
+                        logger.error(ex);
+                    }
+                }
+            }
+        } else {
+            logger.debug("Fastafile does not need formatting !");
+        }
+    }
+
+    public boolean needsFormatting(File fasta) {
+        boolean result = true;
+        String[] list = fasta.getParentFile().list();
+        // Get the filename.
+        String name = fasta.getName();
+
+        // Find all three processed files.
+        boolean phr = false;
+        boolean pin = false;
+        boolean psq = false;
+        for (int i = 0; i < list.length; i++) {
+            String s = list[i];
+            if (s.equals(name + ".phr")) {
+                phr = true;
+            }
+            if (s.equals(name + ".pin")) {
+                pin = true;
+            }
+            if (s.equals(name + ".psq")) {
+                psq = true;
+            }
+        }
+
+        if (phr && pin && psq) {
+            result = false;
+        }
+
+        return result;
+    }
+
+    public static File makeBlastDbBatch() {
+        String osName = null;
+        BufferedWriter out = null;
+        File tempBatch = null;
+        try {
+            RelimsProperties.initialize();
+            if (System.getProperty("os.name").toLowerCase().contains("windows")) {
+                osName = "windows";
+            } else if (System.getProperty("os.name").toLowerCase().contains("mac")) {
+                osName = "mac";
+            } else if (System.getProperty("os.name").toLowerCase().contains("mac")) {
+                osName = "windows";
+            } else {
+                System.out.println("Unsupported operating system !");
+            }
+
+            File makeBlastDbFile = new File(RelimsProperties.getSearchGuiFolder() + "/resources/makeblastdb/" + osName + "/makeblastdb");
+            File fastaParentFolder = new File(RelimsProperties.getDefaultSearchDatabase()).getParentFile();
+            String currentDir = System.getProperty("user.dir");
+            //MAKE A BATCH FILE !!!!
+            String driveLetter = "" + fastaParentFolder.getAbsolutePath().charAt(0);
+
+            tempBatch = new File("./tempRelims.bat");
+            out = new BufferedWriter(new FileWriter(tempBatch));
+            //1 = move this process to the fastaParent
+            out.write(driveLetter + ":");
+            logger.debug(driveLetter + ":");
+            out.newLine();
+            out.write("cd " + fastaParentFolder.getAbsolutePath());
+            logger.debug("cd " + fastaParentFolder.getAbsolutePath());
+            out.newLine();
+            out.write(makeBlastDbFile.getAbsolutePath() + " -in " + RelimsProperties.getDefaultSearchDatabase());
+            logger.debug(makeBlastDbFile.getAbsolutePath() + " -in " + RelimsProperties.getDefaultSearchDatabase());
+            out.newLine();
+            out.write("cd " + RelimsProperties.getSearchGuiFolder());
+            logger.debug("cd " + RelimsProperties.getSearchGuiFolder());
+            out.newLine();
+            //2 = tell the process to run the makeblastdb
+            out.close();
+        } catch (IOException e) {
+            if (out != null) {
+                out = null;
+            }
+        } finally {
+            return tempBatch;
         }
     }
 
