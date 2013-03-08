@@ -142,18 +142,21 @@ public class ProjectRunnerImpl extends Observable implements ProjectRunner {
         searchResultFolder = new File(RelimsVariableManager.getResultsFolder());
         //  RelimsVariableManager.setSearchResultFolder(searchResultFolder.getAbsolutePath().toString());
         setDataProvider(projectProvider.getDataProvider());
-        // GET THE SPECTRA FILE         
+
         logger.debug(format("loading MS/MS spectra for project %s from %s", projectID, dataProvider.toString()));
-        spectrumFile = dataProvider.getSpectraForProject(projectID);
         if (dataProvider.isProjectValuable("" + projectID) && spectrumFile != null) {
             logger.debug("Attempting to get modifications");
             setModificationResolver(modificationResolver = projectProvider.getModificationResolver());
             logger.debug("Building projectbean");
             relimsProjectBean = projectProvider.getProject(projectID);
-            setProject(relimsProjectBean);
+                  setProject(relimsProjectBean);
             RelimsVariableManager.setProjectID(projectID);
             long lProjectid = relimsProjectBean.getProjectID();
 
+                  // GET THE SPECTRA FILE 
+            
+            spectrumFile = dataProvider.getSpectraForProject(projectID);
+            
             logger.debug("creating projectrunner for " + lProjectid);
 
             Collection<Predicate> lPredicates = predicateManager.createCollection(

@@ -90,8 +90,10 @@ public class PrideXMLDataProvider implements DataProvider {
             prideXMLFile = fileGrabber.getPrideXML(aProjectid);
             // MAKE AN MGF FILE
             if (prideXMLFile != null) {
+                //Initiate the prideservice
+                iPrideService.init(prideXMLFile);
                 destinationFile = new File(RelimsVariableManager.getResultsFolder() + "/" + aProjectid + ".mgf");
-                //Save the MGF file in the resultFolder          
+                //Save the MGF file in the resultFolder       
                 errorList = iPrideService.getSpectraAsMgf(prideXMLFile, destinationFile);
                 //Get the errorList and store it in the results later
                 RelimsVariableManager.setConversionErrorList(errorList);
