@@ -162,7 +162,13 @@ public class CommandExceptionGuard extends Thread implements Callable {
                 }
                 manager.setPriority(priority);
             } catch (Exception ex) {
-                logger.error(ex);
+                if (ex instanceof NullPointerException) {
+                    //if OMSSA or XTandem isn't running, it returns a nullpointer...
+                } else {
+                    ex.printStackTrace();
+                    logger.error(ex);
+                }
+
             }
         }
     }
