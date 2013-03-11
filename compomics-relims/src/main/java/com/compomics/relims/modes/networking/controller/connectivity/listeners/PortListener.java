@@ -35,7 +35,12 @@ public class PortListener extends Thread implements Runnable {
 
     public PortListener(int serverPort) throws IOException {
         this.serverPort = serverPort;
-        serverSock = new ServerSocket(serverPort);
+        try {
+            serverSock = new ServerSocket(serverPort);
+        } catch (java.net.BindException e) {
+            logger.error("Another instance of the controller seems to be running on port " + serverPort);
+            System.exit(0);
+        }
     }
 
     public void waitForConnections() {
@@ -53,7 +58,7 @@ public class PortListener extends Thread implements Runnable {
     public static void launch() {
         int port;
         try {
-          port = RelimsProperties.getControllerPort();
+            port = RelimsProperties.getControllerPort();
         } catch (NullPointerException ex) {
             port = 6789;
             ex.printStackTrace();

@@ -240,7 +240,6 @@ public class SearchGUIJobBean {
             } catch (Exception ex) {
                 ex.printStackTrace();
             }
-            searchParameters.setFastaFile(fastaFile);
             searchParameters.setPrecursorAccuracy(iRelimsProjectBean.getPrecursorError());
             searchParameters.setFragmentIonAccuracy(iRelimsProjectBean.getFragmentError());
             searchParameters.setnMissedCleavages(RelimsProperties.getMissedCleavages());
@@ -506,6 +505,7 @@ public class SearchGUIJobBean {
 
     public int launch() throws IOException, ConfigurationException {
         prepare();
+        //
         File searchGuiFolder = new File(RelimsProperties.getSearchGuiFolder());
         Command.setWorkFolder(searchGuiFolder);
         StringBuilder totalCommandLine = new StringBuilder();

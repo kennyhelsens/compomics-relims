@@ -44,26 +44,25 @@ class TaskHandler implements Runnable {
     public void run() {
         Task newTask = null;
         logger.debug("Processing a task-request.");
-        System.out.println("Processing a task-request");
         while (true) {
             try {
                 //ONLY READ THIS STREAM IF THE TASKRECIEVER IS NOT BUSY ! = prevent error floods....
-                if (TaskReciever.locked = false) {
+                if (!TaskReciever.locked) {
                     newTask = (Task) sockInput.readObject();
-                }
-                if (newTask != null) {
-                    try {
-                        TaskReciever.locked = true;
-                        //Unlocked when the task is done...
-                        System.out.println("Setting up worker to run for project " + newTask.getProjectID());
-                        ResourceManager.setTaskID(newTask.getTaskID());
-                        RelimsProperties.setUserID(newTask.getUserID());
-                        TaskRunner taskRunner = new TaskRunner(newTask);
-                        taskRunner.launch();
-                    } catch (Exception e) {
-                        TaskReciever.locked = false;
-                    } finally {
-                        //close input?
+                    if (newTask != null) {
+                        try {
+                            TaskReciever.locked = true;
+                            //Unlocked when the task is done...
+                            System.out.println("Setting up worker to run for project " + newTask.getProjectID());
+                            ResourceManager.setTaskID(newTask.getTaskID());
+                            RelimsProperties.setUserID(newTask.getUserID());
+                            TaskRunner taskRunner = new TaskRunner(newTask);
+                            taskRunner.launch();
+                        } catch (Exception e) {
+                            TaskReciever.locked = false;
+                        } finally {
+                            //close input?
+                        }
                     }
                 }
             } catch (EOFException eof) {
