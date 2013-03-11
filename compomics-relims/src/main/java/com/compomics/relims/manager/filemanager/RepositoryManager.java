@@ -40,10 +40,10 @@ public class RepositoryManager {
         repositoryPRIDE = new File(PrideRepositoryString);
 
         //check if the repository is there and exists
-        System.out.println("Repositories at : ");
-        System.out.println(commonRepositoryString);
-        System.out.println(MSLimsRepositoryString);
-        System.out.println(PrideRepositoryString);
+        logger.debug("Repositories at : ");
+        logger.debug(commonRepositoryString);
+        logger.debug(MSLimsRepositoryString);
+        logger.debug(PrideRepositoryString);
 
 
         if (!repositoryMain.exists()) {

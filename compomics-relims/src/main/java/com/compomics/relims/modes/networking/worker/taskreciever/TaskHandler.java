@@ -43,9 +43,11 @@ class TaskHandler implements Runnable {
     @Override
     public void run() {
         Task newTask = null;
+        TaskRunner taskRunner = null;
         logger.debug("Processing a task-request.");
         while (true) {
             try {
+                Thread.sleep(10000);
                 //ONLY READ THIS STREAM IF THE TASKRECIEVER IS NOT BUSY ! = prevent error floods....
                 if (!TaskReciever.locked) {
                     newTask = (Task) sockInput.readObject();
@@ -53,42 +55,52 @@ class TaskHandler implements Runnable {
                         try {
                             TaskReciever.locked = true;
                             //Unlocked when the task is done...
-                            System.out.println("Setting up worker to run for project " + newTask.getProjectID());
+                            logger.debug("Setting up worker to run for project " + newTask.getProjectID());
                             ResourceManager.setTaskID(newTask.getTaskID());
                             RelimsProperties.setUserID(newTask.getUserID());
-                            TaskRunner taskRunner = new TaskRunner(newTask);
+                            taskRunner = new TaskRunner(newTask);
                             taskRunner.launch();
+                            while (taskRunner.isRunning()) {
+                                //wait while taskrunner is actually running...
+                            }
                         } catch (Exception e) {
                             TaskReciever.locked = false;
+                            //unlock if failed
+                            closeConnection();
                         } finally {
-                            //close input?
                         }
                     }
                 }
             } catch (EOFException eof) {
-                logger.debug("Error : " + eof);
-                eof.printStackTrace();
+                logger.error(eof);
             } catch (IOException ex) {
-                logger.debug("Error : " + ex);
-                ex.printStackTrace();
+                logger.error(ex);
             } catch (ClassNotFoundException ex) {
                 if (!ex.toString().contains("Connection reset")) {
-                    ex.printStackTrace();
                 } else {
                     //TODO HANDLE SOCKET RESET EXCEPTIONS
                     // switch to local mode perhaps?
                 }
+            } catch (InterruptedException e) {
+                logger.error(e);
             } finally {
-                if (!sock.isClosed()) {
-                    try {
-                        logger.debug("Closing connection");
-                        sock.close();
-                    } catch (Exception e) {
-                        logger.error("Exception while closing socket, e=" + e);
-                        e.printStackTrace(System.err);
-                    }
-                }
+                closeConnection();
             }
+        }
+    }
+
+    private void closeConnection() {
+        if (!sock.isClosed()) {
+            try {
+                logger.debug("Closing connection");
+                sock.close();
+            } catch (Exception e) {
+             if(sock!=null){
+                 sock=null;
+             }
+                logger.error("Exception while closing socket, e=" + e);
+                logger.error("Forced shutdown on socket");
+                         }
         }
     }
 }

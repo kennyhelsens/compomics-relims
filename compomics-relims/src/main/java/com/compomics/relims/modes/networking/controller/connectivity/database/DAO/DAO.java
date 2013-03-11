@@ -46,7 +46,7 @@ public class DAO {
         if (!directoryFile.exists()) {
             boolean success = directoryFile.mkdirs();
             if (!success) {
-                System.out.println("Did not successfully create directory");
+                logger.error("Did not successfully create directory");
             }
         }
         this.dataSource = setupDataSource(protocol + directory + "/" + dbName);
@@ -379,9 +379,9 @@ public class DAO {
             } else {
                 statement.execute("CALL SYSCS_UTIL.SYSCS_SET_DATABASE_PROPERTY('sqlite.locks.deadlockTimeout', '30')");
             }
-            System.out.println("Set timeout configuration");
+            logger.debug("Set timeout configuration");
         } catch (SQLException e) {
-            System.out.println("Could not set configuration");
+            logger.debug("Could not set configuration");
             e.printStackTrace();
             logger.debug(e);
         } finally {

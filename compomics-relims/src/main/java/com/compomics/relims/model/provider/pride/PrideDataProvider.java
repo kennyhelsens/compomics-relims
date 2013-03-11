@@ -87,11 +87,11 @@ public class PrideDataProvider implements DataProvider {
             destinationFile = new File(RelimsVariableManager.getResultsFolder() + "/" + aProjectid + ".mgf");
             //Save the MGF file in the resultFolder               
             if (destinationFile.exists()) {
-                System.out.println("Saving mgf file to : " + destinationFile.getAbsolutePath().toString());
+                logger.info("Saving mgf file to : " + destinationFile.getAbsolutePath().toString());
                 returningFile = destinationFile;
             } else {
                 // System.out.println("Could not locate : " + destinationFile.getAbsolutePath().toString());
-                System.out.println("Returning pride-generated-mgf file");
+                logger.info("Returning pride-generated-mgf file");
                 MGFFile = getMGFFromPride(aProjectid);
                 returningFile = MGFFile;
             }
@@ -143,7 +143,6 @@ public class PrideDataProvider implements DataProvider {
                 }
                 lSpectrumAnnotator.annotate(String.valueOf(aProjectid));
             } catch (Exception e) {
-                System.out.println(e);
                 logger.error(e.getMessage());
                 logger.error(e.getCause());
                 ProgressManager.setState(Checkpoint.PRIDEFAILURE, e);

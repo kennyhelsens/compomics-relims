@@ -25,9 +25,7 @@ public class RelimsExceptionHandler implements Thread.UncaughtExceptionHandler {
 
     @Override
     public void uncaughtException(Thread t, Throwable e) {
-        System.out.println("Throwable: " + e.getMessage());
-        e.printStackTrace();
-        System.out.println(t.toString());
+        logger.error(e);
     }
 
     public void throwException(Thread t, Throwable e) {

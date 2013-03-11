@@ -42,7 +42,7 @@ public class PeptideShakerJobBean {
     private String identificationFiles;
 
     public PeptideShakerJobBean(long projectId, File searchParameters, File spectra) {
-        System.out.println("Collecting PeptideShaker parameters");
+        logger.debug("Collecting PeptideShaker parameters");
         this.projectId = projectId;
         this.searchParametersFile = searchParameters;
         this.spectra = spectra;

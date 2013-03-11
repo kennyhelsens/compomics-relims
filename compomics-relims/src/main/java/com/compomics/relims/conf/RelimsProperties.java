@@ -71,10 +71,10 @@ public class RelimsProperties {
         }
     }
 
-    public static boolean getDebugMode(){
+    public static boolean getDebugMode() {
         return config.getBoolean("relims.debugmode");
     }
-    
+
     public static int getBackupInterval() {
         return config.getInt("relims.networking.db.backupInterval");
     }
@@ -127,16 +127,18 @@ public class RelimsProperties {
         try {
             File lResource;
             int lOperatingSystem = Utilities.getOperatingSystem();
-            String jarFilePath = new Properties().getJarFilePath() + folderSeparator;
-            if (jarFilePath.startsWith(".")) {
-                jarFilePath = "";
-            }
 
-//            File locatorFile = new File(".");
-//            String path = locatorFile.getAbsolutePath().toString();
-//            path = path.substring(0, path.length() - 1);
 
-            String path = jarFilePath;
+            /*  String jarFilePath = new Properties().getJarFilePath() + folderSeparator;
+             if (jarFilePath.startsWith(".")) {
+             jarFilePath = "";
+             }*/
+
+            File locatorFile = new File(".");
+            String path = locatorFile.getAbsolutePath().toString();
+            path = path.substring(0, path.length() - 1);
+
+            //String path = jarFilePath;
 
             if (lOperatingSystem == Utilities.OS_MAC) {
                 path = path + "resources" + folderSeparator + "conf" + folderSeparator + "relims-mac.properties";
@@ -153,10 +155,6 @@ public class RelimsProperties {
             }
 
 
-            // Set the workspace for all future Commands to the SearchGUI  --> this is overkill...
-
-            Command.setWorkFolder(new File(getSearchGuiFolder() + folderSeparator));
-
             // Override Pride-Asap properties
             PropertiesConfigurationHolder lAsapProperties = PropertiesConfigurationHolder.getInstance();
             lAsapProperties.setProperty("spectrum.limit", config.getBoolean("relims.asap.spectrum.limit"));
@@ -166,7 +164,7 @@ public class RelimsProperties {
             lAsapProperties.setProperty("results_path_tmp_max", config.getInt("relims.results_path_tmp_max"));
             lAsapProperties.setProperty("results_path", config.getString("relims.asap.results"));
             lAsapProperties.setProperty("results_path_tmp", config.getString("relims.asap.results.tmp"));
-            
+
         } catch (Exception e) {
             e.printStackTrace();
             logger.error(e.getMessage(), e);
@@ -621,11 +619,11 @@ public class RelimsProperties {
         return config.getBoolean("peptideshaker.export.cps");
     }
 
-  public static boolean getPeptideShakerTSVOutput() {
+    public static boolean getPeptideShakerTSVOutput() {
         return config.getBoolean("peptideshaker.export.tsv");
     }
 
-   public static boolean getPeptideShakerUniprotOutput() {
+    public static boolean getPeptideShakerUniprotOutput() {
         return config.getBoolean("peptideshaker.export.uniprot");
     }
 

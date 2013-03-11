@@ -85,9 +85,9 @@ public class StatisticsDAO {
             }
             String projectID = dds.getProjectID((Long) statisticsMap.get("taskID"));
             if (createSucces) {
-                System.out.println("SUCCESS : Stored results for task " + statisticsMap.get("taskID") + " - ProjectID : " + projectID);
+                logger.info("SUCCESS : Stored results for task " + statisticsMap.get("taskID") + " - ProjectID : " + projectID);
             } else {
-                System.out.println("FAILURE : Could not run task " + statisticsMap.get("taskID") + " - ProjectID : " + projectID);
+                logger.error("FAILURE : Could not run task " + statisticsMap.get("taskID") + " - ProjectID : " + projectID);
             }
             return createSucces;
         }

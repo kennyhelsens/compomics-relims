@@ -247,7 +247,7 @@ public class SearchGUIJobBean {
             searchParameters.setPrecursorAccuracyType(SearchParameters.PrecursorAccuracyType.DA);
             validate(searchParameters);
         }
-        System.out.println("Searchparameters were loaded");
+        logger.info("Searchparameters were loaded");
         try {
             //save the file to the correct folder
             searchParametersFile = new File(RelimsProperties.getWorkSpace().toString() + "/SearchGUI.parameters ");
@@ -347,7 +347,7 @@ public class SearchGUIJobBean {
             } else if (System.getProperty("os.name").toLowerCase().contains("mac")) {
                 osName = "windows";
             } else {
-                System.out.println("Unsupported operating system !");
+                logger.error("Unsupported operating system !");
             }
 
             File makeBlastDbFile = new File(RelimsProperties.getSearchGuiFolder() + "/resources/makeblastdb/" + osName + "/makeblastdb");
@@ -513,8 +513,8 @@ public class SearchGUIJobBean {
         for (String aCmd : searchGUICommandLine) {
             totalCommandLine.append(aCmd);
         }
+        logger.debug("Launching command : ");
         logger.debug(totalCommandLine.toString());
-        System.out.println(totalCommandLine.toString());
         return Command.call(totalCommandLine.toString());
     }
 }

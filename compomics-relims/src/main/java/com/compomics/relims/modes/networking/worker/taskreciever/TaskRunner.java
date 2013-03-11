@@ -18,8 +18,6 @@ import java.util.concurrent.Callable;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 
-
-
 /**
  *
  * @author Kenneth
@@ -33,13 +31,14 @@ public class TaskRunner {
         this.task = task;
     }
     Thread runner = new Thread(new RelimsJobStarter());
+    Thread jobStarter = null;
 
     public void launch() {
-        Thread jobStarter = null;
+
         Thread.setDefaultUncaughtExceptionHandler(new RelimsExceptionHandler());
 
         try {
-            System.out.println("Preparing the search...This might take a long period of time.");
+            logger.info("Preparing the search...This might take a long period of time.");
             jobStarter = new Thread(new RelimsJobStarter());
             jobStarter.start();
             //use checkpoints to determine action
@@ -49,6 +48,15 @@ public class TaskRunner {
                 jobStarter.interrupt();
             }
         }
+    }
+
+    public boolean isRunning() {
+        if (jobStarter == null) {
+            return false;
+        } else if (jobStarter.isAlive()) {
+            return true;
+        }
+        return false;
     }
 
     private class RelimsJobStarter implements Callable, Runnable {
@@ -183,17 +191,16 @@ public class TaskRunner {
                 boolean sentToServer = false;
                 while (!sentToServer) {
                     try {
-                        System.out.println("Sending feedback to server...");
+                        logger.info("Sending feedback to server...");
                         sentToServer = resultNotifier.sendStatistics(ResourceManager.getAllSystemInfo());
                         TaskReciever.locked = false;
                         Thread.sleep(500);
-                        System.out.println("Waiting for new task");
+                        logger.debug("Waiting for new task");
                         System.out.println("");
                     } catch (Exception ex) {
                         //catch a general exception to make sure the results are sent...
-                        System.out.println("Server could not be contacted succesfully. Retrying...");
+                        logger.error("Server could not be contacted succesfully. Retrying...");
                         logger.error(ex);
-                        ex.printStackTrace();
                     }
                 }
             }

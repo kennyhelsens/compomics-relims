@@ -41,9 +41,7 @@ public class ProgressManager {
     }
 
     public static void setState(Checkpoint checkpoint, Throwable e) {
-        logger.error(e.getMessage());
-        logger.error(e.getCause());
-        System.out.println(e.getMessage());
+        logger.error(e);
         setState(checkpoint);
         //append to manual verification file
         logForValidation(Arrays.toString(e.getStackTrace()));

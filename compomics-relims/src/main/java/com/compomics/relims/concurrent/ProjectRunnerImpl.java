@@ -149,14 +149,14 @@ public class ProjectRunnerImpl extends Observable implements ProjectRunner {
             setModificationResolver(modificationResolver = projectProvider.getModificationResolver());
             logger.debug("Building projectbean");
             relimsProjectBean = projectProvider.getProject(projectID);
-                  setProject(relimsProjectBean);
+            setProject(relimsProjectBean);
             RelimsVariableManager.setProjectID(projectID);
             long lProjectid = relimsProjectBean.getProjectID();
 
-                  // GET THE SPECTRA FILE 
-            
+            // GET THE SPECTRA FILE 
+
             spectrumFile = dataProvider.getSpectraForProject(projectID);
-            
+
             logger.debug("creating projectrunner for " + lProjectid);
 
             Collection<Predicate> lPredicates = predicateManager.createCollection(
@@ -194,7 +194,7 @@ public class ProjectRunnerImpl extends Observable implements ProjectRunner {
                         return false;
                     }
                 } else {
-                    System.out.println("Aborting task...");
+                    logger.debug("Aborting task...");
                     return false;
                 }
             } catch (Exception e) {
@@ -350,7 +350,7 @@ public class ProjectRunnerImpl extends Observable implements ProjectRunner {
                         RepositoryManager.storeFlagInRepository("FAILED", "mslims", new File(RelimsVariableManager.getSearchResultFolder()), projectID);
                     } else {
                         RepositoryManager.storeFlagInRepository("FAILED", "pride", new File(RelimsVariableManager.getSearchResultFolder()), projectID);
-                        System.out.println("Stored sourcefiles (MGF / SearchParameters) to PRIDE repository");
+                        logger.info("Stored sourcefiles (MGF / SearchParameters) to PRIDE repository");
                     }
                     //delete the resultfolder
                     if (progressManager.getEndState() != Checkpoint.CLASSICRELIMS) {

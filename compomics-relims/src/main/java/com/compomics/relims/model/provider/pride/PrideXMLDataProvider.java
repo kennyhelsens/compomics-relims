@@ -160,7 +160,6 @@ public class PrideXMLDataProvider implements DataProvider {
 
                 lSpectrumAnnotator.annotate(xmlFile);
             } catch (Exception e) {
-                System.out.println(e);
                 logger.error(e.getMessage());
                 logger.error(e.getCause());
                 ProgressManager.setState(Checkpoint.PRIDEFAILURE, e);
