@@ -44,7 +44,6 @@ public class HeartbeatGenerator implements Runnable {
                     sockInput = new ObjectInputStream(sock.getInputStream());
                     sockOutput = new ObjectOutputStream(sock.getOutputStream());
                 } catch (IOException e) {
-                    e.printStackTrace();
                     logger.error("Server could not be reached...Retrying...");
                 }
                 try {

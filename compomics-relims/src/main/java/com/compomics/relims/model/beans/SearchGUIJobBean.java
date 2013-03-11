@@ -505,7 +505,6 @@ public class SearchGUIJobBean {
 
     public int launch() throws IOException, ConfigurationException {
         prepare();
-        //
         File searchGuiFolder = new File(RelimsProperties.getSearchGuiFolder());
         Command.setWorkFolder(searchGuiFolder);
         StringBuilder totalCommandLine = new StringBuilder();

@@ -79,7 +79,7 @@ class TaskHandler implements Runnable {
                     // switch to local mode perhaps?
                 }
             } finally {
-                if (sock.isClosed()) {
+                if (!sock.isClosed()) {
                     try {
                         logger.debug("Closing connection");
                         sock.close();
