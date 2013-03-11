@@ -42,11 +42,15 @@ class TaskHandler implements Runnable {
 
     @Override
     public void run() {
+        Task newTask = null;
         logger.debug("Processing a task-request.");
         System.out.println("Processing a task-request");
         while (true) {
             try {
-                Task newTask = (Task) sockInput.readObject();
+                //ONLY READ THIS STREAM IF THE TASKRECIEVER IS NOT BUSY ! = prevent error floods....
+                if (TaskReciever.locked = false) {
+                    newTask = (Task) sockInput.readObject();
+                }
                 if (newTask != null) {
                     try {
                         TaskReciever.locked = true;
