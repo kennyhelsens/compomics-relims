@@ -11,7 +11,7 @@ import com.compomics.pride_asa_pipeline.service.PrideXmlModificationService;
 import com.compomics.pride_asa_pipeline.spring.ApplicationContextProvider;
 import com.compomics.pridexmltomgfconverter.errors.enums.ConversionError;
 import com.compomics.relims.conf.RelimsProperties;
-import com.compomics.relims.manager.variablemanager.RelimsVariableManager;
+import com.compomics.relims.manager.variablemanager.ProcessVariableManager;
 import com.compomics.relims.manager.processmanager.processguard.RelimsException;
 import com.compomics.relims.manager.filemanager.FileManager;
 import com.compomics.relims.model.beans.RelimsProjectBean;
@@ -92,11 +92,11 @@ public class PrideXMLDataProvider implements DataProvider {
             if (prideXMLFile != null) {
                 //Initiate the prideservice
                 iPrideService.init(prideXMLFile);
-                destinationFile = new File(RelimsVariableManager.getResultsFolder() + "/" + aProjectid + ".mgf");
+                destinationFile = new File(ProcessVariableManager.getResultsFolder() + "/" + aProjectid + ".mgf");
                 //Save the MGF file in the resultFolder       
                 errorList = iPrideService.getSpectraAsMgf(prideXMLFile, destinationFile);
                 //Get the errorList and store it in the results later
-                RelimsVariableManager.setConversionErrorList(errorList);
+                ProcessVariableManager.setConversionErrorList(errorList);
                 if (destinationFile == null) {
                     logger.error("The Pride provider could not load an MGF-file.");
                     // try to get it from other source = good idea?

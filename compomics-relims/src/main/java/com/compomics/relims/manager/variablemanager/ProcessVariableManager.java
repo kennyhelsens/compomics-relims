@@ -16,7 +16,7 @@ import java.util.List;
  *
  * @author Kenneth
  */
-public class RelimsVariableManager {
+public class ProcessVariableManager {
 
     /**
      * the searchResultFolder = where all files needed to run both PeptideShaker
@@ -77,7 +77,7 @@ public class RelimsVariableManager {
      */
     static SearchParameters searchParameters;
     private static List<ConversionError> errorList;
-    //public RelimsVariableManager(File propFolder)  {
+    //public ProcessVariableManager(File propFolder)  {
     //this.repositoryFolder = propFolder;
     //}
     private static boolean classicMode;
@@ -88,7 +88,7 @@ public class RelimsVariableManager {
     }
 
     public static void setRepository(File propertiesFolder) {
-        RelimsVariableManager.repositoryFolder = propertiesFolder;
+        ProcessVariableManager.repositoryFolder = propertiesFolder;
     }
 
     public static File getRepository() {
@@ -104,7 +104,7 @@ public class RelimsVariableManager {
     }
 
     public static void setMGFFile(String MGFFile) {
-        RelimsVariableManager.MGFFile = MGFFile;
+        ProcessVariableManager.MGFFile = MGFFile;
     }
 
     public static String getNormalModFile() {
@@ -112,11 +112,11 @@ public class RelimsVariableManager {
     }
 
     public static void setModOMSSAFile(String OMXFile) {
-        RelimsVariableManager.normalModFile = OMXFile;
+        ProcessVariableManager.normalModFile = OMXFile;
     }
 
     public static void setSearchResultFolder(String iSearchResultFolder) {
-        RelimsVariableManager.searchResultFolder = iSearchResultFolder;
+        ProcessVariableManager.searchResultFolder = iSearchResultFolder;
     }
 
     public static String getSearchResultFolder() {
@@ -128,11 +128,11 @@ public class RelimsVariableManager {
     }
 
     public static void setProjectID(long projectId) {
-        RelimsVariableManager.projectId = projectId;
+        ProcessVariableManager.projectId = projectId;
     }
 
     public static void setTimeStampSearch(String iTimeStamp) {
-        RelimsVariableManager.timeStamp = iTimeStamp;
+        ProcessVariableManager.timeStamp = iTimeStamp;
     }
 
     public static String getTimeStampSearch() {
@@ -144,7 +144,7 @@ public class RelimsVariableManager {
 
     public static String buildIdentificationList() {
 
-        List<String> selectedIdentifications = fileGrabber.getIdentificationsList(RelimsVariableManager.workSpace);
+        List<String> selectedIdentifications = fileGrabber.getIdentificationsList(ProcessVariableManager.workSpace);
         StringBuilder cmdStringIdentifications = new StringBuilder();
 
         for (String anIdentification : selectedIdentifications) {
@@ -157,74 +157,74 @@ public class RelimsVariableManager {
     }
 
     public static String buildSpectraList() {
-        return fileGrabber.getGenericMGFFile(RelimsVariableManager.workSpace).getAbsolutePath().toString();
+        return fileGrabber.getGenericMGFFile(ProcessVariableManager.workSpace).getAbsolutePath().toString();
     }
 
     public static void setWorkSpace(String workSpace) {
-        RelimsVariableManager.workSpace = workSpace;
+        ProcessVariableManager.workSpace = workSpace;
     }
 
     public static String getFullMGFFile() {
-        return fileGrabber.getGenericMGFFile(RelimsVariableManager.workSpace).getAbsolutePath().toString();
+        return fileGrabber.getGenericMGFFile(ProcessVariableManager.workSpace).getAbsolutePath().toString();
     }
 
     public static void setSpectrumFiles(List<String> lSpectrumFiles) {
-        RelimsVariableManager.spectrumFiles = lSpectrumFiles;
+        ProcessVariableManager.spectrumFiles = lSpectrumFiles;
     }
 
     public static List<String> getSpectrumFiles() {
-        return RelimsVariableManager.spectrumFiles;
+        return ProcessVariableManager.spectrumFiles;
     }
 
     public static void setResultsFolder(String resultsFolder) {
-        RelimsVariableManager.resultsFolder = resultsFolder;
+        ProcessVariableManager.resultsFolder = resultsFolder;
     }
 
     public static String getResultsFolder() {
-        return RelimsVariableManager.resultsFolder;
+        return ProcessVariableManager.resultsFolder;
     }
 
     /*  public static long getTaskID() {
-     return RelimsVariableManager.taskID;
+     return ProcessVariableManager.taskID;
      }
 
      public static void setTaskID(long taskID) {
      try {
-     RelimsVariableManager.taskID = taskID;
+     ProcessVariableManager.taskID = taskID;
      } catch (Throwable e) {
      e.printStackTrace();
      }
      }
 
      public static int getWorkerPort() {
-     return RelimsVariableManager.workerport;
+     return ProcessVariableManager.workerport;
      }
 
      public static void setWorkerPort(int workerport) {
-     RelimsVariableManager.workerport = workerport;
+     ProcessVariableManager.workerport = workerport;
      }*/
     public static void setSearchParameters(SearchParameters searchParameters) {
-        RelimsVariableManager.searchParameters = searchParameters;
+        ProcessVariableManager.searchParameters = searchParameters;
     }
 
     public static SearchParameters getSearchParameters() {
-        return RelimsVariableManager.searchParameters;
+        return ProcessVariableManager.searchParameters;
     }
 
     public static void setConversionErrorList(List<ConversionError> errorList) {
-        RelimsVariableManager.errorList = errorList;
+        ProcessVariableManager.errorList = errorList;
     }
 
     public static List<ConversionError> getConversionErrorList() {
-        return RelimsVariableManager.errorList;
+        return ProcessVariableManager.errorList;
     }
 
     public static boolean getClassicMode() {
-        return RelimsVariableManager.classicMode;
+        return ProcessVariableManager.classicMode;
     }
 
     public static void setClassicMode(boolean classicMode) {
-        RelimsVariableManager.classicMode = classicMode;
+        ProcessVariableManager.classicMode = classicMode;
     }
 
    

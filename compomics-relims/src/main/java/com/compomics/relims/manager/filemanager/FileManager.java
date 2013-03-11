@@ -4,7 +4,7 @@
  */
 package com.compomics.relims.manager.filemanager;
 
-import com.compomics.relims.manager.variablemanager.RelimsVariableManager;
+import com.compomics.relims.manager.variablemanager.ProcessVariableManager;
 import com.compomics.relims.conf.RelimsProperties;
 import java.io.File;
 import java.io.FileFilter;
@@ -39,7 +39,7 @@ public class FileManager {
     public static List<String> getIdentificationsList(String directoryName) {
 
 
-        projectSpecificRegex = RelimsVariableManager.getProjectId() + "_";
+        projectSpecificRegex = ProcessVariableManager.getProjectId() + "_";
 
         fileList = new ArrayList<String>();
         File directory = new File(directoryName);
@@ -61,12 +61,12 @@ public class FileManager {
     }
 
     public static String getMGFFile(String directoryName) {
-        String fileName = RelimsVariableManager.getProjectId() + ".mgf";
+        String fileName = ProcessVariableManager.getProjectId() + ".mgf";
         return fileName;
     }
 
     public String getFullMGFFile(String workSpace) {
-        String fileName = workSpace + "/" + RelimsVariableManager.getProjectId() + ".mgf";
+        String fileName = workSpace + "/" + ProcessVariableManager.getProjectId() + ".mgf";
         return fileName;
     }
 
@@ -98,15 +98,15 @@ public class FileManager {
          }*/
 
         //fileNames.append(RelimsProperties.getWorkSpace().toString()).append("/");
-        //fileNames.append(RelimsVariableManager.getProjectId()).append(".omx").append(",");
+        //fileNames.append(ProcessVariableManager.getProjectId()).append(".omx").append(",");
         //fileNames.append(RelimsProperties.getWorkSpace().toString()).append("/");
-        //fileNames.append(RelimsVariableManager.getProjectId()).append("t.xml");
+        //fileNames.append(ProcessVariableManager.getProjectId()).append("t.xml");
 
         return fileNames.toString();
     }
 
     public static void deleteResultFolder() {
-        if (!RelimsVariableManager.getClassicMode()) {
+        if (!ProcessVariableManager.getClassicMode()) {
             File resultFolder = RelimsProperties.getWorkSpace();
             try {
                 FileUtils.deleteDirectory(resultFolder);

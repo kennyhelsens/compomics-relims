@@ -1,7 +1,7 @@
 package com.compomics.relims.manager.progressmanager;
 
 import com.compomics.relims.conf.RelimsProperties;
-import com.compomics.relims.manager.variablemanager.RelimsVariableManager;
+import com.compomics.relims.manager.variablemanager.ProcessVariableManager;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
@@ -85,7 +85,7 @@ public class ProgressManager {
                 out.write("=========================================================");
                 out.newLine();
                 out.newLine();
-                out.write("Project ID : " + RelimsVariableManager.getProjectId());
+                out.write("Project ID : " + ProcessVariableManager.getProjectId());
                 out.newLine();
                 out.write("Error stacktrace : ");
                 out.newLine();

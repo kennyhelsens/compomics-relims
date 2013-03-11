@@ -6,7 +6,7 @@ import com.compomics.relims.concurrent.Command;
 import com.compomics.relims.manager.processmanager.gearbox.enums.PriorityLevel;
 import com.compomics.relims.manager.progressmanager.Checkpoint;
 import com.compomics.relims.manager.progressmanager.ProgressManager;
-import com.compomics.relims.manager.variablemanager.RelimsVariableManager;
+import com.compomics.relims.manager.variablemanager.ProcessVariableManager;
 import com.compomics.relims.model.guava.functions.SpeciesFinderFunction;
 import com.compomics.relims.modes.gui.util.Properties;
 import com.compomics.util.experiment.biology.PTMFactory;
@@ -239,7 +239,7 @@ public class RelimsProperties {
         fileName.append(dateformatter.format(date.getTime()));
         workSpace = new File(getWorkSpacePath(), fileName.toString());
         workSpace.mkdir();
-        RelimsVariableManager.setSearchResultFolder(workSpace.getAbsolutePath().toString());
+        ProcessVariableManager.setSearchResultFolder(workSpace.getAbsolutePath().toString());
         return workSpace;
     }
 

@@ -2,7 +2,7 @@ package com.compomics.relims.model.beans;
 
 import com.compomics.relims.concurrent.Command;
 import com.compomics.relims.conf.RelimsProperties;
-import com.compomics.relims.manager.variablemanager.RelimsVariableManager;
+import com.compomics.relims.manager.variablemanager.ProcessVariableManager;
 import com.compomics.relims.manager.progressmanager.ProgressManager;
 import com.compomics.util.experiment.biology.Enzyme;
 import com.compomics.util.experiment.biology.EnzymeFactory;
@@ -152,7 +152,7 @@ public class SearchGUIJobBean {
 
         searchGUICommandLine.add(" -output_folder ");
         //figure out what the projectprovider was
-        searchGUICommandLine.add(RelimsVariableManager.getResultsFolder() + "/");
+        searchGUICommandLine.add(ProcessVariableManager.getResultsFolder() + "/");
 
         searchGUICommandLine.add(" -search_params ");
         searchGUICommandLine.add(searchParametersFile.getAbsolutePath());
@@ -173,7 +173,7 @@ public class SearchGUIJobBean {
 
     protected void createSearchParametersFile() {
 
-        File searchParametersRepositoryFile = new File(RelimsVariableManager.getSearchResultFolder() + "/SearchGUI.parameters");
+        File searchParametersRepositoryFile = new File(ProcessVariableManager.getSearchResultFolder() + "/SearchGUI.parameters");
         File fastaFile = new File(RelimsProperties.getDefaultSearchDatabase());
         //makeBlastDB(fastaFile) Searchgui should take care of this !;
         if (searchParametersRepositoryFile.exists()) {
@@ -471,8 +471,8 @@ public class SearchGUIJobBean {
     protected void prepare() {
         //Create the resultFolder
         iTimeStamp = System.currentTimeMillis();
-        iSearchResultFolder = new File(RelimsVariableManager.getSearchResultFolder());
-        RelimsVariableManager.setSearchResultFolder(iSearchResultFolder.toString());
+        iSearchResultFolder = new File(ProcessVariableManager.getSearchResultFolder());
+        ProcessVariableManager.setSearchResultFolder(iSearchResultFolder.toString());
         createSearchParametersFile();
     }
 

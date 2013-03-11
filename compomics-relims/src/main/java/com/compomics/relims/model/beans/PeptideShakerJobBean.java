@@ -3,7 +3,7 @@ package com.compomics.relims.model.beans;
 import com.compomics.relims.concurrent.Command;
 import com.compomics.relims.conf.RelimsProperties;
 import com.compomics.relims.manager.filemanager.FileManager;
-import com.compomics.relims.manager.variablemanager.RelimsVariableManager;
+import com.compomics.relims.manager.variablemanager.ProcessVariableManager;
 import org.apache.log4j.Logger;
 
 import java.io.File;
@@ -46,9 +46,9 @@ public class PeptideShakerJobBean {
         this.projectId = projectId;
         this.searchParametersFile = searchParameters;
         this.spectra = spectra;
-        this.jobDirectory = new File(RelimsVariableManager.getResultsFolder());
+        this.jobDirectory = new File(ProcessVariableManager.getResultsFolder());
 //Save the SearchParameters in temporary file with the project...
-        this.identificationFiles = FileManager.getIdentificationFiles(RelimsVariableManager.getResultsFolder() + "/");
+        this.identificationFiles = FileManager.getIdentificationFiles(ProcessVariableManager.getResultsFolder() + "/");
     }
 
     public PeptideShakerJobBean(long projectId) {
@@ -116,9 +116,9 @@ public class PeptideShakerJobBean {
             PSCommandLine.add(RelimsProperties.getPeptideShakerArchive());
             PSCommandLine.add(" eu.isas.peptideshaker.cmd.PeptideShakerCLI ");
             PSCommandLine.add("-experiment ");
-            PSCommandLine.add(RelimsVariableManager.getProjectId() + " ");
+            PSCommandLine.add(ProcessVariableManager.getProjectId() + " ");
             PSCommandLine.add("-sample ");
-            PSCommandLine.add("AutoReprocessed " + RelimsVariableManager.getProjectId() + " ");
+            PSCommandLine.add("AutoReprocessed " + ProcessVariableManager.getProjectId() + " ");
             PSCommandLine.add("-replicate 1 ");
             PSCommandLine.add("-identification_files ");
             PSCommandLine.add(identificationFiles);
@@ -128,7 +128,7 @@ public class PeptideShakerJobBean {
             PSCommandLine.add(this.searchParametersFile.getAbsolutePath().toString());
             if (RelimsProperties.getPeptideShakerCPSOutput()) {
                 PSCommandLine.add(" -out ");
-                PSCommandLine.add(jobDirectory.getAbsolutePath().toString() + "/" + RelimsVariableManager.getProjectId() + ".cps");
+                PSCommandLine.add(jobDirectory.getAbsolutePath().toString() + "/" + ProcessVariableManager.getProjectId() + ".cps");
             }
             //Required for R
             if (RelimsProperties.getPeptideShakerTSVOutput()) {

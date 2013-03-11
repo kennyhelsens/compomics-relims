@@ -16,7 +16,7 @@ import com.compomics.relims.manager.filemanager.FileManager;
 import com.compomics.relims.manager.processmanager.processguard.RelimsException;
 import com.compomics.relims.manager.progressmanager.Checkpoint;
 import com.compomics.relims.manager.progressmanager.ProgressManager;
-import com.compomics.relims.manager.variablemanager.RelimsVariableManager;
+import com.compomics.relims.manager.variablemanager.ProcessVariableManager;
 import com.compomics.relims.model.beans.RelimsProjectBean;
 import com.compomics.relims.model.interfaces.DataProvider;
 import com.google.common.collect.Sets;
@@ -84,7 +84,7 @@ public class PrideDataProvider implements DataProvider {
         File returningFile = null;
         try {
             // MAKE AN MGF FILE
-            destinationFile = new File(RelimsVariableManager.getResultsFolder() + "/" + aProjectid + ".mgf");
+            destinationFile = new File(ProcessVariableManager.getResultsFolder() + "/" + aProjectid + ".mgf");
             //Save the MGF file in the resultFolder               
             if (destinationFile.exists()) {
                 logger.info("Saving mgf file to : " + destinationFile.getAbsolutePath().toString());
@@ -199,7 +199,7 @@ public class PrideDataProvider implements DataProvider {
         // Try maximum three times to get the spectra. Otherwise fail.
         int i = 0;
         int max = 3;
-        File MGFFile = new File(RelimsVariableManager.getResultsFolder() + "/" + aProjectid + ".mgf");
+        File MGFFile = new File(ProcessVariableManager.getResultsFolder() + "/" + aProjectid + ".mgf");
         boolean spectraRetrieved = false;
         while (i < max && !spectraRetrieved) {
             try {

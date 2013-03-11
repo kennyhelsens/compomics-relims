@@ -3,7 +3,7 @@ package com.compomics.relims.concurrent;
 import com.compomics.pride_asa_pipeline.logic.PrideSpectrumAnnotator;
 import com.compomics.pride_asa_pipeline.spring.ApplicationContextProvider;
 import com.compomics.relims.conf.RelimsProperties;
-import com.compomics.relims.manager.variablemanager.RelimsVariableManager;
+import com.compomics.relims.manager.variablemanager.ProcessVariableManager;
 import com.compomics.relims.manager.processmanager.processguard.RelimsException;
 import com.compomics.relims.manager.processmanager.processguard.RelimsExceptionHandler;
 import com.compomics.relims.manager.filemanager.RepositoryManager;
@@ -94,7 +94,7 @@ public class RelimsJob implements Callable, Closable {
             }
             if (!usePrideAsap) {
                 RelimsProperties.setAppendPrideAsapAutomatic(false);
-                RelimsVariableManager.setSearchParameters(searchParameters);
+                ProcessVariableManager.setSearchParameters(searchParameters);
             }
             this.projectID = aProjectID;
             progressManager.setState(Checkpoint.LOADINGPROVIDERS);
@@ -119,20 +119,20 @@ public class RelimsJob implements Callable, Closable {
         Thread.setDefaultUncaughtExceptionHandler(new RelimsExceptionHandler());
         progressManager.setUp();
         List<Future> lFutures = Lists.newArrayList();
-        Object[] relimsResultObjects = new Object[]{Checkpoint.FAILED, RelimsVariableManager.getSearchParameters()};
+        Object[] relimsResultObjects = new Object[]{Checkpoint.FAILED, ProcessVariableManager.getSearchParameters()};
         if (this.projectID != -1) {
             Checkpoint endState;
             try {
                 progressManager.setState(Checkpoint.RUNRELIMS);
                 endState = runRelims(projectID);
-                relimsResultObjects = new Object[]{endState, RelimsVariableManager.getSearchParameters(), RelimsVariableManager.getConversionErrorList()};
+                relimsResultObjects = new Object[]{endState, ProcessVariableManager.getSearchParameters(), ProcessVariableManager.getConversionErrorList()};
             } catch (Exception ex) {
-                relimsResultObjects = new Object[]{Checkpoint.FAILED, RelimsVariableManager.getSearchParameters(), RelimsVariableManager.getConversionErrorList()};
+                relimsResultObjects = new Object[]{Checkpoint.FAILED, ProcessVariableManager.getSearchParameters(), ProcessVariableManager.getConversionErrorList()};
             } finally {
                 return relimsResultObjects;
             }
         } else {
-            RelimsVariableManager.setClassicMode(true);
+            ProcessVariableManager.setClassicMode(true);
             runClassicRelims();
             return lFutures;
         }
@@ -141,16 +141,16 @@ public class RelimsJob implements Callable, Closable {
     private void runClassicRelims() {
         //Run relims as it used to be run ...
         Thread.setDefaultUncaughtExceptionHandler(new RelimsExceptionHandler());
-        RelimsVariableManager.setClassicMode(true);
+        ProcessVariableManager.setClassicMode(true);
         progressManager.setUp();
         Long lProjectID;
         ProjectListProvider lPreDefinedProjects = projectProvider.getPreDefinedProjects();
-        RelimsVariableManager.setResultsFolder(" ");
+        ProcessVariableManager.setResultsFolder(" ");
         while ((lProjectID = lPreDefinedProjects.nextProjectID()) != -1) {
             try {
                 // Class searchStrategyClass = RelimsProperties.getRelimsSearchStrategyClass(iSearchStrategyID);
                 // SearchStrategy searchStrategy = (SearchStrategy) searchStrategyClass.newInstance();
-                ProjectRunner lProjectRunner = new ProjectRunnerImpl();
+                ProjectRunner lProjectRunner = new RelimsJobController();
                 lProjectRunner.setProjectID(lProjectID);
                 lProjectRunner.setProjectProvider(projectProvider);
                 lProjectRunner.setPredicateManager(predicateManager);
@@ -178,12 +178,12 @@ public class RelimsJob implements Callable, Closable {
     }
 
     private Checkpoint runRelims(long lProjectID) {
-        //   RelimsVariableManager.setResultsFolder(RelimsProperties.createWorkSpace().getAbsolutePath().toString());
+        //   ProcessVariableManager.setResultsFolder(RelimsProperties.createWorkSpace().getAbsolutePath().toString());
         Thread.setDefaultUncaughtExceptionHandler(relimsErrorHandler);
-        RelimsVariableManager.setClassicMode(false);
-        RelimsVariableManager.setResultsFolder(" ");
+        ProcessVariableManager.setClassicMode(false);
+        ProcessVariableManager.setResultsFolder(" ");
         try {
-            ProjectRunner lProjectRunner = new ProjectRunnerImpl();
+            ProjectRunner lProjectRunner = new RelimsJobController();
             lProjectRunner.setProjectID(lProjectID);
             lProjectRunner.setProjectProvider(projectProvider);
             lProjectRunner.setPredicateManager(predicateManager);

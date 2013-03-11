@@ -4,7 +4,7 @@
  */
 package com.compomics.relims.manager.filemanager;
 
-import com.compomics.relims.manager.variablemanager.RelimsVariableManager;
+import com.compomics.relims.manager.variablemanager.ProcessVariableManager;
 import com.compomics.relims.conf.RelimsProperties;
 import java.io.File;
 import java.io.FilenameFilter;
@@ -129,7 +129,7 @@ public class RepositoryManager {
         File repositoryDirectory;
 
         try {
-            File resultFolder = new File(RelimsVariableManager.getResultsFolder());
+            File resultFolder = new File(ProcessVariableManager.getResultsFolder());
 
             if (provider.contains("mslims")) {
                 repositoryDirectory = repositoryMSLIMS;
