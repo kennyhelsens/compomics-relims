@@ -39,8 +39,6 @@ public class RelimsWrapper {
             launch();
         } catch (Exception e) {
             e.printStackTrace();
-            ProgressManager.setState(Checkpoint.FAILED, e);;
-            Thread.currentThread().interrupt();
         }
     }
 
@@ -52,6 +50,7 @@ public class RelimsWrapper {
     private void launch() throws Exception {
 
         String path = this.getClass().getResource("RelimsWrapper.class").getPath();
+        System.err.println(path);
         path = path.substring(5, path.indexOf(jarFileName));
         path = path.replace("%20", " ");
         path = path.replace("%5b", "[");
