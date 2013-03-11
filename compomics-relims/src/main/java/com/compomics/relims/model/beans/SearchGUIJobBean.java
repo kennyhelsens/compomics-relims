@@ -175,7 +175,7 @@ public class SearchGUIJobBean {
 
         File searchParametersRepositoryFile = new File(RelimsVariableManager.getSearchResultFolder() + "/SearchGUI.parameters");
         File fastaFile = new File(RelimsProperties.getDefaultSearchDatabase());
-        makeBlastDB(fastaFile);
+        //makeBlastDB(fastaFile) Searchgui should take care of this !;
         if (searchParametersRepositoryFile.exists()) {
             try {
                 searchParameters = SearchParameters.getIdentificationParameters(searchParametersRepositoryFile);
@@ -297,12 +297,6 @@ public class SearchGUIJobBean {
                     if (tempBatch.exists()) {
                         tempBatch.delete();
                         logger.debug("Cleaned up temporary batch file...");
-                    }
-                    try {
-                        Runtime.getRuntime().exec("cd " + RelimsProperties.getSearchGuiFolder());
-                        logger.debug("Returning to searchgui folder");
-                    } catch (IOException ex) {
-                        logger.error(ex);
                     }
                 }
             }
