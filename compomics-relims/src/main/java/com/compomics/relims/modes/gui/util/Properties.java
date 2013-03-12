@@ -1,14 +1,20 @@
 package com.compomics.relims.modes.gui.util;
 
+import com.compomics.relims.conf.RelimsProperties;
+import org.apache.log4j.Logger;
+
 import java.io.InputStream;
+import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
 
 /**
  * This class makes it easy to get the version number from the pom file, and the
  * path to the jar file.
  *
- * @author Harald Barsnes
  */
 public class Properties {
+
+    private static Logger logger = Logger.getLogger(Properties.class);
 
     /**
      * Creates a new empty Properties object.
@@ -40,9 +46,14 @@ public class Properties {
      *
      * @return the path to the jar file
      */
-    public String getJarFilePath() {
-        String path = getClass().getResource("Properties.class").getPath();
-
+    public String getRootFolder() {
+//        String path = getClass().getResource("Properties.class").getPath();
+        String path = RelimsProperties.class.getProtectionDomain().getCodeSource().getLocation().getPath();
+        try {
+            path = URLDecoder.decode(path, "UTF-8");
+        } catch (UnsupportedEncodingException e) {
+            logger.error(e.getMessage(), e);
+        }
 
         if (path.matches(".*jar.*")) {
             // Working with a jar file!

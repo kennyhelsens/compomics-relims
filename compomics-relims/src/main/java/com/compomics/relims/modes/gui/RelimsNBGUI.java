@@ -153,14 +153,14 @@ public class RelimsNBGUI extends javax.swing.JFrame {
      */
     private void addShortcutAtDeskTop() {
 
-        if (!new Properties().getJarFilePath().equalsIgnoreCase(".")
+        if (!new Properties().getRootFolder().equalsIgnoreCase(".")
                 && System.getProperty("os.name").lastIndexOf("Windows") != -1
-                && new File(new Properties().getJarFilePath() + "/resources/conf/firstRun").exists()) {
+                && new File(new Properties().getRootFolder() + "/resources/conf/firstRun").exists()) {
 
             // @TODO: add support for desktop icons in mac and linux??
 
             // delete the firstRun file such that the user is not asked the next time around
-            new File(new Properties().getJarFilePath() + "/resources/conf/firstRun").delete();
+            new File(new Properties().getRootFolder() + "/resources/conf/firstRun").delete();
 
             int value = JOptionPane.showConfirmDialog(null,
                     "Create a shortcut to Relims on the desktop?",
@@ -170,7 +170,7 @@ public class RelimsNBGUI extends javax.swing.JFrame {
 
             if (value == JOptionPane.YES_OPTION) {
 
-                String jarFilePath = new Properties().getJarFilePath();
+                String jarFilePath = new Properties().getRootFolder();
                 String versionNumber = new Properties().getVersion();
 
                 if (!jarFilePath.equalsIgnoreCase(".")) {

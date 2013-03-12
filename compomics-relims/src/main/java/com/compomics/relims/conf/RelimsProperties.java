@@ -2,8 +2,8 @@ package com.compomics.relims.conf;
 
 import com.compomics.omssa.xsd.UserMod;
 import com.compomics.pride_asa_pipeline.config.PropertiesConfigurationHolder;
-import com.compomics.relims.concurrent.Command;
 import com.compomics.relims.manager.processmanager.gearbox.enums.PriorityLevel;
+import com.compomics.relims.manager.processmanager.processguard.RelimsException;
 import com.compomics.relims.manager.progressmanager.Checkpoint;
 import com.compomics.relims.manager.progressmanager.ProgressManager;
 import com.compomics.relims.manager.variablemanager.ProcessVariableManager;
@@ -128,30 +128,29 @@ public class RelimsProperties {
             File lResource;
             int lOperatingSystem = Utilities.getOperatingSystem();
 
+            String rootPath = new Properties().getRootFolder() + folderSeparator;
+             if (rootPath.startsWith(".")) {
+                rootPath = "";
+             }
 
-            /*  String jarFilePath = new Properties().getJarFilePath() + folderSeparator;
-             if (jarFilePath.startsWith(".")) {
-             jarFilePath = "";
-             }*/
-
-            File locatorFile = new File(".");
-            String path = locatorFile.getAbsolutePath().toString();
-            path = path.substring(0, path.length() - 1);
-
-            //String path = jarFilePath;
+            String path = rootPath;
+            path = path + "resources" + folderSeparator + "conf" + folderSeparator;
 
             if (lOperatingSystem == Utilities.OS_MAC) {
-                path = path + "resources" + folderSeparator + "conf" + folderSeparator + "relims-mac.properties";
+                path += "relims-mac.properties";
             } else if (lOperatingSystem == Utilities.OS_WIN_OTHER) {
-                path = path + "resources" + folderSeparator + "conf" + folderSeparator + "relims-windows.properties";
+                path += "relims-windows.properties";
             } else {
-                path = path + "resources" + folderSeparator + "conf" + folderSeparator + "relims.properties";
+                path += "relims.properties";
             }
+
             lResource = new File(path);
             if (lResource.exists()) {
                 logger.debug("Found relimsproperties");
                 config = new PropertiesConfiguration(lResource);
                 configFolder = new File(lResource.getParent());
+            }else{
+                throw new RelimsException(String.format("Could not find properties file %s", path));
             }
 
 
