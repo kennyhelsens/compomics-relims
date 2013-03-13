@@ -72,7 +72,7 @@ public class DatabaseService {
             setWALstate = setWALConn.createStatement();
             setWALstate.execute("PRAGMA journal_mode=WAL");
             DAO.disconnect(setWALConn, rs, setWALstate);
-            System.out.println("WALMODE set");
+            logger.info("WALMODE set");
         } catch (Exception e) {
             DAO.disconnect(setWALConn, null, setWALstate);
         }
@@ -86,8 +86,7 @@ public class DatabaseService {
             //set WAL mode
             setWALMode();
         } catch (SQLException ex) {
-            System.out.println("ex");
-            ex.printStackTrace();
+            logger.error(ex);
         }
         logger.debug("Locating database at : " + directory + "...");
     }
@@ -97,10 +96,6 @@ public class DatabaseService {
     }
 
     private synchronized void loadDriver() {
-
-        //       java.io.PrintWriter logWriter = new java.io.PrintWriter
-        //    (new java.io.OutputStreamWriter(System.out));
-        //     DriverManager.setLogWriter(logWriter);
 
         try {
             Class.forName(driver).newInstance();
@@ -238,10 +233,8 @@ public class DatabaseService {
     }
 
     public synchronized void createTables() {
-        System.out.println("Creating Tables...");
-
+        logger.info("Creating Tables...");
         DAO.createTables();
-
     }
 
     public void storeErrorList(List<ConversionError> errorList, String projectID) {

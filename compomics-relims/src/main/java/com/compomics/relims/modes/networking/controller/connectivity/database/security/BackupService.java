@@ -58,7 +58,6 @@ public class BackupService implements Runnable {
             cs.setString(1, backupdirectory);
             cs.execute();
             cs.close();
-            System.out.println("Backed up databases to " + backupdirectory);
             logger.warn("Backed up databases to " + backupdirectory);
             clearBackups();
         } catch (Exception e) {
@@ -79,7 +78,6 @@ public class BackupService implements Runnable {
             File originalDatabase = new File(dbLocation + "/" + RelimsProperties.getTaskDatabaseName() + ".db");
             backupDirectoryFile.mkdirs();
             FileUtils.copyFileToDirectory(originalDatabase, backupDirectoryFile);
-            System.out.println("Backed up databases to " + backupdirectory);
             logger.warn("Backed up databases to " + backupdirectory);
             clearBackups();
         } catch (Exception e) {

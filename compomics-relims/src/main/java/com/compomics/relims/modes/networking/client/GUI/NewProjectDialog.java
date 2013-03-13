@@ -779,7 +779,7 @@ public class NewProjectDialog extends javax.swing.JDialog {
                 ServerConnector connector = new ServerConnector();   
                 connector.setConnectionParameters(controllerIP, port);
                 try {
-                    Map<Long, Long> generatedTaskIDs = connector.SendToServer(tasksForServer);
+                        Map<Long, Long> generatedTaskIDs = connector.SendToServer(tasksForServer);
                     logger.debug("Recieved TaskIDs from controlserver...");
                     connector.resetConnectionParameters();
                 } catch (IOException ex) {
@@ -794,6 +794,7 @@ public class NewProjectDialog extends javax.swing.JDialog {
         dispose();
     }
 
+    
 //GEN-LAST:event_okButtonActionPerformed
 
     /**
