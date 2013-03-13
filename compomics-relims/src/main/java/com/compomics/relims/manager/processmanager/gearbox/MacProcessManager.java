@@ -31,7 +31,7 @@ public class MacProcessManager extends MainProcessManager implements ProcessMana
                     Runtime.getRuntime().exec("renice " + priority.getLinuxCode() + " " + PID);
                     logger.debug("Changed process with " + PID + " to priority : " + priority);
                 } catch (NumberFormatException NFE) {
-                    Runtime.getRuntime().exec("renice " + priority.getLinuxCode() + "  $(pidof process_name)");
+                    Runtime.getRuntime().exec("renice " + priority.getLinuxCode() + " pidof "+ processName);
                     logger.debug("Changed " + processName + " to priority : " + priority);
                 }
             } catch (IOException ex) {
@@ -71,7 +71,7 @@ public class MacProcessManager extends MainProcessManager implements ProcessMana
     public boolean isProcessRunning(String serviceName) {
         try {
             //in other words, is the PID in the tasklist ! 
-            Process process = Runtime.getRuntime().exec("$(pidof " + serviceName + ")");
+            Process process = Runtime.getRuntime().exec("pidof " + serviceName);
             BufferedReader br = new BufferedReader(new InputStreamReader(process.getInputStream()));
             String ps = br.readLine();
             try {
