@@ -24,6 +24,8 @@ public class RelimsWorkerMode {
     private static int workerPort;
     public static boolean connected = false;
     public static Map<String, Object> cliArgumentMap = new HashMap<String, Object>();
+    private static Thread registrator;
+    private static Thread reciever;
 
     public static void main(String[] args) {
 
@@ -60,13 +62,20 @@ public class RelimsWorkerMode {
         //Start the registrator
         workerPort = ResourceManager.getWorkerPort();
         ResourceManager.setWorkerPort(workerPort);
-        Thread registrator = new Thread(new HeartbeatGenerator());
+        registrator = new Thread(new HeartbeatGenerator());
         registrator.start();
-        Thread reciever = new Thread(new TaskReciever());
+       reciever = new Thread(new TaskReciever());
         reciever.start();
         logger.debug("Started taskreciever-service...");
     }
 
+    
+    public static void stopWorker(){
+        registrator.interrupt();
+        reciever.interrupt();
+        System.exit(0);
+    }
+    
     public static void launchWorkerCLI() {
         int port = ResourceManager.getWorkerPort();
         ArrayList<String> errors = new ArrayList<String>();

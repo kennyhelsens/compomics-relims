@@ -56,14 +56,12 @@ public class ProcessSimulatorTest extends TestCase {
 
     @Override
     protected void tearDown() throws Exception {
-        cleanUp();
-        sleep(3000);
         super.tearDown();
     }
     // TODO add test methods here. The name must begin with 'test'. For example:
     // public void testHello() {}
 
-    public void testProcess() {
+    public void testAAProcess() {
         overrideSearchGUI();
         sleep(3000);
         InitializeController();
@@ -74,7 +72,11 @@ public class ProcessSimulatorTest extends TestCase {
         //wait to finish this up !
         File results = new File("src/test/resources/results");
         //add a timer?
-        while (results.listFiles().length <= 10) {
+        while (results.listFiles().length < 1) {
+            //wait to test this untill the result folder is made ! (multithreaded bottleneck)
+        }
+        File subdirectory = results.listFiles()[0];
+        while (subdirectory.listFiles().length <= 10) {
             try {
                 Thread.sleep(1000);
             } catch (InterruptedException ex) {
@@ -220,7 +222,9 @@ public class ProcessSimulatorTest extends TestCase {
         assertEquals(true, accountedFor);
     }
 
-    public void testValidate() {
-        assertEquals(true, true);
+    public void testCleanupOnExit() {
+        //move this in a test suite later on...(not sure how to do this atm)
+        cleanUp();
+        sleep(3000);
     }
 }
