@@ -12,21 +12,19 @@ import com.compomics.relims.modes.gui.util.Properties;
 import com.compomics.util.experiment.biology.PTMFactory;
 import com.google.common.base.Function;
 import com.google.common.base.Joiner;
+import static com.google.common.base.Preconditions.checkNotNull;
 import com.google.common.collect.Lists;
-import org.apache.commons.configuration.ConfigurationException;
-import org.apache.commons.configuration.PropertiesConfiguration;
-import org.apache.log4j.Logger;
-import org.xmlpull.v1.XmlPullParserException;
-
-import javax.annotation.Nullable;
 import java.io.File;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
-
-import static com.google.common.base.Preconditions.checkNotNull;
+import javax.annotation.Nullable;
+import org.apache.commons.configuration.ConfigurationException;
+import org.apache.commons.configuration.PropertiesConfiguration;
+import org.apache.log4j.Logger;
+import org.xmlpull.v1.XmlPullParserException;
 
 /**
  * This class contains the Relims properties.

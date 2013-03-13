@@ -250,7 +250,7 @@ public class SearchGUIJobBean {
         logger.info("Searchparameters were loaded");
         try {
             //save the file to the correct folder
-            searchParametersFile = new File(RelimsProperties.getWorkSpace().toString() + "/SearchGUI.parameters ");
+            searchParametersFile = new File(RelimsProperties.getWorkSpace().toString() + "/SearchGUI.parameters");
             SearchParameters.saveIdentificationParameters(searchParameters, searchParametersFile);
             logger.debug("Loaded parameters...");
         } catch (FileNotFoundException ex) {

@@ -42,33 +42,24 @@ class TaskHandler implements Runnable {
 
     @Override
     public void run() {
-        Task newTask = null;
-        TaskRunner taskRunner = null;
+        Task newTask;
+        TaskRunner taskRunner;
+        boolean finished = false;
         logger.debug("Processing a task-request.");
-        while (true) {
+        while (!finished) {
             try {
                 Thread.sleep(10000);
                 //ONLY READ THIS STREAM IF THE TASKRECIEVER IS NOT BUSY ! = prevent error floods....
                 if (!TaskReciever.locked) {
                     newTask = (Task) sockInput.readObject();
                     if (newTask != null) {
-                        try {
-                            TaskReciever.locked = true;
-                            //Unlocked when the task is done...
-                            logger.debug("Setting up worker to run for project " + newTask.getProjectID());
-                            ResourceManager.setTaskID(newTask.getTaskID());
-                            RelimsProperties.setUserID(newTask.getUserID());
-                            taskRunner = new TaskRunner(newTask);
-                            taskRunner.launch();
-                            while (taskRunner.isRunning()) {
-                                //wait while taskrunner is actually running...
-                            }
-                        } catch (Exception e) {
-                            TaskReciever.locked = false;
-                            //unlock if failed
-                            closeConnection();
-                        } finally {
-                        }
+                        TaskReciever.locked = true;
+                        //Unlocked when the task is done...
+                        logger.debug("Setting up worker to run for project " + newTask.getProjectID());
+                        ResourceManager.setTaskID(newTask.getTaskID());
+                        RelimsProperties.setUserID(newTask.getUserID());
+                        taskRunner = new TaskRunner(newTask);
+                        taskRunner.launch();
                     }
                 }
             } catch (EOFException eof) {
@@ -84,6 +75,7 @@ class TaskHandler implements Runnable {
             } catch (InterruptedException e) {
                 logger.error(e);
             } finally {
+                finished = true;
                 closeConnection();
             }
         }
@@ -95,12 +87,12 @@ class TaskHandler implements Runnable {
                 logger.debug("Closing connection");
                 sock.close();
             } catch (Exception e) {
-             if(sock!=null){
-                 sock=null;
-             }
+                if (sock != null) {
+                    sock = null;
+                }
                 logger.error("Exception while closing socket, e=" + e);
                 logger.error("Forced shutdown on socket");
-                         }
+            }
         }
     }
 }

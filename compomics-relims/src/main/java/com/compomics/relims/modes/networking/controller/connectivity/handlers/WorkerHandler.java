@@ -62,8 +62,7 @@ public class WorkerHandler implements Runnable {
                     //register if this is the first contact
                     if (!workerpool.isRegistered(worker)) {
                         workerpool.register(worker);
-                        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS");
-                        System.out.println(sdf.format(new java.util.Date().getTime()) + ": Worker was registrated : " + worker.getHost() + " ( " + worker.getPort() + ")");
+                        logger.debug("Worker was registrated : " + worker.getHost() + " ( " + worker.getPort() + ")");
                         registered = true;
                         workerpool.setOnline(worker);
                         break;
