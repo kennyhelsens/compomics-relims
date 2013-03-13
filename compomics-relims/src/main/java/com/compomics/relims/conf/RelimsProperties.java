@@ -122,14 +122,15 @@ public class RelimsProperties {
     // -------------------------- STATIC BLOCKS --------------------------
 
     public static void initialize() {
+        if (config == null) {
         try {
             File lResource;
             int lOperatingSystem = Utilities.getOperatingSystem();
 
             String rootPath = new Properties().getRootFolder() + folderSeparator;
-             if (rootPath.startsWith(".")) {
+            if (rootPath.startsWith(".")) {
                 rootPath = "";
-             }
+            }
 
             String path = rootPath;
             path = path + "resources" + folderSeparator + "conf" + folderSeparator;
@@ -147,7 +148,50 @@ public class RelimsProperties {
                 logger.debug("Found relimsproperties");
                 config = new PropertiesConfiguration(lResource);
                 configFolder = new File(lResource.getParent());
-            }else{
+            } else {
+                throw new RelimsException(String.format("Could not find properties file %s", path));
+            }
+
+
+            // Override Pride-Asap properties
+            PropertiesConfigurationHolder lAsapProperties = PropertiesConfigurationHolder.getInstance();
+            lAsapProperties.setProperty("spectrum.limit", config.getBoolean("relims.asap.spectrum.limit"));
+            lAsapProperties.setProperty("spectrum.limit.size", config.getInt("relims.asap.spectrum.limit.size"));
+            lAsapProperties.setProperty("spectrum_peaks_cache.maximum_cache_size", config.getInt("spectrum_peaks_cache.maximum_cache_size"));
+            lAsapProperties.setProperty("spectrumannotator.annotate_modified_identifications_only", true);
+            lAsapProperties.setProperty("results_path_tmp_max", config.getInt("relims.results_path_tmp_max"));
+            lAsapProperties.setProperty("results_path", config.getString("relims.asap.results"));
+            lAsapProperties.setProperty("results_path_tmp", config.getString("relims.asap.results.tmp"));
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            logger.error(e.getMessage(), e);
+            progressManager.setState(Checkpoint.FAILED, e);;
+            //TODO set default values?
+        }
+    }
+}
+public static void initializeForTesting() {
+        try {
+            File lResource;
+            int lOperatingSystem = Utilities.getOperatingSystem();
+
+            String path = "src" + folderSeparator + "test" + folderSeparator + "resources" + folderSeparator + "conf" + folderSeparator;
+
+            if (lOperatingSystem == Utilities.OS_MAC) {
+                path += "relims-mac.properties";
+            } else if (lOperatingSystem == Utilities.OS_WIN_OTHER) {
+                path += "relims-windows.properties";
+            } else {
+                path += "relims.properties";
+            }
+
+            lResource = new File(path);
+            if (lResource.exists()) {
+                logger.debug("Found relimsproperties");
+                config = new PropertiesConfiguration(lResource);
+                configFolder = new File(lResource.getParent());
+            } else {
                 throw new RelimsException(String.format("Could not find properties file %s", path));
             }
 

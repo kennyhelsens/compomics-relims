@@ -23,7 +23,7 @@ public class RelimsControllerMode {
 
     private static DatabaseService dds;
     private static BackupService bs;
-    private static Logger classLogger;
+    private static Logger logger;
     private static ExecutorService bootingService;
 
     public static void main(String[] args) {
@@ -33,7 +33,7 @@ public class RelimsControllerMode {
         }
         dds = DatabaseService.getInstance();
         bs = BackupService.getInstance();
-        classLogger = Logger.getLogger(RelimsControllerMode.class);
+        logger = Logger.getLogger(RelimsControllerMode.class);
         bootingService = Executors.newSingleThreadExecutor();
         try {
             //set logger
@@ -64,7 +64,7 @@ public class RelimsControllerMode {
             Future future = bootingService.submit(new Runnable() {
                 public void run() {
                     dds.launch();
-                    System.out.println("Booted database...");
+                    logger.info("Booted database...");
                 }
             });
             while (future.get() != null) {
@@ -88,8 +88,8 @@ public class RelimsControllerMode {
             while (future.get() != null) {
                 // wait for the future   
             }
-            System.out.println("Loaded Database...");
-            System.out.println("Checking for incorrectly shut down tasks...");
+            logger.info("Loaded Database...");
+            logger.info("Checking for incorrectly shut down tasks...");
             future = bootingService.submit(new Runnable() {
                 public void run() {
                     dds.startupSweep();
@@ -98,7 +98,7 @@ public class RelimsControllerMode {
             while (future.get() != null) {
                 // wait for the future   
             }
-            System.out.println("Booting connection service...");
+            logger.info("Booting connection service...");
             future = bootingService.submit(new Runnable() {
                 @Override
                 public void run() {
@@ -110,7 +110,7 @@ public class RelimsControllerMode {
                 // wait for the future   
             }
 
-            System.out.println("Loading job manager...");
+            logger.info("Loading job manager...");
             future = bootingService.submit(new Runnable() {
                 @Override
                 public void run() {
