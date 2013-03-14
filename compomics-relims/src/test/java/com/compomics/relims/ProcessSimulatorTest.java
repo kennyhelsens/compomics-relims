@@ -10,14 +10,13 @@ import com.compomics.relims.modes.networking.controller.RelimsControllerMode;
 import com.compomics.relims.modes.networking.controller.connectivity.taskobjects.TaskContainer;
 import com.compomics.relims.modes.networking.worker.RelimsWorkerMode;
 import com.compomics.util.experiment.identification.SearchParameters;
+import com.compomics.util.experiment.massspectrometry.SpectrumFactory;
 import java.io.File;
 import java.io.FileFilter;
+import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.util.Arrays;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
-import java.util.Scanner;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import junit.framework.TestCase;
@@ -41,6 +40,8 @@ public class ProcessSimulatorTest extends TestCase {
         "PeptideShaker_3_AutoReprocessed_1_psms.txt",
         "SearchGUI.parameters",};
     private SearchParameters loadedSearchParameters;
+    private int MGF_SPECTRACOUNT;
+    private Double MGF_MAX_INTENSITY;
 
     public ProcessSimulatorTest(String testName) {
         super(testName);
@@ -61,29 +62,35 @@ public class ProcessSimulatorTest extends TestCase {
     // TODO add test methods here. The name must begin with 'test'. For example:
     // public void testHello() {}
 
-    public void testAAProcess() {
+    //TEST 
+    public void testProcess() {
         overrideSearchGUI();
         sleep(3000);
-        InitializeController();
+        initializeController();
         sleep(3000);
-        InitializeWorker();
+        initializeWorker();
         sleep(3000);
         simulateClientInput();
         //wait to finish this up !
-        File results = new File("src/test/resources/results");
-        //add a timer?
-        while (results.listFiles().length < 1) {
-            //wait to test this untill the result folder is made ! (multithreaded bottleneck)
+        File results = new File("src/test/resources/results/admin");
+        long timeout = 0;
+        while (!results.exists() && timeout <= 600) {
+            sleep(1000);
+            //wait untill result folder is actually there...
         }
-        File subdirectory = results.listFiles()[0];
-        while (subdirectory.listFiles().length <= 10) {
-            try {
-                Thread.sleep(1000);
-            } catch (InterruptedException ex) {
-                Logger.getLogger(ProcessSimulatorTest.class.getName()).log(Level.SEVERE, null, ex);
-            }
+        timeout = 0;
+        while (results.listFiles().length > 0 && timeout <= 600) {
+            sleep(1000);
+            //wait for the timestamped map to be there
         }
-        assertEquals(true, results.listFiles().length > 9);
+        timeout = 0;
+        File timestampedResults = results.listFiles()[0];
+        while (timestampedResults.listFiles().length < 12 && timeout <= 600) {
+            sleep(1000);
+            timeout++;
+            //wait untill all the files are processed and put in the resultfolder or timeout happens...
+        }
+        endSimulation();
     }
 
     private void overrideSearchGUI() {
@@ -103,17 +110,24 @@ public class ProcessSimulatorTest extends TestCase {
         }
     }
 
+    //HELPERMETHODS
     public void cleanUp() {
         File databaseLocation = new File("src/test/resources/databases");
         File results = new File("src/test/resources/results");
         File repository = new File("src/test/resources/repository");
         File fastawin = new File("src/test/resources/sourcefiles/Fasta/windows");
         File fastamac = new File("src/test/resources/sourcefiles/Fasta/mac");
+
+
+
+        //CLEANUP DATABASE
         File[] filesFolder = databaseLocation.listFiles();
         for (File aFolder : filesFolder) {
             FileUtils.deleteQuietly(aFolder);
             System.out.println("Removed " + aFolder.getName());
         }
+
+        //CLEAN UP RESULTS
         filesFolder = results.listFiles();
         for (File aFolder : filesFolder) {
             try {
@@ -123,6 +137,8 @@ public class ProcessSimulatorTest extends TestCase {
                 System.err.println("COULD NOT REMOVE" + aFolder.getName());
             }
         }
+
+        //CLEAN UP REPOSITORY
         filesFolder = repository.listFiles();
         for (File aFolder : filesFolder) {
             try {
@@ -133,6 +149,7 @@ public class ProcessSimulatorTest extends TestCase {
             }
         }
 
+        //CLEAN UP FASTAFILES
         filesFolder = fastawin.listFiles(new FileFilter() {
             @Override
             public boolean accept(File pathname) {
@@ -157,12 +174,17 @@ public class ProcessSimulatorTest extends TestCase {
 
     }
 
-    public void InitializeController() {
+    public void initializeController() {
         RelimsControllerMode.main(Controllerargs);
     }
 
-    public void InitializeWorker() {
+    public void initializeWorker() {
         RelimsWorkerMode.main(Workerargs);
+    }
+
+    public void endSimulation() {
+        RelimsWorkerMode.stopWorker();
+        RelimsControllerMode.stopController();
     }
 
     public void simulateClientInput() {
@@ -197,13 +219,11 @@ public class ProcessSimulatorTest extends TestCase {
         }
     }
 
-    public void testAllOutput() {
+    public boolean testAllOutput() {
         //TEST THIS WITH A WHILE FILES ARE NOT THERE ?
         //Work with timeout counter?
 
-        File results = new File("src/test/resources/results");
-
-
+        File results = new File("src/test/resources/results/admin");
         File[] filesFolder = results.listFiles();
         filesFolder = results.listFiles();
         boolean accountedFor = false;
@@ -219,12 +239,39 @@ public class ProcessSimulatorTest extends TestCase {
                 }
             }
         }
-        assertEquals(true, accountedFor);
+        return accountedFor;
     }
 
-    public void testCleanupOnExit() {
-        //move this in a test suite later on...(not sure how to do this atm)
-        cleanUp();
-        sleep(3000);
+    public void testMGFFile() {
+        File spectrumFile = null;
+
+        boolean correctFile = false;
+        //determine number of spectra from the factory in this file
+        try {
+            File[] filesInAdminFolder = new File("src/test/resources/results/admin").listFiles();
+            File mgfFile = new File(filesInAdminFolder[0].getAbsolutePath() + "/3.mgf");
+            SpectrumFactory sfac = SpectrumFactory.getInstance();
+            sfac.addSpectra(spectrumFile);
+            
+            if (sfac.getNSpectra() == MGF_SPECTRACOUNT) {
+                correctFile = true;
+            }else{
+                correctFile = false;
+            }
+
+            if (sfac.getMaxIntensity() == MGF_MAX_INTENSITY) {
+                correctFile = true;
+            }else{
+                correctFile = false;
+            }
+        } catch (FileNotFoundException ex) {
+            Logger.getLogger(ProcessSimulatorTest.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (IOException ex) {
+            Logger.getLogger(ProcessSimulatorTest.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (ClassNotFoundException ex) {
+            Logger.getLogger(ProcessSimulatorTest.class.getName()).log(Level.SEVERE, null, ex);
+        } finally {
+            assertEquals(true, correctFile);
+        }
     }
 }

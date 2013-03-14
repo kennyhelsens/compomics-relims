@@ -143,6 +143,5 @@ public class RelimsControllerMode {
 
     public static void stopController() {
         bootingService.shutdownNow();
-        System.exit(0);
     }
 }

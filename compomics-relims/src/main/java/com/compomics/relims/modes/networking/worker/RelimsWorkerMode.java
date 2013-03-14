@@ -73,7 +73,6 @@ public class RelimsWorkerMode {
     public static void stopWorker(){
         registrator.interrupt();
         reciever.interrupt();
-        System.exit(0);
     }
     
     public static void launchWorkerCLI() {
