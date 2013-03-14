@@ -64,17 +64,17 @@ public class RelimsWorkerMode {
         ResourceManager.setWorkerPort(workerPort);
         registrator = new Thread(new HeartbeatGenerator());
         registrator.start();
-       reciever = new Thread(new TaskReciever());
+        reciever = new Thread(new TaskReciever());
         reciever.start();
         logger.debug("Started taskreciever-service...");
     }
 
-    
-    public static void stopWorker(){
+    public static void stopWorker() {
         registrator.interrupt();
         reciever.interrupt();
+        logger.info("Worker interrupted");
     }
-    
+
     public static void launchWorkerCLI() {
         int port = ResourceManager.getWorkerPort();
         ArrayList<String> errors = new ArrayList<String>();

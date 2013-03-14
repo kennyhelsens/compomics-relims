@@ -143,5 +143,6 @@ public class RelimsControllerMode {
 
     public static void stopController() {
         bootingService.shutdownNow();
+        logger.info("Controller interrupted");
     }
 }

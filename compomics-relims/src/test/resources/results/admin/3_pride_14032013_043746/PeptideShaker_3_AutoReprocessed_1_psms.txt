@@ -1,0 +1,34 @@
+Protein(s)	Sequence	Variable Modification(s)	D-score	A-score	PTM location confidence	Spectrum Charge	Identification Charge	Spectrum	Spectrum File	Identification File(s)	Precursor RT	Precursor mz	Theoretic Mass	Mass Error (ppm)	Isotope	Mascot Score	Mascot E-Value	OMSSA E-Value	X!Tandem E-Value	p score	p	Decoy	Validated
+O60239-1 O60239-2 	RAINKSKPYFELK					2+	2	3.mgf	2357	3.t.xml 	-1.0	797.465	1592.9038526600002	7.269592184321765	0				8.4	8.4	0.0	0	1
+P30499 	AVMVPSGEEQR					2+	2	3.mgf	2823	3.t.xml 	-1.0	601.7952	1201.57612266	0.22897620384672382	0				9.1	9.1	0.0	0	1
+Q9NRA8-1 	DSDGLRLLGGRR					2+	2	3.mgf	3611	3.t.xml 	-1.0	657.8641	1313.71639566	2.0890240720032818	0				11.0	11.0	0.0	0	1
+P30479 P30481 P30483 P30485 P30487 P30488 Q04826 	EPRAPWIEQEGPEYWDR	pyro-glu from n-term e(1)	pyro-glu from n-term e (Not Scored)	pyro-glu from n-term e (1: 100.0)	pyro-glu from n-term e (Not Scored)	2+	2	3.mgf	3287	3.t.xml 	-1.0	1070.4955	2138.9809946600008	2.1240556198408185	0				1.6	1.6	0.0	0	1
+Q04917 	GDREQLLQR					2+	2	3.mgf	2939	3.t.xml 	-1.0	557.8004	1113.58907066	2.5310007643647046	0				9.8	9.8	0.0	0	1
+P05534 P30447 	SQTDRENLR					2+	2	3.mgf	2115	3.t.xml 	-1.0	559.7765	1117.54759866	8.174261349161293	0				7.7	7.7	0.0	0	1
+Q16537 	DPSLTEPVIR					2+	2	3.mgf	955	3.t.xml 	-1.0	563.8096	1125.60298866	1.4707170783214571	0				0.56	0.56	0.0	0	1
+P08195-1 P08195-2 P08195-3 P08195-4 	EDFDSLLQSAKK	pyro-glu from n-term e(1)	pyro-glu from n-term e (Not Scored)	pyro-glu from n-term e (1: 100.0)	pyro-glu from n-term e (Not Scored)	2+	2	3.mgf	211	3.t.xml 	-1.0	681.8469	1361.68269466	2.5281224479376956	0				23.0	23.0	0.0	0	1
+Q7L8J4 	EEELDPR	pyro-glu from n-term e(1)	pyro-glu from n-term e (Not Scored)	pyro-glu from n-term e (1: 100.0)	pyro-glu from n-term e (Not Scored)	2+	2	3.mgf	2069	3.t.xml 	-1.0	435.2048	868.39266066	2.741712543975618	0				2.9E-4	2.9E-4	0.0	0	1
+Q66LE6 	AEGYNLKDEDGR					2+	2	3.mgf	1743	3.t.xml 	-1.0	683.8168	1365.6160636599998	2.1814416407399717	0				1.9	1.9	0.0	0	1
+P14060 	RLLVKEKELKEIRVLDKAFGPE					3+	3	3.mgf	677	3.t.xml 	-1.0	870.8491	2609.52685766	0.5309223300000737	0				0.03	0.03	0.0	0	1
+Q04826 P30479 P30481 P30483 P30485 P30487 P30488 	EPRAPWIEQEGPEYWDR	pyro-glu from n-term e(1)	pyro-glu from n-term e (Not Scored)	pyro-glu from n-term e (1: 100.0)	pyro-glu from n-term e (Not Scored)	2+	2	3.mgf	3235	3.t.xml 	-1.0	1070.4937	2138.9809946600008	3.8055163795570386	0				12.0	12.0	0.0	0	1
+Q04826 P30479 P30481 P30483 P30485 P30487 P30488 	EPRAPWIEQEGPEYWDR	pyro-glu from n-term e(1)	pyro-glu from n-term e (Not Scored)	pyro-glu from n-term e (1: 100.0)	pyro-glu from n-term e (Not Scored)	3+	3	3.mgf	3121	3.t.xml 	-1.0	714.0005	2138.9809946600008	0.6181413124862353	0				0.36	0.36	0.0	0	1
+P28335 	RNTAEEENSANPNQDQNARRR					3+	3	3.mgf	811	3.t.xml 	-1.0	824.0538	2469.14533466	2.3315819901554122	0				0.032	0.032	0.0	0	1
+Q7L8J4 	QLDEARTTYR					2+	2	3.mgf	3467	3.t.xml 	-1.0	626.8159	1251.6207566599999	2.7995331631281344	0				0.046	0.046	0.0	0	1
+P13761 	DILEDRRGQV					2+	2	3.mgf	1831	3.t.xml 	-1.0	600.8154	1199.62584966	7.991237314731275	0				20.0	20.0	0.0	0	1
+A5X5Y0-1 A5X5Y0-2 A5X5Y0-3 	EVWEITDASR					2+	2	3.mgf	3643	3.t.xml 	-1.0	603.2892	1204.57241666	7.102342259461831	0				11.0	11.0	0.0	0	1
+Q04826 P30479 P30481 P30483 P30485 P30487 P30488 	EPRAPWIEQEGPEYWDR	pyro-glu from n-term e(1)	pyro-glu from n-term e (Not Scored)	pyro-glu from n-term e (1: 100.0)	pyro-glu from n-term e (Not Scored)	3+	3	3.mgf	3145	3.t.xml 	-1.0	714.0067	2138.9809946600008	8.065320628449593	0				0.085	0.085	0.0	0	1
+Q15173-1 Q15173-2 	SHSSSQFR					2+	2	3.mgf	2183	3.t.xml 	-1.0	468.2198	934.4256916599998	0.6883446407481568	0				28.0	28.0	0.0	0	1
+P26439-1 P26439-2 	GWSCLVTGAGGLLGQR	acetylation of protein n-term(1)	acetylation of protein n-term (Not Scored)	acetylation of protein n-term (1: 100.0)	acetylation of protein n-term (Not Scored)	2+	2	3.mgf	2835	3.t.xml 	-1.0	808.907	1615.8140636599999	9.034698406120116	0				1.2E-4	1.2E-4	0.0	0	1
+Q04826 P30479 P30481 P30483 P30485 P30487 P30488 	EPRAPWIEQEGPEYWDR	pyro-glu from n-term e(1)	pyro-glu from n-term e (Not Scored)	pyro-glu from n-term e (1: 100.0)	pyro-glu from n-term e (Not Scored)	3+	3	3.mgf	3289	3.t.xml 	-1.0	713.9948	2138.9809946600008	8.601324064498234	0				0.16	0.16	0.0	0	1
+P31947-1 P31947-2 	SAYQEAMDISKK					2+	2	3.mgf	987	3.t.xml 	-1.0	685.8298	1369.6547576599999	7.079398473688754	0				3.2	3.2	0.0	0	1
+Q04826 P30479 P30481 P30483 P30485 P30487 P30488 	EPRAPWIEQEGPEYWDR	pyro-glu from n-term e(1)	pyro-glu from n-term e (Not Scored)	pyro-glu from n-term e (1: 100.0)	pyro-glu from n-term e (Not Scored)	2+	2	3.mgf	3143	3.t.xml 	-1.0	1070.4951	2138.9809946600008	2.497713566350023	0				1.2	1.2	0.0	0	1
+Q04917 	GDREQLLQR					2+	2	3.mgf	2829	3.t.xml 	-1.0	557.804	1113.58907066	3.922904411040457	0				8.7	8.7	0.0	0	1
+P04222 P30685 	NLRGYYNQSEAGSHIIQR					2+	2	3.mgf	731	3.t.xml 	-1.0	1053.5206	2105.04023166	6.447195261910738	0				10.0	10.0	0.0	0	1
+Q15173-2 Q15173-1 	ARPRRSHSSSQFR					2+	2	3.mgf	505	3.t.xml 	-1.0	786.4129	1570.8189026599998	4.86738986663906	0				8.8	8.8	0.0	0	1
+P30154-1 P30154-2 P30154-3 	QMLPIVLKMAGDQVANVR	pyro-glu from n-term q(1)	pyro-glu from n-term q (Not Scored)	pyro-glu from n-term q (1: 100.0)	pyro-glu from n-term q (Not Scored)	3+	3	3.mgf	781	3.t.xml 	-1.0	656.0264	1965.0539756599999	1.7250044715263277	0				0.47	0.47	0.0	0	1
+Q04826 P30479 P30481 P30483 P30485 P30487 P30488 	EPRAPWIEQEGPEYWDR	pyro-glu from n-term e(1)	pyro-glu from n-term e (Not Scored)	pyro-glu from n-term e (1: 100.0)	pyro-glu from n-term e (Not Scored)	3+	3	3.mgf	3237	3.t.xml 	-1.0	714.0002	2138.9809946600008	1.0383088258086866	0				1.4	1.4	0.0	0	1
+Q15172-1 	QGSQAELH	acetylation of protein n-term(1)	acetylation of protein n-term (Not Scored)	acetylation of protein n-term (1: 100.0)	acetylation of protein n-term (Not Scored)	2+	2	3.mgf	1677	3.t.xml 	-1.0	456.2133	910.41446066	2.6452398905526557	0				17.0	17.0	0.0	0	1
+Q7L8J4 	QLDEARTTYR					2+	2	3.mgf	3457	3.t.xml 	-1.0	626.8227	1251.6207566599999	8.048916857321016	0				0.031	0.031	0.0	0	1
+Q7L8J4 	RGSDGGARGGRHQR					2+	2	3.mgf	3265	3.t.xml 	-1.0	733.8685	1465.7359036599998	9.168175396052705	0				33.0	33.0	0.0	0	0
+P30153 P30154-1 P30154-2 	DELRNEDVQLRL	acetylation of protein n-term(1)	acetylation of protein n-term (Not Scored)	acetylation of protein n-term (1: 100.0)	acetylation of protein n-term (Not Scored)	2+	2	3.mgf	287	3.t.xml 	-1.0	771.4024	1540.7845346599997	3.7026249381200746	0				0.029	0.029	0.0	0	1
+Q95IE3 	HNYGAVESFTVQR					2+	2	3.mgf	1965	3.t.xml 	-1.0	754.3618	1506.7215326599996	8.275531912270116	0				1.8	1.8	0.0	0	1
