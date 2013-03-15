@@ -5,11 +5,16 @@
 package com.compomics.relims.simulator;
 
 import com.compomics.relims.conf.RelimsProperties;
+import com.compomics.relims.modes.gui.util.Properties;
 import com.compomics.relims.modes.networking.client.connectivity.connectors.ServerConnector;
 import com.compomics.relims.modes.networking.controller.RelimsControllerMode;
 import com.compomics.relims.modes.networking.controller.connectivity.taskobjects.TaskContainer;
 import com.compomics.relims.modes.networking.worker.RelimsWorkerMode;
 import com.compomics.util.experiment.identification.SearchParameters;
+import junit.framework.TestCase;
+import org.apache.commons.configuration.PropertiesConfiguration;
+import org.apache.commons.io.FileUtils;
+
 import java.io.File;
 import java.io.FileFilter;
 import java.io.IOException;
@@ -22,7 +27,6 @@ import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 
 /**
- *
  * @author Kenneth
  */
 public class Simulator extends TestCase {
@@ -32,13 +36,13 @@ public class Simulator extends TestCase {
     private static long TIME_OUT = 100;
     private static final Logger logger = Logger.getLogger(Simulator.class);
     private String[] resultFolderFilenames = new String[]{"3.cps",
-        "3.mgf",
-        "3.omx",
-        "3.t.xml",
-        "PeptideShaker_3_AutoReprocessed_1_peptides.txt",
-        "PeptideShaker_3_AutoReprocessed_1_proteins.txt",
-        "PeptideShaker_3_AutoReprocessed_1_psms.txt",
-        "SearchGUI.parameters",};
+            "3.mgf",
+            "3.omx",
+            "3.t.xml",
+            "PeptideShaker_3_AutoReprocessed_1_peptides.txt",
+            "PeptideShaker_3_AutoReprocessed_1_proteins.txt",
+            "PeptideShaker_3_AutoReprocessed_1_psms.txt",
+            "SearchGUI.parameters",};
     private static SearchParameters loadedSearchParameters;
 
     public Simulator(String testName) {
@@ -100,28 +104,62 @@ public class Simulator extends TestCase {
     }
 
     //HELPERMETHODS
-    public static void testCleanUp() {
+    public static void cleanUp() {
+        String lRootFolder = new Properties().getRootFolder();
+
         File databaseLocation = new File("src/test/resources/databases");
-        File results = new File("src/test/resources/results");
-        File repository = new File("src/test/resources/repository");
-        File fastawin = new File("src/test/resources/sourcefiles/Fasta/windows");
-        File fastamac = new File("src/test/resources/sourcefiles/Fasta/mac");
+        File results = new File(lRootFolder, "src/test/resources/results");
+        File repository = new File(lRootFolder, "src/test/resources/repository");
+        File fastawin = new File(lRootFolder, "src/test/resources/sourcefiles/Fasta/windows");
+        File fastamac = new File(lRootFolder, "src/test/resources/sourcefiles/Fasta/mac");
 
         //CLEANUP DATABASE
-        File[] filesFolder = databaseLocation.listFiles();
-        for (File aFolder : filesFolder) {
-            FileUtils.deleteQuietly(aFolder);
-            logger.info("Removed " + aFolder.getName());
+        if (databaseLocation.exists()) {
+            File[] filesFolder = databaseLocation.listFiles();
+            for (File aFolder : filesFolder) {
+                FileUtils.deleteQuietly(aFolder);
+                System.out.println("Removed " + aFolder.getName());
+            }
         }
 
         //CLEAN UP RESULTS
-        filesFolder = results.listFiles();
-        for (File aFolder : filesFolder) {
-            try {
-                FileUtils.forceDelete(aFolder);
-                logger.info("Removed " + aFolder.getName());
-            } catch (IOException ex) {
-                logger.error("Could not remove " + aFolder.getName());
+        if (results.exists()) {
+            File[] filesFolder = results.listFiles();
+            for (File aFolder : filesFolder) {
+                try {
+                    FileUtils.deleteDirectory(aFolder);
+                    System.out.println("Removed " + aFolder.getName());
+                } catch (IOException ex) {
+                    System.err.println("COULD NOT REMOVE" + aFolder.getName());
+                }
+            }
+        }
+
+        if (repository.exists()) {
+            //CLEAN UP REPOSITORY
+            File[] filesFolder = repository.listFiles();
+            for (File aFolder : filesFolder) {
+                try {
+                    FileUtils.deleteDirectory(aFolder);
+                    System.out.println("Removed " + aFolder.getName());
+                } catch (IOException ex) {
+                    System.err.println("COULD NOT REMOVE" + aFolder.getName());
+                }
+            }
+        }
+        File[] filesFolder = new File[0];
+
+        if (fastawin.exists()) {
+            //CLEAN UP FASTAFILES
+            filesFolder = fastawin.listFiles(new FileFilter() {
+                @Override
+                public boolean accept(File pathname) {
+                    return !pathname.getAbsolutePath().toLowerCase().endsWith(".fasta");
+                }
+            });
+            for (File aFolder : filesFolder) {
+                FileUtils.deleteQuietly(aFolder);
+                System.out.println("Removed " + aFolder.getName());
             }
 
         }
