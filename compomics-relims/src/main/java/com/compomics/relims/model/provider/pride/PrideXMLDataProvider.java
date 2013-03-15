@@ -90,8 +90,6 @@ public class PrideXMLDataProvider implements DataProvider {
             prideXMLFile = fileGrabber.getPrideXML(aProjectid);
             // MAKE AN MGF FILE
             if (prideXMLFile != null) {
-                //Initiate the prideservice
-                iPrideService.init(prideXMLFile);
                 destinationFile = new File(ProcessVariableManager.getResultsFolder() + "/" + aProjectid + ".mgf");
                 //Save the MGF file in the resultFolder       
                 errorList = iPrideService.getSpectraAsMgf(prideXMLFile, destinationFile);
@@ -206,10 +204,7 @@ public class PrideXMLDataProvider implements DataProvider {
         }
         logger.setLevel(Level.DEBUG);
         logger.debug("Retrieved searchparameters from remote Pride");
-        // Clean MGF resources after project success
-        PrideXmlSpectrumAnnotator lSpectrumAnnotator;
-        lSpectrumAnnotator = (PrideXmlSpectrumAnnotator) applicationContext.getBean("prideXmlSpectrumAnnotator");
-
+       
         return lRelimsProjectBean;
     }
 
