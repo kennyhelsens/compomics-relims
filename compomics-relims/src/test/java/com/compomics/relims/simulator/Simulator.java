@@ -15,11 +15,11 @@ import java.io.FileFilter;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import junit.framework.TestCase;
 import org.apache.commons.configuration.PropertiesConfiguration;
 import org.apache.commons.io.FileUtils;
+import org.apache.log4j.Level;
+import org.apache.log4j.Logger;
 
 /**
  *
@@ -30,6 +30,7 @@ public class Simulator extends TestCase {
     private static String[] Controllerargs = new String[]{""};
     private static String[] Workerargs = new String[]{"-workerport", "15557"};
     private static long TIME_OUT = 100;
+    private static final Logger logger = Logger.getLogger(Simulator.class);
     private String[] resultFolderFilenames = new String[]{"3.cps",
         "3.mgf",
         "3.omx",
@@ -46,7 +47,7 @@ public class Simulator extends TestCase {
 
     public static void testSimulateProcess() {
         try {
-            cleanUp();
+            testCleanUp();
             overrideSearchGUI();
             sleep(3000);
             initializeController();
@@ -87,19 +88,19 @@ public class Simulator extends TestCase {
         File searchGUIDefaultFasta = new File(RelimsProperties.getDefaultSearchDatabase());
         config.setProperty("searchgui.fasta.default", searchGUIDefaultFasta.getAbsolutePath());
         config.setProperty("relims.db.DB_OR.file", searchGUIDefaultFasta.getAbsolutePath());
-        System.out.println("Overriden searchgui's default database location");
+        logger.info("Overriden searchgui's default database location");
     }
 
     private static void sleep(long ms) {
         try {
             Thread.sleep(ms);
         } catch (InterruptedException ex) {
-            Logger.getLogger(Simulator.class.getName()).log(Level.SEVERE, null, ex);
+            logger.error(ex);
         }
     }
 
     //HELPERMETHODS
-    public static void cleanUp() {
+    public static void testCleanUp() {
         File databaseLocation = new File("src/test/resources/databases");
         File results = new File("src/test/resources/results");
         File repository = new File("src/test/resources/repository");
@@ -110,29 +111,26 @@ public class Simulator extends TestCase {
         File[] filesFolder = databaseLocation.listFiles();
         for (File aFolder : filesFolder) {
             FileUtils.deleteQuietly(aFolder);
-            System.out.println("Removed " + aFolder.getName());
+            logger.info("Removed " + aFolder.getName());
         }
 
         //CLEAN UP RESULTS
         filesFolder = results.listFiles();
         for (File aFolder : filesFolder) {
             try {
-                FileUtils.deleteDirectory(aFolder);
-                System.out.println("Removed " + aFolder.getName());
+                FileUtils.forceDelete(aFolder);
+                logger.info("Removed " + aFolder.getName());
             } catch (IOException ex) {
-                System.err.println("COULD NOT REMOVE" + aFolder.getName());
+                logger.error("Could not remove " + aFolder.getName());
             }
+
         }
 
         //CLEAN UP REPOSITORY
         filesFolder = repository.listFiles();
         for (File aFolder : filesFolder) {
-            try {
-                FileUtils.deleteDirectory(aFolder);
-                System.out.println("Removed " + aFolder.getName());
-            } catch (IOException ex) {
-                System.err.println("COULD NOT REMOVE" + aFolder.getName());
-            }
+            FileUtils.deleteQuietly(aFolder);
+           logger.info("Removed " + aFolder.getName());
         }
 
         //CLEAN UP FASTAFILES
@@ -144,7 +142,7 @@ public class Simulator extends TestCase {
         });
         for (File aFolder : filesFolder) {
             FileUtils.deleteQuietly(aFolder);
-            System.out.println("Removed " + aFolder.getName());
+            logger.info("Removed " + aFolder.getName());
         }
 
         filesFolder = fastamac.listFiles(new FileFilter() {
@@ -155,9 +153,9 @@ public class Simulator extends TestCase {
         });
         for (File aFolder : filesFolder) {
             FileUtils.deleteQuietly(aFolder);
-            System.out.println("Removed " + aFolder.getName());
+            logger.info("Removed " + aFolder.getName());
         }
-
+        assertTrue(true);
     }
 
     public static File getResultFolder() {
@@ -176,7 +174,7 @@ public class Simulator extends TestCase {
     public static void endSimulation() {
         RelimsWorkerMode.stopWorker();
         RelimsControllerMode.stopController();
-        System.out.println("END OF SIMULATION");
+        logger.info("END OF SIMULATION");
     }
 
     public static void simulateClientInput() {

@@ -32,6 +32,7 @@ public class SourceFileTests extends TestCase {
         suite.addTest(new SourceFileTest("testProteinsFileLength"));
         suite.addTest(new SourceFileTest("testPeptideFileLength"));
         suite.addTest(new SourceFileTest("testCheckCPSSize"));
+        suite.addTest(new Simulator("testCleanUp"));
         return suite;
     }
 
@@ -42,7 +43,8 @@ public class SourceFileTests extends TestCase {
 
     @Override
     protected void tearDown() throws Exception {
-        Simulator.endSimulation();
         super.tearDown();
+        Simulator.endSimulation();
+        Simulator.testCleanUp();
     }
 }
