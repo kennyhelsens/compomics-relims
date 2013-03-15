@@ -22,6 +22,10 @@ public class MGFResultFinder {
 
     private static TreeMap<Date, File> mgfList;
 
+      public static void main(String args[]){
+        findMGF(new File("V:/relims_results/admin"));
+    }
+    
     public static void findMGF(File directory) {
         File[] files = directory.listFiles();
         File[] subFiles;
