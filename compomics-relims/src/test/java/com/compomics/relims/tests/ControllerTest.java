@@ -38,7 +38,8 @@ public class ControllerTest extends TestCase {
         boolean testDatabaseExists = false;
         File[] filesInDirectory = testDBLocation.listFiles();
         for (File aFile : filesInDirectory) {
-            if (!aFile.isDirectory() && aFile.getAbsolutePath().contains("TestTaskDatabase.db")) {
+            if (!aFile.isDirectory() && aFile.getAbsolutePath().contains("TestTaskDatabase")) {
+                logger.debug("A databasefile was found !");
                 testDatabaseExists = true;
             }
         }
@@ -51,7 +52,8 @@ public class ControllerTest extends TestCase {
         File backupLocation = new File(testDBLocation.getAbsolutePath() + "/backups");
         File[] filesInDirectory = backupLocation.listFiles();
         for (File aFile : filesInDirectory) {
-            if (!aFile.isDirectory() && aFile.getAbsolutePath().contains("TestTaskDatabase.db")) {
+            if (!aFile.isDirectory() && aFile.getAbsolutePath().contains("TestTaskDatabase")) {
+                logger.debug("A backup has been created !");
                 testBackupDb = true;
             }
         }

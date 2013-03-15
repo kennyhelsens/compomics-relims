@@ -174,9 +174,9 @@ public class Simulator extends TestCase {
     }
 
     public static void endSimulation() {
-        System.out.println("END OF SIMULATION");
         RelimsWorkerMode.stopWorker();
         RelimsControllerMode.stopController();
+        System.out.println("END OF SIMULATION");
     }
 
     public static void simulateClientInput() {
