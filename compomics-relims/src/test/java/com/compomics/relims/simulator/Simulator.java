@@ -36,22 +36,24 @@ public class Simulator extends TestCase {
     private static long TIME_OUT = 100;
     private static final Logger logger = Logger.getLogger(Simulator.class);
     private String[] resultFolderFilenames = new String[]{"3.cps",
-            "3.mgf",
-            "3.omx",
-            "3.t.xml",
-            "PeptideShaker_3_AutoReprocessed_1_peptides.txt",
-            "PeptideShaker_3_AutoReprocessed_1_proteins.txt",
-            "PeptideShaker_3_AutoReprocessed_1_psms.txt",
-            "SearchGUI.parameters",};
+        "3.mgf",
+        "3.omx",
+        "3.t.xml",
+        "PeptideShaker_3_AutoReprocessed_1_peptides.txt",
+        "PeptideShaker_3_AutoReprocessed_1_proteins.txt",
+        "PeptideShaker_3_AutoReprocessed_1_psms.txt",
+        "SearchGUI.parameters",};
     private static SearchParameters loadedSearchParameters;
 
     public Simulator(String testName) {
         super(testName);
     }
 
+    
+    
     public static void testSimulateProcess() {
         try {
-            testCleanUp();
+            cleanUp();
             overrideSearchGUI();
             sleep(3000);
             initializeController();
@@ -168,7 +170,7 @@ public class Simulator extends TestCase {
         filesFolder = repository.listFiles();
         for (File aFolder : filesFolder) {
             FileUtils.deleteQuietly(aFolder);
-           logger.info("Removed " + aFolder.getName());
+            logger.info("Removed " + aFolder.getName());
         }
 
         //CLEAN UP FASTAFILES
@@ -246,4 +248,11 @@ public class Simulator extends TestCase {
             connector.resetConnectionParameters();
         }
     }
+    
+    public void testFinalCleanUp(){
+        cleanUp();
+        assertTrue(true);
+        //TODO ---> CHECK IF THE FILES ARE ACTUALLY DELETED IN THE FUTURE !
+    }
+    
 }

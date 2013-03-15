@@ -15,6 +15,7 @@ import junit.framework.TestSuite;
  *
  * @author Kenneth
  */
+
 public class SourceFileTests extends TestCase {
 
     public SourceFileTests(String testName) {
@@ -32,7 +33,7 @@ public class SourceFileTests extends TestCase {
         suite.addTest(new SourceFileTest("testProteinsFileLength"));
         suite.addTest(new SourceFileTest("testPeptideFileLength"));
         suite.addTest(new SourceFileTest("testCheckCPSSize"));
-        suite.addTest(new Simulator("testCleanUp"));
+        suite.addTest(new Simulator("testFinalCleanUp"));
         return suite;
     }
 
@@ -45,6 +46,5 @@ public class SourceFileTests extends TestCase {
     protected void tearDown() throws Exception {
         super.tearDown();
         Simulator.endSimulation();
-        Simulator.testCleanUp();
     }
 }
