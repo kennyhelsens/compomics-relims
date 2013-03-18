@@ -227,7 +227,7 @@ public class RelimsProperties {
     }
 
     public static String getRelimsTempFolder() {
-        return config.getString("relims.local.tempfolder");
+        return System.getProperty("user.dir") + System.getProperty("file.separator") + ".relims";
     }
 
     public static String getPeptideShakerFolder() {
