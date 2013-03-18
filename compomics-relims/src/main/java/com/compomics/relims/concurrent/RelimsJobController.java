@@ -190,7 +190,7 @@ public class RelimsJobController extends Observable implements ProjectRunner {
                         experimentID = sampleID;
                         return true;
                     } else {
-                        progressManager.setEndState(Checkpoint.SEARCHGUIFAILURE);
+                        progressManager.setEndState(Checkpoint.PROCESSFAILURE);
                         return false;
                     }
                 } else {
@@ -242,7 +242,7 @@ public class RelimsJobController extends Observable implements ProjectRunner {
                     experimentID = sampleID;
                     return true;
                 } else {
-                    progressManager.setEndState(Checkpoint.SEARCHGUIFAILURE);
+                    progressManager.setEndState(Checkpoint.PROCESSFAILURE);
                     return false;
                 }
             } else {
@@ -285,7 +285,7 @@ public class RelimsJobController extends Observable implements ProjectRunner {
                     experimentID = sampleID;
                     return true;
                 } else {
-                    progressManager.setEndState(Checkpoint.SEARCHGUIFAILURE);
+                    progressManager.setEndState(Checkpoint.PROCESSFAILURE);
                     return false;
                 }
             } else {

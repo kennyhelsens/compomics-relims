@@ -8,7 +8,6 @@ package com.compomics.relims.modes.networking.controller.connectivity.handlers;
  *
  * @author Kenneth
  */
-
 import com.compomics.pridexmltomgfconverter.errors.enums.ConversionError;
 import com.compomics.relims.manager.progressmanager.Checkpoint;
 import com.compomics.relims.modes.networking.controller.connectivity.database.service.DatabaseService;
@@ -61,7 +60,7 @@ public class ResultHandler implements Runnable {
                 String projectID = dds.getProjectID(taskID);
                 try {
                     projectID = dds.getProjectID(taskID);
-                   // dds.storeErrorList((List<ConversionError>) resultMap.get("PrideXMLErrorList"), projectID);
+                    // dds.storeErrorList((List<ConversionError>) resultMap.get("PrideXMLErrorList"), projectID);
                 } catch (Exception e) {
                     projectID = "Unknown projectID";
                 }
@@ -96,9 +95,23 @@ public class ResultHandler implements Runnable {
                     dds.storeStatistics(resultMap, projectID);
                     dds.storeErrorList((List<ConversionError>) resultMap.get("PrideXMLErrorList"), projectID);
                     //delete the worker from the active database ---> is this necessary?
-                   // dds.deleteWorker(runner.getHost(), runner.getPort());
+                    // dds.deleteWorker(runner.getHost(), runner.getPort());
                     WorkerPool.setWorkerState(runner, Checkpoint.IDLE);
                 }
+
+                if (finishState != null && finishState.equalsIgnoreCase(Checkpoint.PROCESSFAILURE.toString())) {
+                    // set task to ProcessFailure and worker back to IDLE
+                    dds.updateTask(taskID, Checkpoint.PROCESSFAILURE.toString());
+                    WorkerRunner runner = new WorkerRunner(sock.getInetAddress().getHostName(), workerPort);
+                    logger.debug("Task " + taskID + " : could not be run. An error occurred while searching : " + projectID);
+                    //store statistics !        
+                    dds.storeStatistics(resultMap, projectID);
+                    dds.storeErrorList((List<ConversionError>) resultMap.get("PrideXMLErrorList"), projectID);
+                    //delete the worker from the active database ---> is this necessary?
+                    // dds.deleteWorker(runner.getHost(), runner.getPort());
+                    WorkerPool.setWorkerState(runner, Checkpoint.IDLE);
+                }
+
                 logger.debug("Handled task");
             } catch (Exception ex) {
                 logger.error("Could not reset task and worker...");

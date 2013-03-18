@@ -201,7 +201,7 @@ public class RelimsJob implements Callable, Closable {
                 } else if (lFuture.isDone()) {
                     if (progressManager.getState() == Checkpoint.FAILED
                             || progressManager.getState() == Checkpoint.PRIDEFAILURE
-                            || progressManager.getState() == Checkpoint.SEARCHGUIFAILURE
+                            || progressManager.getState() == Checkpoint.PROCESSFAILURE
                             || progressManager.getState() == Checkpoint.PEPTIDESHAKERFAILURE
                             || progressManager.getState() == Checkpoint.TIMEOUTFAILURE) {
                         logger.debug(String.format("Failed analysis of project %s.", lProjectID));

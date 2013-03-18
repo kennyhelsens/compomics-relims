@@ -108,8 +108,8 @@ public class ProgressManager {
     public static void setState(Checkpoint state) {
         newProgress.setState(state);
 
-        if (state == Checkpoint.FINISHED || state == Checkpoint.FAILED || state == Checkpoint.PRIDEFAILURE || state == Checkpoint.SEARCHGUIFAILURE || state == Checkpoint.PEPTIDESHAKERFAILURE || state == Checkpoint.TIMEOUTFAILURE) {
-            if (endState != Checkpoint.FAILED && endState != Checkpoint.PRIDEFAILURE && endState != Checkpoint.SEARCHGUIFAILURE) {
+        if (state == Checkpoint.FINISHED || state == Checkpoint.FAILED || state == Checkpoint.PRIDEFAILURE || state == Checkpoint.PROCESSFAILURE || state == Checkpoint.PEPTIDESHAKERFAILURE || state == Checkpoint.TIMEOUTFAILURE) {
+            if (endState != Checkpoint.FAILED && endState != Checkpoint.PRIDEFAILURE && endState != Checkpoint.PROCESSFAILURE) {
                 endState = state;
             }
         }

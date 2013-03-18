@@ -73,13 +73,12 @@ public class WorkerPool {
     public synchronized static WorkerRunner getWorker() {
 //should return null if there is no worker !
         WorkerRunner selectedWorker = null;
-
         //List IDLE workers 
         HashSet<WorkerRunner> workerList = workerMap.get(Checkpoint.IDLE);
         //shuffle the idle workers so that they all get a task rather than one clogging the set
         if (!workerList.isEmpty()) {
             int size = workerList.size();
-            int item = new Random().nextInt(size); // In real life, the Random object should be rather more shared than this
+            int item = new Random().nextInt(size);
             int i = 0;
             for (WorkerRunner obj : workerList) {
                 if (i == item) {
@@ -214,7 +213,7 @@ public class WorkerPool {
     private static WorkerRunner getWorkerToDelete() {
         return WorkerPool.workerToDelete;
     }
-    private static WorkerRunner workerRunner;
+
     private static WorkerRunner workerToDelete;
 
     private static class TaskDistributor implements Runnable {
