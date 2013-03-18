@@ -226,12 +226,24 @@ public class RelimsProperties {
         return config.getString("java.home");
     }
 
+    public static String getRelimsTempFolder() {
+        return config.getString("relims.local.tempfolder");
+    }
+
     public static String getPeptideShakerFolder() {
         return config.getString("peptideshaker.directory");
     }
 
+    public static void setPeptideShakerFolder(String peptideshakerDir) {
+        config.setProperty("peptideshaker.directory", peptideshakerDir);
+    }
+
     public static String getPeptideShakerArchive() {
         return config.getString("peptideshaker.jar");
+    }
+
+    public static void setPeptideShakerArchive(String peptideshakerJar) {
+        config.setProperty("peptideshaker.jar", peptideshakerJar);
     }
 
     public static String getPeptideShakerMemory() {
