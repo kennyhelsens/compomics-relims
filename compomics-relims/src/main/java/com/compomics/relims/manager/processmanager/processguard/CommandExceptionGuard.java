@@ -98,7 +98,7 @@ public class CommandExceptionGuard extends Thread implements Callable {
                     }
                     for (String aKeyword : keyWords) {
                         if (line.contains(aKeyword) || isTimeUp()) {
-                            progressManager.setState(Checkpoint.SEARCHGUIFAILURE);
+                            progressManager.setState(Checkpoint.PROCESSFAILURE);
                             process.destroy();
                             killSearchEngines();
                             return false;
@@ -108,7 +108,7 @@ public class CommandExceptionGuard extends Thread implements Callable {
                     //     checkProcesses();
                 }
             } catch (IOException ex) {
-                progressManager.setState(Checkpoint.SEARCHGUIFAILURE, ex);
+                progressManager.setState(Checkpoint.PROCESSFAILURE, ex);
                 errorless = false;
                 process.destroy();
                 break;

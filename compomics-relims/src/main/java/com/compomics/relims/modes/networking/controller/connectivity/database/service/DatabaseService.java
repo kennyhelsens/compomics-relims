@@ -211,9 +211,7 @@ public class DatabaseService {
     }
 
     public synchronized void deleteWorker(String hostname, int workerPort) {
-
         WorkerDAO.deleteWorker(hostname, workerPort);
-
     }
 
     //==========STATISTIC RELATED METHODS===============//
