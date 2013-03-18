@@ -27,6 +27,7 @@ import java.util.Calendar;
 import java.util.List;
 
 import static com.google.common.base.Preconditions.checkNotNull;
+import java.util.logging.Level;
 
 /**
  * This class contains the Relims properties.
@@ -226,8 +227,13 @@ public class RelimsProperties {
         return config.getString("java.home");
     }
 
-    public static String getRelimsTempFolder() {
-        return System.getProperty("user.dir") + System.getProperty("file.separator") + ".relims";
+    public static File getRelimsTempFolder() {
+        try {
+            return File.createTempFile("relimsTemp", Long.toString(System.nanoTime()));
+        } catch (IOException ex) {
+            logger.error("Could not create tempfolder!");
+        }
+        return null;
     }
 
     public static String getPeptideShakerFolder() {

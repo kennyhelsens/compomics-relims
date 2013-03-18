@@ -16,11 +16,12 @@ import org.apache.log4j.Logger;
  */
 public class PeptideShakerLocalizer {
 
-    private static File relimsPeptideShakerTemp = new File(RelimsProperties.getRelimsTempFolder() + "/peptideshaker");
+    private static File relimsPeptideShakerTemp = new File(RelimsProperties.getRelimsTempFolder().getAbsolutePath() + "/peptideshaker");
     private static final Logger logger = Logger.getLogger(PeptideShakerLocalizer.class);
 
     public synchronized static void cleanCopy() {
         try {
+            logger.debug("Making a peptideshaker temp folder in " + relimsPeptideShakerTemp.getAbsolutePath());
             File peptideShakerFolder = new File(RelimsProperties.getPeptideShakerFolder());
             //clear the relimsPeptideShakerTemp folder
             if (relimsPeptideShakerTemp.exists()) {
@@ -34,6 +35,8 @@ public class PeptideShakerLocalizer {
             RelimsProperties.setPeptideShakerFolder(relimsPeptideShakerTemp.getAbsolutePath());
         } catch (Exception e) {
             logger.error(e);
+        } finally {
+            relimsPeptideShakerTemp.deleteOnExit();
         }
 
     }
