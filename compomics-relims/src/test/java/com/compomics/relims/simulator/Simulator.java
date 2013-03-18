@@ -14,17 +14,13 @@ import com.compomics.util.experiment.identification.SearchParameters;
 import junit.framework.TestCase;
 import org.apache.commons.configuration.PropertiesConfiguration;
 import org.apache.commons.io.FileUtils;
+import org.apache.log4j.Logger;
 
 import java.io.File;
 import java.io.FileFilter;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
-import junit.framework.TestCase;
-import org.apache.commons.configuration.PropertiesConfiguration;
-import org.apache.commons.io.FileUtils;
-import org.apache.log4j.Level;
-import org.apache.log4j.Logger;
 
 /**
  * @author Kenneth
@@ -168,9 +164,11 @@ public class Simulator extends TestCase {
 
         //CLEAN UP REPOSITORY
         filesFolder = repository.listFiles();
-        for (File aFolder : filesFolder) {
-            FileUtils.deleteQuietly(aFolder);
-            logger.info("Removed " + aFolder.getName());
+        if (filesFolder != null) {
+            for (File aFolder : filesFolder) {
+                FileUtils.deleteQuietly(aFolder);
+                logger.info("Removed " + aFolder.getName());
+            }
         }
 
         //CLEAN UP FASTAFILES
@@ -180,9 +178,12 @@ public class Simulator extends TestCase {
                 return !pathname.getAbsolutePath().toLowerCase().endsWith(".fasta");
             }
         });
-        for (File aFolder : filesFolder) {
-            FileUtils.deleteQuietly(aFolder);
-            logger.info("Removed " + aFolder.getName());
+
+        if (filesFolder != null) {
+            for (File aFolder : filesFolder) {
+                FileUtils.deleteQuietly(aFolder);
+                logger.info("Removed " + aFolder.getName());
+            }
         }
 
         filesFolder = fastamac.listFiles(new FileFilter() {
@@ -191,9 +192,12 @@ public class Simulator extends TestCase {
                 return !pathname.getAbsolutePath().toLowerCase().endsWith(".fasta");
             }
         });
-        for (File aFolder : filesFolder) {
-            FileUtils.deleteQuietly(aFolder);
-            logger.info("Removed " + aFolder.getName());
+
+        if (filesFolder != null) {
+            for (File aFolder : filesFolder) {
+                FileUtils.deleteQuietly(aFolder);
+                logger.info("Removed " + aFolder.getName());
+            }
         }
         assertTrue(true);
     }
@@ -232,6 +236,7 @@ public class Simulator extends TestCase {
         try {
             File currentParameters = new File(RelimsProperties.getConfigFolder().getAbsolutePath() + "/default_parameters.parameters");
             loadedSearchParameters = SearchParameters.getIdentificationParameters(currentParameters);
+            loadedSearchParameters.setFastaFile(new File(RelimsProperties.getDefaultSearchDatabase()));
         } catch (Exception e) {
             e.printStackTrace();
         }
