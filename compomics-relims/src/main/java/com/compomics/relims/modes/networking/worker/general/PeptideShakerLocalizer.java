@@ -16,27 +16,27 @@ import org.apache.log4j.Logger;
  */
 public class PeptideShakerLocalizer {
 
-    private static File relimsPeptideShakerTemp = new File(RelimsProperties.getRelimsTempFolder().getAbsolutePath() + "/peptideshaker");
+    private static File relimsTemp = RelimsProperties.getRelimsTempFolder();
     private static final Logger logger = Logger.getLogger(PeptideShakerLocalizer.class);
 
     public synchronized static void cleanCopy() {
         try {
-            logger.debug("Making a peptideshaker temp folder in " + relimsPeptideShakerTemp.getAbsolutePath());
+            logger.debug("Making a peptideshaker temp folder in " + relimsTemp.getAbsolutePath());
             File peptideShakerFolder = new File(RelimsProperties.getPeptideShakerFolder());
-            //clear the relimsPeptideShakerTemp folder
-            if (relimsPeptideShakerTemp.exists()) {
-                FileUtils.cleanDirectory(relimsPeptideShakerTemp);
+            //clear the relimsTemp folder
+            if (relimsTemp.exists()) {
+                FileUtils.cleanDirectory(relimsTemp);
             } else {
-                relimsPeptideShakerTemp.mkdirs();
+                relimsTemp.mkdirs();
             }
             // copy the entire director
-            FileUtils.copyDirectory(peptideShakerFolder, relimsPeptideShakerTemp);
+            FileUtils.copyDirectory(peptideShakerFolder, relimsTemp);
             //set relims properties
-            RelimsProperties.setPeptideShakerFolder(relimsPeptideShakerTemp.getAbsolutePath());
+            RelimsProperties.setPeptideShakerFolder(relimsTemp.getAbsolutePath());
         } catch (Exception e) {
             logger.error(e);
         } finally {
-            relimsPeptideShakerTemp.deleteOnExit();
+            relimsTemp.deleteOnExit();
         }
 
     }

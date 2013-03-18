@@ -228,12 +228,18 @@ public class RelimsProperties {
     }
 
     public static File getRelimsTempFolder() {
+        File tempFolder = null;
         try {
-            return File.createTempFile("relimsTemp", Long.toString(System.nanoTime()));
+            File locator = File.createTempFile("relimsTemp", Long.toString(System.nanoTime()));
+            locator.delete();
+            locator.mkdirs();
+            tempFolder = new File(locator.getParent() + "/relimsTemp");
+            tempFolder.deleteOnExit();
         } catch (IOException ex) {
+            ex.printStackTrace();
             logger.error("Could not create tempfolder!");
         }
-        return null;
+        return tempFolder;
     }
 
     public static String getPeptideShakerFolder() {
