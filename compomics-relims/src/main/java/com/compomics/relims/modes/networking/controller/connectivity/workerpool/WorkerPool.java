@@ -16,10 +16,9 @@ import java.text.SimpleDateFormat;
 import java.util.EnumMap;
 import java.util.HashSet;
 import java.util.Map;
+import java.util.Random;
 import java.util.concurrent.ConcurrentHashMap;
 import org.apache.log4j.Logger;
-
-
 
 /**
  *
@@ -47,18 +46,18 @@ public class WorkerPool {
     }
 
     public static void initializeWorkerPool() {
-        try{
-        checkpoints = new Checkpoint[]{Checkpoint.IDLE, Checkpoint.REGISTER, Checkpoint.CANCELLED, Checkpoint.FAILED, Checkpoint.FINISHED, Checkpoint.RUNNING};
-        logger = Logger.getLogger(WorkerPool.class);
-        //workerMap = Collections.synchronizedMap(new EnumMap<Checkpoint, HashSet<WorkerRunner>>(Checkpoint.class));
-        workerMap = new EnumMap<Checkpoint, HashSet<WorkerRunner>>(Checkpoint.class);
-        totalServerPool = new ConcurrentHashMap<>();
-        databaseLocked = false;
-        dds = DatabaseService.getInstance();
-        }catch(Throwable e){
+        try {
+            checkpoints = new Checkpoint[]{Checkpoint.IDLE, Checkpoint.REGISTER, Checkpoint.CANCELLED, Checkpoint.FAILED, Checkpoint.FINISHED, Checkpoint.RUNNING};
+            logger = Logger.getLogger(WorkerPool.class);
+            //workerMap = Collections.synchronizedMap(new EnumMap<Checkpoint, HashSet<WorkerRunner>>(Checkpoint.class));
+            workerMap = new EnumMap<Checkpoint, HashSet<WorkerRunner>>(Checkpoint.class);
+            totalServerPool = new ConcurrentHashMap<>();
+            databaseLocked = false;
+            dds = DatabaseService.getInstance();
+        } catch (Throwable e) {
             e.printStackTrace();
         }
-   
+
         for (Checkpoint aState : checkpoints) {
             HashSet<WorkerRunner> workerList = new HashSet<>();
             workerMap.put(aState, workerList);
@@ -77,8 +76,17 @@ public class WorkerPool {
 
         //List IDLE workers 
         HashSet<WorkerRunner> workerList = workerMap.get(Checkpoint.IDLE);
+        //shuffle the idle workers so that they all get a task rather than one clogging the set
         if (!workerList.isEmpty()) {
-            selectedWorker = workerList.iterator().next();
+            int size = workerList.size();
+            int item = new Random().nextInt(size); // In real life, the Random object should be rather more shared than this
+            int i = 0;
+            for (WorkerRunner obj : workerList) {
+                if (i == item) {
+                    selectedWorker = obj;
+                }
+                i = i + 1;
+            }
         }
         return selectedWorker;
     }

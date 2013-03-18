@@ -95,19 +95,16 @@ public class ResultHandler implements Runnable {
                     //store statistics !        
                     dds.storeStatistics(resultMap, projectID);
                     dds.storeErrorList((List<ConversionError>) resultMap.get("PrideXMLErrorList"), projectID);
-                    //delete the worker from the active database
-                    dds.deleteWorker(runner.getHost(), runner.getPort());
+                    //delete the worker from the active database ---> is this necessary?
+                   // dds.deleteWorker(runner.getHost(), runner.getPort());
                     WorkerPool.setWorkerState(runner, Checkpoint.IDLE);
                 }
-
                 logger.debug("Handled task");
-
             } catch (Exception ex) {
                 logger.error("Could not reset task and worker...");
                 ex.printStackTrace();
             }
         } finally {
-
             try {
                 sock.close();
             } catch (Exception e) {
