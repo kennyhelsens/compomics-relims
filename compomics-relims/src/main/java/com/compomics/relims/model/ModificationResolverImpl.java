@@ -9,6 +9,7 @@ import com.compomics.relims.model.interfaces.ModificationResolver;
 import com.compomics.relims.manager.progressmanager.Checkpoint;
 import com.compomics.relims.manager.progressmanager.ProgressManager;
 import com.compomics.util.experiment.biology.PTM;
+import com.compomics.util.experiment.biology.PTMFactory;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
@@ -17,6 +18,7 @@ import java.io.IOException;
 import java.util.HashSet;
 import java.util.List;
 import org.apache.log4j.Logger;
+import org.xmlpull.v1.XmlPullParserException;
 
 /**
  * This class is a
@@ -90,16 +92,24 @@ public class ModificationResolverImpl implements ModificationResolver {
             logger.debug("loading " + lUserModsSize + " extra usermods for the current search (PTMFactory size:" + lPTMFactorySize + ")");
 
             iUserModsFile.setOMSSAXSDModifications(lUnresolvedModifications);
-
             iVariableMatchedPTMStrings.addAll(iUserModsFile.getVarModsAsString());
             iFixedMatchedPTMStrings.addAll(iUserModsFile.getFixedModsAsString());
         }
 
         iRelimsProjectBean.setFixedMatchedPTMs(Lists.newArrayList(iFixedMatchedPTMStrings));
         iRelimsProjectBean.setVariableMatchedPTMs(Lists.newArrayList(iVariableMatchedPTMStrings));
-
-        persistUserMods(RelimsProperties.getSearchGuiUserModFile());
-    }
+        persistUserMods(RelimsProperties.getSearchGuiUserVarModFile());
+             try {
+            //LOAD THE GENERATED USERMODS INTO THE PTMFactory
+            PTMFactory.getInstance().importModifications(RelimsProperties.getSearchGuiUserVarModFile(), true, true);
+            //LOAD THE FIXED USERMODS INTO THE PTM
+            //PTMFactory.getInstance().importModifications(RelimsProperties.getSearchGuiUserModFile(), true, true);
+        } catch (XmlPullParserException ex) {
+            logger.error(ex);
+        } catch (IOException ex) {
+            logger.error(ex);
+        }
+       }
 
     @Override
     public void persistUserMods(File aFile) {
@@ -114,5 +124,6 @@ public class ModificationResolverImpl implements ModificationResolver {
             ProgressManager.setState(Checkpoint.FAILED, e);;
         }
         iRelimsProjectBean.setUserModsFile(iUserModsFile);
+        
     }
 }

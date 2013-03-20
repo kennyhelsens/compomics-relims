@@ -150,6 +150,7 @@ public class RelimsJobController extends Observable implements ProjectRunner {
             logger.debug("Building projectbean");
             relimsProjectBean = projectProvider.getProject(projectID);
             setProject(relimsProjectBean);
+            modificationResolver.resolveModificationList(relimsProjectBean);
             ProcessVariableManager.setProjectID(projectID);
             //make a projectBean
             long lProjectid = relimsProjectBean.getProjectID();

@@ -18,7 +18,7 @@ import com.compomics.relims.model.beans.RelimsProjectBean;
 import com.compomics.relims.model.interfaces.DataProvider;
 import com.compomics.relims.manager.progressmanager.Checkpoint;
 import com.compomics.relims.manager.progressmanager.ProgressManager;
-import com.compomics.relims.model.ModificationResolverImpl;
+import com.compomics.util.experiment.biology.PTM;
 import com.google.common.collect.Sets;
 import java.io.BufferedWriter;
 import java.io.File;
@@ -28,7 +28,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import org.apache.commons.io.FileUtils;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.springframework.context.ApplicationContext;
@@ -133,10 +132,7 @@ public class PrideXMLDataProvider implements DataProvider {
 
             lSpectrumAnnotator = (PrideXmlSpectrumAnnotator) lContext.getBean("prideXmlSpectrumAnnotator");
             PrideXmlModificationService lModificationService = (PrideXmlModificationService) lContext.getBean("prideXmlModificationService");
-
-
             lRelimsProjectBean.setProjectID((int) aProjectid);
-
             Set<Modification> lModificationSet = Sets.newHashSet();
 
             logger.debug("estimating PTMs via inspecting the modified_sequence values of the PSMs");
@@ -150,13 +146,11 @@ public class PrideXMLDataProvider implements DataProvider {
                     //ProgressManager.setState(Checkpoint.PRIDEFAILURE);
                     logger.error("Pride found no usefull identifications.");
                 }
-
-                for (Modification lModification : lModificationSet) {
-                    logger.debug(String.format("Resolved PTM '%s' with mass '%f' from modified sequence", lModification.getName(), lModification.getMassShift()));
-                }
                 lModificationSet = lModificationService.loadExperimentModifications();
-
-
+                         for (Modification lModification : lModificationSet) {
+                     logger.debug(String.format("Resolved PTM '%s' with mass '%f' from modified sequence", lModification.getName(), lModification.getMassShift()));
+                     //PUT THEM IN THE PTM FACTORY AS NEW PTMS HERE !!!!
+                      }
                 lSpectrumAnnotator.annotate(xmlFile);
             } catch (Exception e) {
                 logger.error(e.getMessage());
@@ -173,13 +167,16 @@ public class PrideXMLDataProvider implements DataProvider {
                     logger.debug(lAsapModification.getName());
                 }
             }
-
             OmssaModificationMarshaller marshaller = new OmssaModificationMarshallerImpl();
             UserModCollection lUserModCollection = marshaller.marshallModifications(lModificationSet);
-            
+
+            //set usermods
             lRelimsProjectBean.setStandardModificationList(lUserModCollection);
+            //set fixedmods
+
             // Set precursor and fragment errors
             Set<AnalyzerData> lAnalyzerDataSet = getInstrumentsForProject(aProjectid);
+
 
             double lPrecursorError = 0.0;
             double lFragmentError = 0.0;
@@ -205,10 +202,6 @@ public class PrideXMLDataProvider implements DataProvider {
         }
         logger.setLevel(Level.DEBUG);
         logger.debug("Retrieved searchparameters from Pride xml");
-       //Write the usermodXML file to the searchgui config folder !
-        ModificationResolverImpl modResolver = new ModificationResolverImpl();
-        modResolver.resolveModificationList(lRelimsProjectBean);
-        
         return lRelimsProjectBean;
     }
 

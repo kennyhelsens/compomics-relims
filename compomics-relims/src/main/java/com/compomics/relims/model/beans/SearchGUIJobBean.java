@@ -6,6 +6,7 @@ import com.compomics.relims.manager.variablemanager.ProcessVariableManager;
 import com.compomics.relims.manager.progressmanager.ProgressManager;
 import com.compomics.util.experiment.biology.Enzyme;
 import com.compomics.util.experiment.biology.EnzymeFactory;
+import com.compomics.util.experiment.biology.PTM;
 import com.compomics.util.experiment.biology.PTMFactory;
 import com.compomics.util.experiment.identification.SearchParameters;
 import com.compomics.util.preferences.ModificationProfile;
@@ -17,7 +18,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.logging.Level;
 import no.uib.jsparklines.data.XYDataPoint;
 import org.apache.commons.configuration.ConfigurationException;
 import org.apache.commons.configuration.PropertiesConfiguration;
@@ -197,28 +197,22 @@ public class SearchGUIJobBean {
                 e.printStackTrace();
             }
             logger.debug("Project was not found in repository. Remaking searchparameters file");
-            //Set the modifications 
-            List<String> modifications = iRelimsProjectBean.getFixedMatchedPTMs();
+            //Set the fixedModifications 
+            List<String> fixedModifications = iRelimsProjectBean.getFixedMatchedPTMs();
             ModificationProfile modProfile = new ModificationProfile();
 
-            logger.debug("setting fixed modifications to searchparameters file");
-            //Add the relims-mods
-
-            for (String aMod : modifications) {
-                try {
-                    modProfile.addFixedModification(ptmFactory.getPTM(aMod));
-                } catch (Exception e) {
-                    logger.error(e);
-                    logger.debug("failed to set " + aMod + " in the modificationprofile.");
-                }
-            }
-
-            modifications = iRelimsProjectBean.getVariableMatchedPTMs();
-            logger.debug("setting variabele modifications to searchparameters file");
-            for (String aMod : modifications) {
+            logger.debug("setting fixed modifications to searchparameters file");     
+            fixedModifications = iRelimsProjectBean.getFixedMatchedPTMs();
+                   for (String aMod : ptmFactory.getUserModifications()) {
                 try {
                     if (!modProfile.contains(aMod)) {
-                        modProfile.addVariableModification(ptmFactory.getPTM(aMod));
+                        if (fixedModifications.contains(aMod)) {
+                            modProfile.addFixedModification(ptmFactory.getPTM(aMod));
+                               logger.debug("Added fixed modification : " + aMod);
+                        } else {
+                            modProfile.addVariableModification(ptmFactory.getPTM(aMod));
+                               logger.debug("Added variable modification : " + aMod);
+                        }        
                     }
                 } catch (Exception e) {
                     logger.error(e);
@@ -226,16 +220,14 @@ public class SearchGUIJobBean {
                 }
             }
             searchParameters.setModificationProfile(modProfile);
-
             // Set other parameters (defaults)
-
             try {
                 File enzymesFile = new File(RelimsProperties.getSearchGuiFolder() + "/resources/conf/searchGUI_enzymes.xml");
                 enzymeFactory.importEnzymes(enzymesFile);
-                if (iRelimsProjectBean.getEnzyme() != null) {
-                    Enzyme enzyme = iRelimsProjectBean.getEnzyme();
+                Enzyme enzyme = iRelimsProjectBean.getEnzyme();
+                if (iRelimsProjectBean.getEnzyme() == null) {
+                    enzyme = enzymeFactory.getEnzyme("Trypsin");
                 }
-                Enzyme enzyme = enzymeFactory.getEnzyme("Trypsin");
                 searchParameters.setEnzyme(enzyme);
             } catch (Exception ex) {
                 ex.printStackTrace();
@@ -252,7 +244,7 @@ public class SearchGUIJobBean {
             //save the file to the correct folder
             searchParametersFile = new File(RelimsProperties.getWorkSpace().toString() + "/SearchGUI.parameters");
             SearchParameters.saveIdentificationParameters(searchParameters, searchParametersFile);
-            logger.debug("Loaded parameters...");
+            logger.debug("Loaded parameters and stored at " + searchParametersFile.getAbsolutePath());
         } catch (FileNotFoundException ex) {
             ex.printStackTrace();
         } catch (IOException ex) {
@@ -443,18 +435,16 @@ public class SearchGUIJobBean {
 
         logger.debug("Using Max Peptide Length : " + searchParameters.getMaxPeptideLength());
 
-        if (searchParameters.getModificationProfile() == null) {
-            logger.debug("Mod-profile was null!");
-            searchParameters.setModificationProfile(new ModificationProfile());
+        ArrayList<String> fixModList = searchParameters.getModificationProfile().getFixedModifications();
+        logger.debug("Using Fixed Mod profile : ");
+        for (String aMod : fixModList) {
+            logger.debug("Fixed Modification : " + aMod);
         }
-
-        ArrayList<String> modList = searchParameters.getModificationProfile().getAllModifications();
-
-        logger.debug("Using Mod-profile : ");
-        for (String aMod : modList) {
-            logger.debug("Modification : " + aMod);
+        ArrayList<String> varModList = searchParameters.getModificationProfile().getVariableModifications();
+        logger.debug("Using Variable Mod profile : ");
+        for (String aMod : varModList) {
+            logger.debug("Var Modification : " + aMod);
         }
-
         if (searchParameters.getnMissedCleavages() == null) {
             logger.debug("Missed Cleavages was null!");
             searchParameters.setnMissedCleavages(0);
@@ -507,6 +497,7 @@ public class SearchGUIJobBean {
         prepare();
         File searchGuiFolder = new File(RelimsProperties.getSearchGuiFolder());
         Command.setWorkFolder(searchGuiFolder);
+        logger.debug("Launching searchgui from" + searchGuiFolder.getAbsolutePath());
         StringBuilder totalCommandLine = new StringBuilder();
         searchGUICommandLine = generateCommand();
 

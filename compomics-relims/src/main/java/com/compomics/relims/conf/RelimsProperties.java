@@ -114,7 +114,15 @@ public class RelimsProperties {
     }
 
     public static void setSearchGUIFolder(String searchGUIDir) {
-        config.setProperty("searchgui.directory",searchGUIDir);
+        config.setProperty("searchgui.directory", searchGUIDir);
+    }
+
+    public static File getUserModsFile() {
+        throw new UnsupportedOperationException("Not yet implemented");
+    }
+
+    public static File getSearchGuiUserVarModFile() {
+        return new File(getSearchGuiUserModFile().getAbsolutePath() + "_varMod.xml");
     }
     /**
      * the results will all be placed in a user-specific folder. Therefor, all
