@@ -6,9 +6,8 @@ package com.compomics.relims.modes.networking.worker;
 
 import com.compomics.relims.conf.RelimsProperties;
 import com.compomics.relims.modes.networking.worker.feedbackproviders.HeartbeatGenerator;
-import com.compomics.relims.modes.networking.worker.general.PeptideShakerLocalizer;
+import com.compomics.relims.modes.networking.worker.general.ProcesRelocalizer;
 import com.compomics.relims.modes.networking.worker.general.ResourceManager;
-import com.compomics.relims.modes.networking.worker.general.SearchGUILocalizer;
 import com.compomics.relims.modes.networking.worker.taskreciever.TaskReciever;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -32,8 +31,7 @@ public class RelimsWorkerMode {
     public static void main(String[] args) {
 
         RelimsProperties.initialize();
-        PeptideShakerLocalizer.cleanCopy();
-        SearchGUILocalizer.cleanCopy();
+        ProcesRelocalizer.cleanCopy();
         if (!RelimsProperties.getDebugMode()) {
             Logger.getRootLogger().setLevel(Level.ERROR);
         }

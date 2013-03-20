@@ -1,12 +1,12 @@
 package com.compomics.relims.model.provider;
 
+import com.compomics.relims.model.ModificationResolverImpl;
 import com.compomics.relims.conf.RelimsProperties;
 import com.compomics.relims.manager.processmanager.processguard.RelimsException;
 import com.compomics.relims.model.beans.RelimsProjectBean;
 import com.compomics.relims.model.interfaces.DataProvider;
 import com.compomics.relims.model.interfaces.ModificationResolver;
 import com.compomics.relims.model.interfaces.ProjectListProvider;
-import com.compomics.relims.model.provider.mslims.ModificationResolverImpl;
 import com.compomics.relims.model.provider.projectlist.ProjectListProviderLocal;
 import com.compomics.relims.model.provider.projectlist.ProjectListProviderRedis;
 import org.apache.log4j.Logger;

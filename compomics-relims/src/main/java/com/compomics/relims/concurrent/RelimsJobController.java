@@ -151,6 +151,7 @@ public class RelimsJobController extends Observable implements ProjectRunner {
             relimsProjectBean = projectProvider.getProject(projectID);
             setProject(relimsProjectBean);
             ProcessVariableManager.setProjectID(projectID);
+            //make a projectBean
             long lProjectid = relimsProjectBean.getProjectID();
 
             // GET THE SPECTRA FILE 
@@ -413,10 +414,14 @@ public class RelimsJobController extends Observable implements ProjectRunner {
             e.printStackTrace();
             logger.error("ERROR OCCURRED FOR PROJECT " + projectID);
             logger.error(e);
-            if (provider.equals("pride")) {
-                progressManager.setEndState(Checkpoint.PRIDEFAILURE);
+            if (e instanceof java.lang.IllegalArgumentException) {
+                 progressManager.setEndState(Checkpoint.MODFAILURE);
             } else {
-                progressManager.setState(Checkpoint.FAILED, e);;
+                if (provider.equals("pride")) {
+                    progressManager.setEndState(Checkpoint.PRIDEFAILURE);
+                } else {
+                    progressManager.setState(Checkpoint.FAILED, e);;
+                }
             }
         }
         //nullcheck to prevent standalone relims to delete its folders

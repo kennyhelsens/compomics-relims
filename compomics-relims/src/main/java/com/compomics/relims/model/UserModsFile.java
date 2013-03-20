@@ -81,9 +81,6 @@ public class UserModsFile {
         return lResult;
     }
 
-
-
-
     public void setMascotModifications(List<Modification> aMascotModifications) {
         iMascotModifications = aMascotModifications;
     }

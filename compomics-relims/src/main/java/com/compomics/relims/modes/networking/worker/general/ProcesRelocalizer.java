@@ -14,15 +14,18 @@ import org.apache.log4j.Logger;
  *
  * @author Kenneth
  */
-public class PeptideShakerLocalizer {
+public class ProcesRelocalizer {
 
     private static File relimsTemp = RelimsProperties.getRelimsTempFolder();
-    private static final Logger logger = Logger.getLogger(PeptideShakerLocalizer.class);
+    private static File relimsPepTemp = new File(relimsTemp.getAbsolutePath() + "/peptideshaker");
+    private static File relimsSearchGuiTemp = new File(relimsTemp.getAbsolutePath() + "/searchgui");
+    private static final Logger logger = Logger.getLogger(ProcesRelocalizer.class);
 
     public synchronized static void cleanCopy() {
         try {
-            logger.debug("Making a peptideshaker temp folder in " + relimsTemp.getAbsolutePath());
+            logger.debug("Making a process temp folder in " + relimsTemp.getAbsolutePath());
             File peptideShakerFolder = new File(RelimsProperties.getPeptideShakerFolder());
+            File searchGuiFolder = new File(RelimsProperties.getSearchGuiFolder());
             //clear the relimsTemp folder
             if (relimsTemp.exists()) {
                 FileUtils.cleanDirectory(relimsTemp);
@@ -30,7 +33,8 @@ public class PeptideShakerLocalizer {
                 relimsTemp.mkdirs();
             }
             // copy the entire director
-            FileUtils.copyDirectory(peptideShakerFolder, relimsTemp);
+            FileUtils.copyDirectory(peptideShakerFolder, relimsPepTemp);
+            FileUtils.copyDirectory(searchGuiFolder, relimsSearchGuiTemp);
             //set relims properties
             RelimsProperties.setPeptideShakerFolder(relimsTemp.getAbsolutePath());
         } catch (Exception e) {

@@ -18,6 +18,7 @@ import com.compomics.relims.model.beans.RelimsProjectBean;
 import com.compomics.relims.model.interfaces.DataProvider;
 import com.compomics.relims.manager.progressmanager.Checkpoint;
 import com.compomics.relims.manager.progressmanager.ProgressManager;
+import com.compomics.relims.model.ModificationResolverImpl;
 import com.google.common.collect.Sets;
 import java.io.BufferedWriter;
 import java.io.File;
@@ -175,7 +176,7 @@ public class PrideXMLDataProvider implements DataProvider {
 
             OmssaModificationMarshaller marshaller = new OmssaModificationMarshallerImpl();
             UserModCollection lUserModCollection = marshaller.marshallModifications(lModificationSet);
-
+            
             lRelimsProjectBean.setStandardModificationList(lUserModCollection);
             // Set precursor and fragment errors
             Set<AnalyzerData> lAnalyzerDataSet = getInstrumentsForProject(aProjectid);
@@ -203,8 +204,11 @@ public class PrideXMLDataProvider implements DataProvider {
             lRelimsProjectBean.setFragmentError(lFragmentError);
         }
         logger.setLevel(Level.DEBUG);
-        logger.debug("Retrieved searchparameters from remote Pride");
-       
+        logger.debug("Retrieved searchparameters from Pride xml");
+       //Write the usermodXML file to the searchgui config folder !
+        ModificationResolverImpl modResolver = new ModificationResolverImpl();
+        modResolver.resolveModificationList(lRelimsProjectBean);
+        
         return lRelimsProjectBean;
     }
 

@@ -1,4 +1,4 @@
-package com.compomics.relims.model.provider.mslims;
+package com.compomics.relims.model;
 
 import com.compomics.omssa.xsd.UserMod;
 import com.compomics.relims.conf.RelimsProperties;
@@ -9,6 +9,7 @@ import com.compomics.relims.model.interfaces.ModificationResolver;
 import com.compomics.relims.manager.progressmanager.Checkpoint;
 import com.compomics.relims.manager.progressmanager.ProgressManager;
 import com.compomics.util.experiment.biology.PTM;
+import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import java.io.File;
@@ -64,8 +65,8 @@ public class ModificationResolverImpl implements ModificationResolver {
             }
         }
 
-//        int lMatchCount = iFixedMatchedPTMStrings.size() + iVariableMatchedPTMStrings.size();
-//        int lOriginalCount = lAllModifications.size();
+        int lMatchCount = iFixedMatchedPTMStrings.size() + iVariableMatchedPTMStrings.size();
+        int lOriginalCount = lAllModifications.size();
 
         // Persist the so-far unknown usermods in the PTMFactory.
         boolean lBuildUserMods = false;
@@ -74,8 +75,8 @@ public class ModificationResolverImpl implements ModificationResolver {
         }
 
         // Be sure that all modifications have been matched!
-//        String lErrorMessage = "not all mods were matched! (original:" + lOriginalCount + " - matched: " + lMatchCount + ")";
-//        Preconditions.checkArgument(lOriginalCount == lMatchCount, lErrorMessage);
+        String lErrorMessage = "not all mods were matched! (original:" + lOriginalCount + " - matched: " + lMatchCount + ")";
+        Preconditions.checkArgument(lOriginalCount == lMatchCount, lErrorMessage);
 
         iUserModsFile = new UserModsFile();
 
@@ -97,6 +98,7 @@ public class ModificationResolverImpl implements ModificationResolver {
         persistUserMods(RelimsProperties.getSearchGuiUserModFile());
     }
 
+    @Override
     public void persistUserMods(File aFile) {
         if (aFile.exists()) {
             aFile.delete();
@@ -106,9 +108,7 @@ public class ModificationResolverImpl implements ModificationResolver {
             iUserModsFile.write(aFile);
         } catch (IOException e) {
             logger.error(e.getMessage(), e);
-            ProgressManager.setState(Checkpoint.FAILED,e);;
-            Thread.currentThread().interrupt();
-            return;
+            ProgressManager.setState(Checkpoint.FAILED, e);;
         }
         iRelimsProjectBean.setUserModsFile(iUserModsFile);
     }
