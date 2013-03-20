@@ -112,6 +112,10 @@ public class RelimsProperties {
     public static void setConfigFolder(String location) {
         RelimsProperties.configFolder = new File(location);
     }
+
+    public static void setSearchGUIFolder(String searchGUIDir) {
+        config.setProperty("searchgui.directory",searchGUIDir);
+    }
     /**
      * the results will all be placed in a user-specific folder. Therefor, all
      * "normal" relims projects that are not run via the automatic setup, will
