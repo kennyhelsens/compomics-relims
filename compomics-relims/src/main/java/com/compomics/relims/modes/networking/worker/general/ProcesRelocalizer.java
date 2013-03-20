@@ -26,6 +26,9 @@ public class ProcesRelocalizer {
             logger.debug("Making a process temp folder in " + relimsTemp.getAbsolutePath());
             File peptideShakerFolder = new File(RelimsProperties.getPeptideShakerFolder());
             File searchGuiFolder = new File(RelimsProperties.getSearchGuiFolder());
+            //redirect relims to these folders
+            RelimsProperties.setPeptideShakerFolder(relimsPepTemp.getAbsolutePath());
+            RelimsProperties.setSearchGUIFolder(relimsSearchGuiTemp.getAbsolutePath());
             //clear the relimsTemp folder
             if (relimsTemp.exists()) {
                 FileUtils.cleanDirectory(relimsTemp);

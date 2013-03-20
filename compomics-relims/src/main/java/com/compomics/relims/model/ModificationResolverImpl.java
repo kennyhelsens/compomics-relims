@@ -76,8 +76,11 @@ public class ModificationResolverImpl implements ModificationResolver {
 
         // Be sure that all modifications have been matched!
         String lErrorMessage = "not all mods were matched! (original:" + lOriginalCount + " - matched: " + lMatchCount + ")";
-        Preconditions.checkArgument(lOriginalCount == lMatchCount, lErrorMessage);
-
+        try {
+            Preconditions.checkArgument(lOriginalCount == lMatchCount, lErrorMessage);
+        } catch (IllegalArgumentException e) {
+            // catch it here or else entire pride dataprovider will be "failed"
+        }
         iUserModsFile = new UserModsFile();
 
         if (lBuildUserMods) {
