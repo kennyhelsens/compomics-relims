@@ -6,7 +6,8 @@ package com.compomics.relims.modes.networking.controller.connectivity.database.D
 
 import com.compomics.relims.conf.RelimsProperties;
 import com.compomics.relims.modes.networking.controller.connectivity.database.service.DatabaseService;
-import com.compomics.remoterelimscontrolserver.connectivity.database.security.KryptoDynamite;
+import com.compomics.relims.modes.networking.controller.connectivity.database.security.KryptoDynamite;
+
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;

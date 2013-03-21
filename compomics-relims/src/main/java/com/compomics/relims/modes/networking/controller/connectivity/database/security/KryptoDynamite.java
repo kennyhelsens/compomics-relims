@@ -2,7 +2,8 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-package com.compomics.remoterelimscontrolserver.connectivity.database.security;
+package com.compomics.relims.modes.networking.controller.connectivity.database.security;
+
 
 import java.security.MessageDigest;
 import java.util.Random;
