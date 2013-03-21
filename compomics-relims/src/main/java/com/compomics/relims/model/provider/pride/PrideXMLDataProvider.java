@@ -11,15 +11,18 @@ import com.compomics.pride_asa_pipeline.service.PrideXmlModificationService;
 import com.compomics.pride_asa_pipeline.spring.ApplicationContextProvider;
 import com.compomics.pridexmltomgfconverter.errors.enums.ConversionError;
 import com.compomics.relims.conf.RelimsProperties;
-import com.compomics.relims.manager.variablemanager.ProcessVariableManager;
-import com.compomics.relims.manager.processmanager.processguard.RelimsException;
 import com.compomics.relims.manager.filemanager.FileManager;
-import com.compomics.relims.model.beans.RelimsProjectBean;
-import com.compomics.relims.model.interfaces.DataProvider;
+import com.compomics.relims.manager.processmanager.processguard.RelimsException;
 import com.compomics.relims.manager.progressmanager.Checkpoint;
 import com.compomics.relims.manager.progressmanager.ProgressManager;
-import com.compomics.util.experiment.biology.PTM;
+import com.compomics.relims.manager.variablemanager.ProcessVariableManager;
+import com.compomics.relims.model.beans.RelimsProjectBean;
+import com.compomics.relims.model.interfaces.DataProvider;
 import com.google.common.collect.Sets;
+import org.apache.log4j.Level;
+import org.apache.log4j.Logger;
+import org.springframework.context.ApplicationContext;
+
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
@@ -28,9 +31,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import org.apache.log4j.Level;
-import org.apache.log4j.Logger;
-import org.springframework.context.ApplicationContext;
 
 /**
  * This class is a
@@ -170,9 +170,7 @@ public class PrideXMLDataProvider implements DataProvider {
             OmssaModificationMarshaller marshaller = new OmssaModificationMarshallerImpl();
             UserModCollection lUserModCollection = marshaller.marshallModifications(lModificationSet);
 
-            //set usermods
             lRelimsProjectBean.setStandardModificationList(lUserModCollection);
-            //set fixedmods
 
             // Set precursor and fragment errors
             Set<AnalyzerData> lAnalyzerDataSet = getInstrumentsForProject(aProjectid);

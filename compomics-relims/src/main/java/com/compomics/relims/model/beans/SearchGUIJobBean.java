@@ -1,27 +1,23 @@
 package com.compomics.relims.model.beans;
 
+import com.compomics.omssa.xsd.UserMod;
 import com.compomics.relims.concurrent.Command;
 import com.compomics.relims.conf.RelimsProperties;
-import com.compomics.relims.manager.variablemanager.ProcessVariableManager;
 import com.compomics.relims.manager.progressmanager.ProgressManager;
-import com.compomics.util.experiment.biology.Enzyme;
-import com.compomics.util.experiment.biology.EnzymeFactory;
-import com.compomics.util.experiment.biology.PTM;
-import com.compomics.util.experiment.biology.PTMFactory;
+import com.compomics.relims.manager.variablemanager.ProcessVariableManager;
+import com.compomics.util.experiment.biology.*;
 import com.compomics.util.experiment.identification.SearchParameters;
 import com.compomics.util.preferences.ModificationProfile;
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
+import com.google.common.base.Function;
+import com.google.common.collect.Sets;
 import no.uib.jsparklines.data.XYDataPoint;
 import org.apache.commons.configuration.ConfigurationException;
 import org.apache.commons.configuration.PropertiesConfiguration;
 import org.apache.log4j.Logger;
+
+import javax.annotation.Nullable;
+import java.io.*;
+import java.util.*;
 
 /**
  * This class is a
@@ -197,22 +193,63 @@ public class SearchGUIJobBean {
                 e.printStackTrace();
             }
             logger.debug("Project was not found in repository. Remaking searchparameters file");
-            //Set the fixedModifications 
-            List<String> fixedModifications = iRelimsProjectBean.getFixedMatchedPTMs();
-            ModificationProfile modProfile = new ModificationProfile();
 
-            logger.debug("setting fixed modifications to searchparameters file");     
-            fixedModifications = iRelimsProjectBean.getFixedMatchedPTMs();
-                   for (String aMod : ptmFactory.getUserModifications()) {
+            logger.debug("building modification profile for searchparameters file");
+            ModificationProfile modProfile = new ModificationProfile();
+            List<UserMod> lStandardModificationList = iRelimsProjectBean.getStandardModificationList();
+            List<UserMod> lExtraModificationList = iRelimsProjectBean.getExtraModificationList();
+
+            Function<UserMod, PTM> UserModToPTMFunction = new Function<UserMod, PTM>() {
+                @Override
+                public PTM apply(@Nullable UserMod input) {
+                    // Prepare the position as an AminoAcidPattern
+                    AminoAcidPattern pos = new AminoAcidPattern();
+                    ArrayList<AminoAcid> target = new ArrayList<AminoAcid>();
+                    for(char aa : input.getLocation().toCharArray()){
+                        target.add(AminoAcid.getAminoAcid(aa));
+                    }
+                    pos.setTargeted(0, target);
+
+                    // Create a PTM instance from the UserMod data
+                    PTM res = new PTM(
+                            input.getLocationType().getLocationTypeID(),
+                            "|relimsmod|" + input.getModificationName(),
+                            input.getMass(),
+                            pos);
+                    return res;
+                }
+            };
+
+            // Join all default and usermod names from the current PTMFactory
+            HashSet<String> ptmFactoryAllModifications = Sets.newHashSet();
+            ptmFactoryAllModifications.addAll(ptmFactory.getDefaultModifications());
+            ptmFactoryAllModifications.addAll(ptmFactory.getUserModifications());
+
+            // Join all Relims Modifications needed for this SearchGUIJob
+            HashSet<UserMod> jobUserMods = Sets.newHashSet();
+            jobUserMods.addAll(lStandardModificationList);
+            jobUserMods.addAll(lExtraModificationList);
+
+            // Iterate over the relims modifications
+            for (UserMod aMod : jobUserMods) {
                 try {
-                    if (!modProfile.contains(aMod)) {
-                        if (fixedModifications.contains(aMod)) {
-                            modProfile.addFixedModification(ptmFactory.getPTM(aMod));
-                               logger.debug("Added fixed modification : " + aMod);
-                        } else {
-                            modProfile.addVariableModification(ptmFactory.getPTM(aMod));
-                               logger.debug("Added variable modification : " + aMod);
-                        }        
+                    PTM aModPTM = UserModToPTMFunction.apply(aMod);
+
+                    // Check whether the relims modification name is known in the PTMFactory
+                    if(!ptmFactoryAllModifications.contains(aModPTM.getName())){
+                        // If not known, convert to Utilities-PTM instance, and add keep the modification name.
+                        ptmFactory.addUserPTM(aModPTM);
+                        ptmFactoryAllModifications.add(aModPTM.getName());
+                    }
+
+                    // Add the PTM to the ModificationProfile instance
+                    // that will be used in the SearchParameters instance.
+                    if(aMod.isFixed()){
+                        modProfile.addFixedModification(ptmFactory.getPTM(aModPTM.getName()));
+                       logger.debug("Added fixed modification : " + aMod.getModificationName());
+                    }else{
+                        modProfile.addVariableModification(ptmFactory.getPTM(aModPTM.getName()));
+                       logger.debug("Added variable modification : " + aMod.getModificationName());
                     }
                 } catch (Exception e) {
                     logger.error(e);
