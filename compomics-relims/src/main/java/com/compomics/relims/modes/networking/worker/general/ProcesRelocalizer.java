@@ -38,8 +38,6 @@ public class ProcesRelocalizer {
             // copy the entire director
             FileUtils.copyDirectory(peptideShakerFolder, relimsPepTemp);
             FileUtils.copyDirectory(searchGuiFolder, relimsSearchGuiTemp);
-            //set relims properties
-            RelimsProperties.setPeptideShakerFolder(relimsTemp.getAbsolutePath());
         } catch (Exception e) {
             logger.error(e);
         } finally {

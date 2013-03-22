@@ -11,26 +11,25 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import org.apache.commons.io.FileUtils;
 
 /**
  * This class is a
  */
 public class UserModsFile {
-    private static Logger logger = Logger.getLogger(UserModsFile.class);
 
+    private static Logger logger = Logger.getLogger(UserModsFile.class);
     private List<Modification> iMascotModifications = Lists.newArrayList();
     private List<UserMod> iOMSSAXSDModifications = Lists.newArrayList();
 
-
     public void write(File aFile) throws IOException {
+  
         UserModCollection lUserModCollection = new UserModCollection();
 
         for (Modification lMascotModification : iMascotModifications) {
             UserMod lUserMod = UserModConverter.convert(lMascotModification);
             lUserModCollection.add(lUserMod);
         }
-
-
         // Add the relims mods, if any!
         if (iOMSSAXSDModifications != null && iOMSSAXSDModifications.size() > 0) {
             lUserModCollection.addAll(iOMSSAXSDModifications);
@@ -42,7 +41,6 @@ public class UserModsFile {
         lUserModCollection.build(aFile);
     }
 
-
     public Collection<String> getFixedModsAsString() {
         Collection<String> lResult = new ArrayList<String>();
         for (Modification lModification : iMascotModifications) {
@@ -51,7 +49,7 @@ public class UserModsFile {
             }
         }
 
-        if(iOMSSAXSDModifications != null){
+        if (iOMSSAXSDModifications != null) {
             for (UserMod lRelimsMod : iOMSSAXSDModifications) {
                 if (lRelimsMod.isFixed()) {
                     lResult.add(lRelimsMod.getModificationName());

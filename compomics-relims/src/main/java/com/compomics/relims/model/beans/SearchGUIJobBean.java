@@ -18,6 +18,8 @@ import org.apache.log4j.Logger;
 import javax.annotation.Nullable;
 import java.io.*;
 import java.util.*;
+import java.util.logging.Level;
+import org.apache.commons.io.FileUtils;
 
 /**
  * This class is a
@@ -205,7 +207,7 @@ public class SearchGUIJobBean {
                     // Prepare the position as an AminoAcidPattern
                     AminoAcidPattern pos = new AminoAcidPattern();
                     ArrayList<AminoAcid> target = new ArrayList<AminoAcid>();
-                    for(char aa : input.getLocation().toCharArray()){
+                    for (char aa : input.getLocation().toCharArray()) {
                         target.add(AminoAcid.getAminoAcid(aa));
                     }
                     pos.setTargeted(0, target);
@@ -213,7 +215,7 @@ public class SearchGUIJobBean {
                     // Create a PTM instance from the UserMod data
                     PTM res = new PTM(
                             input.getLocationType().getLocationTypeID(),
-                            "|relimsmod|" + input.getModificationName(),
+                            "relimsmod " + input.getModificationName().toLowerCase(),
                             input.getMass(),
                             pos);
                     return res;
@@ -236,7 +238,7 @@ public class SearchGUIJobBean {
                     PTM aModPTM = UserModToPTMFunction.apply(aMod);
 
                     // Check whether the relims modification name is known in the PTMFactory
-                    if(!ptmFactoryAllModifications.contains(aModPTM.getName())){
+                    if (!ptmFactoryAllModifications.contains(aModPTM.getName())) {
                         // If not known, convert to Utilities-PTM instance, and add keep the modification name.
                         ptmFactory.addUserPTM(aModPTM);
                         ptmFactoryAllModifications.add(aModPTM.getName());
@@ -244,17 +246,29 @@ public class SearchGUIJobBean {
 
                     // Add the PTM to the ModificationProfile instance
                     // that will be used in the SearchParameters instance.
-                    if(aMod.isFixed()){
+                    if (aMod.isFixed()) {
                         modProfile.addFixedModification(ptmFactory.getPTM(aModPTM.getName()));
-                       logger.debug("Added fixed modification : " + aMod.getModificationName());
-                    }else{
+                        logger.debug("Added fixed modification : " + aMod.getModificationName());
+                    } else {
                         modProfile.addVariableModification(ptmFactory.getPTM(aModPTM.getName()));
-                       logger.debug("Added variable modification : " + aMod.getModificationName());
+                        logger.debug("Added variable modification : " + aMod.getModificationName());
                     }
+                    ptmFactory.addUserPTM(aModPTM);
                 } catch (Exception e) {
                     logger.error(e);
                     logger.debug("failed to set " + aMod + " in the modificationprofile.");
+                } finally {
                 }
+
+            }
+            // persist the usermods to the usermod.xml
+            File relimsUserMod = RelimsProperties.getUserModsFile();
+            try {
+                logger.debug("Writing OMSSA modifications to " + relimsUserMod);
+                ptmFactory.writeOmssaUserModificationFile(relimsUserMod);
+            } catch (IOException ex) {
+                logger.error(ex);
+            } finally {
             }
             searchParameters.setModificationProfile(modProfile);
             // Set other parameters (defaults)

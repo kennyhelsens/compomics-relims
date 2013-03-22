@@ -2,7 +2,6 @@ package com.compomics.relims.model;
 
 import com.compomics.omssa.xsd.UserMod;
 import com.compomics.relims.conf.RelimsProperties;
-import com.compomics.relims.model.UserModsFile;
 import com.compomics.relims.model.beans.RelimsProjectBean;
 import com.compomics.relims.model.guava.functions.OMSSAXSDModificationMatchFunction;
 import com.compomics.relims.model.interfaces.ModificationResolver;
@@ -43,7 +42,7 @@ public class ModificationResolverImpl implements ModificationResolver {
         lAllModifications.addAll(lExtraModificationList);
 
         // Reload the PTM factory.
-        RelimsProperties.getPTMFactory(true);
+        //  RelimsProperties.getPTMFactory(true);
 
         iFixedMatchedPTMStrings = Sets.newHashSet();
         iVariableMatchedPTMStrings = Sets.newHashSet();
@@ -85,12 +84,11 @@ public class ModificationResolverImpl implements ModificationResolver {
         }
         iUserModsFile = new UserModsFile();
 
+
         if (lBuildUserMods) {
             int lPTMFactorySize = RelimsProperties.getPTMFactory(false).getPTMs().size();
             int lUserModsSize = lUnresolvedModifications.size();
-
             logger.debug("loading " + lUserModsSize + " extra usermods for the current search (PTMFactory size:" + lPTMFactorySize + ")");
-
             iUserModsFile.setOMSSAXSDModifications(lUnresolvedModifications);
             iVariableMatchedPTMStrings.addAll(iUserModsFile.getVarModsAsString());
             iFixedMatchedPTMStrings.addAll(iUserModsFile.getFixedModsAsString());
@@ -98,18 +96,7 @@ public class ModificationResolverImpl implements ModificationResolver {
 
         iRelimsProjectBean.setFixedMatchedPTMs(Lists.newArrayList(iFixedMatchedPTMStrings));
         iRelimsProjectBean.setVariableMatchedPTMs(Lists.newArrayList(iVariableMatchedPTMStrings));
-        persistUserMods(RelimsProperties.getSearchGuiUserVarModFile());
-             try {
-            //LOAD THE GENERATED USERMODS INTO THE PTMFactory
-            PTMFactory.getInstance().importModifications(RelimsProperties.getSearchGuiUserVarModFile(), true, true);
-            //LOAD THE FIXED USERMODS INTO THE PTM
-            //PTMFactory.getInstance().importModifications(RelimsProperties.getSearchGuiUserModFile(), true, true);
-        } catch (XmlPullParserException ex) {
-            logger.error(ex);
-        } catch (IOException ex) {
-            logger.error(ex);
-        }
-       }
+    }
 
     @Override
     public void persistUserMods(File aFile) {
@@ -124,6 +111,6 @@ public class ModificationResolverImpl implements ModificationResolver {
             ProgressManager.setState(Checkpoint.FAILED, e);;
         }
         iRelimsProjectBean.setUserModsFile(iUserModsFile);
-        
+
     }
 }

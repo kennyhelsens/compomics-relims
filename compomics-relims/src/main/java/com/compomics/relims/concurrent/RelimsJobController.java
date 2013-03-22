@@ -202,7 +202,7 @@ public class RelimsJobController extends Observable implements ProjectRunner {
             } catch (Exception e) {
                 logger.error("ERROR OCCURRED FOR PROJECT " + lProjectid);
                 logger.error(e);
-                logger.error(e.getCause());
+                e.printStackTrace();
                 progressManager.setState(Checkpoint.FAILED, e);
             } finally {
                 dataProvider.clearResources();

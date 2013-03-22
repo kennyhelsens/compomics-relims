@@ -169,7 +169,11 @@ public class PrideXMLDataProvider implements DataProvider {
             }
             OmssaModificationMarshaller marshaller = new OmssaModificationMarshallerImpl();
             UserModCollection lUserModCollection = marshaller.marshallModifications(lModificationSet);
-
+            try {
+                  lUserModCollection.build(RelimsProperties.getSearchGuiUserModFile());
+            } catch (IOException ex) {
+                java.util.logging.Logger.getLogger(PrideXMLDataProvider.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            }
             lRelimsProjectBean.setStandardModificationList(lUserModCollection);
 
             // Set precursor and fragment errors

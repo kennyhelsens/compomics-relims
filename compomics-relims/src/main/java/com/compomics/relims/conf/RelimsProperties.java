@@ -118,11 +118,7 @@ public class RelimsProperties {
     }
 
     public static File getUserModsFile() {
-        throw new UnsupportedOperationException("Not yet implemented");
-    }
-
-    public static File getSearchGuiUserVarModFile() {
-        return new File(getSearchGuiUserModFile().getAbsolutePath() + "_varMod.xml");
+        return new File(getSearchGuiUserModFile().getAbsolutePath());
     }
     /**
      * the results will all be placed in a user-specific folder. Therefor, all
@@ -358,7 +354,7 @@ public class RelimsProperties {
     private static PTMFactory loadOMSSAPTMFactory() {
 
         File lModFile = new File(getSearchGuiConfFolder(), config.getString("searchgui.mods"));
-        File lUserModFile = new File(getSearchGuiConfFolder(), config.getString("searchgui.usermods.default"));
+       // File lUserModFile = new File(getSearchGuiConfFolder(), config.getString("searchgui.usermods.default"));
 
         try {
             if (ptmFactory == null) {
@@ -369,7 +365,7 @@ public class RelimsProperties {
             ptmFactory = PTMFactory.getInstance();
 
             ptmFactory.importModifications(lModFile, false);
-            ptmFactory.importModifications(lUserModFile, true);
+     //       ptmFactory.importModifications(lUserModFile, true);
 
             logger.debug("loaded PTMFactory (size: " + ptmFactory.getPTMs().size() + " mods)");
 

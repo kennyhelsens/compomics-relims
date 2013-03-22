@@ -10,6 +10,7 @@ import com.compomics.util.experiment.biology.Enzyme;
 import com.compomics.util.experiment.identification.SearchParameters;
 import com.compomics.util.experiment.massspectrometry.Charge;
 import com.compomics.util.experiment.massspectrometry.SpectrumFactory;
+import com.compomics.util.preferences.ModificationProfile;
 import java.io.BufferedReader;
 import java.io.DataInputStream;
 import java.io.File;
@@ -58,7 +59,7 @@ public class SourceFileTest extends TestCase {
         logger.debug("TESTING MGF RESULTFILE");
         SpectrumFactory sf = SpectrumFactory.getInstance();
         boolean correctMGF = false;
-        File MGF_FILE = new File(superFolder + "3.mgf");
+        File MGF_FILE = new File(superFolder + "12088.mgf");
         try {
             //load file in 
             sf.addSpectra(MGF_FILE);
@@ -116,6 +117,23 @@ public class SourceFileTest extends TestCase {
                 for (String aParameter : erronousParameterList) {
                     logger.debug(aParameter + " ,");
                 }
+                ModificationProfile modProfile = parameters.getModificationProfile();
+                List<String> PTMs = modProfile.getAllModifications();
+                List<String> verifiedPTMs = new ArrayList<String>();
+                verifiedPTMs.add("Oxidation");
+                verifiedPTMs.add("Deamination");
+                verifiedPTMs.add("Carbamidomethyl");
+                verifiedPTMs.add("Acetylation");
+                if (!PTMs.containsAll(verifiedPTMs)) {
+                    erronousParameterList.add("PTMS");
+                    if (PTMs.isEmpty()) {
+                        logger.debug("No PTMS in searchparameters modProfile !");
+                    } else {
+                        logger.debug("Incorrect PTMS !");
+                    }
+
+                }
+
             } else {
                 logger.debug("All parameters were validated");
             }
@@ -129,7 +147,7 @@ public class SourceFileTest extends TestCase {
 
     public void testPsmsFileLength() {
         logger.debug("TESTING PSMS RESULTFILE");
-        File PSMS_FILE = new File(superFolder + "PeptideShaker_3_AutoReprocessed_1_psms.txt");
+        File PSMS_FILE = new File(superFolder + "PeptideShaker_12088_AutoReprocessed_1_psms.txt");
         int psmCounter = 0;
         try {
             FileInputStream fin = new FileInputStream(PSMS_FILE);
@@ -156,7 +174,7 @@ public class SourceFileTest extends TestCase {
     public void testProteinsFileLength() {
         logger.debug("TESTING PROTEIN RESULTFILE");
         int proteinCounter = 0;
-        File PROTEIN_FILE = new File(superFolder + "PeptideShaker_3_AutoReprocessed_1_proteins.txt");
+        File PROTEIN_FILE = new File(superFolder + "PeptideShaker_12088_AutoReprocessed_1_proteins.txt");
         try {
             FileInputStream fin = new FileInputStream(PROTEIN_FILE);
             DataInputStream in = new DataInputStream(fin);
@@ -182,7 +200,7 @@ public class SourceFileTest extends TestCase {
     public void testPeptideFileLength() {
         logger.debug("TESTING PEPTIDE RESULTFILE");
         int peptideCounter = 0;
-        File PEPTIDE_FILE = new File(superFolder + "PeptideShaker_3_AutoReprocessed_1_peptides.txt");
+        File PEPTIDE_FILE = new File(superFolder + "PeptideShaker_12088_AutoReprocessed_1_peptides.txt");
         try {
             FileInputStream fin = new FileInputStream(PEPTIDE_FILE);
             DataInputStream in = new DataInputStream(fin);
@@ -207,7 +225,7 @@ public class SourceFileTest extends TestCase {
 
     public void testCheckCPSSize() {
         logger.debug("TESTING CPS RESULTFILE");
-        File CPS_FILE = new File(superFolder + "3.cps");
+        File CPS_FILE = new File(superFolder + "12088.cps");
         long fileSize = CPS_FILE.length();
         System.out.println(fileSize);
         assertEquals(2529280, fileSize);
