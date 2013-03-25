@@ -215,7 +215,7 @@ public class SearchGUIJobBean {
                     // Create a PTM instance from the UserMod data
                     PTM res = new PTM(
                             input.getLocationType().getLocationTypeID(),
-                            "relimsmod " + input.getModificationName().toLowerCase(),
+                            input.getModificationName().toLowerCase(),
                             input.getMass(),
                             pos);
                     return res;
@@ -237,8 +237,20 @@ public class SearchGUIJobBean {
                 try {
                     PTM aModPTM = UserModToPTMFunction.apply(aMod);
 
+                    boolean isInFactory = false;
+
+                    for (String lPtmName : ptmFactoryAllModifications) {
+                        PTM lPTM = PTMFactory.getInstance().getPTM(lPtmName);
+                        if (lPTM.isSameAs(aModPTM)) {
+                            isInFactory = true;
+                            aModPTM = lPTM;
+                            break;
+                        };
+                    }
+
+
                     // Check whether the relims modification name is known in the PTMFactory
-                    if (!ptmFactoryAllModifications.contains(aModPTM.getName())) {
+                    if (!isInFactory) {
                         // If not known, convert to Utilities-PTM instance, and add keep the modification name.
                         ptmFactory.addUserPTM(aModPTM);
                         ptmFactoryAllModifications.add(aModPTM.getName());

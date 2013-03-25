@@ -35,7 +35,7 @@ public class SourceFileTest extends TestCase {
     private final static double MAX_MGF_MZ = 1198.1465;
     private final static double N_MGF_SPECTRA = 1958;
     private final static int N_PSMS = 49;
-    private final static int N_PEPTIDE = 25;
+    private final static int N_PEPTIDE = 45;
     private final static int N_PROTEIN = 29;
 
     public SourceFileTest(String testName) {
@@ -211,7 +211,7 @@ public class SourceFileTest extends TestCase {
             //Read File Line By Line
             while ((strLine = br.readLine()) != null) {
                 // Print the content on the console
-                if (!strLine.startsWith("Protein")) {
+                if (!strLine.toLowerCase().contains("protein")) {
                     peptideCounter++;
                 }
             }
@@ -230,6 +230,6 @@ public class SourceFileTest extends TestCase {
         File CPS_FILE = new File(superFolder + "3.cps");
         long fileSize = CPS_FILE.length();
         System.out.println(fileSize);
-        assertEquals(2529280, fileSize);
+        assertEquals(2836480, fileSize);
     }
 }
