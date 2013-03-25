@@ -317,10 +317,10 @@ public class RelimsJobController extends Observable implements ProjectRunner {
 
             Command.setWorkFolder(peptideShakerFolder);
 
-            lPeptideShakerJobBean = new PeptideShakerJobBean(projectID, searchParametersFile, spectrumFile);
+            lPeptideShakerJobBean = new PeptideShakerJobBean(projectID, searchParametersFile, spectrumFile, searchGUIJobBean.getSearchResultFolder());
 
             lPeptideShakerJobBean.setOutFolder(lPeptideShakerResultsFolder);
-            lPeptideShakerJobBean.setSearchGUIResultsFolder(searchResultFolder);
+            //  lPeptideShakerJobBean.setSearchGUIResultsFolder(searchGUIJobBean.getSearchResultFolder());
 
             double lFDR = RelimsProperties.getFDR();
             lPeptideShakerJobBean.setPepfdr(lFDR);
@@ -340,44 +340,13 @@ public class RelimsJobController extends Observable implements ProjectRunner {
                         "finished PeptideShakerCLI on project '%s', sample '%s'",
                         experimentID,
                         sampleID));
-
-                //Check if the CPS file exists
-                if (new File(ProcessVariableManager.getResultsFolder() + "/" + projectID + ".cps").exists()) {
-                    //store the files in the local repository, mainly so that pride doesn't need to be re-run next time
-                    storeInRepository();
-                    return true;
-                } else {
-                    logger.error("Could not find a generated cps-file after running this project...");
-                    if (projectProvider.getClass().toString().contains("mslims")) {
-                        RepositoryManager.storeFlagInRepository("FAILED", "mslims", new File(ProcessVariableManager.getSearchResultFolder()), projectID);
-                    } else {
-                        RepositoryManager.storeFlagInRepository("FAILED", "pride", new File(ProcessVariableManager.getSearchResultFolder()), projectID);
-                        logger.info("Stored sourcefiles (MGF / SearchParameters) to PRIDE repository");
-                    }
-                    //delete the resultfolder
-                    if (progressManager.getEndState() != Checkpoint.CLASSICRELIMS) {
-                        //             fileGrabber.deleteResultFolder();
-                    }
-                    return false;
-                }
+                storeInRepository();
+                return true;
             } else {
-                if (projectProvider.getClass().toString().contains("mslims")) {
-                    logger.error("The MSLIMS-Project could not be run correctly");
-                    progressManager.setState(Checkpoint.FAILED);;
-                } else {
-                    logger.error("The PRIDE-Project could not be run correctly");
-                }
-
-                if (!spectrumFile.exists()) {
-                    logger.error("There was no MGF-file in the folder to be run...");
-                }
-                if (!searchParametersFile.exists()) {
-                    logger.error("There was no parameters-file in the folder to be run...");
-                }
+                progressManager.setState(Checkpoint.PROCESSFAILURE);
                 return false;
             }
         } else {
-            progressManager.setState(Checkpoint.PEPTIDESHAKERFAILURE);
             return false;
         }
     }
@@ -408,7 +377,8 @@ public class RelimsJobController extends Observable implements ProjectRunner {
                 logger.debug("Project will be run with user specified searchparameters...");
                 runPeptideshaker = prepareSearchGUIFromClientInput(ProcessVariableManager.getSearchParameters());
             }
-            if (runPeptideshaker && progressManager.getState() != Checkpoint.FAILED) {
+            if (runPeptideshaker && progressManager.getState() != Checkpoint.PROCESSFAILURE) {
+                logger.debug("Preparing peptideshaker");
                 preparePeptideShaker();
             }
         } catch (Throwable e) {
@@ -416,7 +386,7 @@ public class RelimsJobController extends Observable implements ProjectRunner {
             logger.error("ERROR OCCURRED FOR PROJECT " + projectID);
             logger.error(e);
             if (e instanceof java.lang.IllegalArgumentException) {
-                 progressManager.setEndState(Checkpoint.MODFAILURE);
+                progressManager.setEndState(Checkpoint.MODFAILURE);
             } else {
                 if (provider.equals("pride")) {
                     progressManager.setEndState(Checkpoint.PRIDEFAILURE);

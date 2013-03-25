@@ -41,14 +41,14 @@ public class PeptideShakerJobBean {
     private ArrayList<String> psCommandLine;
     private String identificationFiles;
 
-    public PeptideShakerJobBean(long projectId, File searchParameters, File spectra) {
+    public PeptideShakerJobBean(long projectId, File searchParameters, File spectra, File searchGuiResultsFolder) {
         logger.debug("Collecting PeptideShaker parameters");
         this.projectId = projectId;
         this.searchParametersFile = searchParameters;
         this.spectra = spectra;
         this.jobDirectory = new File(ProcessVariableManager.getResultsFolder());
-//Save the SearchParameters in temporary file with the project...
-        this.identificationFiles = FileManager.getIdentificationFiles(ProcessVariableManager.getResultsFolder() + "/");
+        this.identificationFiles = searchGuiResultsFolder.getAbsolutePath() + "/" + projectId + ".omx , " + searchGuiResultsFolder.getAbsolutePath() + "/" + projectId + ".t.xml";
+        logger.debug("Getting identification files from " + searchGuiResultsFolder.getAbsolutePath());
     }
 
     public PeptideShakerJobBean(long projectId) {
@@ -141,7 +141,7 @@ public class PeptideShakerJobBean {
                 PSCommandLine.add(jobDirectory.getAbsolutePath().toString());
             }
             System.err.println("");
-            logger.debug("PEPTIDESHAKERCOMMAND");
+            System.err.println("PEPTIDESHAKERCOMMAND");
             for (String aParam : PSCommandLine) {
                 System.err.print(aParam);
             }

@@ -16,6 +16,7 @@ import java.util.List;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.filefilter.WildcardFileFilter;
+import org.apache.log4j.Logger;
 
 /**
  *
@@ -26,6 +27,7 @@ public class FileManager {
     private static List<String> fileList = new ArrayList<String>();
     private static String projectSpecificRegex;
     private static FileManager fileGrabber;
+    private static final Logger logger = Logger.getLogger(FileManager.class);
 
     private FileManager() {
     }
@@ -43,17 +45,12 @@ public class FileManager {
         File directory = new File(directoryName);
 //get all the files from a directory
 
-        File[] files = directory.listFiles(new FileFilter() {
-            private final FileNameExtensionFilter filter =
-                    new FileNameExtensionFilter("omx",
-                    "t.xml");
+        File[] files = directory.listFiles();
 
-            public boolean accept(File file) {
-                return filter.accept(file);
-            }
-        });
         for (File aFile : files) {
-            fileList.add(aFile.getAbsolutePath());
+            if (aFile.getAbsolutePath().endsWith(".omx") || aFile.getAbsolutePath().endsWith(".t.xml")) {
+                fileList.add(aFile.getAbsolutePath());
+            }
         }
         return fileList;
     }
@@ -78,12 +75,12 @@ public class FileManager {
     public static String getIdentificationFiles(String directoryName) {
         StringBuilder fileNames = new StringBuilder();
         List<String> idList = getIdentificationsList(directoryName);
-
-
+        logger.debug("Found " + idList.size() + " identification files");
         Iterator itr = idList.iterator();
         while (itr.hasNext()) {
             String anIdentificationFile = (String) itr.next();
             fileNames.append(anIdentificationFile);
+            logger.debug(anIdentificationFile);
             if (itr.hasNext()) {
                 fileNames.append(",");
             }
