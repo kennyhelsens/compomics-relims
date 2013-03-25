@@ -13,6 +13,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import javax.swing.filechooser.FileNameExtensionFilter;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.filefilter.WildcardFileFilter;
 
@@ -38,24 +39,21 @@ public class FileManager {
 
     public static List<String> getIdentificationsList(String directoryName) {
 
-
-        projectSpecificRegex = ProcessVariableManager.getProjectId() + "_";
-
         fileList = new ArrayList<String>();
         File directory = new File(directoryName);
 //get all the files from a directory
-        File[] fList = directory.listFiles();
-        for (File file : fList) {
-            if (file.isFile()) {
-                if (file.getAbsolutePath().toString().contains(projectSpecificRegex)) {
-                    if (file.getAbsolutePath().toString().contains(".omx") || file.getAbsolutePath().toString().contains("t.xml")) {
-                        String filePath = file.getAbsolutePath().toString();
-                        fileList.add(filePath);
-                    }
-                }
-            } else if (file.isDirectory()) {
-                getIdentificationsList(file.getAbsolutePath());
+
+        File[] files = directory.listFiles(new FileFilter() {
+            private final FileNameExtensionFilter filter =
+                    new FileNameExtensionFilter("omx",
+                    "t.xml");
+
+            public boolean accept(File file) {
+                return filter.accept(file);
             }
+        });
+        for (File aFile : files) {
+            fileList.add(aFile.getAbsolutePath());
         }
         return fileList;
     }

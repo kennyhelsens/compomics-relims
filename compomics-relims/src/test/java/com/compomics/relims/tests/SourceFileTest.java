@@ -122,10 +122,10 @@ public class SourceFileTest extends TestCase {
                 ModificationProfile modProfile = parameters.getModificationProfile();
                 List<String> PTMs = modProfile.getAllModifications();
                 List<String> verifiedPTMs = new ArrayList<String>();
-                verifiedPTMs.add("Oxidation");
-                verifiedPTMs.add("Deamination");
-                verifiedPTMs.add("Carbamidomethyl");
-                verifiedPTMs.add("Acetylation");
+                verifiedPTMs.add("oxidation of m");
+                verifiedPTMs.add("pyro-glutamation of e");
+                verifiedPTMs.add("terminal acetylation");
+                verifiedPTMs.add("carboxyamidomethylation");
                 if (!PTMs.containsAll(verifiedPTMs)) {
                     erronousParameterList.add("PTMS");
                     if (PTMs.isEmpty()) {

@@ -238,34 +238,32 @@ public class SearchGUIJobBean {
                     PTM aModPTM = UserModToPTMFunction.apply(aMod);
 
                     boolean isInFactory = false;
-
+                    // Check whether the relims modification name is known in the PTMFactory  
                     for (String lPtmName : ptmFactoryAllModifications) {
-                        PTM lPTM = PTMFactory.getInstance().getPTM(lPtmName);
+                        PTM lPTM = ptmFactory.getPTM(lPtmName);
                         if (lPTM.isSameAs(aModPTM)) {
+
                             isInFactory = true;
                             aModPTM = lPTM;
+                            //OMSSA is caps sensitive
+                            aModPTM.setName(aModPTM.getName().toLowerCase());
                             break;
-                        };
+                        }
                     }
-
-
-                    // Check whether the relims modification name is known in the PTMFactory
+                    // If not known, convert to Utilities-PTM instance, and add keep the modification name.
                     if (!isInFactory) {
-                        // If not known, convert to Utilities-PTM instance, and add keep the modification name.
                         ptmFactory.addUserPTM(aModPTM);
-                        ptmFactoryAllModifications.add(aModPTM.getName());
+                        ptmFactoryAllModifications.add(aModPTM.getName().toLowerCase());
                     }
-
-                    // Add the PTM to the ModificationProfile instance
-                    // that will be used in the SearchParameters instance.
+                    // Add the PTM to the ModificationProfile instance that will be used in the SearchParameters instance.
                     if (aMod.isFixed()) {
-                        modProfile.addFixedModification(ptmFactory.getPTM(aModPTM.getName()));
-                        logger.debug("Added fixed modification : " + aMod.getModificationName());
+                        modProfile.addFixedModification(ptmFactory.getPTM(aModPTM.getName().toLowerCase()));
+                        logger.debug("Added fixed modification : " + aModPTM.getName().toLowerCase());
                     } else {
-                        modProfile.addVariableModification(ptmFactory.getPTM(aModPTM.getName()));
-                        logger.debug("Added variable modification : " + aMod.getModificationName());
+                        modProfile.addVariableModification(ptmFactory.getPTM(aModPTM.getName().toLowerCase()));
+                        logger.debug("Added variable modification : " + aModPTM.getName().toLowerCase());
                     }
-                    ptmFactory.addUserPTM(aModPTM);
+                  //  ptmFactory.addUserPTM(aModPTM);
                 } catch (Exception e) {
                     logger.error(e);
                     logger.debug("failed to set " + aMod + " in the modificationprofile.");
