@@ -304,37 +304,27 @@ public class RelimsJobController extends Observable implements ProjectRunner {
     }
     //Prepare the peptideshaker job using the output from searchgui
 
-    private boolean preparePeptideShaker() {
+    private boolean prepareAndLaunchPeptideShaker() {
         //PEPTIDESHAKER -----------------------------------------------------------------------
         logger.debug("processing the search results with PeptideShaker");
         File peptideShakerFolder = new File(RelimsProperties.getPeptideShakerArchivePath().replace(RelimsProperties.getPeptideShakerArchive(), ""));
         File lPeptideShakerResultsFolder = searchResultFolder;
         //get the searchparametersfile from the searchgui output, the command USES this file so it has to be loaded for now
         File searchParametersFile = new File(searchResultFolder.getAbsolutePath().toString() + "/SearchGUI.parameters");
-
-
         if (spectrumFile.exists() && searchParametersFile.exists()) {
-
             Command.setWorkFolder(peptideShakerFolder);
-
             lPeptideShakerJobBean = new PeptideShakerJobBean(projectID, searchParametersFile, spectrumFile, searchGUIJobBean.getSearchResultFolder());
-
             lPeptideShakerJobBean.setOutFolder(lPeptideShakerResultsFolder);
             //  lPeptideShakerJobBean.setSearchGUIResultsFolder(searchGUIJobBean.getSearchResultFolder());
-
             double lFDR = RelimsProperties.getFDR();
             lPeptideShakerJobBean.setPepfdr(lFDR);
             lPeptideShakerJobBean.setProtfdr(lFDR);
             lPeptideShakerJobBean.setPsmfdr(lFDR);
             lPeptideShakerJobBean.setSampleName(sampleID);
             lPeptideShakerJobBean.setExperimentName(experimentID);
-
             lPeptideShakerJobBean.setAscore(false);
-
             // Run PeptideShaker
-
             // IF the return value = 0 (= system.exit.value) then the process ran correctly. (Timeout etc will change this value)
-
             if (lPeptideShakerJobBean.launch() == 0) {
                 logger.debug(format(
                         "finished PeptideShakerCLI on project '%s', sample '%s'",
@@ -379,7 +369,7 @@ public class RelimsJobController extends Observable implements ProjectRunner {
             }
             if (runPeptideshaker && progressManager.getState() != Checkpoint.PROCESSFAILURE) {
                 logger.debug("Preparing peptideshaker");
-                preparePeptideShaker();
+                prepareAndLaunchPeptideShaker();
             }
         } catch (Throwable e) {
             e.printStackTrace();
@@ -391,7 +381,7 @@ public class RelimsJobController extends Observable implements ProjectRunner {
                 if (provider.equals("pride")) {
                     progressManager.setEndState(Checkpoint.PRIDEFAILURE);
                 } else {
-                    progressManager.setState(Checkpoint.FAILED, e);;
+                    progressManager.setState(Checkpoint.FAILED, e);
                 }
             }
         }
