@@ -150,13 +150,10 @@ public class CommandExceptionGuard extends Thread implements Callable {
         public void run() {
             try {
                 priority = RelimsProperties.getPriority();
-                boolean found = false;
-                logger.debug("Waiting for Omssa");
                 while (!manager.isOmssaRunning()) {
                     Thread.sleep(500);
                 }
                 manager.setPriority(priority);
-                logger.debug("Waiting for xTandem");
                 while (!manager.isXTandemRunning()) {
                     Thread.sleep(500);
                 }

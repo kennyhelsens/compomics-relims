@@ -87,6 +87,7 @@ public class DatabaseService {
             setWALMode();
         } catch (SQLException ex) {
             logger.error(ex);
+            ex.printStackTrace();
         }
         logger.debug("Locating database at : " + directory + "...");
     }

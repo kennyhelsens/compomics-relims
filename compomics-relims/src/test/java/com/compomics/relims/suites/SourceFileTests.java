@@ -15,7 +15,6 @@ import junit.framework.TestSuite;
  *
  * @author Kenneth
  */
-
 public class SourceFileTests extends TestCase {
 
     public SourceFileTests(String testName) {
@@ -25,8 +24,6 @@ public class SourceFileTests extends TestCase {
     public static Test suite() {
         TestSuite suite = new TestSuite("SourceFileTests");
         suite.addTest(new Simulator("testSimulateProcess"));
-        suite.addTest(new ControllerTest("testTaskDB"));
-        suite.addTest(new ControllerTest("testTaskDBBackup"));
         suite.addTest(new SourceFileTest("testMGF"));
         suite.addTest(new SourceFileTest("testSearchParameters"));
         suite.addTest(new SourceFileTest("testPsmsFileLength"));
@@ -45,6 +42,5 @@ public class SourceFileTests extends TestCase {
     @Override
     protected void tearDown() throws Exception {
         super.tearDown();
-        Simulator.endSimulation();
-    }
+          }
 }

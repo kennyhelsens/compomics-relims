@@ -29,7 +29,7 @@ public class Simulator extends TestCase {
 
     private static String[] Controllerargs = new String[]{""};
     private static String[] Workerargs = new String[]{"-workerport", "15557"};
-    private static long TIME_OUT = 100;
+    private static long TIME_OUT = Long.MAX_VALUE;
     private static final Logger logger = Logger.getLogger(Simulator.class);
     private String[] resultFolderFilenames = new String[]{"3.cps",
         "3.mgf",
@@ -45,42 +45,37 @@ public class Simulator extends TestCase {
         super(testName);
     }
 
-    
-    
     public static void testSimulateProcess() {
-        try {
-            cleanUp();
-            overrideSearchGUI();
-            sleep(3000);
-            initializeController();
-            sleep(3000);
-            initializeWorker();
-            sleep(3000);
-            simulateClientInput();
-            //wait to finish this up !
-            File results = new File("src/test/resources/results/admin");
-            long timeout = 0;
-            while (!results.exists()) {
-                sleep(1000);
-                //wait untill result folder is actually there...
-            }
-            timeout = 0;
-            while (results.listFiles().length == 0) {
-                sleep(1000);
-                //wait for the timestamped map to be there
-            }
-            timeout = 0;
-            File timestampedResults = results.listFiles()[0];
-            while (timestampedResults.listFiles().length < 12 && timeout < TIME_OUT) {
-                sleep(1000);
-                timeout++;
-                //wait untill all the files are processed and put in the resultfolder or timeout happens...
-            }
-            if (timeout >= TIME_OUT) {
-                assertFalse("Search timed out...No results were created in time...", false);
-            }
-        } finally {
-            endSimulation();
+
+        cleanUp();
+        overrideSearchGUI();
+        sleep(3000);
+        initializeController();
+        sleep(3000);
+        initializeWorker();
+        sleep(3000);
+        simulateClientInput();
+        //wait to finish this up !
+        File results = new File("src/test/resources/results/admin");
+        long timeout = 0;
+        while (!results.exists()) {
+            sleep(1000);
+            //wait untill result folder is actually there...
+        }
+        timeout = 0;
+        while (results.listFiles().length == 0) {
+            sleep(1000);
+            //wait for the timestamped map to be there
+        }
+        timeout = 0;
+        File timestampedResults = results.listFiles()[0];
+        while (timestampedResults.listFiles().length < 12 && timeout < TIME_OUT) {
+            sleep(1000);
+            timeout++;
+            //wait untill all the files are processed and put in the resultfolder or timeout happens...
+        }
+        if (timeout >= TIME_OUT) {
+            assertFalse("Search timed out...No results were created in time...", false);
         }
     }
 
@@ -253,11 +248,11 @@ public class Simulator extends TestCase {
             connector.resetConnectionParameters();
         }
     }
-    
-    public void testFinalCleanUp(){
+
+    public void testFinalCleanUp() {
+        Simulator.endSimulation();
         cleanUp();
         assertTrue(true);
         //TODO ---> CHECK IF THE FILES ARE ACTUALLY DELETED IN THE FUTURE !
     }
-    
 }

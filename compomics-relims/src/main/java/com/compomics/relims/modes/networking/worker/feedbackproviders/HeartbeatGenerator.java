@@ -70,13 +70,7 @@ public class HeartbeatGenerator implements Runnable {
                         logger.error(e.getMessage());
                     }
                 }
-                // Sleep for a bit --> safety measure
-                try {
-                    Thread.sleep(500);
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-
+ 
                 try {
                     Thread.sleep(30000);
                 } catch (InterruptedException ex) {
