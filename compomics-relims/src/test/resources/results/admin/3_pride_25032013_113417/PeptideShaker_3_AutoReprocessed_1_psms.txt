@@ -1,0 +1,1 @@
+Protein(s)	Sequence	Variable Modification(s)	D-score	A-score	PTM location confidence	Spectrum Charge	Identification Charge	Spectrum	Spectrum File	Identification File(s)	Precursor RT	Precursor mz	Theoretic Mass	Mass Error (ppm)	Isotope	Mascot Score	Mascot E-Value	OMSSA E-Value	X!Tandem E-Value	p score	p	Decoy	Validated

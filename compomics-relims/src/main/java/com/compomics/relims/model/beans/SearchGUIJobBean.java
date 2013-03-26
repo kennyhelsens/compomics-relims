@@ -49,7 +49,6 @@ public class SearchGUIJobBean {
     public SearchGUIJobBean(String aName, String provider, File searchParameters, File aSpectrumFile) {
 
         try {
-            this.searchParametersFile = null;
             iProjectProvider = provider;
             searchParametersFile = searchParameters;
             iName = aName;
@@ -222,7 +221,7 @@ public class SearchGUIJobBean {
                 }
             };
 
-            // Join all default and usermod names from the current PTMFactory
+            // Join all default and usermod names from the current 
             HashSet<String> ptmFactoryAllModifications = Sets.newHashSet();
             ptmFactoryAllModifications.addAll(ptmFactory.getDefaultModifications());
             ptmFactoryAllModifications.addAll(ptmFactory.getUserModifications());
@@ -257,13 +256,17 @@ public class SearchGUIJobBean {
                     }
                     // Add the PTM to the ModificationProfile instance that will be used in the SearchParameters instance.
                     if (aMod.isFixed()) {
-                        modProfile.addFixedModification(ptmFactory.getPTM(aModPTM.getName().toLowerCase()));
-                        logger.debug("Added fixed modification : " + aModPTM.getName().toLowerCase());
+                        if (!modProfile.getFixedModifications().contains(aModPTM.getName())) {
+                            modProfile.addFixedModification(ptmFactory.getPTM(aModPTM.getName().toLowerCase()));
+                            logger.debug("Added fixed modification : " + aModPTM.getName().toLowerCase());
+                        }
                     } else {
-                        modProfile.addVariableModification(ptmFactory.getPTM(aModPTM.getName().toLowerCase()));
-                        logger.debug("Added variable modification : " + aModPTM.getName().toLowerCase());
+                        if (!modProfile.getVariableModifications().contains(aModPTM.getName())) {
+                            modProfile.addVariableModification(ptmFactory.getPTM(aModPTM.getName().toLowerCase()));
+                            logger.debug("Added variable modification : " + aModPTM.getName().toLowerCase());
+                        }
                     }
-                  //  ptmFactory.addUserPTM(aModPTM);
+                    //  ptmFactory.addUserPTM(aModPTM);
                 } catch (Exception e) {
                     logger.error(e);
                     logger.debug("failed to set " + aMod + " in the modificationprofile.");
@@ -279,6 +282,7 @@ public class SearchGUIJobBean {
             } catch (IOException ex) {
                 logger.error(ex);
             } finally {
+                
             }
             searchParameters.setModificationProfile(modProfile);
             // Set other parameters (defaults)

@@ -147,10 +147,10 @@ public class PrideXMLDataProvider implements DataProvider {
                     logger.error("Pride found no usefull identifications.");
                 }
                 lModificationSet = lModificationService.loadExperimentModifications();
-                         for (Modification lModification : lModificationSet) {
-                     logger.debug(String.format("Resolved PTM '%s' with mass '%f' from modified sequence", lModification.getName(), lModification.getMassShift()));
-                     //PUT THEM IN THE PTM FACTORY AS NEW PTMS HERE !!!!
-                      }
+                for (Modification lModification : lModificationSet) {
+                    logger.debug(String.format("Resolved PTM '%s' with mass '%f' from modified sequence", lModification.getName(), lModification.getMassShift()));
+                    //PUT THEM IN THE PTM FACTORY AS NEW PTMS HERE !!!!
+                }
                 lSpectrumAnnotator.annotate(xmlFile);
             } catch (Exception e) {
                 logger.error(e.getMessage());
@@ -170,7 +170,7 @@ public class PrideXMLDataProvider implements DataProvider {
             OmssaModificationMarshaller marshaller = new OmssaModificationMarshallerImpl();
             UserModCollection lUserModCollection = marshaller.marshallModifications(lModificationSet);
             try {
-                  lUserModCollection.build(RelimsProperties.getSearchGuiUserModFile());
+                lUserModCollection.build(RelimsProperties.getSearchGuiUserModFile());
             } catch (IOException ex) {
                 java.util.logging.Logger.getLogger(PrideXMLDataProvider.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
             }
@@ -184,7 +184,9 @@ public class PrideXMLDataProvider implements DataProvider {
             double lFragmentError = 0.0;
 
             for (AnalyzerData lNext : lAnalyzerDataSet) {
-
+                logger.warn(lNext.getAnalyzerFamily().toString() + 
+                        " (precursor error : " + lNext.getPrecursorMassError() +
+                        " , fragment error" + lNext.getFragmentMassError() + ")");
                 Double lNextPrecursorMassError = lNext.getPrecursorMassError();
                 if (lPrecursorError > 0.0 && lNextPrecursorMassError != lPrecursorError) {
                     throw new RelimsException("There are multiple Mass Analyzers with different Precursor Mass errors for this project!!");

@@ -126,6 +126,10 @@ public class PeptideShakerJobBean {
             PSCommandLine.add(this.spectra.getAbsolutePath().toString());
             PSCommandLine.add(" -search_params ");
             PSCommandLine.add(this.searchParametersFile.getAbsolutePath().toString());
+            PSCommandLine.add(" -exclude_unknown_ptms ");
+            PSCommandLine.add("0");
+            PSCommandLine.add(" -max_precursor_error ");
+            PSCommandLine.add("10");
             if (RelimsProperties.getPeptideShakerCPSOutput()) {
                 PSCommandLine.add(" -out ");
                 PSCommandLine.add(jobDirectory.getAbsolutePath().toString() + "/" + ProcessVariableManager.getProjectId() + ".cps");
