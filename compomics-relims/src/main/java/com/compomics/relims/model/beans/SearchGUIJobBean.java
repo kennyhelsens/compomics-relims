@@ -153,7 +153,9 @@ public class SearchGUIJobBean {
 
         searchGUICommandLine.add(" -search_params ");
         searchGUICommandLine.add(searchParametersFile.getAbsolutePath());
-
+        
+        searchGUICommandLine.add(" -ppm ");
+        searchGUICommandLine.add("1");
         System.err.println("");
         System.err.println("SEARCHGUICOMMAND");
         StringBuilder commandLine = new StringBuilder();
@@ -282,7 +284,6 @@ public class SearchGUIJobBean {
             } catch (IOException ex) {
                 logger.error(ex);
             } finally {
-                
             }
             searchParameters.setModificationProfile(modProfile);
             // Set other parameters (defaults)
@@ -302,6 +303,7 @@ public class SearchGUIJobBean {
             searchParameters.setnMissedCleavages(RelimsProperties.getMissedCleavages());
             // Precursor
             searchParameters.setPrecursorAccuracyType(SearchParameters.PrecursorAccuracyType.PPM);
+  
             validate(searchParameters);
         }
         logger.info("Searchparameters were loaded");

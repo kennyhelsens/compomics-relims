@@ -331,12 +331,15 @@ public class RelimsJobController extends Observable implements ProjectRunner {
                         experimentID,
                         sampleID));
                 storeInRepository();
+                lPeptideShakerJobBean.removeJunk();
                 return true;
             } else {
                 progressManager.setState(Checkpoint.PROCESSFAILURE);
+                lPeptideShakerJobBean.removeJunk();
                 return false;
             }
         } else {
+            lPeptideShakerJobBean.removeJunk();
             return false;
         }
     }
