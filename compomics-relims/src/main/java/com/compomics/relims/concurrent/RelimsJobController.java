@@ -323,6 +323,7 @@ public class RelimsJobController extends Observable implements ProjectRunner {
             lPeptideShakerJobBean.setSampleName(sampleID);
             lPeptideShakerJobBean.setExperimentName(experimentID);
             lPeptideShakerJobBean.setAscore(false);
+            lPeptideShakerJobBean.setMaxPrecursorError(relimsProjectBean.getPrecursorError());
             // Run PeptideShaker
             // IF the return value = 0 (= system.exit.value) then the process ran correctly. (Timeout etc will change this value)
             if (lPeptideShakerJobBean.launch() == 0) {

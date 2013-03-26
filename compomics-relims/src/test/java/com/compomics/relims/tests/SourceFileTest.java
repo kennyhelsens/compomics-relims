@@ -80,7 +80,8 @@ public class SourceFileTest extends TestCase {
             logger.error(ex);
         } catch (ClassNotFoundException ex) {
             logger.error(ex);
-        }        assertEquals(true, correctMGF);
+        }
+        assertEquals(true, correctMGF);
     }
 
     public void testSearchParameters() {
@@ -114,28 +115,28 @@ public class SourceFileTest extends TestCase {
                 erronousParameterList.add("precursorAccuracy");
             }
 
+
+            ModificationProfile modProfile = parameters.getModificationProfile();
+            List<String> PTMs = modProfile.getAllModifications();
+            List<String> verifiedPTMs = new ArrayList<String>();
+            verifiedPTMs.add("oxidation of m");
+            verifiedPTMs.add("pyro-glutamation of e");
+            verifiedPTMs.add("terminal acetylation");
+            verifiedPTMs.add("carboxyamidomethylation");
+            if (!PTMs.containsAll(verifiedPTMs)) {
+                erronousParameterList.add("PTMS");
+                if (PTMs.isEmpty()) {
+                    logger.debug("No PTMS in searchparameters modProfile !");
+                } else {
+                    logger.debug("Incorrect PTMS !");
+                }
+
+            }
             if (!erronousParameterList.isEmpty()) {
-                logger.debug("The following parameters are faulty/missing : ");
+                 System.out.println("The following parameters are faulty/missing : ");
                 for (String aParameter : erronousParameterList) {
-                    logger.debug(aParameter + " ,");
+                    System.out.println(aParameter + " ,");
                 }
-                ModificationProfile modProfile = parameters.getModificationProfile();
-                List<String> PTMs = modProfile.getAllModifications();
-                List<String> verifiedPTMs = new ArrayList<String>();
-                verifiedPTMs.add("oxidation of m");
-                verifiedPTMs.add("pyro-glutamation of e");
-                verifiedPTMs.add("terminal acetylation");
-                verifiedPTMs.add("carboxyamidomethylation");
-                if (!PTMs.containsAll(verifiedPTMs)) {
-                    erronousParameterList.add("PTMS");
-                    if (PTMs.isEmpty()) {
-                        logger.debug("No PTMS in searchparameters modProfile !");
-                    } else {
-                        logger.debug("Incorrect PTMS !");
-                    }
-
-                }
-
             } else {
                 logger.debug("All parameters were validated");
             }

@@ -41,6 +41,7 @@ public class PeptideShakerJobBean {
     private ArrayList<String> psCommandLine;
     private String identificationFiles;
     private final File resultFolder;
+    private double maxPrecursorError = 10.0;
 
     public PeptideShakerJobBean(long projectId, File searchParameters, File spectra, File searchGuiResultsFolder) {
         logger.debug("Collecting PeptideShaker parameters");
@@ -56,6 +57,10 @@ public class PeptideShakerJobBean {
     public PeptideShakerJobBean(long projectId) {
         this.projectId = projectId;
         this.resultFolder = new File(RelimsProperties.getPeptideShakerResultsFolder());
+    }
+
+    public void setMaxPrecursorError(double error) {
+        this.maxPrecursorError = error;
     }
 
     public void setAscore(boolean aAscore) {
@@ -134,7 +139,7 @@ public class PeptideShakerJobBean {
             PSCommandLine.add(" -max_precursor_error_type ");
             PSCommandLine.add("1");
             PSCommandLine.add(" -max_precursor_error ");
-            PSCommandLine.add("10");
+            PSCommandLine.add("" + maxPrecursorError);
             PSCommandLine.add(" -a_score ");
             PSCommandLine.add("1");
             if (RelimsProperties.getPeptideShakerCPSOutput()) {
