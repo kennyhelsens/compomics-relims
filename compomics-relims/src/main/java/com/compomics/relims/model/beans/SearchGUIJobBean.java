@@ -301,7 +301,7 @@ public class SearchGUIJobBean {
             searchParameters.setFragmentIonAccuracy(iRelimsProjectBean.getFragmentError());
             searchParameters.setnMissedCleavages(RelimsProperties.getMissedCleavages());
             // Precursor
-            searchParameters.setPrecursorAccuracyType(SearchParameters.PrecursorAccuracyType.DA);
+            searchParameters.setPrecursorAccuracyType(SearchParameters.PrecursorAccuracyType.PPM);
             validate(searchParameters);
         }
         logger.info("Searchparameters were loaded");

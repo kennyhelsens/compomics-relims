@@ -423,9 +423,9 @@ public class MsLimsDataProvider implements DataProvider {
             }
             lFragmentError = lNextFragmentMassError;
         }
-
-        lRelimsProjectBean.setPrecursorError(lPrecursorError);
-        lRelimsProjectBean.setFragmentError(lFragmentError);
+        //conversion to PPM from da
+        lRelimsProjectBean.setPrecursorError(lPrecursorError * 100);
+        lRelimsProjectBean.setFragmentError(lFragmentError * 100);
 
         return lRelimsProjectBean;
     }
@@ -438,8 +438,7 @@ public class MsLimsDataProvider implements DataProvider {
     public boolean isProjectValuable(String experimentID) {
         return true;
     }
-    
-    
+
     @Override
     public void clearResources() {
         //TODO code for cleanup operations

@@ -1,1 +1,0 @@
-Protein(s)	Sequence	Variable Modification(s)	PTM location confidence	n Spectra	n Spectra Validated	p score	p	Decoy	Validated
