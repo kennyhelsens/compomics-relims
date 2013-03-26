@@ -387,6 +387,8 @@ public class RelimsJobController extends Observable implements ProjectRunner {
                     progressManager.setState(Checkpoint.FAILED, e);
                 }
             }
+        } finally {
+            RelimsProperties.saveRelimsProperties();
         }
         //nullcheck to prevent standalone relims to delete its folders
         if (ProcessVariableManager.getClassicMode()) {

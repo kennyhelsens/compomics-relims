@@ -184,8 +184,8 @@ public class PrideDataProvider implements DataProvider {
 
             }
             //*100 = conversion to PPM from da
-            lRelimsProjectBean.setPrecursorError(lPrecursorError * 100);
-            lRelimsProjectBean.setFragmentError(lFragmentError * 100);
+            lRelimsProjectBean.setPrecursorError(lPrecursorError);
+            lRelimsProjectBean.setFragmentError(lFragmentError);
         }
         logger.setLevel(Level.DEBUG);
         logger.debug("Retrieved searchparameters from remote Pride");

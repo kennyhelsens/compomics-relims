@@ -201,7 +201,7 @@ public class PrideXMLDataProvider implements DataProvider {
 
             }
             //*100 = conversion to PPM from da
-            lRelimsProjectBean.setPrecursorError(lPrecursorError * 100);
+            lRelimsProjectBean.setPrecursorError(lPrecursorError);
             //26/03/2013 - setting the fragmentErrorType is not possible ---> need to keep it in da untill resolved
             lRelimsProjectBean.setFragmentError(lFragmentError);
         }

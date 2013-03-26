@@ -424,8 +424,8 @@ public class MsLimsDataProvider implements DataProvider {
             lFragmentError = lNextFragmentMassError;
         }
         //conversion to PPM from da
-        lRelimsProjectBean.setPrecursorError(lPrecursorError * 100);
-        lRelimsProjectBean.setFragmentError(lFragmentError * 100);
+        lRelimsProjectBean.setPrecursorError(lPrecursorError);
+        lRelimsProjectBean.setFragmentError(lFragmentError);
 
         return lRelimsProjectBean;
     }

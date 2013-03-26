@@ -49,7 +49,7 @@ public class PeptideShakerJobBean {
         this.spectra = spectra;
         this.jobDirectory = new File(ProcessVariableManager.getResultsFolder());
         this.resultFolder = searchGuiResultsFolder;
-        this.identificationFiles = searchGuiResultsFolder.getAbsolutePath() + "/" + projectId + ".omx , " + searchGuiResultsFolder.getAbsolutePath() + "/" + projectId + ".t.xml";
+        this.identificationFiles = searchGuiResultsFolder.getAbsolutePath() + "/" + projectId + ".omx," + searchGuiResultsFolder.getAbsolutePath() + "/" + projectId + ".t.xml";
         logger.debug("Getting identification files from " + searchGuiResultsFolder.getAbsolutePath());
     }
 
@@ -132,9 +132,9 @@ public class PeptideShakerJobBean {
             PSCommandLine.add(" -exclude_unknown_ptms ");
             PSCommandLine.add("0");
             PSCommandLine.add(" -max_precursor_error_type ");
-            PSCommandLine.add("0");
+            PSCommandLine.add("1");
             PSCommandLine.add(" -max_precursor_error ");
-            PSCommandLine.add("100");
+            PSCommandLine.add("10");
             PSCommandLine.add(" -a_score ");
             PSCommandLine.add("1");
             if (RelimsProperties.getPeptideShakerCPSOutput()) {

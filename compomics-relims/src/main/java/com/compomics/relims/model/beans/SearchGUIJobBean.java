@@ -155,7 +155,7 @@ public class SearchGUIJobBean {
         searchGUICommandLine.add(searchParametersFile.getAbsolutePath());
         
         searchGUICommandLine.add(" -ppm ");
-        searchGUICommandLine.add("1");
+        searchGUICommandLine.add("2");
         System.err.println("");
         System.err.println("SEARCHGUICOMMAND");
         StringBuilder commandLine = new StringBuilder();
@@ -302,7 +302,7 @@ public class SearchGUIJobBean {
             searchParameters.setFragmentIonAccuracy(iRelimsProjectBean.getFragmentError());
             searchParameters.setnMissedCleavages(RelimsProperties.getMissedCleavages());
             // Precursor
-            searchParameters.setPrecursorAccuracyType(SearchParameters.PrecursorAccuracyType.PPM);
+            searchParameters.setPrecursorAccuracyType(SearchParameters.PrecursorAccuracyType.DA);
   
             validate(searchParameters);
         }
