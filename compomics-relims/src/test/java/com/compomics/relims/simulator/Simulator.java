@@ -31,6 +31,7 @@ public class Simulator extends TestCase {
     private static String[] Workerargs = new String[]{"-workerport", "15557"};
     private static long TIME_OUT = Long.MAX_VALUE;
     private static final Logger logger = Logger.getLogger(Simulator.class);
+    private static int projectId;
     private String[] resultFolderFilenames = new String[]{"3.cps",
         "3.mgf",
         "3.omx",
@@ -45,6 +46,11 @@ public class Simulator extends TestCase {
         super(testName);
     }
 
+    
+    public static void setProjectId(int projectId){
+        Simulator.projectId = projectId;
+    }
+    
     public static void testSimulateProcess() {
 
         cleanUp();
@@ -54,7 +60,7 @@ public class Simulator extends TestCase {
         sleep(3000);
         initializeWorker();
         sleep(3000);
-        simulateClientInput();
+        simulateClientInput(projectId);
         //wait to finish this up !
         File results = new File("src/test/resources/results/admin");
         long timeout = 0;
@@ -216,10 +222,10 @@ public class Simulator extends TestCase {
         logger.info("END OF SIMULATION");
     }
 
-    public static void simulateClientInput() {
+    public static void simulateClientInput(int projectId) {
 
         Map<String, String> currentUserMap = new HashMap<String, String>();
-        currentUserMap.put("username", "admin");
+        currentUserMap.put("username", RelimsProperties.getUserID());
         currentUserMap.put("password", "admin");
         //setting up TaskObject
         TaskContainer tasksForServer = new TaskContainer();
@@ -237,7 +243,7 @@ public class Simulator extends TestCase {
         }
         tasksForServer.setSearchParameters(loadedSearchParameters);
         tasksForServer.updateInstruction("runpipeline", "allow");
-        tasksForServer.addJob("3", "TestingProject");
+        tasksForServer.addJob("" + projectId, "TestingProject");
         ServerConnector connector = new ServerConnector();
         connector.setConnectionParameters(RelimsProperties.getControllerIP(), RelimsProperties.getControllerPort());
         try {

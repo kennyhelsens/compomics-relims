@@ -31,12 +31,37 @@ public class SourceFileTest extends TestCase {
 
     String superFolder;// = "src/test/resources/Testing_Files_for_Verification/";
     private final static Logger logger = Logger.getLogger(SourceFileTest.class);
-    private final static double MAX_MGF_INTENSITY = 58177.0547;
-    private final static double MAX_MGF_MZ = 1198.1465;
-    private final static double N_MGF_SPECTRA = 1958;
-    private final static int N_PSMS = 49;
-    private final static int N_PEPTIDE = 45;
-    private final static int N_PROTEIN = 29;
+    private static double MAX_MGF_INTENSITY = 58177.0547;
+    private static double MAX_MGF_MZ = 1198.1465;
+    private static double N_MGF_SPECTRA = 1958;
+    private static long cpsFileSize = 0;
+
+    public static void setMAX_MGF_INTENSITY(double MAX_MGF_INTENSITY) {
+        SourceFileTest.MAX_MGF_INTENSITY = MAX_MGF_INTENSITY;
+    }
+
+    public static void setMAX_MGF_MZ(double MAX_MGF_MZ) {
+        SourceFileTest.MAX_MGF_MZ = MAX_MGF_MZ;
+    }
+
+    public static void setN_MGF_SPECTRA(double N_MGF_SPECTRA) {
+        SourceFileTest.N_MGF_SPECTRA = N_MGF_SPECTRA;
+    }
+
+    public static void setN_PSMS(int N_PSMS) {
+        SourceFileTest.N_PSMS = N_PSMS;
+    }
+
+    public static void setN_PEPTIDE(int N_PEPTIDE) {
+        SourceFileTest.N_PEPTIDE = N_PEPTIDE;
+    }
+
+    public static void setN_PROTEIN(int N_PROTEIN) {
+        SourceFileTest.N_PROTEIN = N_PROTEIN;
+    }
+    private static int N_PSMS = 49;
+    private static int N_PEPTIDE = 45;
+    private static int N_PROTEIN = 29;
 
     public SourceFileTest(String testName) {
         super(testName);
@@ -231,6 +256,6 @@ public class SourceFileTest extends TestCase {
         File CPS_FILE = new File(superFolder + "3.cps");
         long fileSize = CPS_FILE.length();
         System.out.println(fileSize);
-        assertEquals(2836480, fileSize);
+        assertEquals(cpsFileSize, fileSize);
     }
 }
