@@ -29,12 +29,28 @@ import org.apache.log4j.Logger;
  */
 public class SourceFileTest extends TestCase {
 
-    String superFolder;// = "src/test/resources/Testing_Files_for_Verification/";
+    private static String superFolder;// = "src/test/resources/Testing_Files_for_Verification/";
     private final static Logger logger = Logger.getLogger(SourceFileTest.class);
     private static double MAX_MGF_INTENSITY = 58177.0547;
     private static double MAX_MGF_MZ = 1198.1465;
     private static double N_MGF_SPECTRA = 1958;
     private static long cpsFileSize = 0;
+    private static int N_PSMS = 49;
+    private static int N_PEPTIDE = 45;
+    private static int N_PROTEIN = 29;
+    private static long projectID = 0L;
+
+    public static void setCpsFileSize(long cpsFileSize) {
+        SourceFileTest.cpsFileSize = cpsFileSize;
+    }
+
+    public static void setSuperFolder(String superFolder) {
+        SourceFileTest.superFolder = superFolder;
+    }
+
+    public static void setProjectID(long projectID) {
+        SourceFileTest.projectID = projectID;
+    }
 
     public static void setMAX_MGF_INTENSITY(double MAX_MGF_INTENSITY) {
         SourceFileTest.MAX_MGF_INTENSITY = MAX_MGF_INTENSITY;
@@ -59,9 +75,6 @@ public class SourceFileTest extends TestCase {
     public static void setN_PROTEIN(int N_PROTEIN) {
         SourceFileTest.N_PROTEIN = N_PROTEIN;
     }
-    private static int N_PSMS = 49;
-    private static int N_PEPTIDE = 45;
-    private static int N_PROTEIN = 29;
 
     public SourceFileTest(String testName) {
         super(testName);
@@ -69,7 +82,6 @@ public class SourceFileTest extends TestCase {
 
     @Override
     protected void setUp() throws Exception {
-        superFolder = Simulator.getResultFolder().getAbsolutePath() + "/";
         super.setUp();
     }
 
@@ -84,7 +96,7 @@ public class SourceFileTest extends TestCase {
         logger.debug("TESTING MGF RESULTFILE");
         SpectrumFactory sf = SpectrumFactory.getInstance();
         boolean correctMGF = false;
-        File MGF_FILE = new File(superFolder + "3.mgf");
+        File MGF_FILE = new File(Simulator.getResultFolder().getAbsolutePath() + "/" + projectID + ".mgf");
         try {
             //load file in 
             sf.addSpectra(MGF_FILE);
@@ -158,7 +170,7 @@ public class SourceFileTest extends TestCase {
 
             }
             if (!erronousParameterList.isEmpty()) {
-                 System.out.println("The following parameters are faulty/missing : ");
+                System.out.println("The following parameters are faulty/missing : ");
                 for (String aParameter : erronousParameterList) {
                     System.out.println(aParameter + " ,");
                 }
@@ -175,7 +187,8 @@ public class SourceFileTest extends TestCase {
 
     public void testPsmsFileLength() {
         logger.debug("TESTING PSMS RESULTFILE");
-        File PSMS_FILE = new File(superFolder + "PeptideShaker_3_AutoReprocessed_1_psms.txt");
+        File PSMS_FILE = new File(RelimsProperties.getWorkSpace().getAbsolutePath() + "/PeptideShaker_" + this.projectID + "_AutoReprocessed_1_psms.txt");
+        logger.debug(PSMS_FILE.getAbsolutePath());
         int psmCounter = 0;
         try {
             FileInputStream fin = new FileInputStream(PSMS_FILE);
@@ -202,7 +215,8 @@ public class SourceFileTest extends TestCase {
     public void testProteinsFileLength() {
         logger.debug("TESTING PROTEIN RESULTFILE");
         int proteinCounter = 0;
-        File PROTEIN_FILE = new File(superFolder + "PeptideShaker_3_AutoReprocessed_1_proteins.txt");
+        File PROTEIN_FILE = new File(RelimsProperties.getWorkSpace().getAbsolutePath() + "/PeptideShaker_" + projectID + "_AutoReprocessed_1_proteins.txt");
+        logger.debug(PROTEIN_FILE.getAbsolutePath());
         try {
             FileInputStream fin = new FileInputStream(PROTEIN_FILE);
             DataInputStream in = new DataInputStream(fin);
@@ -228,7 +242,8 @@ public class SourceFileTest extends TestCase {
     public void testPeptideFileLength() {
         logger.debug("TESTING PEPTIDE RESULTFILE");
         int peptideCounter = 0;
-        File PEPTIDE_FILE = new File(superFolder + "PeptideShaker_3_AutoReprocessed_1_peptides.txt");
+        File PEPTIDE_FILE = new File(RelimsProperties.getWorkSpace().getAbsolutePath() + "/PeptideShaker_" + projectID + "_AutoReprocessed_1_peptides.txt");
+        logger.debug(PEPTIDE_FILE.getAbsolutePath());
         try {
             FileInputStream fin = new FileInputStream(PEPTIDE_FILE);
             DataInputStream in = new DataInputStream(fin);
@@ -253,7 +268,7 @@ public class SourceFileTest extends TestCase {
 
     public void testCheckCPSSize() {
         logger.debug("TESTING CPS RESULTFILE");
-        File CPS_FILE = new File(superFolder + "3.cps");
+        File CPS_FILE = new File(RelimsProperties.getWorkSpace().getAbsolutePath() + "/" + projectID + ".cps");
         long fileSize = CPS_FILE.length();
         System.out.println(fileSize);
         assertEquals(cpsFileSize, fileSize);

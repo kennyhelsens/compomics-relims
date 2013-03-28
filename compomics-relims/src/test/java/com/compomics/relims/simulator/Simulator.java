@@ -46,11 +46,10 @@ public class Simulator extends TestCase {
         super(testName);
     }
 
-    
-    public static void setProjectId(int projectId){
+    public static void setProjectID(int projectId) {
         Simulator.projectId = projectId;
     }
-    
+
     public static void testSimulateProcess() {
 
         cleanUp();
@@ -62,7 +61,7 @@ public class Simulator extends TestCase {
         sleep(3000);
         simulateClientInput(projectId);
         //wait to finish this up !
-        File results = new File("src/test/resources/results/admin");
+        File results = new File("src/test/resources/results/" + RelimsProperties.getUserID() + "/");
         long timeout = 0;
         while (!results.exists()) {
             sleep(1000);
@@ -74,15 +73,16 @@ public class Simulator extends TestCase {
             //wait for the timestamped map to be there
         }
         timeout = 0;
-        File timestampedResults = results.listFiles()[0];
-        while (timestampedResults.listFiles().length < 12 && timeout < TIME_OUT) {
+        File relimsPropertiesFile = new File(RelimsProperties.getWorkSpace().getAbsolutePath() + "/relimsproperties.properties");
+        while (!relimsPropertiesFile.exists() && timeout < TIME_OUT) {
             sleep(1000);
             timeout++;
             //wait untill all the files are processed and put in the resultfolder or timeout happens...
+            if (timeout >= TIME_OUT) {
+                assertFalse("Search timed out...No results were created in time...", false);
+            }
         }
-        if (timeout >= TIME_OUT) {
-            assertFalse("Search timed out...No results were created in time...", false);
-        }
+        assertTrue("Simulation completed...", true);
     }
 
     private static void overrideSearchGUI() {
@@ -200,11 +200,10 @@ public class Simulator extends TestCase {
                 logger.info("Removed " + aFolder.getName());
             }
         }
-        assertTrue(true);
     }
 
     public static File getResultFolder() {
-        File results = new File("src/test/resources/results/admin");
+        File results = new File("src/test/resources/results/" + RelimsProperties.getUserID());
         return results.listFiles()[0];
     }
 
