@@ -1,3 +1,5 @@
 /compomics-relims/target/
 compomics-relims.iml
 compomics-relims/resources/databases
+compomics-relims/src/test/resources/results/
+compomics-relims/src/test/resources/repository/
