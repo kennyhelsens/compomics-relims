@@ -11,7 +11,6 @@ import com.compomics.relims.modes.networking.controller.connectivity.workerpool.
  *
  * @author Kenneth
  */
-
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -48,38 +47,33 @@ public class WorkerHandler implements Runnable {
 
     @Override
     public void run() {
-        while (true) {
+
+        try {
+            WorkerPool workerpool = WorkerPool.getInstance();
             try {
-                WorkerPool workerpool = WorkerPool.getInstance();
-                try {
-                    int workerPortNumber = (Integer) sockInput.readInt();
-                    worker = new WorkerRunner(sock.getInetAddress().getHostName(), workerPortNumber);
-                    registered = workerpool.isRegistered(worker);
-                } catch (IOException ex) {
-                    registered = false;
-                }
-                if (!registered) {
-                    //register if this is the first contact
-                    if (!workerpool.isRegistered(worker)) {
-                        workerpool.register(worker);
-                        logger.debug("Worker was registrated : " + worker.getHost() + " ( " + worker.getPort() + ")");
-                        registered = true;
-                        workerpool.setOnline(worker);
-                        break;
-                    } else {
-                        logger.debug(worker.getHost() + " sent heartbeat...");
-                        workerpool.setOnline(worker);
-                        break;
-                    }
-                }
-            } catch (Throwable e) {
-                e.printStackTrace();
-            } finally {
-                try {
-                    sock.close();
-                } catch (Exception e) {
-                    e.printStackTrace(System.err);
-                }
+                int workerPortNumber = (Integer) sockInput.readInt();
+                worker = new WorkerRunner(sock.getInetAddress().getHostName(), workerPortNumber);
+                registered = workerpool.isRegistered(worker);
+            } catch (IOException ex) {
+                ex.printStackTrace();
+                registered = false;
+            }
+            if (!registered) {
+                workerpool.register(worker);
+                logger.debug("Worker was registrated : " + worker.getHost() + " ( " + worker.getPort() + ")");
+                registered = true;
+                workerpool.setOnline(worker);
+            } else {
+                logger.debug(worker.getHost() + " sent heartbeat...");
+                workerpool.setOnline(worker);
+            }
+        } catch (Throwable e) {
+            e.printStackTrace();
+        } finally {
+            try {
+                sock.close();
+            } catch (Exception e) {
+                e.printStackTrace(System.err);
             }
         }
     }

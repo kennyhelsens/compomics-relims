@@ -51,8 +51,8 @@ public class ResultNotifier {
         this.data = data;
     }
 
-    public void sendNotify(Checkpoint state) {
-
+    public boolean sendResults(Checkpoint state) {
+        boolean sucess = false;
         try {
             try {
                 sock = new Socket(serverHostname, serverPort);
@@ -60,17 +60,17 @@ public class ResultNotifier {
                 sockOutput = new ObjectOutputStream(sock.getOutputStream());
             } catch (IOException e) {
                 e.printStackTrace(System.err);
-                return;
+                return false;
             }
             try {
                 Map<String, Object> resultMap = new HashMap<String, Object>();
                 resultMap.put("finishState", state.toString());
                 resultMap.put("workerPort", ResourceManager.getWorkerPort());
                 resultMap.put("taskID", ResourceManager.getTaskID());
-                resultMap.put("projectId", ResourceManager.getProjectID());
-                resultMap.put("SystemInfoMap", ResourceManager.getAllSystemInfo());
+                resultMap.put("projectID", ResourceManager.getProjectID());
+                resultMap.put("systemInfoMap", ResourceManager.getAllSystemInfo());
                 resultMap.put("PrideXMLErrorList", ResourceManager.getConversionErrors());
-                ResultManager resultManager = ResultManager.getInstance();
+                ResultManager resultManager = new ResultManager();
                 Map<String, Object> projectResultMap = resultManager.buildResultMap();
                 if (projectResultMap == null) {
                     logger.error("Projectresultmap could not be built : null");
@@ -78,12 +78,14 @@ public class ResultNotifier {
                     logger.error("Projectresultmap could not be built : empty");
                 }
                 resultMap.put("projectResult", projectResultMap);
-                sockOutput.writeInt(2);
+                sockOutput.writeInt(1);
                 sockOutput.flush();
                 sockOutput.writeObject(resultMap);
                 sockOutput.flush();
                 //sockInput.readBoolean();
+                sucess = true;
             } catch (IOException e) {
+                sucess = false;
                 e.printStackTrace(System.err);
             }
             try {
@@ -92,12 +94,7 @@ public class ResultNotifier {
             }
 
         } finally {
-            try {
-                sock.close();
-            } catch (IOException e) {
-                System.err.println("Exception closing socket.");
-                e.printStackTrace(System.err);
-            }
+             return sucess;
         }
     }
 
@@ -132,6 +129,7 @@ public class ResultNotifier {
             try {
                 sock.close();
             } catch (NullPointerException e) {
+                e.printStackTrace();
             } catch (IOException e) {
                 System.err.println("Exception closing socket.");
                 e.printStackTrace(System.err);

@@ -42,10 +42,12 @@ public class MotherHandler implements Runnable {
             try {
                 int handlerRequired = (Integer) sockInput.readInt();
                 if (handlerRequired == 0) {
+                    logger.debug("Client connected");
                     ClientHandler cHandler = new ClientHandler(sock, sockOutput, sockInput);
                     cHandler.run();
                     break;
                 } else if (handlerRequired == 1) {
+                    logger.debug("Worker connected to store results");
                     ResultHandler rHandler = new ResultHandler(sock, sockOutput, sockInput);
                     rHandler.run();
                     break;

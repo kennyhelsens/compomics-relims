@@ -71,9 +71,9 @@ public class ResultDAO {
     }
 
     public void storeMods(long taskID, String projectId, List<String> mods, boolean fixed) {
-        String parameterName = "fixed modification";
+        String parameterName = "fixed_modification";
         if (!fixed) {
-            parameterName = "variable modification";
+            parameterName = "variable_modification";
         }
         int i = 1;
         for (String aMod : mods) {

@@ -29,17 +29,12 @@ public class ResultManager {
 
     private static ResultManager resultManager;
     private static final Logger logger = Logger.getLogger(ResultManager.class);
-    private static HashMap<String, Object> resultMap = new HashMap<>();
+    private static HashMap<String, Object> resultMap;
 
-    private ResultManager() {
+    public ResultManager() {
+        this.resultMap = new HashMap<String,Object>();
     }
 
-    public static ResultManager getInstance() {
-        if (resultManager == null) {
-            resultManager = new ResultManager();
-        }
-        return resultManager;
-    }
 
     public HashMap<String, Object> buildResultMap() {
         logger.info("Gathering results...");
@@ -133,7 +128,7 @@ public class ResultManager {
 
     private void includeSearchParameters() {
         try {//TODO ADD ALL PARAMETERS !!!!
-            File SEARCHPARAM_FILE = new File(RelimsProperties.getWorkSpace() + "SearchGUI.parameters");
+            File SEARCHPARAM_FILE = new File(RelimsProperties.getWorkSpace() + "/SearchGUI.parameters");
             logger.debug("Getting searchparameters from " + SEARCHPARAM_FILE.getAbsolutePath());
             SearchParameters parameters = SearchParameters.getIdentificationParameters(SEARCHPARAM_FILE);
             Enzyme enzyme = parameters.getEnzyme();

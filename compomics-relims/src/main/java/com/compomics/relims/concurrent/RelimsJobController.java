@@ -169,9 +169,14 @@ public class RelimsJobController extends Observable implements ProjectRunner {
 
             logger.debug(format("validating project contents by %d predices", lPredicates.size()));
             for (Predicate lProjectPredicate : lPredicates) {
-                boolean lResult = lProjectPredicate.apply(relimsProjectBean);
-                if (!lResult) {
-                    logger.error("END " + lProjectid);
+                try {
+                    boolean lResult = lProjectPredicate.apply(relimsProjectBean);
+                    if (!lResult) {
+                        logger.error("END " + lProjectid);
+                        return false;
+                    }
+                } catch (NullPointerException e) {
+                    logger.error("No analyzerdata found !");
                     return false;
                 }
             }

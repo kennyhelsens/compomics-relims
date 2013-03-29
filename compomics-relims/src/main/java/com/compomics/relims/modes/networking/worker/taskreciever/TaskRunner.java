@@ -87,6 +87,7 @@ public class TaskRunner {
                 int lWorkerPort = ResourceManager.getWorkerPort();
                 iRelimsJob = new RelimsJob(lSearchStrategyID, lProjectProviderID, lProjectID, lTaskID, lWorkerPort, lSearchParameters, usePrideAsa);
                 ResourceManager.setUserID(task.getUserID());
+                ResourceManager.setProjectID(lProjectID);
                 Object returnValue = iRelimsJob.call();
                 if (returnValue instanceof Checkpoint) {
                     endState = (Checkpoint) returnValue;
@@ -192,10 +193,9 @@ public class TaskRunner {
                 while (!sentToServer) {
                     try {
                         logger.info("Sending feedback to server...");
-                        sentToServer = resultNotifier.sendStatistics(ResourceManager.getAllSystemInfo());
+                        sentToServer = resultNotifier.sendResults(Checkpoint.valueOf(ResourceManager.getFinishState()));
                         TaskReciever.locked = false;
                         Thread.sleep(500);
-                        logger.debug("Waiting for new task");
                         System.out.println("");
                     } catch (Exception ex) {
                         //catch a general exception to make sure the results are sent...
@@ -203,6 +203,7 @@ public class TaskRunner {
                         logger.error(ex);
                     }
                 }
+                logger.debug("Waiting for new task");
             }
         }
     }
