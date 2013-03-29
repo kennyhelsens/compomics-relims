@@ -130,15 +130,17 @@ public class FileManager {
         FileFilter fileFilter = new WildcardFileFilter(wildCardFilterString);
         File[] files = dir.listFiles(fileFilter);
         if (files != null) {
-//try to find the zipped ones first (a LOT more of these...)
+
+            //if not, maybe it is already unzipped !
             for (File aFile : files) {
-                if (aFile.getAbsoluteFile().toString().endsWith(".gz")) {
+                if (aFile.getAbsoluteFile().toString().endsWith(".xml")) {
                     return aFile;
                 }
             }
-//if not, maybe it is already unzipped !
+
+            //try to find the zipped ones first (a LOT more of these...)
             for (File aFile : files) {
-                if (aFile.getAbsoluteFile().toString().endsWith(".xml")) {
+                if (aFile.getAbsoluteFile().toString().endsWith(".gz")) {
                     return aFile;
                 }
             }
