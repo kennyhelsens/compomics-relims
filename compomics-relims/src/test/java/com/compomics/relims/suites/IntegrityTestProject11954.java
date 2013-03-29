@@ -30,7 +30,7 @@ public class IntegrityTestProject11954 extends TestCase {
         SourceFileTest.setN_MGF_SPECTRA(517);
         SourceFileTest.setMAX_MGF_MZ(1321.146);
         SourceFileTest.setMAX_MGF_INTENSITY(1.0);
-       
+
         TestSuite suite = new TestSuite("SourceFileTests");
         suite.addTest(new Simulator("testSimulateProcess"));
         suite.addTest(new SourceFileTest("testMGF"));
@@ -39,7 +39,7 @@ public class IntegrityTestProject11954 extends TestCase {
         suite.addTest(new SourceFileTest("testProteinsFileLength"));
         suite.addTest(new SourceFileTest("testPeptideFileLength"));
         //   suite.addTest(new SourceFileTest("testCheckCPSSize"));
-        //suite.addTest(new Simulator("testFinalCleanUp"));
+        suite.addTest(new Simulator("testFinalCleanUp"));
         return suite;
     }
 

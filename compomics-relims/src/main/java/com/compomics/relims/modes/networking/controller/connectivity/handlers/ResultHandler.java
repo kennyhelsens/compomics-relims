@@ -83,6 +83,22 @@ public class ResultHandler implements Runnable {
                     //store statistics !                  
                     dds.storeStatistics(resultMap, sock.getInetAddress().getHostName());
                     dds.storeErrorList((List<ConversionError>) resultMap.get("PrideXMLErrorList"), projectID);
+                    //store project results
+                    logger.error(taskID);
+                    String projectId = dds.getProjectID(taskID);
+                    logger.error(projectId);
+
+                    if ((HashMap<String, Object>) resultMap.get("projectResult") == null) {
+                        logger.error("resultmap is null !");
+                    } else {
+                        logger.error("resultmap is not null");
+                    }
+                    try {
+                        dds.storeResults(taskID, projectId, (HashMap<String, Object>) resultMap.get("projectResult"));
+                    } catch (NullPointerException e) {
+                        logger.error("Projectresults could not be stored");
+                        e.printStackTrace();
+                    }
                     WorkerPool.setWorkerState(runner, Checkpoint.IDLE);
                 }
 
@@ -115,6 +131,7 @@ public class ResultHandler implements Runnable {
                 logger.debug("Handled task");
             } catch (Exception ex) {
                 logger.error("Could not reset task and worker...");
+                logger.error(ex);
                 ex.printStackTrace();
             }
         } finally {
