@@ -32,9 +32,8 @@ public class ResultManager {
     private static HashMap<String, Object> resultMap;
 
     public ResultManager() {
-        this.resultMap = new HashMap<String,Object>();
+        this.resultMap = new HashMap<String, Object>();
     }
-
 
     public HashMap<String, Object> buildResultMap() {
         logger.info("Gathering results...");
@@ -151,6 +150,20 @@ public class ResultManager {
             logger.error(ex);
         } catch (IOException | ClassNotFoundException ex) {
             logger.error(ex);
+        }
+    }
+
+    public static void removeSearchEngineFiles(File directory) {
+        File[] fileArray = directory.listFiles();
+
+        for (File aFile : fileArray) {
+            if (aFile.isDirectory()) {
+                removeSearchEngineFiles(aFile);
+            } else {
+                if (aFile.getAbsolutePath().endsWith(".omx") || aFile.getAbsolutePath().endsWith("t.xml")) {
+                    aFile.delete();
+                }
+            }
         }
     }
 }

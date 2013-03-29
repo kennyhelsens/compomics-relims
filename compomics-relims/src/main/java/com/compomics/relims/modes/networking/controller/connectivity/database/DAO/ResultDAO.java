@@ -34,8 +34,8 @@ public class ResultDAO {
             conn = DAO.getConnection();
             //     statement = conn.prepareStatement("BEGIN");
             //     statement.execute();
-            String query = "insert into " + RelimsProperties.getDbPrefix() + "Users"
-                    + "(TaskID,projectID,parameterName,parameter) values (?, ?, ?,?);";
+            String query = "insert into " + RelimsProperties.getDbPrefix() + "ProjectResults"
+                    + "(TaskID,projectID,parameterName,parameterValue) values (?, ?, ?,?);";
             statement = conn.prepareStatement(query, Statement.RETURN_GENERATED_KEYS);
             statement.setLong(1, taskID);
             statement.setString(2, projectId);

@@ -6,8 +6,6 @@ package com.compomics.relims.modes.networking.client;
 
 import com.compomics.relims.conf.RelimsProperties;
 import com.compomics.relims.modes.networking.client.GUI.MainClientGUI;
-import java.util.HashMap;
-import java.util.Map;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 
@@ -28,6 +26,5 @@ public class RelimsClientMode {
         String intermediateClient = RelimsProperties.getUserID();
         MainClientGUI gui = new MainClientGUI(intermediateClient);
         gui.setVisible(true);
-
     }
 }

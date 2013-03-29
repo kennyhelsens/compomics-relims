@@ -84,9 +84,8 @@ public class ResultHandler implements Runnable {
                     dds.storeStatistics((HashMap<String, Object>) resultMap.get("systemInfoMap"), sock.getInetAddress().getHostName());
                     dds.storeErrorList((List<ConversionError>) resultMap.get("PrideXMLErrorList"), projectID);
                     //store project results
-                    logger.error(taskID);
                     String projectId = dds.getProjectID(taskID);
-                    logger.error(projectId);
+                    logger.debug("Task : " + taskID + " (project id = " + projectId + " were correctly stored");
                     if ((HashMap<String, Object>) resultMap.get("projectResult") == null) {
                         logger.error("resultmap is null !");
                     } else {

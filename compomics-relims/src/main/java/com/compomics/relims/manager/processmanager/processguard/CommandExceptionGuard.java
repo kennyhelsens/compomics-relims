@@ -92,7 +92,6 @@ public class CommandExceptionGuard extends Thread implements Callable {
             try {
                 while ((line = processOutputStream.readLine()) != null) {
                     if (!line.isEmpty() || !line.equals("")) {
-                        System.out.println(line);
                         //reset the timer if the process returned output 
                         resetTimer();
                     }

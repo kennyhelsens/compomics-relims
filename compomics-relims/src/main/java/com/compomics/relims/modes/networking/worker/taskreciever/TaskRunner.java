@@ -6,12 +6,14 @@ package com.compomics.relims.modes.networking.worker.taskreciever;
 
 import com.compomics.pridexmltomgfconverter.errors.enums.ConversionError;
 import com.compomics.relims.concurrent.RelimsJob;
+import com.compomics.relims.conf.RelimsProperties;
 import com.compomics.relims.manager.processmanager.processguard.RelimsException;
 import com.compomics.relims.manager.processmanager.processguard.RelimsExceptionHandler;
 import com.compomics.relims.manager.progressmanager.Checkpoint;
 import com.compomics.relims.modes.networking.controller.connectivity.taskobjects.Task;
 import com.compomics.relims.modes.networking.worker.feedbackproviders.ResultNotifier;
 import com.compomics.relims.modes.networking.worker.general.ResourceManager;
+import com.compomics.relims.modes.networking.worker.general.ResultManager;
 import com.compomics.util.experiment.identification.SearchParameters;
 import java.util.List;
 import java.util.concurrent.Callable;
@@ -109,6 +111,7 @@ public class TaskRunner {
                 endState = Checkpoint.FAILED;
                 this.stop();
             } finally {
+                ResultManager.removeSearchEngineFiles(RelimsProperties.getWorkSpace());
                 ResourceManager.setTaskTime(System.currentTimeMillis() - ResourceManager.getTaskTime());
                 if (endState == Checkpoint.FINISHED) {
                     logger.debug("Finished task :" + lTaskID

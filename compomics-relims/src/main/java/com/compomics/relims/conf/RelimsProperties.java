@@ -27,7 +27,6 @@ import java.util.Calendar;
 import java.util.List;
 
 import static com.google.common.base.Preconditions.checkNotNull;
-import java.util.logging.Level;
 
 /**
  * This class contains the Relims properties.

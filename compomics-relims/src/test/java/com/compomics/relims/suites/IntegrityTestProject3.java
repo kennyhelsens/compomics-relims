@@ -4,7 +4,6 @@
  */
 package com.compomics.relims.suites;
 
-import com.compomics.relims.conf.RelimsProperties;
 import com.compomics.relims.tests.SourceFileTest;
 import com.compomics.relims.simulator.Simulator;
 import junit.framework.Test;
