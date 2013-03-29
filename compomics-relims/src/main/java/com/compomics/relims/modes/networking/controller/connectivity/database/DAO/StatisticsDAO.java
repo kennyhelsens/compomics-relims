@@ -5,7 +5,6 @@
 package com.compomics.relims.modes.networking.controller.connectivity.database.DAO;
 
 import com.compomics.relims.conf.RelimsProperties;
-import com.compomics.relims.modes.networking.controller.connectivity.database.DAO.DAO;
 import com.compomics.relims.modes.networking.controller.connectivity.database.service.DatabaseService;
 import java.sql.Connection;
 import java.sql.PreparedStatement;

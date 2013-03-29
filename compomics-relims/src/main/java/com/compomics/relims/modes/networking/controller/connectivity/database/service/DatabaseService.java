@@ -8,6 +8,7 @@ import com.compomics.pridexmltomgfconverter.errors.enums.ConversionError;
 import com.compomics.relims.conf.RelimsProperties;
 import com.compomics.relims.modes.networking.controller.connectivity.database.DAO.DAO;
 import com.compomics.relims.modes.networking.controller.connectivity.database.DAO.PrideDetailsDAO;
+import com.compomics.relims.modes.networking.controller.connectivity.database.DAO.ResultDAO;
 import com.compomics.relims.modes.networking.controller.connectivity.database.DAO.StatisticsDAO;
 import com.compomics.relims.modes.networking.controller.connectivity.database.DAO.TaskDAO;
 import com.compomics.relims.modes.networking.controller.connectivity.database.DAO.UserDAO;
@@ -32,6 +33,7 @@ public class DatabaseService {
     private final static WorkerDAO WorkerDAO = new WorkerDAO();
     private final static StatisticsDAO StatisticsDAO = new StatisticsDAO();
     private final static PrideDetailsDAO prideDetailsDAO = new PrideDetailsDAO();
+    private final static ResultDAO projectResultDAO = new ResultDAO();
     private final static BackupService backupService = BackupService.getInstance();
     private final static ExecutorService dbExService = Executors.newSingleThreadExecutor();
 
@@ -238,5 +240,10 @@ public class DatabaseService {
 
     public void storeErrorList(List<ConversionError> errorList, String projectID) {
         prideDetailsDAO.createPrideDetails(errorList, projectID);
+    }
+
+    //==========PROJECT RESULT RELATED METHODS===============//
+    public void storeResults(long taskID, String projectId, HashMap<String, Object> resultMap) {
+        projectResultDAO.storeProjectResults(taskID, projectId, resultMap);
     }
 }

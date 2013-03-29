@@ -183,7 +183,7 @@ public class PrideDataProvider implements DataProvider {
                 lFragmentError = lNextFragmentMassError;
 
             }
-
+            //*100 = conversion to PPM from da
             lRelimsProjectBean.setPrecursorError(lPrecursorError);
             lRelimsProjectBean.setFragmentError(lFragmentError);
         }

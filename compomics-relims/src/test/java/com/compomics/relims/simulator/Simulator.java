@@ -31,6 +31,7 @@ public class Simulator extends TestCase {
     private static String[] Workerargs = new String[]{"-workerport", "15557"};
     private static long TIME_OUT = Long.MAX_VALUE;
     private static final Logger logger = Logger.getLogger(Simulator.class);
+    private static int projectId;
     private String[] resultFolderFilenames = new String[]{"3.cps",
         "3.mgf",
         "3.omx",
@@ -45,6 +46,10 @@ public class Simulator extends TestCase {
         super(testName);
     }
 
+    public static void setProjectID(int projectId) {
+        Simulator.projectId = projectId;
+    }
+
     public static void testSimulateProcess() {
 
         cleanUp();
@@ -54,9 +59,9 @@ public class Simulator extends TestCase {
         sleep(3000);
         initializeWorker();
         sleep(3000);
-        simulateClientInput();
+        simulateClientInput(projectId);
         //wait to finish this up !
-        File results = new File("src/test/resources/results/admin");
+        File results = new File("src/test/resources/results/" + RelimsProperties.getUserID() + "/");
         long timeout = 0;
         while (!results.exists()) {
             sleep(1000);
@@ -68,15 +73,16 @@ public class Simulator extends TestCase {
             //wait for the timestamped map to be there
         }
         timeout = 0;
-        File timestampedResults = results.listFiles()[0];
-        while (timestampedResults.listFiles().length < 12 && timeout < TIME_OUT) {
+        File relimsPropertiesFile = new File(RelimsProperties.getWorkSpace().getAbsolutePath() + "/relimsproperties.properties");
+        while (!relimsPropertiesFile.exists() && timeout < TIME_OUT) {
             sleep(1000);
             timeout++;
             //wait untill all the files are processed and put in the resultfolder or timeout happens...
+            if (timeout >= TIME_OUT) {
+                assertFalse("Search timed out...No results were created in time...", false);
+            }
         }
-        if (timeout >= TIME_OUT) {
-            assertFalse("Search timed out...No results were created in time...", false);
-        }
+        assertTrue("Simulation completed...", true);
     }
 
     private static void overrideSearchGUI() {
@@ -194,11 +200,10 @@ public class Simulator extends TestCase {
                 logger.info("Removed " + aFolder.getName());
             }
         }
-        assertTrue(true);
     }
 
     public static File getResultFolder() {
-        File results = new File("src/test/resources/results/admin");
+        File results = new File("src/test/resources/results/" + RelimsProperties.getUserID());
         return results.listFiles()[0];
     }
 
@@ -216,10 +221,10 @@ public class Simulator extends TestCase {
         logger.info("END OF SIMULATION");
     }
 
-    public static void simulateClientInput() {
+    public static void simulateClientInput(int projectId) {
 
         Map<String, String> currentUserMap = new HashMap<String, String>();
-        currentUserMap.put("username", "admin");
+        currentUserMap.put("username", RelimsProperties.getUserID());
         currentUserMap.put("password", "admin");
         //setting up TaskObject
         TaskContainer tasksForServer = new TaskContainer();
@@ -237,7 +242,7 @@ public class Simulator extends TestCase {
         }
         tasksForServer.setSearchParameters(loadedSearchParameters);
         tasksForServer.updateInstruction("runpipeline", "allow");
-        tasksForServer.addJob("3", "TestingProject");
+        tasksForServer.addJob("" + projectId, "TestingProject");
         ServerConnector connector = new ServerConnector();
         connector.setConnectionParameters(RelimsProperties.getControllerIP(), RelimsProperties.getControllerPort());
         try {

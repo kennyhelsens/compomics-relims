@@ -367,7 +367,11 @@ public class DAO {
                 + "HostName VARCHAR(75),"
                 + "workerPort INTEGER,"
                 + "taskID VARCHAR(30));");
-
+        queryList.add("CREATE TABLE ProjectResults ("
+                + "TaskID BIGINT,"
+                + "projectID VarChar(50),"
+                + "parameterName VarChar(30),"
+                + "parameterValue VarChar(200));");
     }
 
     public void setTimeOut(Connection connection) {

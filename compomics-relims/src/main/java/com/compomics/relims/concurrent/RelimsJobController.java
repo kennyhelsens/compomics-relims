@@ -323,6 +323,7 @@ public class RelimsJobController extends Observable implements ProjectRunner {
             lPeptideShakerJobBean.setSampleName(sampleID);
             lPeptideShakerJobBean.setExperimentName(experimentID);
             lPeptideShakerJobBean.setAscore(false);
+            lPeptideShakerJobBean.setMaxPrecursorError(relimsProjectBean.getPrecursorError());
             // Run PeptideShaker
             // IF the return value = 0 (= system.exit.value) then the process ran correctly. (Timeout etc will change this value)
             if (lPeptideShakerJobBean.launch() == 0) {
@@ -331,12 +332,15 @@ public class RelimsJobController extends Observable implements ProjectRunner {
                         experimentID,
                         sampleID));
                 storeInRepository();
+                lPeptideShakerJobBean.removeJunk();
                 return true;
             } else {
                 progressManager.setState(Checkpoint.PROCESSFAILURE);
+                lPeptideShakerJobBean.removeJunk();
                 return false;
             }
         } else {
+            lPeptideShakerJobBean.removeJunk();
             return false;
         }
     }
@@ -384,6 +388,8 @@ public class RelimsJobController extends Observable implements ProjectRunner {
                     progressManager.setState(Checkpoint.FAILED, e);
                 }
             }
+        } finally {
+            RelimsProperties.saveRelimsProperties();
         }
         //nullcheck to prevent standalone relims to delete its folders
         if (ProcessVariableManager.getClassicMode()) {

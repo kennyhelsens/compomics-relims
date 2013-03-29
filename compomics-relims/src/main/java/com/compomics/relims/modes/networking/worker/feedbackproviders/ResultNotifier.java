@@ -15,6 +15,7 @@ package com.compomics.relims.modes.networking.worker.feedbackproviders;
 import com.compomics.relims.conf.RelimsProperties;
 import com.compomics.relims.manager.progressmanager.Checkpoint;
 import com.compomics.relims.modes.networking.worker.general.ResourceManager;
+import com.compomics.relims.modes.networking.worker.general.ResultManager;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -62,12 +63,21 @@ public class ResultNotifier {
                 return;
             }
             try {
-                Map<String, Object> resultMap = new HashMap<String,Object>();
+                Map<String, Object> resultMap = new HashMap<String, Object>();
                 resultMap.put("finishState", state.toString());
                 resultMap.put("workerPort", ResourceManager.getWorkerPort());
                 resultMap.put("taskID", ResourceManager.getTaskID());
+                resultMap.put("projectId", ResourceManager.getProjectID());
                 resultMap.put("SystemInfoMap", ResourceManager.getAllSystemInfo());
                 resultMap.put("PrideXMLErrorList", ResourceManager.getConversionErrors());
+                ResultManager resultManager = ResultManager.getInstance();
+                Map<String, Object> projectResultMap = resultManager.buildResultMap();
+                if (projectResultMap == null) {
+                    logger.error("Projectresultmap could not be built : null");
+                } else if (projectResultMap.isEmpty()) {
+                    logger.error("Projectresultmap could not be built : empty");
+                }
+                resultMap.put("projectResult", projectResultMap);
                 sockOutput.writeInt(2);
                 sockOutput.flush();
                 sockOutput.writeObject(resultMap);

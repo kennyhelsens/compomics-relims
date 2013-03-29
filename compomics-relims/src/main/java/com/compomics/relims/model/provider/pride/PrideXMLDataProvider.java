@@ -184,9 +184,9 @@ public class PrideXMLDataProvider implements DataProvider {
             double lFragmentError = 0.0;
 
             for (AnalyzerData lNext : lAnalyzerDataSet) {
-                logger.warn(lNext.getAnalyzerFamily().toString() + 
-                        " (precursor error : " + lNext.getPrecursorMassError() +
-                        " , fragment error" + lNext.getFragmentMassError() + ")");
+                logger.warn(lNext.getAnalyzerFamily().toString()
+                        + " (precursor error : " + lNext.getPrecursorMassError()
+                        + " , fragment error" + lNext.getFragmentMassError() + ")");
                 Double lNextPrecursorMassError = lNext.getPrecursorMassError();
                 if (lPrecursorError > 0.0 && lNextPrecursorMassError != lPrecursorError) {
                     throw new RelimsException("There are multiple Mass Analyzers with different Precursor Mass errors for this project!!");
@@ -200,8 +200,9 @@ public class PrideXMLDataProvider implements DataProvider {
                 lFragmentError = lNextFragmentMassError;
 
             }
-
+            //*100 = conversion to PPM from da
             lRelimsProjectBean.setPrecursorError(lPrecursorError);
+            //26/03/2013 - setting the fragmentErrorType is not possible ---> need to keep it in da untill resolved
             lRelimsProjectBean.setFragmentError(lFragmentError);
         }
         logger.setLevel(Level.DEBUG);

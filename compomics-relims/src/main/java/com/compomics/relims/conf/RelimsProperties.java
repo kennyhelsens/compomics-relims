@@ -354,7 +354,7 @@ public class RelimsProperties {
     private static PTMFactory loadOMSSAPTMFactory() {
 
         File lModFile = new File(getSearchGuiConfFolder(), config.getString("searchgui.mods"));
-       // File lUserModFile = new File(getSearchGuiConfFolder(), config.getString("searchgui.usermods.default"));
+        // File lUserModFile = new File(getSearchGuiConfFolder(), config.getString("searchgui.usermods.default"));
 
         try {
             if (ptmFactory == null) {
@@ -365,7 +365,7 @@ public class RelimsProperties {
             ptmFactory = PTMFactory.getInstance();
 
             ptmFactory.importModifications(lModFile, false);
-     //       ptmFactory.importModifications(lUserModFile, true);
+            //       ptmFactory.importModifications(lUserModFile, true);
 
             logger.debug("loaded PTMFactory (size: " + ptmFactory.getPTMs().size() + " mods)");
 
@@ -721,4 +721,13 @@ public class RelimsProperties {
 
     }
     private static File configFolder;
+
+    public static void saveRelimsProperties() {
+        try {
+            config.save(new File(ProcessVariableManager.getResultsFolder() + "/relimsproperties.properties"));
+        } catch (ConfigurationException ex) {
+            logger.error("Could not save relimsproperties \n" + ex);
+        }
+
+    }
 }

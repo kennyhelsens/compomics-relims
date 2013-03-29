@@ -80,9 +80,6 @@ public class MainClientGUI extends javax.swing.JFrame {
         currentUserMap.put("username", RelimsProperties.getUserID());
         currentUserMap.put("password", RelimsProperties.getPassword());
         initComponents();
-
-
-
         TextAreaAppender consoleAppender = new TextAreaAppender();
         setTitle("Remote Relims");
 
