@@ -6,12 +6,14 @@ package com.compomics.relims.modes.networking.worker.taskreciever;
 
 import com.compomics.pridexmltomgfconverter.errors.enums.ConversionError;
 import com.compomics.relims.concurrent.RelimsJob;
+import com.compomics.relims.conf.RelimsProperties;
 import com.compomics.relims.manager.processmanager.processguard.RelimsException;
 import com.compomics.relims.manager.processmanager.processguard.RelimsExceptionHandler;
 import com.compomics.relims.manager.progressmanager.Checkpoint;
 import com.compomics.relims.modes.networking.controller.connectivity.taskobjects.Task;
 import com.compomics.relims.modes.networking.worker.feedbackproviders.ResultNotifier;
 import com.compomics.relims.modes.networking.worker.general.ResourceManager;
+import com.compomics.relims.modes.networking.worker.general.ResultManager;
 import com.compomics.util.experiment.identification.SearchParameters;
 import java.util.List;
 import java.util.concurrent.Callable;
@@ -87,6 +89,7 @@ public class TaskRunner {
                 int lWorkerPort = ResourceManager.getWorkerPort();
                 iRelimsJob = new RelimsJob(lSearchStrategyID, lProjectProviderID, lProjectID, lTaskID, lWorkerPort, lSearchParameters, usePrideAsa);
                 ResourceManager.setUserID(task.getUserID());
+                ResourceManager.setProjectID(lProjectID);
                 Object returnValue = iRelimsJob.call();
                 if (returnValue instanceof Checkpoint) {
                     endState = (Checkpoint) returnValue;
@@ -108,6 +111,7 @@ public class TaskRunner {
                 endState = Checkpoint.FAILED;
                 this.stop();
             } finally {
+                ResultManager.removeSearchEngineFiles(RelimsProperties.getWorkSpace());
                 ResourceManager.setTaskTime(System.currentTimeMillis() - ResourceManager.getTaskTime());
                 if (endState == Checkpoint.FINISHED) {
                     logger.debug("Finished task :" + lTaskID
@@ -192,10 +196,9 @@ public class TaskRunner {
                 while (!sentToServer) {
                     try {
                         logger.info("Sending feedback to server...");
-                        sentToServer = resultNotifier.sendStatistics(ResourceManager.getAllSystemInfo());
+                        sentToServer = resultNotifier.sendResults(Checkpoint.valueOf(ResourceManager.getFinishState()));
                         TaskReciever.locked = false;
                         Thread.sleep(500);
-                        logger.debug("Waiting for new task");
                         System.out.println("");
                     } catch (Exception ex) {
                         //catch a general exception to make sure the results are sent...
@@ -203,6 +206,7 @@ public class TaskRunner {
                         logger.error(ex);
                     }
                 }
+                logger.debug("Waiting for new task");
             }
         }
     }

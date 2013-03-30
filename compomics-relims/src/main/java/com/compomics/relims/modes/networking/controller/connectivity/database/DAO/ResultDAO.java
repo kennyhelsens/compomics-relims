@@ -34,8 +34,8 @@ public class ResultDAO {
             conn = DAO.getConnection();
             //     statement = conn.prepareStatement("BEGIN");
             //     statement.execute();
-            String query = "insert into " + RelimsProperties.getDbPrefix() + "Users"
-                    + "(TaskID,projectID,parameterName,parameter) values (?, ?, ?,?);";
+            String query = "insert into " + RelimsProperties.getDbPrefix() + "ProjectResults"
+                    + "(TaskID,projectID,parameterName,parameterValue) values (?, ?, ?,?);";
             statement = conn.prepareStatement(query, Statement.RETURN_GENERATED_KEYS);
             statement.setLong(1, taskID);
             statement.setString(2, projectId);
@@ -71,9 +71,9 @@ public class ResultDAO {
     }
 
     public void storeMods(long taskID, String projectId, List<String> mods, boolean fixed) {
-        String parameterName = "fixed modification";
+        String parameterName = "fixed_modification";
         if (!fixed) {
-            parameterName = "variable modification";
+            parameterName = "variable_modification";
         }
         int i = 1;
         for (String aMod : mods) {

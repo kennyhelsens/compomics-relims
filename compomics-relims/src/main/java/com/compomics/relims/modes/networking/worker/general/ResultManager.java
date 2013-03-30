@@ -30,9 +30,13 @@ public class ResultManager {
 
     private static ResultManager resultManager;
     private static final Logger logger = Logger.getLogger(ResultManager.class);
-    private static HashMap<String, Object> resultMap = new HashMap<>();
+    private static HashMap<String, Object> resultMap;
 
     public ResultManager() {
+<<<<<<< HEAD
+=======
+        this.resultMap = new HashMap<String, Object>();
+>>>>>>> master
     }
 
     public HashMap<String, Object> buildResultMap() {
@@ -128,7 +132,7 @@ public class ResultManager {
 
     private void includeSearchParameters() {
         try {//TODO ADD ALL PARAMETERS !!!!
-            File SEARCHPARAM_FILE = new File(RelimsProperties.getWorkSpace() + "SearchGUI.parameters");
+            File SEARCHPARAM_FILE = new File(RelimsProperties.getWorkSpace() + "/SearchGUI.parameters");
             logger.debug("Getting searchparameters from " + SEARCHPARAM_FILE.getAbsolutePath());
             SearchParameters parameters = SearchParameters.getIdentificationParameters(SEARCHPARAM_FILE);
             Enzyme enzyme = parameters.getEnzyme();
@@ -154,6 +158,7 @@ public class ResultManager {
         }
     }
 
+<<<<<<< HEAD
     public void removeJunk() {
         //omx
         File omxFile = new File(RelimsProperties.getWorkSpace().getAbsolutePath() + "/" + ResourceManager.getProjectID() + ".omx");
@@ -163,5 +168,19 @@ public class ResultManager {
         FileUtils.deleteQuietly(omxFile);
         FileUtils.deleteQuietly(mgfFile);
         logger.info("Removed searchengine result files to reduce foldersize");
+=======
+    public static void removeSearchEngineFiles(File directory) {
+        File[] fileArray = directory.listFiles();
+
+        for (File aFile : fileArray) {
+            if (aFile.isDirectory()) {
+                removeSearchEngineFiles(aFile);
+            } else {
+                if (aFile.getAbsolutePath().endsWith(".omx") || aFile.getAbsolutePath().endsWith("t.xml")) {
+                    aFile.delete();
+                }
+            }
+        }
+>>>>>>> master
     }
 }

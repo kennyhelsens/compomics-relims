@@ -32,7 +32,7 @@ public class InstrumentPredicate implements Predicate<RelimsProjectBean> {
         }
 
         boolean accept =false;
-        Set<AnalyzerData> lAnalyzerDataSet = iDataProvider.getInstrumentsForProject(aProjectBean.getProjectID());
+        Set<AnalyzerData> lAnalyzerDataSet = iDataProvider.getInstrumentsForProject(lProjectid);
 
         for (AnalyzerData lAnalyzerData : lAnalyzerDataSet) {
 

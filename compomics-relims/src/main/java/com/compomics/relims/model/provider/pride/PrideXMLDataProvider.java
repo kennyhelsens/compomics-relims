@@ -182,23 +182,30 @@ public class PrideXMLDataProvider implements DataProvider {
 
             double lPrecursorError = 0.0;
             double lFragmentError = 0.0;
+            try {
+                for (AnalyzerData lNext : lAnalyzerDataSet) {
 
-            for (AnalyzerData lNext : lAnalyzerDataSet) {
-                logger.warn(lNext.getAnalyzerFamily().toString()
-                        + " (precursor error : " + lNext.getPrecursorMassError()
-                        + " , fragment error" + lNext.getFragmentMassError() + ")");
-                Double lNextPrecursorMassError = lNext.getPrecursorMassError();
-                if (lPrecursorError > 0.0 && lNextPrecursorMassError != lPrecursorError) {
-                    throw new RelimsException("There are multiple Mass Analyzers with different Precursor Mass errors for this project!!");
+                    logger.warn(lNext.getAnalyzerFamily().toString()
+                            + " (precursor error : " + lNext.getPrecursorMassError()
+                            + " , fragment error" + lNext.getFragmentMassError() + ")");
+                    Double lNextPrecursorMassError = lNext.getPrecursorMassError();
+
+                    if (lPrecursorError > 0.0 && lNextPrecursorMassError != lPrecursorError) {
+                        throw new RelimsException("There are multiple Mass Analyzers with different Precursor Mass errors for this project!!");
+                    }
+                    lPrecursorError = lNextPrecursorMassError;
+
+                    Double lNextFragmentMassError = lNext.getFragmentMassError();
+                    if (lFragmentError > 0.0 && lFragmentError == lNextFragmentMassError) {
+                        throw new RelimsException("There are multiple Mass Analyzers with different Fragment Mass errors for this project!!");
+                    }
+                    lFragmentError = lNextFragmentMassError;
+
                 }
-                lPrecursorError = lNextPrecursorMassError;
-
-                Double lNextFragmentMassError = lNext.getFragmentMassError();
-                if (lFragmentError > 0.0 && lFragmentError == lNextFragmentMassError) {
-                    throw new RelimsException("There are multiple Mass Analyzers with different Fragment Mass errors for this project!!");
-                }
-                lFragmentError = lNextFragmentMassError;
-
+            } catch (NullPointerException e) {
+                logger.error("A nullpointer exception occurred, setting precursorAcc and fragmentIonAcc to default");
+                lPrecursorError = 1.0;
+                lFragmentError = 1.0;
             }
             //*100 = conversion to PPM from da
             lRelimsProjectBean.setPrecursorError(lPrecursorError);

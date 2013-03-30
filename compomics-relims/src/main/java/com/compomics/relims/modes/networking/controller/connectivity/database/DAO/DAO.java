@@ -93,9 +93,6 @@ public class DAO {
         return directory;
     }
 
-    public static void initiate(Properties props) {
-        new DAO();
-    }
 
     public static void initiate() {
         new DAO();
