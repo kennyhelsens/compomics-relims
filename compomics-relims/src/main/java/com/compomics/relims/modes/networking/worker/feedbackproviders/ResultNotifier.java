@@ -70,7 +70,7 @@ public class ResultNotifier {
                 resultMap.put("projectId", ResourceManager.getProjectID());
                 resultMap.put("SystemInfoMap", ResourceManager.getAllSystemInfo());
                 resultMap.put("PrideXMLErrorList", ResourceManager.getConversionErrors());
-                ResultManager resultManager = ResultManager.getInstance();
+                ResultManager resultManager = new ResultManager();
                 Map<String, Object> projectResultMap = resultManager.buildResultMap();
                 if (projectResultMap == null) {
                     logger.error("Projectresultmap could not be built : null");

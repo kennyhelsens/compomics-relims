@@ -19,6 +19,7 @@ import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import org.apache.commons.io.FileUtils;
 import org.apache.log4j.Logger;
 
 /**
@@ -31,14 +32,7 @@ public class ResultManager {
     private static final Logger logger = Logger.getLogger(ResultManager.class);
     private static HashMap<String, Object> resultMap = new HashMap<>();
 
-    private ResultManager() {
-    }
-
-    public static ResultManager getInstance() {
-        if (resultManager == null) {
-            resultManager = new ResultManager();
-        }
-        return resultManager;
+    public ResultManager() {
     }
 
     public HashMap<String, Object> buildResultMap() {
@@ -50,6 +44,7 @@ public class ResultManager {
         for (String aKey : resultMap.keySet()) {
             logger.debug("Set " + aKey + " to " + resultMap.get(aKey));
         }
+        removeJunk();
         return resultMap;
     }
 
@@ -157,5 +152,16 @@ public class ResultManager {
         } catch (IOException | ClassNotFoundException ex) {
             logger.error(ex);
         }
+    }
+
+    public void removeJunk() {
+        //omx
+        File omxFile = new File(RelimsProperties.getWorkSpace().getAbsolutePath() + "/" + ResourceManager.getProjectID() + ".omx");
+        File xtandemFile = new File(RelimsProperties.getWorkSpace().getAbsolutePath() + "/" + ResourceManager.getProjectID() + "t.xml");
+        File mgfFile = new File(RelimsProperties.getWorkSpace().getAbsolutePath() + "/" + ResourceManager.getProjectID() + ".mgf");
+        FileUtils.deleteQuietly(xtandemFile);
+        FileUtils.deleteQuietly(omxFile);
+        FileUtils.deleteQuietly(mgfFile);
+        logger.info("Removed searchengine result files to reduce foldersize");
     }
 }

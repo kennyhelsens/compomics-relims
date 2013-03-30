@@ -185,15 +185,4 @@ public class PeptideShakerJobBean {
             return 1; //System exit value of 1 means a failed process
         }
     }
-
-    public void removeJunk() {
-        //omx
-        File omxFile = new File(resultFolder.getAbsolutePath() + "/" + projectId + ".omx");
-        File xtandemFile = new File(resultFolder.getAbsolutePath() + "/" + projectId + "t.xml");
-        File mgfFile = new File(resultFolder.getAbsolutePath() + "/" + projectId + ".mgf");
-        FileUtils.deleteQuietly(xtandemFile);
-        FileUtils.deleteQuietly(omxFile);
-        FileUtils.deleteQuietly(mgfFile);
-        logger.info("Removed searchengine result files to reduce foldersize");
-    }
 }
