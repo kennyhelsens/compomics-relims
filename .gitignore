@@ -5,3 +5,16 @@ compomics-relims/.idea/
 compomics-relims/src/test/resources/results/
 compomics-relims/src/test/resources/repository/
 compomics-relims/src/test/resources/databases/
+compomics-relims/src/test/resources/image/compomics.png
+compomics-relims/src/test/resources/image/exit.png
+compomics-relims/src/test/resources/image/logo.png
+compomics-relims/src/test/resources/image/logo_small.png
+compomics-relims/src/test/resources/image/start.png
+compomics-relims/src/test/resources/resources/conf/JavaOptions.txt
+compomics-relims/src/test/resources/resources/conf/relims-splash.png
+compomics-relims/src/test/resources/resources/image/compomics.png
+compomics-relims/src/test/resources/resources/image/exit.png
+compomics-relims/src/test/resources/resources/image/logo.png
+compomics-relims/src/test/resources/resources/image/logo_notext.png
+compomics-relims/src/test/resources/resources/image/logo_small.png
+compomics-relims/src/test/resources/resources/image/start.png
