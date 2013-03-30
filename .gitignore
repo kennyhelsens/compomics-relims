@@ -18,3 +18,8 @@ compomics-relims/src/test/resources/resources/image/logo.png
 compomics-relims/src/test/resources/resources/image/logo_notext.png
 compomics-relims/src/test/resources/resources/image/logo_small.png
 compomics-relims/src/test/resources/resources/image/start.png
+compomics-relims/src/test/resources/sourcefiles/Fasta/windows/SP_130428_concatenated_target_decoy.fasta.cui
+compomics-relims/src/test/resources/sourcefiles/Fasta/windows/SP_130428_concatenated_target_decoy.fasta.phr
+compomics-relims/src/test/resources/sourcefiles/Fasta/windows/SP_130428_concatenated_target_decoy.fasta.pin
+compomics-relims/src/test/resources/sourcefiles/Fasta/windows/SP_130428_concatenated_target_decoy.fasta.psq
+compomics-relims/src/test/resources/sourcefiles/Mimic_PrideFTP/PRIDE_Exp_Complete_Ac_11954.xml

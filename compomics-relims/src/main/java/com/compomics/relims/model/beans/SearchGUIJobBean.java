@@ -302,9 +302,20 @@ public class SearchGUIJobBean {
             searchParameters.setnMissedCleavages(RelimsProperties.getMissedCleavages());
             // Precursor
             searchParameters.setPrecursorAccuracyType(SearchParameters.PrecursorAccuracyType.DA);
-
-            int maxCharge = Collections.max(iRelimsProjectBean.getCharges());
-            int minCharge = Collections.min(iRelimsProjectBean.getCharges());
+            int maxCharge;
+            int minCharge;
+            try {
+                maxCharge = Collections.max(iRelimsProjectBean.getCharges());
+            } catch (NullPointerException e) {
+                maxCharge = 4;
+                logger.error("No max charge found, setting default to 4");
+            }
+            try {
+                minCharge = Collections.min(iRelimsProjectBean.getCharges());
+            } catch (NullPointerException e) {
+                minCharge = 1;
+                logger.error("No min charge found, setting default to 1");
+            }
             Charge maxChargeSearched = new Charge(1, maxCharge);
             Charge minChargeSearched = new Charge(1, minCharge);
             searchParameters.setMaxChargeSearched(maxChargeSearched);
