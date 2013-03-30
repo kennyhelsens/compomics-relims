@@ -9,6 +9,7 @@ import org.apache.log4j.Logger;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
+import org.apache.commons.io.FileUtils;
 
 /**
  * This class is a
@@ -189,5 +190,10 @@ public class PeptideShakerJobBean {
         //omx
         File omxFile = new File(resultFolder.getAbsolutePath() + "/" + projectId + ".omx");
         File xtandemFile = new File(resultFolder.getAbsolutePath() + "/" + projectId + "t.xml");
+        File mgfFile = new File(resultFolder.getAbsolutePath() + "/" + projectId + ".mgf");
+        FileUtils.deleteQuietly(xtandemFile);
+        FileUtils.deleteQuietly(omxFile);
+        FileUtils.deleteQuietly(mgfFile);
+        logger.info("Removed searchengine result files to reduce foldersize");
     }
 }
