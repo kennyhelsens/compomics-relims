@@ -6,6 +6,7 @@ import com.compomics.util.experiment.biology.Enzyme;
 import com.google.common.collect.Lists;
 
 import java.util.List;
+import java.util.Set;
 
 /**
  * This class is a
@@ -20,6 +21,7 @@ public class RelimsProjectBean implements Cloneable {
     private List<UserMod> iExtraModificationList = Lists.newArrayList();
     private double iPrecursorError = 1.0;
     private double iFragmentError = 1.0;
+    private Set<Integer> consideredChargeStates;
 
     public RelimsProjectBean() {
     }
@@ -120,5 +122,13 @@ public class RelimsProjectBean implements Cloneable {
     public Enzyme getEnzyme() {
         //TODO GET ENZYME FROM PRIDE 
         return null;
+    }
+
+    public void setCharges(Set<Integer> consideredChargeStates) {
+        this.consideredChargeStates = consideredChargeStates;
+    }
+
+    public Set<Integer> getCharges() {
+        return consideredChargeStates;
     }
 }

@@ -141,7 +141,7 @@ public class PrideXMLDataProvider implements DataProvider {
 
             try {
                 lSpectrumAnnotator.initIdentifications(xmlFile);
-
+                
                 if (lSpectrumAnnotator.getIdentifications().getCompleteIdentifications().isEmpty()) {
                     //ProgressManager.setState(Checkpoint.PRIDEFAILURE);
                     logger.error("Pride found no usefull identifications.");
@@ -178,13 +178,15 @@ public class PrideXMLDataProvider implements DataProvider {
 
             // Set precursor and fragment errors
             Set<AnalyzerData> lAnalyzerDataSet = getInstrumentsForProject(aProjectid);
-
-
+            // get the estimated chargeset from pride !
+            lRelimsProjectBean.setCharges(lSpectrumAnnotator.getConsideredChargeStates());
+            
             double lPrecursorError = 0.0;
             double lFragmentError = 0.0;
             try {
+       
                 for (AnalyzerData lNext : lAnalyzerDataSet) {
-
+                    
                     logger.warn(lNext.getAnalyzerFamily().toString()
                             + " (precursor error : " + lNext.getPrecursorMassError()
                             + " , fragment error" + lNext.getFragmentMassError() + ")");
@@ -194,13 +196,11 @@ public class PrideXMLDataProvider implements DataProvider {
                         throw new RelimsException("There are multiple Mass Analyzers with different Precursor Mass errors for this project!!");
                     }
                     lPrecursorError = lNextPrecursorMassError;
-
                     Double lNextFragmentMassError = lNext.getFragmentMassError();
                     if (lFragmentError > 0.0 && lFragmentError == lNextFragmentMassError) {
                         throw new RelimsException("There are multiple Mass Analyzers with different Fragment Mass errors for this project!!");
                     }
                     lFragmentError = lNextFragmentMassError;
-
                 }
             } catch (NullPointerException e) {
                 logger.error("A nullpointer exception occurred, setting precursorAcc and fragmentIonAcc to default");

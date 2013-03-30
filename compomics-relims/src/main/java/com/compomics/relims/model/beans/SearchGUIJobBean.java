@@ -7,6 +7,7 @@ import com.compomics.relims.manager.progressmanager.ProgressManager;
 import com.compomics.relims.manager.variablemanager.ProcessVariableManager;
 import com.compomics.util.experiment.biology.*;
 import com.compomics.util.experiment.identification.SearchParameters;
+import com.compomics.util.experiment.massspectrometry.Charge;
 import com.compomics.util.preferences.ModificationProfile;
 import com.google.common.base.Function;
 import com.google.common.collect.Sets;
@@ -18,8 +19,6 @@ import org.apache.log4j.Logger;
 import javax.annotation.Nullable;
 import java.io.*;
 import java.util.*;
-import java.util.logging.Level;
-import org.apache.commons.io.FileUtils;
 
 /**
  * This class is a
@@ -153,7 +152,7 @@ public class SearchGUIJobBean {
 
         searchGUICommandLine.add(" -search_params ");
         searchGUICommandLine.add(searchParametersFile.getAbsolutePath());
-        
+
         searchGUICommandLine.add(" -ppm ");
         searchGUICommandLine.add("2");
         System.err.println("");
@@ -303,7 +302,13 @@ public class SearchGUIJobBean {
             searchParameters.setnMissedCleavages(RelimsProperties.getMissedCleavages());
             // Precursor
             searchParameters.setPrecursorAccuracyType(SearchParameters.PrecursorAccuracyType.DA);
-  
+
+            int maxCharge = Collections.max(iRelimsProjectBean.getCharges());
+            int minCharge = Collections.min(iRelimsProjectBean.getCharges());
+            Charge maxChargeSearched = new Charge(1, maxCharge);
+            Charge minChargeSearched = new Charge(1, minCharge);
+            searchParameters.setMaxChargeSearched(maxChargeSearched);
+            searchParameters.setMinChargeSearched(minChargeSearched);
             validate(searchParameters);
         }
         logger.info("Searchparameters were loaded");
@@ -318,126 +323,6 @@ public class SearchGUIJobBean {
             ex.printStackTrace();
         } catch (ClassNotFoundException ex) {
             ex.printStackTrace();
-        }
-    }
-
-    private void makeBlastDB(File fasta) {
-        File tempBatch = null;
-        if (needsFormatting(fasta)) {
-            logger.info("The fasta file needs formatting for OMSSA...");
-            ProcessBuilder processBuilder = new ProcessBuilder();
-            //find the makeblastDB tool...
-            String osName = null;
-            if (System.getProperty("os.name").toLowerCase().contains("windows")) {
-                osName = "windows";
-            } else if (System.getProperty("os.name").toLowerCase().contains("mac")) {
-                osName = "mac";
-            } else if (System.getProperty("os.name").toLowerCase().contains("mac")) {
-                osName = "windows";
-            } else {
-                logger.error("Unsupported operating system !");
-            }
-
-            //MAKE A BATCH FILE !!!!
-            try {
-                tempBatch = makeBlastDbBatch();
-                ProcessBuilder pb = new ProcessBuilder(tempBatch.getAbsolutePath());
-                Process process = pb.start();
-                int exitStatus = process.waitFor();
-                if (process.exitValue() == 0) {
-                    logger.debug("Fastafile was successfully formatted !");
-                }
-            } catch (Exception ex) {
-                ex.printStackTrace();
-                logger.error(ex);
-            } finally {
-                if (tempBatch != null) {
-                    if (tempBatch.exists()) {
-                        tempBatch.delete();
-                        logger.debug("Cleaned up temporary batch file...");
-                    }
-                }
-            }
-        } else {
-            logger.debug("Fastafile does not need formatting !");
-        }
-    }
-
-    public boolean needsFormatting(File fasta) {
-        boolean result = true;
-        String[] list = fasta.getParentFile().list();
-        // Get the filename.
-        String name = fasta.getName();
-
-        // Find all three processed files.
-        boolean phr = false;
-        boolean pin = false;
-        boolean psq = false;
-        for (int i = 0; i < list.length; i++) {
-            String s = list[i];
-            if (s.equals(name + ".phr")) {
-                phr = true;
-            }
-            if (s.equals(name + ".pin")) {
-                pin = true;
-            }
-            if (s.equals(name + ".psq")) {
-                psq = true;
-            }
-        }
-
-        if (phr && pin && psq) {
-            result = false;
-        }
-
-        return result;
-    }
-
-    public static File makeBlastDbBatch() {
-        String osName = null;
-        BufferedWriter out = null;
-        File tempBatch = null;
-        try {
-            RelimsProperties.initialize();
-            if (System.getProperty("os.name").toLowerCase().contains("windows")) {
-                osName = "windows";
-            } else if (System.getProperty("os.name").toLowerCase().contains("mac")) {
-                osName = "mac";
-            } else if (System.getProperty("os.name").toLowerCase().contains("mac")) {
-                osName = "windows";
-            } else {
-                logger.error("Unsupported operating system !");
-            }
-
-            File makeBlastDbFile = new File(RelimsProperties.getSearchGuiFolder() + "/resources/makeblastdb/" + osName + "/makeblastdb");
-            File fastaParentFolder = new File(RelimsProperties.getDefaultSearchDatabase()).getParentFile();
-            String currentDir = System.getProperty("user.dir");
-            //MAKE A BATCH FILE !!!!
-            String driveLetter = "" + fastaParentFolder.getAbsolutePath().charAt(0);
-
-            tempBatch = new File("./tempRelims.bat");
-            out = new BufferedWriter(new FileWriter(tempBatch));
-            //1 = move this process to the fastaParent
-            out.write(driveLetter + ":");
-            logger.debug(driveLetter + ":");
-            out.newLine();
-            out.write("cd " + fastaParentFolder.getAbsolutePath());
-            logger.debug("cd " + fastaParentFolder.getAbsolutePath());
-            out.newLine();
-            out.write(makeBlastDbFile.getAbsolutePath() + " -in " + RelimsProperties.getDefaultSearchDatabase());
-            logger.debug(makeBlastDbFile.getAbsolutePath() + " -in " + RelimsProperties.getDefaultSearchDatabase());
-            out.newLine();
-            out.write("cd " + RelimsProperties.getSearchGuiFolder());
-            logger.debug("cd " + RelimsProperties.getSearchGuiFolder());
-            out.newLine();
-            //2 = tell the process to run the makeblastdb
-            out.close();
-        } catch (IOException e) {
-            if (out != null) {
-                out = null;
-            }
-        } finally {
-            return tempBatch;
         }
     }
 
@@ -463,12 +348,18 @@ public class SearchGUIJobBean {
         }
         logger.debug("Using Fraction Molecular Weight Range : " + searchParameters.getFractionMolecularWeightRanges());
 
-
         if (searchParameters.getFragmentIonAccuracy() == null) {
             logger.debug("Fragment Ion Accuracy was null");
             searchParameters.setFragmentIonAccuracy(0.0);
         }
         logger.debug("Using Fragment Ion Accuracy : " + searchParameters.getFractionMolecularWeightRanges());
+
+        if (searchParameters.getPrecursorAccuracy() == null) {
+            logger.debug("Precursor Accuracy was null!");
+            searchParameters.setPrecursorAccuracy(0.0);
+        }
+        logger.debug("Using Precursor Accuracy : " + searchParameters.getPrecursorAccuracy());
+
 
         if (searchParameters.getHitListLength() == null) {
             logger.debug("Hitlist length was null!");
@@ -518,11 +409,17 @@ public class SearchGUIJobBean {
         }
         logger.debug("Using Missed Cleavages : " + searchParameters.getnMissedCleavages());
 
-        if (searchParameters.getPrecursorAccuracy() == null) {
-            logger.debug("Precursor Accuracy was null!");
-            searchParameters.setPrecursorAccuracy(0.0);
+        if (searchParameters.getMaxChargeSearched() == null) {
+            logger.debug("Max Charge Searched was null!");
+            searchParameters.setMaxChargeSearched(new Charge(1, 4));
         }
-        logger.debug("Using Precursor Accuracy : " + searchParameters.getPrecursorAccuracy());
+        logger.debug("Using Max Charge : " + searchParameters.getMaxChargeSearched());
+
+        if (searchParameters.getMinChargeSearched() == null) {
+            logger.debug("Min Charge Searched was null!");
+            searchParameters.setMinChargeSearched(new Charge(1, 1));
+        }
+        logger.debug("Using Min Charge : " + searchParameters.getMinChargeSearched());
     }
 
     protected void prepare() {
