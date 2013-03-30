@@ -111,7 +111,7 @@ public class TaskRunner {
                 endState = Checkpoint.FAILED;
                 this.stop();
             } finally {
-                ResultManager.removeSearchEngineFiles(RelimsProperties.getWorkSpace());
+                ResultManager.removeJunk();
                 ResourceManager.setTaskTime(System.currentTimeMillis() - ResourceManager.getTaskTime());
                 if (endState == Checkpoint.FINISHED) {
                     logger.debug("Finished task :" + lTaskID
