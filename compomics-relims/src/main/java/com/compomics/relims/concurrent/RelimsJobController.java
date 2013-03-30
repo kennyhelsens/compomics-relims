@@ -18,6 +18,7 @@ import com.compomics.relims.manager.progressmanager.ProgressManager;
 import com.compomics.util.experiment.identification.SearchParameters;
 import com.google.common.base.Predicate;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import static java.lang.String.format;
 import java.util.ArrayList;
@@ -323,7 +324,20 @@ public class RelimsJobController extends Observable implements ProjectRunner {
             lPeptideShakerJobBean.setSampleName(sampleID);
             lPeptideShakerJobBean.setExperimentName(experimentID);
             lPeptideShakerJobBean.setAscore(false);
-            lPeptideShakerJobBean.setMaxPrecursorError(relimsProjectBean.getPrecursorError());
+            try {
+                lPeptideShakerJobBean.setMaxPrecursorError(relimsProjectBean.getPrecursorError());
+            } catch (NullPointerException e) {
+                try {
+                    //this cna happen when loaded from repository
+                    SearchParameters params = SearchParameters.getIdentificationParameters(searchParametersFile);
+                    lPeptideShakerJobBean.setMaxPrecursorError(params.getPrecursorAccuracy());
+                } catch (FileNotFoundException ex) {
+                    logger.error(ex);
+                    lPeptideShakerJobBean.setMaxPrecursorError(0.0);
+                } catch (IOException | ClassNotFoundException ex) {
+                    lPeptideShakerJobBean.setMaxPrecursorError(0.0);
+                }
+            }
             // Run PeptideShaker
             // IF the return value = 0 (= system.exit.value) then the process ran correctly. (Timeout etc will change this value)
             if (lPeptideShakerJobBean.launch() == 0) {
