@@ -149,50 +149,6 @@ public class RelimsJobController extends Observable implements ProjectRunner {
     }
     //Prepare and run the searchgui job (different pathways to do so)
 
-    private boolean prepareSearchGUIFromScratch() throws IOException, ConfigurationException {
-        long lProjectId = relimsProjectBean.getProjectID();
-        Collection<Predicate> lPredicates = predicateManager.createCollection(
-                PredicateManager.Types.INSTRUMENT //                    PredicateManager.Types.PROJECT_SIZE,
-                //                    PredicateManager.Types.SPECIES,
-                //                    PredicateManager.Types.SEARCH_SET_SIZE
-                );
-
-        logger.debug(format("validating project contents by %d predices", lPredicates.size()));
-        for (Predicate lProjectPredicate : lPredicates) {
-            try {
-                boolean lResult = lProjectPredicate.apply(relimsProjectBean);
-                if (!lResult) {
-                    logger.error("END " + lProjectId);
-                    return false;
-                }
-            } catch (NullPointerException e) {
-                logger.error("No analyzerdata found !");
-                return false;
-            }
-        }
-
-        try {
-            searchGUIJobBean = new SearchGUIJobBean(relimsProjectBean);
-            sampleID = searchGUIJobBean.getName();
-            logger.debug(format("running search %s", sampleID));
-            if (searchGUIJobBean.launch() == 0) {
-                experimentID = sampleID;
-                return true;
-            } else {
-                progressManager.setEndState(Checkpoint.PROCESSFAILURE);
-                return false;
-            }
-        } catch (Exception e) {
-            logger.error("ERROR OCCURRED FOR PROJECT " + lProjectId);
-            logger.error(e);
-            e.printStackTrace();
-            progressManager.setState(Checkpoint.FAILED, e);
-        } finally {
-            dataProvider.clearResources();
-            return true;
-        }
-    }
-
     private boolean runSearchGUI() throws IOException, ConfigurationException {
         long lProjectId = relimsProjectBean.getProjectID();
         Collection<Predicate> lPredicates = predicateManager.createCollection(
@@ -207,11 +163,13 @@ public class RelimsJobController extends Observable implements ProjectRunner {
                 boolean lResult = lProjectPredicate.apply(relimsProjectBean);
                 if (!lResult) {
                     logger.error("END " + lProjectId);
-                    return false;
+                    //Try anyway...with defaults in searchparams
+                    //     return false;
                 }
             } catch (NullPointerException e) {
                 logger.error("No analyzerdata found !");
-                return false;
+                //Try anyway...with defaults in searchparams
+                //return false;
             }
         }
 
@@ -234,40 +192,6 @@ public class RelimsJobController extends Observable implements ProjectRunner {
         } finally {
             dataProvider.clearResources();
             return true;
-        }
-    }
-
-    private boolean prepareSearchGUIFromFiles() throws IOException, ConfigurationException {
-        try {
-            searchResultFolder = new File(ProcessVariableManager.getResultsFolder());
-            ProcessVariableManager.setProjectID(projectID);
-            long lProjectid = projectID;
-            logger.debug("creating projectrunner for " + lProjectid);
-            // GET THE SPECTRA FILE          
-            logger.debug(format("loading MS/MS spectra for project %s from the repository", lProjectid));
-            logger.info("Looking for project in repository...");
-            spectrumFile = fileGrabber.getGenericMGFFile(searchResultFolder.getAbsolutePath().toString());
-            File repositoryParametersFile = new File(searchResultFolder.getAbsolutePath().toString() + "/SearchGUI.parameters");
-            if (spectrumFile != null && spectrumFile.exists()) {
-                searchGUIJobBean = new SearchGUIJobBean(spectrumFile, repositoryParametersFile, lProjectid);
-                sampleID = searchGUIJobBean.getName();
-                experimentID = "" + lProjectid; // format("projectid_%d", lSearchGUI.getProjectId());
-                logger.debug(format("running search %s", sampleID));
-                if (searchGUIJobBean.launch() == 0) {
-                    experimentID = sampleID;
-                    return true;
-                } else {
-                    progressManager.setEndState(Checkpoint.PROCESSFAILURE);
-                    return false;
-                }
-            } else {
-                return prepareSearchGUIFromScratch();
-            }
-        } catch (Exception e) {
-            logger.error("ERROR OCCURRED FOR PROJECT " + projectID);
-            logger.error(e);
-            progressManager.setState(Checkpoint.FAILED, e);;
-            return false;
         }
     }
 
@@ -339,6 +263,7 @@ public class RelimsJobController extends Observable implements ProjectRunner {
             if (runPeptideshaker && progressManager.getState() != Checkpoint.PROCESSFAILURE) {
                 logger.debug("Preparing peptideshaker");
                 prepareAndLaunchPeptideShaker();
+                progressManager.setEndState(Checkpoint.FINISHED);
             }
         } catch (Throwable e) {
             e.printStackTrace();

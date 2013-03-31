@@ -6,7 +6,6 @@ import com.compomics.relims.manager.processmanager.gearbox.enums.PriorityLevel;
 import com.compomics.relims.manager.processmanager.processguard.RelimsException;
 import com.compomics.relims.manager.progressmanager.Checkpoint;
 import com.compomics.relims.manager.progressmanager.ProgressManager;
-import com.compomics.relims.manager.variablemanager.ProcessVariableManager;
 import com.compomics.relims.model.guava.functions.SpeciesFinderFunction;
 import com.compomics.relims.modes.gui.util.Properties;
 import com.compomics.util.experiment.biology.PTMFactory;

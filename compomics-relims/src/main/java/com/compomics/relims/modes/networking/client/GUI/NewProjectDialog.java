@@ -111,7 +111,7 @@ public class NewProjectDialog extends javax.swing.JFrame {
 //            selectedSource = rdbTextfile1;
         }
 
-
+//        TitleLabel.setIcon(new javax.swing.ImageIcon(getClass().getResource("/resources/image/relimslogo.png")));
 
         formComponentResized(
                 null);
@@ -135,7 +135,7 @@ public class NewProjectDialog extends javax.swing.JFrame {
         jTextPane1 = new javax.swing.JTextPane();
         defaultSearchparamgroup = new javax.swing.ButtonGroup();
         backgroundPanel = new javax.swing.JPanel();
-        jLabel10 = new javax.swing.JLabel();
+        TitleLabel = new javax.swing.JLabel();
         jPanel1 = new javax.swing.JPanel();
         rdbSourcePRIDE1 = new javax.swing.JRadioButton();
         rdbSourceMSLIMS1 = new javax.swing.JRadioButton();
@@ -190,10 +190,9 @@ public class NewProjectDialog extends javax.swing.JFrame {
         backgroundPanel.setBackground(new java.awt.Color(255, 255, 255));
         backgroundPanel.setRequestFocusEnabled(false);
 
-        jLabel10.setBackground(new java.awt.Color(255, 255, 255));
-        jLabel10.setFont(new java.awt.Font("Lucida Grande", 1, 36)); // NOI18N
-        jLabel10.setIcon(new javax.swing.ImageIcon(getClass().getResource("/com/compomics/relims/modes/networking/client/GUI/RelimsLogoSmall.png"))); // NOI18N
-        jLabel10.setText(" Relims Automatic Reprocessing");
+        TitleLabel.setBackground(new java.awt.Color(255, 255, 255));
+        TitleLabel.setFont(new java.awt.Font("Lucida Grande", 1, 36)); // NOI18N
+        TitleLabel.setText(" Relims Automatic Reprocessing");
 
         jPanel1.setBackground(new java.awt.Color(255, 255, 255));
         jPanel1.setBorder(javax.swing.BorderFactory.createTitledBorder(null, "Project source", javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION, javax.swing.border.TitledBorder.DEFAULT_POSITION, new java.awt.Font("Tahoma", 1, 18))); // NOI18N
@@ -545,7 +544,7 @@ public class NewProjectDialog extends javax.swing.JFrame {
                         .addGap(0, 47, Short.MAX_VALUE))
                     .addGroup(backgroundPanelLayout.createSequentialGroup()
                         .addGroup(backgroundPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jLabel10, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(TitleLabel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                             .addGroup(backgroundPanelLayout.createSequentialGroup()
                                 .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, 347, javax.swing.GroupLayout.PREFERRED_SIZE)
                                 .addGap(0, 0, Short.MAX_VALUE)))
@@ -554,7 +553,7 @@ public class NewProjectDialog extends javax.swing.JFrame {
         backgroundPanelLayout.setVerticalGroup(
             backgroundPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(backgroundPanelLayout.createSequentialGroup()
-                .addComponent(jLabel10, javax.swing.GroupLayout.PREFERRED_SIZE, 81, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(TitleLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 81, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(backgroundPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                     .addComponent(jPanel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
@@ -997,10 +996,10 @@ public class NewProjectDialog extends javax.swing.JFrame {
     private javax.swing.JList ScheduledList;
     private javax.swing.ButtonGroup SourceButtonGroup;
     private javax.swing.ButtonGroup StrategyButtonGroup;
+    private javax.swing.JLabel TitleLabel;
     private javax.swing.JPanel backgroundPanel;
     private javax.swing.ButtonGroup defaultSearchparamgroup;
     private javax.swing.JMenuItem editModificationsMenuItem;
-    private javax.swing.JLabel jLabel10;
     private javax.swing.JLabel jLabel12;
     private javax.swing.JLabel jLabel14;
     private javax.swing.JLabel jLabel15;
