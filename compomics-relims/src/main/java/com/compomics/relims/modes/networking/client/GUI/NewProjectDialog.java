@@ -72,7 +72,8 @@ public class NewProjectDialog extends javax.swing.JFrame {
          prioritySlider.setMajorTickSpacing(1);
          prioritySlider.setPaintTicks(true);
          */
-
+        selectedStrategy = rdbVarMOD1;
+        selectedSource = rdbSourcePRIDE1;
 
         if (strategy.equals(
                 "STRAIGHT")) {
@@ -686,11 +687,13 @@ public class NewProjectDialog extends javax.swing.JFrame {
 
     private void rdbSourcePRIDE1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_rdbSourcePRIDE1ActionPerformed
         selectedSource = rdbSourcePRIDE1;
+        selectedSource.setName("pride");
         ImportLists.setText("Import projects from PRIDE-database");
     }//GEN-LAST:event_rdbSourcePRIDE1ActionPerformed
 
     private void rdbSourceMSLIMS1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_rdbSourceMSLIMS1ActionPerformed
         selectedSource = rdbSourceMSLIMS1;
+        selectedSource.setName("mslims");
         ImportLists.setText("Import projects from MSLIMS-database");
     }//GEN-LAST:event_rdbSourceMSLIMS1ActionPerformed
 
@@ -746,37 +749,40 @@ public class NewProjectDialog extends javax.swing.JFrame {
                     Map<Long, Long> generatedTaskIDs = connector.SendToServer(tasksForServer);
                     logger.debug("Recieved TaskIDs from controlserver...");
                     connector.resetConnectionParameters();
+                    JOptionPane.showMessageDialog(this, "Tasks were send succesfully");
                 } catch (IOException ex) {
                     ex.printStackTrace();
                     connector.resetConnectionParameters();
+                    JOptionPane.showMessageDialog(this, "An error has occurred while transmitting tasks...");
                 }
             } else {
+                JOptionPane.showMessageDialog(this, "An error has occurred while transmitting tasks...");
                 logger.error("Transmitting of projectID's cancelled...");
             }
 
         }
-        dispose();
+
     }
 
 //GEN-LAST:event_okButtonActionPerformed
 
     private void rdbStraight1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_rdbStraight1ActionPerformed
-        // TODO add your handling code here:
+        selectedStrategy = rdbStraight1;
     }//GEN-LAST:event_rdbStraight1ActionPerformed
 
     private void rdbVarDB1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_rdbVarDB1ActionPerformed
-        // TODO add your handling code here:
+        selectedStrategy = rdbVarDB1;
     }//GEN-LAST:event_rdbVarDB1ActionPerformed
 
     private void rdbVarMOD1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_rdbVarMOD1ActionPerformed
-        // TODO add your handling code here:
+        selectedStrategy = rdbVarMOD1;
     }//GEN-LAST:event_rdbVarMOD1ActionPerformed
 
     private void ImportLists1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_ImportLists1ActionPerformed
         getTextFileProjects();
     }//GEN-LAST:event_ImportLists1ActionPerformed
 
-   private class ProjectListEntry {
+    private class ProjectListEntry {
 
         int projectID = 0;
         String projectTitle = null;

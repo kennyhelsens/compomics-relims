@@ -213,7 +213,7 @@ public class RelimsProjectBean implements Cloneable {
         searchParameters.setMinChargeSearched(foundCharges[0]);
         searchParameters.setMaxChargeSearched(foundCharges[1]);
 
-// ======================================================VALIDATE CHARGES 
+// ======================================================VALIDATE PARAMETERS 
         validateSearchParameters(searchParameters);
         //}
         logger.info("Searchparameters were loaded");
