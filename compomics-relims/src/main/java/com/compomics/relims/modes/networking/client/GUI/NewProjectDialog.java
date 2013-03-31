@@ -54,16 +54,12 @@ public class NewProjectDialog extends javax.swing.JDialog {
         initComponents();
         this.setTitle("New Taskcontainer");
 
-
         StrategyButtonGroup.add(rdbVarDB1);
         StrategyButtonGroup.add(rdbVarMOD1);
         StrategyButtonGroup.add(rdbStraight1);
 
         SourceButtonGroup.add(rdbSourceMSLIMS1);
         SourceButtonGroup.add(rdbSourcePRIDE1);
-
-        defaultSearchparamgroup.add(rdbNoSuggestion);
-        defaultSearchparamgroup.add(rdbSuggested);
 
         rdbVarDB1.setName("dbvar");
         rdbVarMOD1.setName("modvar");
@@ -138,41 +134,40 @@ public class NewProjectDialog extends javax.swing.JDialog {
         jTextPane1 = new javax.swing.JTextPane();
         defaultSearchparamgroup = new javax.swing.ButtonGroup();
         backgroundPanel = new javax.swing.JPanel();
-        cancelButton = new javax.swing.JButton();
-        okButton = new javax.swing.JButton();
-        rdbVarMOD1 = new javax.swing.JRadioButton();
-        rdbVarDB1 = new javax.swing.JRadioButton();
-        rdbStraight1 = new javax.swing.JRadioButton();
-        jLabel12 = new javax.swing.JLabel();
-        rdbSourceMSLIMS1 = new javax.swing.JRadioButton();
+        jLabel10 = new javax.swing.JLabel();
+        jPanel1 = new javax.swing.JPanel();
         rdbSourcePRIDE1 = new javax.swing.JRadioButton();
-        jLabel14 = new javax.swing.JLabel();
-        jLabel13 = new javax.swing.JLabel();
+        rdbSourceMSLIMS1 = new javax.swing.JRadioButton();
+        jLabel12 = new javax.swing.JLabel();
         jLabel7 = new javax.swing.JLabel();
+        ImportLists = new javax.swing.JButton();
+        ImportLists1 = new javax.swing.JButton();
         jLabel6 = new javax.swing.JLabel();
+        jLabel8 = new javax.swing.JLabel();
+        jLabel9 = new javax.swing.JLabel();
+        manualProjectNameField = new javax.swing.JTextField();
         manualInputField = new javax.swing.JTextField();
         ManualSchedule = new javax.swing.JButton();
-        ImportLists = new javax.swing.JButton();
+        jPanel2 = new javax.swing.JPanel();
+        jLabel14 = new javax.swing.JLabel();
+        rdbVarDB1 = new javax.swing.JRadioButton();
+        rdbVarMOD1 = new javax.swing.JRadioButton();
+        rdbStraight1 = new javax.swing.JRadioButton();
+        jLabel15 = new javax.swing.JLabel();
+        taskContainerName = new javax.swing.JTextField();
+        jPanel3 = new javax.swing.JPanel();
         Importedlabels = new javax.swing.JLabel();
         jScrollPane1 = new javax.swing.JScrollPane();
         ImportedList = new javax.swing.JList();
-        jScrollPane2 = new javax.swing.JScrollPane();
-        ScheduledList = new javax.swing.JList();
-        toRunLabel = new javax.swing.JLabel();
         toRight = new javax.swing.JButton();
         ScheduleAll = new javax.swing.JButton();
         CancelRight = new javax.swing.JButton();
         CancelAll = new javax.swing.JButton();
-        manualProjectNameField = new javax.swing.JTextField();
-        jLabel8 = new javax.swing.JLabel();
-        jLabel9 = new javax.swing.JLabel();
-        jButton1 = new javax.swing.JButton();
-        jButton2 = new javax.swing.JButton();
-        rdbNoSuggestion = new javax.swing.JRadioButton();
-        rdbSuggested = new javax.swing.JRadioButton();
-        jSeparator1 = new javax.swing.JSeparator();
-        jSeparator2 = new javax.swing.JSeparator();
-        ImportLists1 = new javax.swing.JButton();
+        toRunLabel = new javax.swing.JLabel();
+        jScrollPane2 = new javax.swing.JScrollPane();
+        ScheduledList = new javax.swing.JList();
+        okButton = new javax.swing.JButton();
+        cancelButton = new javax.swing.JButton();
 
         editModificationsMenuItem.setText("Edit Modifications");
         editModificationsMenuItem.addActionListener(new java.awt.event.ActionListener() {
@@ -185,7 +180,7 @@ public class NewProjectDialog extends javax.swing.JDialog {
         jScrollPane3.setViewportView(jTextPane1);
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
-        setTitle("Search Settings");
+        setTitle("New taskcontainer");
         setLocationByPlatform(true);
         setResizable(false);
         addComponentListener(new java.awt.event.ComponentAdapter() {
@@ -194,21 +189,179 @@ public class NewProjectDialog extends javax.swing.JDialog {
             }
         });
 
-        backgroundPanel.setBackground(new java.awt.Color(230, 230, 230));
+        backgroundPanel.setBackground(new java.awt.Color(255, 255, 255));
         backgroundPanel.setRequestFocusEnabled(false);
 
-        cancelButton.setText("Cancel");
-        cancelButton.setPreferredSize(null);
-        cancelButton.addActionListener(new java.awt.event.ActionListener() {
+        jLabel10.setBackground(new java.awt.Color(255, 255, 255));
+        jLabel10.setFont(new java.awt.Font("Lucida Grande", 1, 36)); // NOI18N
+        jLabel10.setIcon(new javax.swing.ImageIcon(getClass().getResource("/com/compomics/relims/modes/networking/client/GUI/RelimsLogoSmall.png"))); // NOI18N
+        jLabel10.setText(" Relims Automatic Reprocessing");
+
+        jPanel1.setBackground(new java.awt.Color(255, 255, 255));
+        jPanel1.setBorder(javax.swing.BorderFactory.createTitledBorder(null, "Project source", javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION, javax.swing.border.TitledBorder.DEFAULT_POSITION, new java.awt.Font("Tahoma", 1, 18))); // NOI18N
+
+        rdbSourcePRIDE1.setText("PRIDE");
+        rdbSourcePRIDE1.setIconTextGap(10);
+        rdbSourcePRIDE1.setOpaque(false);
+        rdbSourcePRIDE1.setPreferredSize(null);
+        rdbSourcePRIDE1.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                cancelButtonActionPerformed(evt);
+                rdbSourcePRIDE1ActionPerformed(evt);
             }
         });
 
-        okButton.setText("OK");
-        okButton.addActionListener(new java.awt.event.ActionListener() {
+        rdbSourceMSLIMS1.setSelected(true);
+        rdbSourceMSLIMS1.setText("MSLIMS");
+        rdbSourceMSLIMS1.setIconTextGap(10);
+        rdbSourceMSLIMS1.setOpaque(false);
+        rdbSourceMSLIMS1.setPreferredSize(null);
+        rdbSourceMSLIMS1.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                okButtonActionPerformed(evt);
+                rdbSourceMSLIMS1ActionPerformed(evt);
+            }
+        });
+
+        jLabel12.setFont(new java.awt.Font("Lucida Grande", 1, 12)); // NOI18N
+        jLabel12.setText("Source");
+        jLabel12.setPreferredSize(null);
+
+        jLabel7.setFont(new java.awt.Font("Lucida Grande", 1, 12)); // NOI18N
+        jLabel7.setText("Select Projects");
+        jLabel7.setPreferredSize(null);
+
+        ImportLists.setText("Import projects from MSLIMS-database");
+        ImportLists.setPreferredSize(null);
+        ImportLists.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                ImportListsActionPerformed(evt);
+            }
+        });
+
+        ImportLists1.setText("Import projects from a textfile");
+        ImportLists1.setPreferredSize(null);
+        ImportLists1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                ImportLists1ActionPerformed(evt);
+            }
+        });
+
+        jLabel6.setFont(new java.awt.Font("Lucida Grande", 1, 12)); // NOI18N
+        jLabel6.setText("Manual input : ");
+        jLabel6.setPreferredSize(null);
+
+        jLabel8.setFont(new java.awt.Font("Lucida Grande", 1, 12)); // NOI18N
+        jLabel8.setText("Project ID");
+        jLabel8.setPreferredSize(null);
+
+        jLabel9.setFont(new java.awt.Font("Lucida Grande", 1, 12)); // NOI18N
+        jLabel9.setText("Project Name");
+        jLabel9.setPreferredSize(null);
+
+        manualProjectNameField.setMaximumSize(new java.awt.Dimension(6, 20));
+        manualProjectNameField.setPreferredSize(null);
+        manualProjectNameField.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                manualProjectNameFieldActionPerformed(evt);
+            }
+        });
+
+        manualInputField.setMaximumSize(new java.awt.Dimension(6, 20));
+        manualInputField.setPreferredSize(null);
+        manualInputField.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                manualInputFieldActionPerformed(evt);
+            }
+        });
+
+        ManualSchedule.setText("Add");
+        ManualSchedule.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                ManualScheduleActionPerformed(evt);
+            }
+        });
+
+        javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
+        jPanel1.setLayout(jPanel1Layout);
+        jPanel1Layout.setHorizontalGroup(
+            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                    .addComponent(ImportLists1, javax.swing.GroupLayout.PREFERRED_SIZE, 221, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addGroup(jPanel1Layout.createSequentialGroup()
+                            .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
+                                    .addComponent(jLabel7, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                    .addGap(25, 25, 25))
+                                .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
+                                    .addComponent(jLabel12, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                    .addGap(71, 71, 71)))
+                            .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                .addGroup(jPanel1Layout.createSequentialGroup()
+                                    .addComponent(rdbSourcePRIDE1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                    .addGap(18, 18, 18)
+                                    .addComponent(rdbSourceMSLIMS1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                    .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                                .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
+                                    .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                    .addComponent(ImportLists, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))))
+                        .addGroup(jPanel1Layout.createSequentialGroup()
+                            .addComponent(jLabel6, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addGap(27, 27, 27)
+                            .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                .addComponent(jLabel8, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addGroup(jPanel1Layout.createSequentialGroup()
+                                    .addComponent(jLabel9, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                    .addGap(16, 16, 16)
+                                    .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                        .addGroup(jPanel1Layout.createSequentialGroup()
+                                            .addComponent(manualInputField, javax.swing.GroupLayout.PREFERRED_SIZE, 106, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                            .addComponent(ManualSchedule, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                                        .addComponent(manualProjectNameField, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))))))
+                .addContainerGap())
+        );
+        jPanel1Layout.setVerticalGroup(
+            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel1Layout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(rdbSourcePRIDE1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jLabel12, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(rdbSourceMSLIMS1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGap(18, 18, 18)
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel7, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(ImportLists, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(ImportLists1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(18, 18, 18)
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel6, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jLabel9, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(manualProjectNameField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(manualInputField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(ManualSchedule)
+                    .addComponent(jLabel8, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+        );
+
+        jPanel2.setBackground(new java.awt.Color(255, 255, 255));
+        jPanel2.setBorder(javax.swing.BorderFactory.createTitledBorder(javax.swing.BorderFactory.createTitledBorder("Search settings"), "Search settings", javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION, javax.swing.border.TitledBorder.DEFAULT_POSITION, new java.awt.Font("Tahoma", 1, 18))); // NOI18N
+
+        jLabel14.setFont(new java.awt.Font("Lucida Grande", 1, 12)); // NOI18N
+        jLabel14.setText("Searchstrategy");
+        jLabel14.setPreferredSize(null);
+
+        rdbVarDB1.setText("Variable DB");
+        rdbVarDB1.setIconTextGap(10);
+        rdbVarDB1.setOpaque(false);
+        rdbVarDB1.setPreferredSize(null);
+        rdbVarDB1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                rdbVarDB1ActionPerformed(evt);
             }
         });
 
@@ -224,16 +377,6 @@ public class NewProjectDialog extends javax.swing.JDialog {
             }
         });
 
-        rdbVarDB1.setText("Variable DB");
-        rdbVarDB1.setIconTextGap(10);
-        rdbVarDB1.setOpaque(false);
-        rdbVarDB1.setPreferredSize(null);
-        rdbVarDB1.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                rdbVarDB1ActionPerformed(evt);
-            }
-        });
-
         rdbStraight1.setText("Straight");
         rdbStraight1.setIconTextGap(10);
         rdbStraight1.setOpaque(false);
@@ -244,73 +387,52 @@ public class NewProjectDialog extends javax.swing.JDialog {
             }
         });
 
-        jLabel12.setFont(new java.awt.Font("Lucida Grande", 1, 12)); // NOI18N
-        jLabel12.setText("Source");
-        jLabel12.setPreferredSize(null);
+        jLabel15.setFont(new java.awt.Font("Lucida Grande", 1, 12)); // NOI18N
+        jLabel15.setText("TaskContainer name : ");
 
-        rdbSourceMSLIMS1.setSelected(true);
-        rdbSourceMSLIMS1.setText("MSLIMS");
-        rdbSourceMSLIMS1.setIconTextGap(10);
-        rdbSourceMSLIMS1.setOpaque(false);
-        rdbSourceMSLIMS1.setPreferredSize(null);
-        rdbSourceMSLIMS1.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                rdbSourceMSLIMS1ActionPerformed(evt);
-            }
-        });
+        taskContainerName.setText("admin");
 
-        rdbSourcePRIDE1.setText("PRIDE");
-        rdbSourcePRIDE1.setIconTextGap(10);
-        rdbSourcePRIDE1.setOpaque(false);
-        rdbSourcePRIDE1.setPreferredSize(null);
-        rdbSourcePRIDE1.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                rdbSourcePRIDE1ActionPerformed(evt);
-            }
-        });
+        javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
+        jPanel2.setLayout(jPanel2Layout);
+        jPanel2Layout.setHorizontalGroup(
+            jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel2Layout.createSequentialGroup()
+                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(jPanel2Layout.createSequentialGroup()
+                        .addComponent(jLabel15)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addComponent(taskContainerName, javax.swing.GroupLayout.PREFERRED_SIZE, 202, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addGroup(jPanel2Layout.createSequentialGroup()
+                        .addComponent(jLabel14, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(49, 49, 49)
+                        .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(rdbStraight1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(rdbVarMOD1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(rdbVarDB1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))))
+                .addGap(0, 10, Short.MAX_VALUE))
+        );
+        jPanel2Layout.setVerticalGroup(
+            jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel2Layout.createSequentialGroup()
+                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel15)
+                    .addComponent(taskContainerName, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(rdbVarDB1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jLabel14, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(rdbVarMOD1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(rdbStraight1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(45, 45, 45))
+        );
 
-        jLabel14.setFont(new java.awt.Font("Lucida Grande", 1, 12)); // NOI18N
-        jLabel14.setText("Searchstrategy");
-        jLabel14.setPreferredSize(null);
-
-        jLabel13.setFont(new java.awt.Font("Lucida Grande", 1, 12)); // NOI18N
-        jLabel13.setText("Project Settings");
-
-        jLabel7.setFont(new java.awt.Font("Lucida Grande", 1, 12)); // NOI18N
-        jLabel7.setText("Select Projects");
-        jLabel7.setPreferredSize(null);
-
-        jLabel6.setFont(new java.awt.Font("Lucida Grande", 1, 12)); // NOI18N
-        jLabel6.setText("Manual input : ");
-        jLabel6.setPreferredSize(null);
-
-        manualInputField.setMaximumSize(new java.awt.Dimension(6, 20));
-        manualInputField.setPreferredSize(null);
-        manualInputField.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                manualInputFieldActionPerformed(evt);
-            }
-        });
-
-        ManualSchedule.setText("Add project");
-        ManualSchedule.setPreferredSize(null);
-        ManualSchedule.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                ManualScheduleActionPerformed(evt);
-            }
-        });
-
-        ImportLists.setText("Import projects from MSLIMS-database");
-        ImportLists.setPreferredSize(null);
-        ImportLists.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                ImportListsActionPerformed(evt);
-            }
-        });
+        jPanel3.setBackground(new java.awt.Color(255, 255, 255));
+        jPanel3.setBorder(javax.swing.BorderFactory.createTitledBorder(null, "Task container", javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION, javax.swing.border.TitledBorder.DEFAULT_POSITION, new java.awt.Font("Tahoma", 1, 18))); // NOI18N
 
         Importedlabels.setFont(new java.awt.Font("Tahoma", 1, 11)); // NOI18N
-        Importedlabels.setText("Existing projectslist");
-        Importedlabels.setPreferredSize(null);
+        Importedlabels.setText("Available projects");
 
         jScrollPane1.setPreferredSize(null);
 
@@ -325,18 +447,6 @@ public class NewProjectDialog extends javax.swing.JDialog {
         ImportedList.setRequestFocusEnabled(false);
         ImportedList.setVerifyInputWhenFocusTarget(false);
         jScrollPane1.setViewportView(ImportedList);
-
-        ScheduledList.setAutoscrolls(false);
-        ScheduledList.setDragEnabled(true);
-        ScheduledList.setDropMode(javax.swing.DropMode.ON);
-        ScheduledList.setMaximumSize(new java.awt.Dimension(80, 20000));
-        ScheduledList.setMinimumSize(new java.awt.Dimension(80, 200));
-        ScheduledList.setPreferredSize(null);
-        jScrollPane2.setViewportView(ScheduledList);
-
-        toRunLabel.setFont(new java.awt.Font("Tahoma", 1, 11)); // NOI18N
-        toRunLabel.setText("Taskcontainer");
-        toRunLabel.setPreferredSize(null);
 
         toRight.setText(">");
         toRight.setPreferredSize(null);
@@ -370,63 +480,92 @@ public class NewProjectDialog extends javax.swing.JDialog {
             }
         });
 
-        manualProjectNameField.setMaximumSize(new java.awt.Dimension(6, 20));
-        manualProjectNameField.setPreferredSize(null);
-        manualProjectNameField.addActionListener(new java.awt.event.ActionListener() {
+        toRunLabel.setFont(new java.awt.Font("Tahoma", 1, 11)); // NOI18N
+        toRunLabel.setText("Tasks in container");
+
+        ScheduledList.setAutoscrolls(false);
+        ScheduledList.setDragEnabled(true);
+        ScheduledList.setDropMode(javax.swing.DropMode.ON);
+        ScheduledList.setMaximumSize(new java.awt.Dimension(80, 20000));
+        ScheduledList.setMinimumSize(new java.awt.Dimension(80, 200));
+        ScheduledList.setPreferredSize(null);
+        jScrollPane2.setViewportView(ScheduledList);
+
+        okButton.setText("OK");
+        okButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                manualProjectNameFieldActionPerformed(evt);
+                okButtonActionPerformed(evt);
             }
         });
 
-        jLabel8.setFont(new java.awt.Font("Lucida Grande", 1, 12)); // NOI18N
-        jLabel8.setText("Project ID");
-        jLabel8.setPreferredSize(null);
-
-        jLabel9.setFont(new java.awt.Font("Lucida Grande", 1, 12)); // NOI18N
-        jLabel9.setText("Project Name");
-        jLabel9.setPreferredSize(null);
-
-        jButton1.setText("Reset Searchparameters");
-        jButton1.setPreferredSize(null);
-        jButton1.addActionListener(new java.awt.event.ActionListener() {
+        cancelButton.setText("Cancel");
+        cancelButton.setPreferredSize(null);
+        cancelButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton1ActionPerformed(evt);
+                cancelButtonActionPerformed(evt);
             }
         });
 
-        jButton2.setText("Edit Searchparameters");
-        jButton2.setPreferredSize(null);
-        jButton2.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton2ActionPerformed(evt);
-            }
-        });
+        javax.swing.GroupLayout jPanel3Layout = new javax.swing.GroupLayout(jPanel3);
+        jPanel3.setLayout(jPanel3Layout);
+        jPanel3Layout.setHorizontalGroup(
+            jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel3Layout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(jPanel3Layout.createSequentialGroup()
+                        .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(jPanel3Layout.createSequentialGroup()
+                                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 333, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                        .addComponent(toRight, javax.swing.GroupLayout.PREFERRED_SIZE, 104, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                        .addComponent(ScheduleAll, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 104, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                        .addComponent(CancelRight, javax.swing.GroupLayout.PREFERRED_SIZE, 104, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                    .addComponent(CancelAll, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 104, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                            .addComponent(Importedlabels))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 333, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(toRunLabel)))
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel3Layout.createSequentialGroup()
+                        .addGap(0, 0, Short.MAX_VALUE)
+                        .addComponent(cancelButton, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(okButton)))
+                .addContainerGap())
+        );
 
-        rdbNoSuggestion.setText("Defined searchparameters");
-        rdbNoSuggestion.setIconTextGap(10);
-        rdbNoSuggestion.setOpaque(false);
-        rdbNoSuggestion.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                rdbNoSuggestionActionPerformed(evt);
-            }
-        });
+        jPanel3Layout.linkSize(javax.swing.SwingConstants.HORIZONTAL, new java.awt.Component[] {cancelButton, okButton});
 
-        rdbSuggested.setSelected(true);
-        rdbSuggested.setText("Suggested searchparameters");
-        rdbSuggested.setIconTextGap(10);
-        rdbSuggested.setOpaque(false);
-        rdbSuggested.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                rdbSuggestedActionPerformed(evt);
-            }
-        });
-
-        ImportLists1.setText("Import projects from a textfile");
-        ImportLists1.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                ImportLists1ActionPerformed(evt);
-            }
-        });
+        jPanel3Layout.setVerticalGroup(
+            jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel3Layout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(Importedlabels)
+                    .addComponent(toRunLabel))
+                .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(jPanel3Layout.createSequentialGroup()
+                        .addGap(26, 26, 26)
+                        .addComponent(toRight, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(18, 18, 18)
+                        .addComponent(ScheduleAll, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(18, 18, 18)
+                        .addComponent(CancelRight, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(18, 18, 18)
+                        .addComponent(CancelAll, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addGroup(jPanel3Layout.createSequentialGroup()
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 234, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 234, javax.swing.GroupLayout.PREFERRED_SIZE))))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 17, Short.MAX_VALUE)
+                .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(okButton)
+                    .addComponent(cancelButton, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
+        );
 
         javax.swing.GroupLayout backgroundPanelLayout = new javax.swing.GroupLayout(backgroundPanel);
         backgroundPanel.setLayout(backgroundPanelLayout);
@@ -436,175 +575,40 @@ public class NewProjectDialog extends javax.swing.JDialog {
                 .addContainerGap()
                 .addGroup(backgroundPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(backgroundPanelLayout.createSequentialGroup()
-                        .addGroup(backgroundPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jLabel13)
-                            .addComponent(jLabel14, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(jLabel12, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGroup(backgroundPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                            .addComponent(jLabel10, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                             .addGroup(backgroundPanelLayout.createSequentialGroup()
-                                .addGap(117, 117, 117)
-                                .addGroup(backgroundPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                    .addGroup(backgroundPanelLayout.createSequentialGroup()
-                                        .addGroup(backgroundPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                            .addComponent(rdbVarDB1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                            .addComponent(rdbSourceMSLIMS1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                                        .addGap(18, 18, 18)
-                                        .addGroup(backgroundPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                            .addComponent(rdbSourcePRIDE1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                            .addGroup(backgroundPanelLayout.createSequentialGroup()
-                                                .addComponent(rdbVarMOD1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                                .addGap(18, 18, 18)
-                                                .addComponent(rdbStraight1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                                            .addGroup(backgroundPanelLayout.createSequentialGroup()
-                                                .addGap(119, 119, 119)
-                                                .addComponent(rdbSuggested))))
-                                    .addComponent(rdbNoSuggestion))))
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addGroup(backgroundPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                            .addComponent(jButton2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                            .addComponent(jButton1, javax.swing.GroupLayout.DEFAULT_SIZE, 166, Short.MAX_VALUE))
-                        .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                                .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                .addGap(380, 380, 380)))
+                        .addContainerGap())
                     .addGroup(backgroundPanelLayout.createSequentialGroup()
-                        .addGroup(backgroundPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jSeparator1)
-                            .addGroup(backgroundPanelLayout.createSequentialGroup()
-                                .addGap(0, 0, Short.MAX_VALUE)
-                                .addComponent(okButton)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(cancelButton, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addGap(57, 57, 57))
-                            .addComponent(jSeparator2, javax.swing.GroupLayout.Alignment.TRAILING)
-                            .addGroup(backgroundPanelLayout.createSequentialGroup()
-                                .addGroup(backgroundPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                    .addGroup(backgroundPanelLayout.createSequentialGroup()
-                                        .addGroup(backgroundPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                            .addComponent(Importedlabels, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                            .addGroup(backgroundPanelLayout.createSequentialGroup()
-                                                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 333, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                                .addGap(27, 27, 27)
-                                                .addGroup(backgroundPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                                                    .addComponent(CancelRight, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                                    .addComponent(CancelAll, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                                    .addComponent(ScheduleAll, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                                    .addComponent(toRight, javax.swing.GroupLayout.PREFERRED_SIZE, 49, javax.swing.GroupLayout.PREFERRED_SIZE))))
-                                        .addGap(18, 18, 18)
-                                        .addGroup(backgroundPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                            .addComponent(toRunLabel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                            .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 333, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                                    .addGroup(backgroundPanelLayout.createSequentialGroup()
-                                        .addGroup(backgroundPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                                            .addComponent(jLabel8, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                            .addComponent(jLabel9, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                                        .addGap(18, 18, 18)
-                                        .addGroup(backgroundPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                                            .addGroup(backgroundPanelLayout.createSequentialGroup()
-                                                .addComponent(manualInputField, javax.swing.GroupLayout.PREFERRED_SIZE, 112, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                                .addComponent(ManualSchedule, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                                            .addComponent(manualProjectNameField, javax.swing.GroupLayout.PREFERRED_SIZE, 217, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                                    .addComponent(jLabel6, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                    .addGroup(backgroundPanelLayout.createSequentialGroup()
-                                        .addComponent(jLabel7, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                        .addGap(30, 30, 30)
-                                        .addComponent(ImportLists, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                        .addComponent(ImportLists1)))
-                                .addGap(0, 2, Short.MAX_VALUE)))
-                        .addContainerGap())))
+                        .addGroup(backgroundPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                            .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(jPanel3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addGap(0, 20, Short.MAX_VALUE))))
         );
-
-        backgroundPanelLayout.linkSize(javax.swing.SwingConstants.HORIZONTAL, new java.awt.Component[] {cancelButton, okButton});
-
         backgroundPanelLayout.setVerticalGroup(
             backgroundPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(backgroundPanelLayout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(jLabel13)
-                .addGroup(backgroundPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(backgroundPanelLayout.createSequentialGroup()
-                        .addGap(11, 11, 11)
-                        .addComponent(jButton2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(jButton1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addGroup(backgroundPanelLayout.createSequentialGroup()
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addGroup(backgroundPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addGroup(backgroundPanelLayout.createSequentialGroup()
-                                .addGap(28, 28, 28)
-                                .addGroup(backgroundPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                                    .addComponent(jLabel12, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                    .addComponent(rdbSourceMSLIMS1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                            .addGroup(backgroundPanelLayout.createSequentialGroup()
-                                .addGroup(backgroundPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                                    .addComponent(jLabel14, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                    .addComponent(rdbVarDB1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                    .addComponent(rdbVarMOD1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                    .addComponent(rdbStraight1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                                .addComponent(rdbSourcePRIDE1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                        .addGap(9, 9, 9)
-                        .addGroup(backgroundPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                            .addComponent(rdbNoSuggestion)
-                            .addComponent(rdbSuggested))
-                        .addGap(18, 18, 18)
-                        .addGroup(backgroundPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                            .addComponent(jLabel7, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(ImportLists, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(ImportLists1))))
-                .addGap(18, 18, 18)
-                .addComponent(jSeparator1, javax.swing.GroupLayout.PREFERRED_SIZE, 10, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addGroup(backgroundPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(toRunLabel, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(Importedlabels, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addGroup(backgroundPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, backgroundPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                        .addComponent(jScrollPane2)
-                        .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 171, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, backgroundPanelLayout.createSequentialGroup()
-                        .addComponent(toRight, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(ScheduleAll, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(16, 16, 16)
-                        .addComponent(CancelRight, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(CancelAll, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(13, 13, 13)))
+                .addComponent(jLabel10, javax.swing.GroupLayout.PREFERRED_SIZE, 81, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jLabel6, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(backgroundPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(manualProjectNameField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jLabel9, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(backgroundPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jLabel8, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(manualInputField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(ManualSchedule, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(33, 33, 33)
-                .addComponent(jSeparator2, javax.swing.GroupLayout.PREFERRED_SIZE, 10, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(backgroundPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(okButton)
-                    .addComponent(cancelButton, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(45, 45, 45))
+                .addGroup(backgroundPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                    .addComponent(jPanel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addGap(10, 10, 10)
+                .addComponent(jPanel3, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addContainerGap())
         );
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(backgroundPanel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+            .addComponent(backgroundPanel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(backgroundPanel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap())
+            .addComponent(backgroundPanel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
         );
 
         pack();
@@ -733,7 +737,7 @@ public class NewProjectDialog extends javax.swing.JDialog {
             logger.error("Not allowed to send blank statements...");
         } else {
             Map<String, String> currentUserMap = new HashMap<String, String>();
-            currentUserMap.put("username", currentUser);
+            currentUserMap.put("username", taskContainerName.getText());
             currentUserMap.put("password", RelimsProperties.getPassword());
             //setting up TaskObject
             TaskContainer tasksForServer = new TaskContainer();
@@ -750,17 +754,14 @@ public class NewProjectDialog extends javax.swing.JDialog {
             }
             tasksForServer.setSearchParameters(loadedSearchParameters);
 
-            if (rdbSuggested.isSelected()) {
-                tasksForServer.updateInstruction("runpipeline", "allow");
-            } else {
-                tasksForServer.updateInstruction("runpipeline", "disallow");
-            }
+            tasksForServer.updateInstruction("runpipeline", "allow");
+
 
             //getting properties
             //TODO MOVE TO LOGIN
             //  String IP = IPfield.getText();
             //   String port = portField.getText();
-       
+
             //making relimsJob object
 
             boolean allowToPass = true;
@@ -776,10 +777,10 @@ public class NewProjectDialog extends javax.swing.JDialog {
             }
 
             if (allowToPass) {
-                ServerConnector connector = new ServerConnector();   
+                ServerConnector connector = new ServerConnector();
                 connector.setConnectionParameters(controllerIP, port);
                 try {
-                        Map<Long, Long> generatedTaskIDs = connector.SendToServer(tasksForServer);
+                    Map<Long, Long> generatedTaskIDs = connector.SendToServer(tasksForServer);
                     logger.debug("Recieved TaskIDs from controlserver...");
                     connector.resetConnectionParameters();
                 } catch (IOException ex) {
@@ -794,9 +795,7 @@ public class NewProjectDialog extends javax.swing.JDialog {
         dispose();
     }
 
-    
 //GEN-LAST:event_okButtonActionPerformed
-
     /**
      * Close the window without saving the changes.
      *
@@ -805,30 +804,6 @@ public class NewProjectDialog extends javax.swing.JDialog {
     private void cancelButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cancelButtonActionPerformed
         dispose();
     }//GEN-LAST:event_cancelButtonActionPerformed
-
-    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
-
-        File currentParameters = new File("src" + File.separator + "main" + File.separator + "resources" + File.separator + "configuration" + File.separator + "lastUsedParameters.parameters");
-        File defaultParameters = new File("src" + File.separator + "main" + File.separator + "resources" + File.separator + "configuration" + File.separator + "default_SearchGUI.parameters");
-        try {
-
-            FileUtils.copyFile(defaultParameters, currentParameters, true);
-
-
-        } catch (IOException ex) {
-            java.util.logging.Logger.getLogger(MainClientGUI.class
-                    .getName()).log(Level.SEVERE, null, ex);
-        } finally {
-            MainClientGUI.setUsingDefault(true);
-        }
-
-        // TODO add your handling code here:
-    }//GEN-LAST:event_jButton1ActionPerformed
-
-    private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
-        new SearchGUISettingsDialog();
-        MainClientGUI.setUsingDefault(false);
-    }//GEN-LAST:event_jButton2ActionPerformed
 
     private void rdbStraight1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_rdbStraight1ActionPerformed
         // TODO add your handling code here:
@@ -841,14 +816,6 @@ public class NewProjectDialog extends javax.swing.JDialog {
     private void rdbVarMOD1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_rdbVarMOD1ActionPerformed
         // TODO add your handling code here:
     }//GEN-LAST:event_rdbVarMOD1ActionPerformed
-
-    private void rdbNoSuggestionActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_rdbNoSuggestionActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_rdbNoSuggestionActionPerformed
-
-    private void rdbSuggestedActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_rdbSuggestedActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_rdbSuggestedActionPerformed
 
     private void ImportLists1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_ImportLists1ActionPerformed
         getTextFileProjects();
@@ -1072,32 +1039,31 @@ public class NewProjectDialog extends javax.swing.JDialog {
     private javax.swing.JButton cancelButton;
     private javax.swing.ButtonGroup defaultSearchparamgroup;
     private javax.swing.JMenuItem editModificationsMenuItem;
-    private javax.swing.JButton jButton1;
-    private javax.swing.JButton jButton2;
+    private javax.swing.JLabel jLabel10;
     private javax.swing.JLabel jLabel12;
-    private javax.swing.JLabel jLabel13;
     private javax.swing.JLabel jLabel14;
+    private javax.swing.JLabel jLabel15;
     private javax.swing.JLabel jLabel6;
     private javax.swing.JLabel jLabel7;
     private javax.swing.JLabel jLabel8;
     private javax.swing.JLabel jLabel9;
+    private javax.swing.JPanel jPanel1;
+    private javax.swing.JPanel jPanel2;
+    private javax.swing.JPanel jPanel3;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JScrollPane jScrollPane3;
-    private javax.swing.JSeparator jSeparator1;
-    private javax.swing.JSeparator jSeparator2;
     private javax.swing.JTextPane jTextPane1;
     private javax.swing.JTextField manualInputField;
     private javax.swing.JTextField manualProjectNameField;
     private javax.swing.JPopupMenu modificationOptionsPopupMenu;
     private javax.swing.JButton okButton;
-    private javax.swing.JRadioButton rdbNoSuggestion;
     private javax.swing.JRadioButton rdbSourceMSLIMS1;
     private javax.swing.JRadioButton rdbSourcePRIDE1;
     private javax.swing.JRadioButton rdbStraight1;
-    private javax.swing.JRadioButton rdbSuggested;
     private javax.swing.JRadioButton rdbVarDB1;
     private javax.swing.JRadioButton rdbVarMOD1;
+    private javax.swing.JTextField taskContainerName;
     private javax.swing.JButton toRight;
     private javax.swing.JLabel toRunLabel;
     // End of variables declaration//GEN-END:variables

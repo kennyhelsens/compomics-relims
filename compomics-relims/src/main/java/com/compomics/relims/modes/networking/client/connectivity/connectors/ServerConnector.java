@@ -5,7 +5,6 @@
 package com.compomics.relims.modes.networking.client.connectivity.connectors;
 
 import com.compomics.relims.conf.RelimsProperties;
-import com.compomics.relims.modes.networking.client.GUI.MainClientGUI;
 import com.compomics.relims.modes.networking.controller.connectivity.taskobjects.TaskContainer;
 import java.io.IOException;
 import java.io.ObjectInputStream;
@@ -15,6 +14,7 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import org.apache.log4j.Logger;
 
 /**
  *
@@ -22,7 +22,7 @@ import java.util.Map;
  */
 public class ServerConnector {
 
-    private static org.apache.log4j.Logger logger = MainClientGUI.getLogger();
+    private static final Logger logger = Logger.getLogger(ServerConnector.class);
     private static ObjectOutputStream output;//flows from this server to the server that is idle
     private static ObjectInputStream input;//flows from client to this server
     private static Socket socketConnection; //socket = a connection, rename later

@@ -5,7 +5,7 @@
 package com.compomics.relims.modes.networking.client;
 
 import com.compomics.relims.conf.RelimsProperties;
-import com.compomics.relims.modes.networking.client.GUI.MainClientGUI;
+import com.compomics.relims.modes.networking.client.GUI.NewProjectDialog;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 
@@ -15,7 +15,7 @@ import org.apache.log4j.Logger;
  */
 public class RelimsClientMode {
 
-    private final static Logger logger = Logger.getLogger(MainClientGUI.class);
+    private final static Logger logger = Logger.getLogger(NewProjectDialog.class);
 
     public static void main(String args[]) {
         RelimsProperties.initialize();
@@ -24,7 +24,7 @@ public class RelimsClientMode {
         }
 //        ClientLoginGUI cLGui = new ClientLoginGUI();
         String intermediateClient = RelimsProperties.getUserID();
-        MainClientGUI gui = new MainClientGUI(intermediateClient);
+        NewProjectDialog gui = new NewProjectDialog(intermediateClient, RelimsProperties.getControllerIP(), RelimsProperties.getControllerPort(), "pride", "varmod");
         gui.setVisible(true);
     }
 }
