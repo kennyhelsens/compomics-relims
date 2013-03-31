@@ -315,7 +315,7 @@ public class RelimsProperties {
         fileName.append(dateformatter.format(date.getTime()));
         workSpace = new File(getWorkSpacePath(), fileName.toString());
         workSpace.mkdir();
-        ProcessVariableManager.setSearchResultFolder(workSpace.getAbsolutePath().toString());
+        config.setProperty("relims.resultFolder", workSpace.getAbsolutePath());
         return workSpace;
     }
 
@@ -723,7 +723,8 @@ public class RelimsProperties {
 
     public static void saveRelimsProperties() {
         try {
-            config.save(new File(ProcessVariableManager.getResultsFolder() + "/relimsproperties.properties"));
+            config.setProperty("used.workspace", getWorkSpace().getAbsolutePath());
+            config.save(new File(getWorkSpace().getAbsolutePath() + "/relimsproperties.properties"));
         } catch (ConfigurationException ex) {
             logger.error("Could not save relimsproperties \n" + ex);
         }

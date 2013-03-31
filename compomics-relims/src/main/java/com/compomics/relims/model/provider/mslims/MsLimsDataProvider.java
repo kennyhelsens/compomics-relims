@@ -368,9 +368,7 @@ public class MsLimsDataProvider implements DataProvider {
 
     public RelimsProjectBean buildProjectBean(long aProjectid) {
 
-        RelimsProjectBean lRelimsProjectBean = new RelimsProjectBean();
-
-        lRelimsProjectBean.setProjectID((int) aProjectid);
+        RelimsProjectBean lRelimsProjectBean = new RelimsProjectBean(aProjectid);
 
         ArrayList<ModificationList> lModificationLists = Lists.newArrayList();
 

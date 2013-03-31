@@ -40,7 +40,6 @@ public class PrideDataProvider implements DataProvider {
 
     private static Logger logger = Logger.getLogger(PrideDataProvider.class);
     private DbExperimentService iPrideService;
-    RelimsProjectBean iRelimsProjectBean = new RelimsProjectBean();
     private ProgressManager progressManager = ProgressManager.getInstance();
     private PrideXMLToMGFConverter prideXMLConverter;
     private FileManager fileGrabber = FileManager.getInstance();
@@ -114,8 +113,7 @@ public class PrideDataProvider implements DataProvider {
         logger.setLevel(Level.ERROR);
         ApplicationContext lContext = ApplicationContextProvider.getInstance().getApplicationContext();
 
-        RelimsProjectBean lRelimsProjectBean = new RelimsProjectBean();
-        lRelimsProjectBean.setProjectID((int) aProjectid);
+        RelimsProjectBean lRelimsProjectBean = new RelimsProjectBean(aProjectid);
 
         Set<Modification> lModificationSet = Sets.newHashSet();
 

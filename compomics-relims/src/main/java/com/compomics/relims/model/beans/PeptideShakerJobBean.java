@@ -2,14 +2,12 @@ package com.compomics.relims.model.beans;
 
 import com.compomics.relims.concurrent.Command;
 import com.compomics.relims.conf.RelimsProperties;
-import com.compomics.relims.manager.filemanager.FileManager;
 import com.compomics.relims.manager.variablemanager.ProcessVariableManager;
+import com.compomics.util.experiment.identification.SearchParameters;
 import org.apache.log4j.Logger;
 
 import java.io.File;
-import java.util.ArrayList;
 import java.util.List;
-import org.apache.commons.io.FileUtils;
 
 /**
  * This class is a
@@ -37,27 +35,22 @@ public class PeptideShakerJobBean {
     private StringBuilder PSCommandLine;
     private File searchParametersFile;
     private File spectra;
-    private File jobDirectory;
     private List<String> identifications;
-    private ArrayList<String> psCommandLine;
     private String identificationFiles;
     private final File resultFolder;
     private double maxPrecursorError = 10.0;
+    private final SearchParameters searchParameters;
 
-    public PeptideShakerJobBean(long projectId, File searchParameters, File spectra, File searchGuiResultsFolder) {
+    public PeptideShakerJobBean(RelimsProjectBean lRelimsProjectBean) {
+
         logger.debug("Collecting PeptideShaker parameters");
-        this.projectId = projectId;
-        this.searchParametersFile = searchParameters;
-        this.spectra = spectra;
-        this.jobDirectory = new File(ProcessVariableManager.getResultsFolder());
-        this.resultFolder = searchGuiResultsFolder;
-        this.identificationFiles = searchGuiResultsFolder.getAbsolutePath() + "/" + projectId + ".omx," + searchGuiResultsFolder.getAbsolutePath() + "/" + projectId + ".t.xml";
-        logger.debug("Getting identification files from " + searchGuiResultsFolder.getAbsolutePath());
-    }
-
-    public PeptideShakerJobBean(long projectId) {
-        this.projectId = projectId;
-        this.resultFolder = new File(RelimsProperties.getPeptideShakerResultsFolder());
+        this.projectId = lRelimsProjectBean.getProjectID();
+        this.searchParametersFile = lRelimsProjectBean.getSearchParamFile();
+        this.searchParameters = lRelimsProjectBean.getSearchParameters();
+        this.spectra = lRelimsProjectBean.getSpectrumFile();
+        this.resultFolder = RelimsProperties.getWorkSpace();
+        this.identificationFiles = resultFolder.getAbsolutePath() + "/" + projectId + ".omx," + resultFolder.getAbsolutePath() + "/" + projectId + ".t.xml";
+        logger.debug("Getting identification files from " + resultFolder.getAbsolutePath());
     }
 
     public void setMaxPrecursorError(double error) {
@@ -112,58 +105,49 @@ public class PeptideShakerJobBean {
         sample = aSample;
     }
 
-    public ArrayList<String> getPeptideShakerCommandString() {
-        ArrayList<String> PSCommandLine = new ArrayList<String>();
-
-        //Check if the MGF file is more than 0kb ---> can occur after PRIDE.XML conversion
+    public String getPeptideShakerCommandString() {
+        UpdateMaxPrecursorError();
+        StringBuilder PSCommandLine = new StringBuilder();
 
         if (this.spectra.length() > 0 && this.spectra.exists()) {
-
-            PSCommandLine.clear();
-            PSCommandLine.add("java ");
-            PSCommandLine.add("-cp ");
-            PSCommandLine.add(RelimsProperties.getPeptideShakerArchivePath());
-            PSCommandLine.add(" eu.isas.peptideshaker.cmd.PeptideShakerCLI ");
-            PSCommandLine.add("-experiment ");
-            PSCommandLine.add(ProcessVariableManager.getProjectId() + " ");
-            PSCommandLine.add("-sample ");
-            PSCommandLine.add("AutoReprocessed " + ProcessVariableManager.getProjectId() + " ");
-            PSCommandLine.add("-replicate 1 ");
-            PSCommandLine.add("-identification_files ");
-            PSCommandLine.add(identificationFiles);
-            PSCommandLine.add(" -spectrum_files ");
-            PSCommandLine.add(this.spectra.getAbsolutePath().toString());
-            PSCommandLine.add(" -search_params ");
-            PSCommandLine.add(this.searchParametersFile.getAbsolutePath().toString());
-            PSCommandLine.add(" -exclude_unknown_ptms ");
-            PSCommandLine.add("0");
-            PSCommandLine.add(" -max_precursor_error_type ");
-            PSCommandLine.add("1");
-            PSCommandLine.add(" -max_precursor_error ");
-            PSCommandLine.add("" + maxPrecursorError);
-            PSCommandLine.add(" -a_score ");
-            PSCommandLine.add("1");
+            PSCommandLine.append("java ");
+            PSCommandLine.append("-cp ");
+            PSCommandLine.append(RelimsProperties.getPeptideShakerArchivePath());
+            PSCommandLine.append(" eu.isas.peptideshaker.cmd.PeptideShakerCLI ");
+            PSCommandLine.append("-experiment ");
+            PSCommandLine.append(ProcessVariableManager.getProjectId() + " ");
+            PSCommandLine.append("-sample ");
+            PSCommandLine.append("AutoReprocessed " + ProcessVariableManager.getProjectId() + " ");
+            PSCommandLine.append("-replicate 1 ");
+            PSCommandLine.append("-identification_files ");
+            PSCommandLine.append(identificationFiles);
+            PSCommandLine.append(" -spectrum_files ");
+            PSCommandLine.append(this.spectra.getAbsolutePath().toString());
+            PSCommandLine.append(" -search_params ");
+            PSCommandLine.append(this.searchParametersFile.getAbsolutePath().toString());
+            PSCommandLine.append(" -exclude_unknown_ptms ");
+            PSCommandLine.append("0");
+            PSCommandLine.append(" -max_precursor_error_type ");
+            PSCommandLine.append("1");
+            PSCommandLine.append(" -max_precursor_error ");
+            PSCommandLine.append("" + maxPrecursorError);
+            PSCommandLine.append(" -a_score ");
+            PSCommandLine.append("1");
             if (RelimsProperties.getPeptideShakerCPSOutput()) {
-                PSCommandLine.add(" -out ");
-                PSCommandLine.add(jobDirectory.getAbsolutePath().toString() + "/" + ProcessVariableManager.getProjectId() + ".cps");
+                PSCommandLine.append(" -out ");
+                PSCommandLine.append(resultFolder.getAbsolutePath().toString() + "/" + ProcessVariableManager.getProjectId() + ".cps");
             }
             //Required for R
             if (RelimsProperties.getPeptideShakerTSVOutput()) {
-                PSCommandLine.add(" -out_txt_1 ");
-                PSCommandLine.add(jobDirectory.getAbsolutePath().toString());
+                PSCommandLine.append(" -out_txt_1 ");
+                PSCommandLine.append(resultFolder.getAbsolutePath().toString());
             }
             //Requested by Uniprot
             if (RelimsProperties.getPeptideShakerUniprotOutput()) {
-                PSCommandLine.add(" -out_txt_2 ");
-                PSCommandLine.add(jobDirectory.getAbsolutePath().toString());
+                PSCommandLine.append(" -out_txt_2 ");
+                PSCommandLine.append(resultFolder.getAbsolutePath().toString());
             }
-            System.err.println("");
-            System.err.println("PEPTIDESHAKERCOMMAND");
-            for (String aParam : PSCommandLine) {
-                System.err.print(aParam);
-            }
-            System.err.println("");
-            return PSCommandLine;
+            return PSCommandLine.toString();
         } else {
             return null;
         }
@@ -171,18 +155,22 @@ public class PeptideShakerJobBean {
 
     public int launch() {
 
-        psCommandLine = getPeptideShakerCommandString();
+        String psCommandLine = getPeptideShakerCommandString();
         if (psCommandLine != null) {
             File peptideShakerFolder = new File(RelimsProperties.getPeptideShakerArchivePath()).getParentFile();
             Command.setWorkFolder(peptideShakerFolder);
-            StringBuilder totalCommandLine = new StringBuilder();
-            for (String aCmd : psCommandLine) {
-                totalCommandLine.append(aCmd);
-            }
-            logger.debug(totalCommandLine.toString());
-            return Command.call(totalCommandLine.toString());
+             logger.debug("Launching peptideshaker from " + peptideShakerFolder.getAbsolutePath());
+            return Command.call(psCommandLine);
         } else {
             return 1; //System exit value of 1 means a failed process
+        }
+    }
+
+    private void UpdateMaxPrecursorError() {
+        try {
+            this.maxPrecursorError = searchParameters.getPrecursorAccuracy();
+        } catch (Exception e) {
+            this.maxPrecursorError = 10.0;
         }
     }
 }

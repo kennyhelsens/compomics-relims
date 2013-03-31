@@ -39,7 +39,6 @@ public class PrideXMLDataProvider implements DataProvider {
 
     private static Logger logger = Logger.getLogger(PrideXMLDataProvider.class);
     private PrideXmlExperimentService iPrideService;
-    RelimsProjectBean iRelimsProjectBean = new RelimsProjectBean();
     private ProgressManager progressManager = ProgressManager.getInstance();
     private FileManager fileGrabber = FileManager.getInstance();
     private ApplicationContext applicationContext = ApplicationContextProvider.getInstance().getApplicationContext();
@@ -90,7 +89,7 @@ public class PrideXMLDataProvider implements DataProvider {
             prideXMLFile = fileGrabber.getPrideXML(aProjectid);
             // MAKE AN MGF FILE
             if (prideXMLFile != null) {
-                destinationFile = new File(ProcessVariableManager.getResultsFolder() + "/" + aProjectid + ".mgf");
+                destinationFile = new File(RelimsProperties.getWorkSpace().getAbsolutePath() + "/" + aProjectid + ".mgf");
                 //Save the MGF file in the resultFolder       
                 errorList = iPrideService.getSpectraAsMgf(prideXMLFile, destinationFile);
                 //Get the errorList and store it in the results later
@@ -123,7 +122,7 @@ public class PrideXMLDataProvider implements DataProvider {
 
         ApplicationContext lContext = ApplicationContextProvider.getInstance().getApplicationContext();
 
-        RelimsProjectBean lRelimsProjectBean = new RelimsProjectBean();
+        RelimsProjectBean lRelimsProjectBean = new RelimsProjectBean(aProjectid);
 
         if (RelimsProperties.appendPrideAsapAutomatic()) {
             File xmlFile = fileGrabber.getPrideXML(aProjectid);
@@ -141,7 +140,7 @@ public class PrideXMLDataProvider implements DataProvider {
 
             try {
                 lSpectrumAnnotator.initIdentifications(xmlFile);
-                
+
                 if (lSpectrumAnnotator.getIdentifications().getCompleteIdentifications().isEmpty()) {
                     //ProgressManager.setState(Checkpoint.PRIDEFAILURE);
                     logger.error("Pride found no usefull identifications.");
@@ -180,13 +179,13 @@ public class PrideXMLDataProvider implements DataProvider {
             Set<AnalyzerData> lAnalyzerDataSet = getInstrumentsForProject(aProjectid);
             // get the estimated chargeset from pride !
             lRelimsProjectBean.setCharges(lSpectrumAnnotator.getConsideredChargeStates());
-            
+
             double lPrecursorError = 0.0;
             double lFragmentError = 0.0;
             try {
-       
+
                 for (AnalyzerData lNext : lAnalyzerDataSet) {
-                    
+
                     logger.warn(lNext.getAnalyzerFamily().toString()
                             + " (precursor error : " + lNext.getPrecursorMassError()
                             + " , fragment error" + lNext.getFragmentMassError() + ")");
@@ -207,13 +206,14 @@ public class PrideXMLDataProvider implements DataProvider {
                 lPrecursorError = 1.0;
                 lFragmentError = 1.0;
             }
-            //*100 = conversion to PPM from da
+
             lRelimsProjectBean.setPrecursorError(lPrecursorError);
             //26/03/2013 - setting the fragmentErrorType is not possible ---> need to keep it in da untill resolved
             lRelimsProjectBean.setFragmentError(lFragmentError);
         }
         logger.setLevel(Level.DEBUG);
         logger.debug("Retrieved searchparameters from Pride xml");
+
         return lRelimsProjectBean;
     }
 
@@ -236,27 +236,5 @@ public class PrideXMLDataProvider implements DataProvider {
          appendIfValuable("Usefull", experimentID);
          return true;
          }*/
-    }
-
-    private void appendIfValuable(String type, String experimentID) {
-        BufferedWriter out = null;
-        try {
-            String directory = RelimsProperties.getRepositoryPath() + "/PRIDE/";
-            File outputFile = new File(directory + type + ".txt");
-            if (outputFile.exists()) {
-                outputFile.delete();
-            }
-            FileWriter fstream = new FileWriter(outputFile, true);
-            out = new BufferedWriter(fstream);
-
-            out.write(experimentID);
-            out.newLine();
-            out.close();
-        } catch (Exception e) {//Catch exception if any
-        } finally {
-            if (out != null) {
-                out = null;
-            }
-        }
     }
 }
