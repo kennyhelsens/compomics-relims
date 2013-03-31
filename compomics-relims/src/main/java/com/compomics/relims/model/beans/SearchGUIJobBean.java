@@ -89,7 +89,7 @@ public class SearchGUIJobBean {
             searchGUICommandLine.append(iRelimsProjectBean.getSearchParamFile().getAbsolutePath());
         } else {
             searchGUICommandLine.append(searchParametersFile.getAbsolutePath());
-               iRelimsProjectBean.setSearchParametersFile(searchParametersFile);
+            iRelimsProjectBean.setSearchParametersFile(searchParametersFile);
         }
         searchGUICommandLine.append(" -ppm ");
         searchGUICommandLine.append("2");
@@ -142,6 +142,7 @@ public class SearchGUIJobBean {
         logger.debug("Launching searchgui from " + searchGuiFolder.getAbsolutePath());
         String searchGUICommandLine = generateCommand();
         if (searchGUICommandLine != null) {
+            logger.info(searchGUICommandLine);
             return Command.call(searchGUICommandLine);
         } else {
             return 1;

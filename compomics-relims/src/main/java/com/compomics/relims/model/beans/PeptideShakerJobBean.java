@@ -159,7 +159,8 @@ public class PeptideShakerJobBean {
         if (psCommandLine != null) {
             File peptideShakerFolder = new File(RelimsProperties.getPeptideShakerArchivePath()).getParentFile();
             Command.setWorkFolder(peptideShakerFolder);
-             logger.debug("Launching peptideshaker from " + peptideShakerFolder.getAbsolutePath());
+            logger.debug("Launching peptideshaker from " + peptideShakerFolder.getAbsolutePath());
+            logger.info(psCommandLine);
             return Command.call(psCommandLine);
         } else {
             return 1; //System exit value of 1 means a failed process
