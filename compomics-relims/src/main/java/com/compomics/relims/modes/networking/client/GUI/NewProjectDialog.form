@@ -280,7 +280,7 @@
             </Component>
             <Component class="javax.swing.JButton" name="ImportLists">
               <Properties>
-                <Property name="text" type="java.lang.String" value="Import from MSLIMS-database"/>
+                <Property name="text" type="java.lang.String" value="Import from database"/>
               </Properties>
               <Events>
                 <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="ImportListsActionPerformed"/>
@@ -288,7 +288,7 @@
             </Component>
             <Component class="javax.swing.JButton" name="ImportLists1">
               <Properties>
-                <Property name="text" type="java.lang.String" value="Import from a textfile"/>
+                <Property name="text" type="java.lang.String" value="Import from  textfile"/>
               </Properties>
               <Events>
                 <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="ImportLists1ActionPerformed"/>

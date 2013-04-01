@@ -54,6 +54,8 @@ public class NewProjectDialog extends javax.swing.JFrame {
         initComponents();
         this.setTitle("New Taskcontainer");
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        selectedSource = rdbSourcePRIDE1;
+        selectedSource.setName("pride");
         StrategyButtonGroup.add(rdbVarDB1);
         StrategyButtonGroup.add(rdbVarMOD1);
         StrategyButtonGroup.add(rdbStraight1);
@@ -226,14 +228,14 @@ public class NewProjectDialog extends javax.swing.JFrame {
         jLabel7.setText("Select Projects");
         jLabel7.setPreferredSize(null);
 
-        ImportLists.setText("Import from MSLIMS-database");
+        ImportLists.setText("Import from database");
         ImportLists.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 ImportListsActionPerformed(evt);
             }
         });
 
-        ImportLists1.setText("Import from a textfile");
+        ImportLists1.setText("Import from  textfile");
         ImportLists1.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 ImportLists1ActionPerformed(evt);
@@ -687,13 +689,11 @@ public class NewProjectDialog extends javax.swing.JFrame {
     private void rdbSourcePRIDE1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_rdbSourcePRIDE1ActionPerformed
         selectedSource = rdbSourcePRIDE1;
         selectedSource.setName("pride");
-        ImportLists.setText("Import projects from PRIDE-database");
     }//GEN-LAST:event_rdbSourcePRIDE1ActionPerformed
 
     private void rdbSourceMSLIMS1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_rdbSourceMSLIMS1ActionPerformed
         selectedSource = rdbSourceMSLIMS1;
         selectedSource.setName("mslims");
-        ImportLists.setText("Import projects from MSLIMS-database");
     }//GEN-LAST:event_rdbSourceMSLIMS1ActionPerformed
 
 //GEN-FIRST:event_okButtonActionPerformed
