@@ -129,8 +129,7 @@ public class RepositoryManager {
         File repositoryDirectory;
 
         try {
-            File resultFolder = new File(ProcessVariableManager.getResultsFolder());
-
+            File resultFolder = RelimsProperties.getWorkSpace();
             if (provider.contains("mslims")) {
                 repositoryDirectory = repositoryMSLIMS;
             } else {

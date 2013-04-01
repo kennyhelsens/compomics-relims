@@ -23,3 +23,8 @@ compomics-relims/src/test/resources/sourcefiles/Fasta/windows/SP_130428_concaten
 compomics-relims/src/test/resources/sourcefiles/Fasta/windows/SP_130428_concatenated_target_decoy.fasta.pin
 compomics-relims/src/test/resources/sourcefiles/Fasta/windows/SP_130428_concatenated_target_decoy.fasta.psq
 compomics-relims/src/test/resources/sourcefiles/Mimic_PrideFTP/PRIDE_Exp_Complete_Ac_11954.xml
+compomics-relims/resources/conf/relims-windows - Copy.properties
+compomics-relims/resources/image/relimslogo.png
+compomics-relims/src/main/resources/image/relimslogo.png
+compomics-relims/src/test/resources/image/relimslogo.png
+compomics-relims/src/test/resources/sourcefiles/Mimic_PrideFTP/PRIDE_Exp_Complete_Ac_3.xml
