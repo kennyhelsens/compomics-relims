@@ -68,7 +68,7 @@ public class SearchGUIJobBean {
         //  searchGUICommandLine.append(RelimsProperties.getSearchGuiFolder());
         searchGUICommandLine.append("java ");
         searchGUICommandLine.append("-cp ");
-        searchGUICommandLine.append(RelimsProperties.getSearchGuiArchive());
+        searchGUICommandLine.append(RelimsProperties.getSearchGuiFolder() + "/" + RelimsProperties.getSearchGuiArchive());
         searchGUICommandLine.append(" eu.isas.searchgui.cmd.SearchCLI ");
         searchGUICommandLine.append("-spectrum_files ");
 

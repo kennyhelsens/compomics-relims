@@ -98,9 +98,6 @@ public class PrideXMLDataProvider implements DataProvider {
                     logger.error("The Pride provider could not load an MGF-file.");
                     // try to get it from other source = good idea?
                 }
-                for (ConversionError anError : errorList) {
-                    logger.error(anError.getDescription());
-                }
             }
         } catch (Exception e) {
             logger.error(e);

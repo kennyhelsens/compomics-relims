@@ -148,12 +148,10 @@ public class RelimsProjectBean implements Cloneable {
         lProjectBean.setSearchParameters(getSearchParameters());
         lProjectBean.setStandardModificationList(getStandardModificationList());
         lProjectBean.setExtraModificationList(getExtraModificationList());
-
         lProjectBean.setUserModsFile(getUserModsFile());
-
+        lProjectBean.setSearchParametersFile(getSearchParamFile());
         lProjectBean.setFixedMatchedPTMs(getFixedMatchedPTMs());
         lProjectBean.setVariableMatchedPTMs(getVariableMatchedPTMs());
-
         lProjectBean.setPrecursorError(getPrecursorError());
         lProjectBean.setFragmentError(getFragmentError());
 
@@ -178,8 +176,7 @@ public class RelimsProjectBean implements Cloneable {
 // ======================================================SETTING FASTA FILE
 
         searchParameters.setFastaFile(fastaFile);
-        logger.debug("USING FASTA : " + searchParameters.getFastaFile().getAbsolutePath());
-
+   
 // ======================================================SETTING MOD PROFILE
 
         logger.debug("building modification profile for searchparameters file");

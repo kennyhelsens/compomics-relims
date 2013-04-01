@@ -208,7 +208,7 @@ public class RelimsJobController extends Observable implements ProjectRunner {
         lPeptideShakerJobBean.setPsmfdr(lFDR);
         lPeptideShakerJobBean.setSampleName(sampleID);
         lPeptideShakerJobBean.setExperimentName(experimentID);
-        lPeptideShakerJobBean.setAscore(false);
+        lPeptideShakerJobBean.setAscore(true);
         try {
             lPeptideShakerJobBean.setMaxPrecursorError(relimsProjectBean.getPrecursorError());
         } catch (NullPointerException e) {
