@@ -37,32 +37,114 @@ import org.apache.log4j.Logger;
  */
 public class RelimsProjectBean implements Cloneable {
 
-    private long iProjectID = -1;
+    /**
+     * Project id
+     */
+    private long projectID = -1;
+    /**
+     * XML file that stores the usermods for this project
+     */
     private UserModsFile iUserModsFile = new UserModsFile();
+    /**
+     * List of variable PTM's.
+     */
     private List<String> iVariableMatchedPTMs = Lists.newArrayList();
+    /**
+     * List of fixed PTM's.
+     */
     private List<String> iFixedMatchedPTMs = Lists.newArrayList();
+    /**
+     * List of variable PTM's.
+     */
+    //TODO ---> delete these
     private List<UserMod> iStandardModificationList = Lists.newArrayList();
+    /**
+     * List of FIXED PTM's.
+     */
+    //TODO ---> delete these
     private List<UserMod> iExtraModificationList = Lists.newArrayList();
+    /**
+     * List of EXTRA PTM's.
+     */
     private double iPrecursorError = 1.0;
+    /**
+     * Precursor error in DA
+     */
     private double iFragmentError = 1.0;
+    /**
+     * Fragment ion error in DA
+     */
     private Set<Integer> consideredChargeStates;
-    private final static Logger logger = Logger.getLogger(RelimsProjectBean.class);
+    /**
+     * Possible charges that are estimated by lSpectrumAnnotator from Pride-ASA
+     */
     private SearchParameters searchParameters;
+    /**
+     * SearchParameters in the RelimsProjectBean is transferred to both
+     * SearchGUIJob and PeptideShakerJob
+     */
     private PTMFactory ptmFactory = PTMFactory.getInstance();
+    /**
+     * PTM Factory to format and correctly deliver the PTM's to SearchGUI for
+     * use with OMSSA and xTandem
+     */
     private EnzymeFactory enzymeFactory = EnzymeFactory.getInstance();
+    /**
+     * EnzymeFactory to load the correct Enzyme Object into the Parameters --->
+     * default = Trypsin *
+     */
     private DataProvider dataProvider;
-    private final long projectId;
+    /**
+     * Dataprovider to pull in the required parameters. Currently focussed on
+     * PRIDEXML
+     */
     private File spectrumFile = null;
+    /**
+     * MGF File
+     */
     private File searchParametersFile = null;
+    /**
+     * SearchParametersobject saved as a file
+     */
+    private final static Logger logger = Logger.getLogger(RelimsProjectBean.class);
 
-    public RelimsProjectBean(long projectId) {
-        this.projectId = projectId;
+    public RelimsProjectBean(long projectID) {
+        this.projectID = projectID;
     }
 
-    public RelimsProjectBean(long projectId, File spectrumFile, File searchParametersFile) {
-        this.projectId = projectId;
+    public RelimsProjectBean(long projectID, File spectrumFile, File searchParametersFile) {
+        boolean importSucces = false;
+        this.projectID = projectID;
         this.searchParametersFile = searchParametersFile;
-        this.spectrumFile = spectrumFile;
+      
+        if (spectrumFile.exists()) {
+            this.spectrumFile = spectrumFile;
+        } else {
+            logger.error("MGF file could not be found !");
+        }
+
+        try {
+            updateParameters();
+            importSucces = true;
+        } catch (FileNotFoundException ex) {
+            logger.error(ex);
+            importSucces = false;
+        } catch (IOException | ClassNotFoundException ex) {
+            logger.error(ex);
+            importSucces = false;
+        } finally {
+            if (!importSucces) {
+                logger.error("Could not load stored searchparameters, setting default");
+                createSearchParameters();
+            }
+        }
+    }
+
+    private void updateParameters() throws FileNotFoundException, IOException, ClassNotFoundException {
+        this.searchParameters = SearchParameters.getIdentificationParameters(searchParametersFile);
+        searchParameters.setFastaFile(new File(RelimsProperties.getDefaultSearchDatabase()));
+        //TODO what else should be updated?
+        validateSearchParameters(searchParameters);
     }
 
     public List<UserMod> getStandardModificationList() {
@@ -110,11 +192,11 @@ public class RelimsProjectBean implements Cloneable {
     }
 
     public long getProjectID() {
-        return iProjectID;
+        return projectID;
     }
 
     public void setProjectID(long aProjectID) {
-        iProjectID = aProjectID;
+        projectID = aProjectID;
     }
 
     public void setFragmentError(double aFragmentError) {
@@ -140,7 +222,7 @@ public class RelimsProjectBean implements Cloneable {
 
     @Override
     public RelimsProjectBean clone() throws CloneNotSupportedException {
-        RelimsProjectBean lProjectBean = new RelimsProjectBean(this.projectId);
+        RelimsProjectBean lProjectBean = new RelimsProjectBean(this.projectID);
 
         lProjectBean.setProjectID(getProjectID());
         lProjectBean.setCharges(getCharges());
@@ -176,7 +258,7 @@ public class RelimsProjectBean implements Cloneable {
 // ======================================================SETTING FASTA FILE
 
         searchParameters.setFastaFile(fastaFile);
-   
+
 // ======================================================SETTING MOD PROFILE
 
         logger.debug("building modification profile for searchparameters file");
@@ -351,7 +433,7 @@ public class RelimsProjectBean implements Cloneable {
     public File getSpectrumFile() {
         if (spectrumFile == null) {
             try {
-                this.spectrumFile = dataProvider.getSpectraForProject(projectId);
+                this.spectrumFile = dataProvider.getSpectraForProject(projectID);
             } catch (Exception e) {
                 logger.error("Could not load MGF");
             }
