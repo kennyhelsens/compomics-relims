@@ -11,13 +11,17 @@ import com.compomics.relims.manager.processmanager.gearbox.MainProcessManager;
 import com.compomics.relims.manager.processmanager.gearbox.enums.PriorityLevel;
 import com.compomics.relims.manager.processmanager.gearbox.interfaces.ProcessManager;
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.SequenceInputStream;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.List;
 import java.util.concurrent.Callable;
+import java.util.logging.Level;
 import org.apache.log4j.Logger;
 
 /**
@@ -64,13 +68,23 @@ public class CommandExceptionGuard extends Thread implements Callable {
     long timeOut = (long) System.currentTimeMillis() + (long) maxTimeOutMinutes * 60L * 1000L;
     //returns a system dependent manager for the process...
     private ProcessManager manager = MainProcessManager.getPriorityManager();
+    private BufferedWriter output = null;
+
+    ;
 
     public CommandExceptionGuard(Process processus) {
+        try {
+            this.output = new BufferedWriter(new FileWriter(RelimsProperties.getWorkSpace().getAbsolutePath() + "/commands.log", true));
+        } catch (IOException ex) {
+            logger.error("Could not log commands to the resultfolder");
+            logger.error(ex);
+        }
         this.process = processus;
         this.ois = processus.getInputStream();
         this.eis = processus.getErrorStream();
         this.type = "ERROR";
         keyWords.add("error");
+        keyWords.add("Error");
         keyWords.add("fatal");
         keyWords.add("please contact the developers");
         keyWords.add("Exception");
@@ -85,12 +99,19 @@ public class CommandExceptionGuard extends Thread implements Callable {
         BufferedReader processOutputStream = new BufferedReader(new InputStreamReader(mergedInputStream));
         String line;
         logger.debug("An errorguard was hooked to the process. Timeout = " + maxTimeOutMinutes + " minutes.");
+        try {
+            output.write("Attempting to start searches at " + Calendar.getInstance().getTime().toString());
+            output.flush();
+        } catch (IOException ex) {
+            logger.error(ex);
+        }
         while (errorless && !this.isInterrupted()) {
             Thread priorityThread = new Thread(new PrioritySetter());
             priorityThread.start();
-
             try {
                 while ((line = processOutputStream.readLine()) != null) {
+                    output.write(line + System.lineSeparator());
+                    output.flush();
                     if (!line.isEmpty() || !line.equals("")) {
                         //reset the timer if the process returned output 
                         resetTimer();
@@ -103,8 +124,6 @@ public class CommandExceptionGuard extends Thread implements Callable {
                             return false;
                         }
                     }
-                    //check if omssa / xtandem got stuck...     
-                    //     checkProcesses();
                 }
             } catch (IOException ex) {
                 progressManager.setState(Checkpoint.PROCESSFAILURE, ex);
@@ -115,8 +134,18 @@ public class CommandExceptionGuard extends Thread implements Callable {
             this.interrupt();
             return errorless;
         }
-        return errorless;
 
+        try {
+            output.write("Searhces were closed at " + Calendar.getInstance().getTime().toString());
+            output.flush();
+            output.close();
+        } catch (IOException ex) {
+            if (output != null) {
+                output = null;
+            }
+        }
+
+        return errorless;
     }
 
     public void release() {
