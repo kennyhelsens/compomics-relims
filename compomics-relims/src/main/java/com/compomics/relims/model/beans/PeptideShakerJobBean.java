@@ -21,7 +21,7 @@ public class PeptideShakerJobBean {
     /**
      * parameters for the peptideshaker command line
      */
-    private boolean ascore = false;
+    private boolean ascore = true;
     private File outFolder = null;
     private File searchGUIResultsFolder = null;
     private double pepfdr = 1.0;
@@ -51,6 +51,21 @@ public class PeptideShakerJobBean {
         this.resultFolder = RelimsProperties.getWorkSpace();
         this.identificationFiles = resultFolder.getAbsolutePath() + "/" + projectId + ".omx," + resultFolder.getAbsolutePath() + "/" + projectId + ".t.xml";
         logger.debug("Getting identification files from " + resultFolder.getAbsolutePath());
+    }
+
+    public String findIdentificationFiles() {
+        File omxFile = new File(resultFolder.getAbsolutePath() + "/" + projectId + ".omx");
+        File xTandemFile = new File(resultFolder.getAbsolutePath() + "/" + projectId + "t.xml");
+
+        if (omxFile.exists() && xTandemFile.exists()) {
+            identificationFiles = omxFile.getAbsolutePath() + "," + xTandemFile.getAbsolutePath();
+        }
+        if (omxFile.exists()) {
+            identificationFiles = omxFile.getAbsolutePath();
+        } else if (xTandemFile.exists()) {
+            identificationFiles = xTandemFile.getAbsolutePath();
+        }
+        return identificationFiles;
     }
 
     public void setMaxPrecursorError(double error) {
@@ -120,7 +135,7 @@ public class PeptideShakerJobBean {
             PSCommandLine.append("AutoReprocessed " + ProcessVariableManager.getProjectId() + " ");
             PSCommandLine.append("-replicate 1 ");
             PSCommandLine.append("-identification_files ");
-            PSCommandLine.append(identificationFiles);
+            PSCommandLine.append(findIdentificationFiles());
             PSCommandLine.append(" -spectrum_files ");
             PSCommandLine.append(this.spectra.getAbsolutePath().toString());
             PSCommandLine.append(" -search_params ");
@@ -171,7 +186,7 @@ public class PeptideShakerJobBean {
         try {
             this.maxPrecursorError = searchParameters.getPrecursorAccuracy();
         } catch (Exception e) {
-            this.maxPrecursorError = 10.0;
+            this.maxPrecursorError = 1.0;
         }
     }
 }

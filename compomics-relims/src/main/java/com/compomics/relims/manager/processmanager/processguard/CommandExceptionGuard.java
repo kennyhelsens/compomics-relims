@@ -110,6 +110,7 @@ public class CommandExceptionGuard extends Thread implements Callable {
             priorityThread.start();
             try {
                 while ((line = processOutputStream.readLine()) != null) {
+                    logger.debug(line);
                     output.write(line + System.lineSeparator());
                     output.flush();
                     if (!line.isEmpty() || !line.equals("")) {
@@ -121,15 +122,29 @@ public class CommandExceptionGuard extends Thread implements Callable {
                             progressManager.setState(Checkpoint.PROCESSFAILURE);
                             process.destroy();
                             killSearchEngines();
+                            if (line.contains(aKeyword)) {
+                                output.write("Keyword " + aKeyword + " was detected...");
+                                output.flush();
+                            }
+                            if (isTimeUp()) {
+                                output.write("Process has timed out !");
+                                output.flush();
+                            }
                             return false;
                         }
                     }
                 }
             } catch (IOException ex) {
-                progressManager.setState(Checkpoint.PROCESSFAILURE, ex);
-                errorless = false;
-                process.destroy();
-                break;
+                try {
+                    progressManager.setState(Checkpoint.PROCESSFAILURE, ex);
+                    errorless = false;
+                    process.destroy();
+                    output.write("Process has been terminated");
+                    output.flush();
+                    break;
+                } catch (IOException ex1) {
+                    logger.error(ex1);
+                }
             }
             this.interrupt();
             return errorless;
