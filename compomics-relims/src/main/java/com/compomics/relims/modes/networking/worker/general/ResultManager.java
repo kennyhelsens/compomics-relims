@@ -45,7 +45,6 @@ public class ResultManager {
         for (String aKey : resultMap.keySet()) {
             logger.debug("Set " + aKey + " to " + resultMap.get(aKey));
         }
-        removeJunk();
         return resultMap;
     }
 

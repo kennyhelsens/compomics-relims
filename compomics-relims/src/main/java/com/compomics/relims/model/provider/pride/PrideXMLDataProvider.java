@@ -182,7 +182,7 @@ public class PrideXMLDataProvider implements DataProvider {
 
                     logger.warn(lNext.getAnalyzerFamily().toString()
                             + " (precursor error : " + lNext.getPrecursorMassError()
-                            + " , fragment error" + lNext.getFragmentMassError() + ")");
+                            + " , fragment error " + lNext.getFragmentMassError() + ")");
                     Double lNextPrecursorMassError = lNext.getPrecursorMassError();
 
                     if (lPrecursorError > 0.0 && lNextPrecursorMassError != lPrecursorError) {

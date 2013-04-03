@@ -54,13 +54,12 @@ public class PeptideShakerJobBean {
     }
 
     public String findIdentificationFiles() {
-        File omxFile = new File(resultFolder.getAbsolutePath() + "/" + projectId + ".omx");
-        File xTandemFile = new File(resultFolder.getAbsolutePath() + "/" + projectId + "t.xml");
+        File omxFile = new File(RelimsProperties.getWorkSpace() + "/" + projectId + ".omx");
+        File xTandemFile = new File(RelimsProperties.getWorkSpace() + "/" + projectId + "t.xml");
 
         if (omxFile.exists() && xTandemFile.exists()) {
             identificationFiles = omxFile.getAbsolutePath() + "," + xTandemFile.getAbsolutePath();
-        }
-        if (omxFile.exists()) {
+        } else if (omxFile.exists()) {
             identificationFiles = omxFile.getAbsolutePath();
         } else if (xTandemFile.exists()) {
             identificationFiles = xTandemFile.getAbsolutePath();

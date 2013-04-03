@@ -111,7 +111,6 @@ public class TaskRunner {
                 endState = Checkpoint.FAILED;
                 this.stop();
             } finally {
-                ResultManager.removeJunk();
                 ResourceManager.setTaskTime(System.currentTimeMillis() - ResourceManager.getTaskTime());
                 if (endState == Checkpoint.FINISHED) {
                     logger.debug("Finished task :" + lTaskID
@@ -142,6 +141,7 @@ public class TaskRunner {
                                 + "search strategy : " + lSearchStrategyID
                                 + " )");
                         System.out.println(" ");
+                        ResultManager.removeJunk();
                     } else {
                         if (endState == Checkpoint.PRIDEFAILURE || endState == null) {
                             logger.debug("Failed task :" + lTaskID
@@ -152,6 +152,7 @@ public class TaskRunner {
                             ResourceManager.setFinishState(Checkpoint.PRIDEFAILURE);
                             System.out.println("Reason : PRIDE-ASA did not provide workable data output");
                             System.out.println(" ");
+                            ResultManager.removeJunk();
                         }
                     }
                 }
