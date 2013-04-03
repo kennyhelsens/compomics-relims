@@ -58,12 +58,7 @@ public class PrideXMLDataProvider implements DataProvider {
 
     public Set<AnalyzerData> getInstrumentsForProject(long aProjectID) {
         AnalyzerData lAnalyzerData;
-        try {
-            lAnalyzerData = iPrideService.getAnalyzerData();
-        } catch (NullPointerException e) {
-            //set DEFAULT analyzerdata TODO MAKE THIS RELIMSPROPERTY
-            lAnalyzerData = new AnalyzerData(1.0, 1.0, AnalyzerData.ANALYZER_FAMILY.ORBITRAP);
-        }
+        lAnalyzerData = iPrideService.getAnalyzerData();
         HashSet<AnalyzerData> lResults = Sets.newHashSet();
         lResults.add(lAnalyzerData);
         return lResults;
@@ -138,8 +133,7 @@ public class PrideXMLDataProvider implements DataProvider {
 
             // Do not run PRIDE asap automatic, but retrieve the PTMs from the modified sequence values.
 
-            try {
-                lSpectrumAnnotator.initIdentifications(xmlFile);
+                          lSpectrumAnnotator.initIdentifications(xmlFile);
 
                 if (lSpectrumAnnotator.getIdentifications().getCompleteIdentifications().isEmpty()) {
                     //ProgressManager.setState(Checkpoint.PRIDEFAILURE);
@@ -151,9 +145,7 @@ public class PrideXMLDataProvider implements DataProvider {
                     //PUT THEM IN THE PTM FACTORY AS NEW PTMS HERE !!!!
                 }
                 lSpectrumAnnotator.annotate(xmlFile);
-            } catch (Exception e) {
-                logger.error("Could not initiate spectrumAnnotator : no identifications found");
-            }
+      
             Map<Modification, Integer> lPrideAsapModificationsMap = new HashMap<Modification, Integer>();
             try {
                 lPrideAsapModificationsMap = lModificationService.getUsedModifications(lSpectrumAnnotator.getSpectrumAnnotatorResult());
