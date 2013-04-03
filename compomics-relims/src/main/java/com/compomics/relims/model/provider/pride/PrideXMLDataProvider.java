@@ -25,6 +25,7 @@ import org.springframework.context.ApplicationContext;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -56,7 +57,13 @@ public class PrideXMLDataProvider implements DataProvider {
     }
 
     public Set<AnalyzerData> getInstrumentsForProject(long aProjectID) {
-        AnalyzerData lAnalyzerData = iPrideService.getAnalyzerData();
+        AnalyzerData lAnalyzerData;
+        try {
+            lAnalyzerData = iPrideService.getAnalyzerData();
+        } catch (NullPointerException e) {
+            //set DEFAULT analyzerdata TODO MAKE THIS RELIMSPROPERTY
+            lAnalyzerData = new AnalyzerData(1.0, 1.0, AnalyzerData.ANALYZER_FAMILY.ORBITRAP);
+        }
         HashSet<AnalyzerData> lResults = Sets.newHashSet();
         lResults.add(lAnalyzerData);
         return lResults;
@@ -112,8 +119,6 @@ public class PrideXMLDataProvider implements DataProvider {
         logger.setLevel(Level.ALL);
         logger.debug(String.format("retrieving searchparameters and modifications for project %s", aProjectid));
         logger.debug("warning, if this is the first time the project is run, it might take a considerable amount of time to retrieve the suggested searchparameters...");
-        logger.setLevel(Level.ERROR);
-
 
         ApplicationContext lContext = ApplicationContextProvider.getInstance().getApplicationContext();
 
@@ -147,12 +152,14 @@ public class PrideXMLDataProvider implements DataProvider {
                 }
                 lSpectrumAnnotator.annotate(xmlFile);
             } catch (Exception e) {
-                logger.error(e.getMessage());
-                logger.error(e.getCause());
-                ProgressManager.setState(Checkpoint.PRIDEFAILURE, e);
+                logger.error("Could not initiate spectrumAnnotator : no identifications found");
             }
-
-            Map<Modification, Integer> lPrideAsapModificationsMap = lModificationService.getUsedModifications(lSpectrumAnnotator.getSpectrumAnnotatorResult());
+            Map<Modification, Integer> lPrideAsapModificationsMap = new HashMap<Modification, Integer>();
+            try {
+                lPrideAsapModificationsMap = lModificationService.getUsedModifications(lSpectrumAnnotator.getSpectrumAnnotatorResult());
+            } catch (NullPointerException e) {
+                logger.error("Pride-asa did not resolve find modifications");
+            }
             Set<Modification> lPrideAsapModifications = lPrideAsapModificationsMap.keySet();
             logger.debug("Pride-ASAP additionally resolved :");
             for (Modification lPrideAsapModification : lPrideAsapModifications) {
@@ -166,7 +173,7 @@ public class PrideXMLDataProvider implements DataProvider {
             try {
                 lUserModCollection.build(RelimsProperties.getSearchGuiUserModFile());
             } catch (IOException ex) {
-                java.util.logging.Logger.getLogger(PrideXMLDataProvider.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+                logger.error(ex);
             }
             lRelimsProjectBean.setStandardModificationList(lUserModCollection);
 

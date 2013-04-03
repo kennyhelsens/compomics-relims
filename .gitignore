@@ -28,3 +28,12 @@ compomics-relims/resources/image/relimslogo.png
 compomics-relims/src/main/resources/image/relimslogo.png
 compomics-relims/src/test/resources/image/relimslogo.png
 compomics-relims/src/test/resources/sourcefiles/Mimic_PrideFTP/PRIDE_Exp_Complete_Ac_3.xml
+compomics-relims/src/test/java/com/compomics/relims/suites/IntegrityTestProject1643.java
+compomics-relims/src/test/resources/sourcefiles/Mimic_PrideFTP/PRIDE_Exp_Complete_Ac_1643.xml
+compomics-relims/src/test/resources/sourcefiles/Mimic_PrideFTP/PRIDE_Exp_Complete_Ac_1643.xml.gz
+compomics-relims/src/test/java/com/compomics/relims/suites/IntegrityTestProject2998.java
+compomics-relims/src/test/java/com/compomics/relims/suites/IntegrityTestProject8879.java
+compomics-relims/src/test/resources/repositoryprojects4manual.txt
+compomics-relims/src/test/resources/sourcefiles/Mimic_PrideFTP/PRIDE_Exp_Complete_Ac_2998.xml.gz
+compomics-relims/src/test/resources/sourcefiles/Mimic_PrideFTP/PRIDE_Exp_Complete_Ac_8879.xml
+compomics-relims/src/test/resources/sourcefiles/Mimic_PrideFTP/PRIDE_Exp_Complete_Ac_8879.xml.gz
