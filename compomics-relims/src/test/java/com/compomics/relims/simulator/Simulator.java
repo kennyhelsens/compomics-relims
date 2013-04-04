@@ -86,7 +86,7 @@ public class Simulator extends TestCase {
     }
 
     private static void overrideSearchGUI() {
-        RelimsProperties.initializeForTesting();
+        RelimsProperties.initialize(true);
         PropertiesConfiguration config = RelimsProperties.getConfig();
         File searchGUIDefaultFasta = new File(RelimsProperties.getDefaultSearchDatabase());
         config.setProperty("searchgui.fasta.default", searchGUIDefaultFasta.getAbsolutePath());
@@ -208,10 +208,12 @@ public class Simulator extends TestCase {
     }
 
     public static void initializeController() {
+        RelimsProperties.setNetworkingMode(RelimsProperties.NetworkMode.CONTROLLER);
         RelimsControllerMode.main(Controllerargs);
     }
 
     public static void initializeWorker() {
+        RelimsProperties.setNetworkingMode(RelimsProperties.NetworkMode.WORKER);
         RelimsWorkerMode.main(Workerargs);
     }
 

@@ -135,7 +135,7 @@ public class RelimsJobController extends Observable implements ProjectRunner {
     }
 
     private RelimsProjectBean makeRelimsJobBean() {
-        logger.debug("Building projectbean");
+         logger.debug("Building projectbean");
         //  ProcessVariableManager.setSearchResultFolder(searchResultFolder.getAbsolutePath().toString());
         setDataProvider(projectProvider.getDataProvider());
         setModificationResolver(modificationResolver = projectProvider.getModificationResolver());

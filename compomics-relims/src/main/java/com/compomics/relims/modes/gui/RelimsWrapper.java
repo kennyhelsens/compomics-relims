@@ -1,5 +1,6 @@
 package com.compomics.relims.modes.gui;
 
+import com.compomics.relims.conf.RelimsProperties;
 import com.compomics.relims.manager.progressmanager.Checkpoint;
 import com.compomics.relims.manager.progressmanager.ProgressManager;
 import com.compomics.util.gui.UtilitiesGUIDefaults;
@@ -48,7 +49,7 @@ public class RelimsWrapper {
      * @throws java.lang.Exception
      */
     private void launch() throws Exception {
-
+        RelimsProperties.setNetworkingMode(RelimsProperties.NetworkMode.LOCAL);
         String path = this.getClass().getResource("RelimsWrapper.class").getPath();
         System.err.println(path);
         path = path.substring(5, path.indexOf(jarFileName));

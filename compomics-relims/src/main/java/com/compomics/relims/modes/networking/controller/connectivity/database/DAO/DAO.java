@@ -34,7 +34,7 @@ public class DAO {
     private static final Object lock = new Object();
 
     private DAO() {
-        RelimsProperties.initialize();
+        RelimsProperties.initialize(false);
         protocol = RelimsProperties.getTaskDatabaseProtocol();
         dbName = RelimsProperties.getTaskDatabaseName();// the name of the database
         directoryFile = new File(RelimsProperties.getConfigFolder().getAbsolutePath().replace("conf", "databases"));

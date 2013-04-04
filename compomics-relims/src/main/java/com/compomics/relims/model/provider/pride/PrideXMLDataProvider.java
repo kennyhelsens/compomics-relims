@@ -5,6 +5,7 @@ import com.compomics.pride_asa_pipeline.logic.PrideXmlSpectrumAnnotator;
 import com.compomics.pride_asa_pipeline.logic.modification.OmssaModificationMarshaller;
 import com.compomics.pride_asa_pipeline.logic.modification.impl.OmssaModificationMarshallerImpl;
 import com.compomics.pride_asa_pipeline.model.AnalyzerData;
+import com.compomics.pride_asa_pipeline.model.Identification;
 import com.compomics.pride_asa_pipeline.model.Modification;
 import com.compomics.pride_asa_pipeline.service.PrideXmlExperimentService;
 import com.compomics.pride_asa_pipeline.service.PrideXmlModificationService;
@@ -20,13 +21,12 @@ import com.compomics.relims.model.beans.RelimsProjectBean;
 import com.compomics.relims.model.interfaces.DataProvider;
 import com.compomics.util.experiment.massspectrometry.Charge;
 import com.google.common.collect.Sets;
-import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.springframework.context.ApplicationContext;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.HashMap;
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -112,18 +112,20 @@ public class PrideXMLDataProvider implements DataProvider {
 
     @Override
     public RelimsProjectBean buildProjectBean(long aProjectid) {
-        logger.setLevel(Level.ALL);
         logger.debug(String.format("retrieving searchparameters and modifications for project %s", aProjectid));
         logger.debug("warning, if this is the first time the project is run, it might take a considerable amount of time to retrieve the suggested searchparameters...");
 
         ApplicationContext lContext = ApplicationContextProvider.getInstance().getApplicationContext();
         RelimsProjectBean lRelimsProjectBean = new RelimsProjectBean(aProjectid);
 
+
+
         if (RelimsProperties.appendPrideAsapAutomatic()) {
             //get XML file
             logger.debug("Finding prideXML file");
             File xmlFile = fileGrabber.getPrideXML(aProjectid);
-            logger.debug("estimating PTMs via Pride-asap");
+
+            logger.debug("Extracting SearchParameters file with pride-asa");
             // Run PRIDE asap automatic mode
 
             logger.debug("Making pride-asa beans");
@@ -131,30 +133,27 @@ public class PrideXMLDataProvider implements DataProvider {
             PrideXmlModificationService lModificationService = (PrideXmlModificationService) lContext.getBean("prideXmlModificationService");
             //set project ID in relimsbean
             lRelimsProjectBean.setProjectID((int) aProjectid);
-
-
             Set<Modification> lModificationSet = Sets.newHashSet();
-
-            logger.debug("Initializing spectrumannotator");
-            try {
-                lSpectrumAnnotator.initIdentifications(xmlFile);
-            } catch (Exception e) {
-                logger.error(e);
-                logger.error("Pride SpectrumAnnotator could not be initialized...");
-            }
-            if (lSpectrumAnnotator.getIdentifications().getCompleteIdentifications().isEmpty()) {
-                //ProgressManager.setState(Checkpoint.PRIDEFAILURE);
-                logger.error("Pride found no usefull identifications.");
-            }
-
-            lModificationSet = lModificationService.loadExperimentModifications();
-            for (Modification lModification : lModificationSet) {
-                logger.debug(String.format("Resolved PTM '%s' with mass '%f' from modified sequence", lModification.getName(), lModification.getMassShift()));
-                //PUT THEM IN THE PTM FACTORY AS NEW PTMS HERE !!!!
-            }
-
             UserModCollection lUserModCollection = new UserModCollection();
+            logger.debug("Initializing spectrumannotator");
+            List<Identification> idList = new ArrayList<Identification>();
             try {
+                try {
+                    lSpectrumAnnotator.initIdentifications(xmlFile);
+                    idList = lSpectrumAnnotator.getIdentifications().getCompleteIdentifications();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    logger.error("Pride SpectrumAnnotator could not be initialized...Using all default values");
+                }
+                if (idList.isEmpty()) {
+                    //ProgressManager.setState(Checkpoint.PRIDEFAILURE);
+                    logger.error("Pride found no usefull identifications.");
+                }
+                lModificationSet = lModificationService.loadExperimentModifications();
+                for (Modification lModification : lModificationSet) {
+                    logger.debug(String.format("Resolved PTM '%s' with mass '%f' from modified sequence", lModification.getName(), lModification.getMassShift()));
+                    //PUT THEM IN THE PTM FACTORY AS NEW PTMS HERE !!!!
+                }
                 logger.error("Annotating spectra");
                 lSpectrumAnnotator.annotate(xmlFile);
                 Map<Modification, Integer> lPrideAsapModificationsMap = lModificationService.getUsedModifications(lSpectrumAnnotator.getSpectrumAnnotatorResult());
@@ -172,10 +171,10 @@ public class PrideXMLDataProvider implements DataProvider {
                     } catch (IOException ex) {
                         logger.error(ex);
                     }
-
                 }
-            } catch (NullPointerException e) {
-                logger.error("Pride-asa did not resolve modifications");
+            } catch (Throwable e) {
+                e.printStackTrace();
+                logger.error("Pride-asa did not resolve modifications :" + e);
             } finally {
                 lRelimsProjectBean.setStandardModificationList(lUserModCollection);
             }
@@ -223,10 +222,9 @@ public class PrideXMLDataProvider implements DataProvider {
             }
 
         }
-        logger.setLevel(Level.DEBUG);
         logger.debug("Retrieved searchparameters from prideXml");
 
-        logger.debug("Attempting to extract MGF file from prideXML");
+        logger.debug("Extracting MGF file");
         File MGFFile;
         try {
             MGFFile = getSpectraForProject(aProjectid);

@@ -27,7 +27,8 @@ public class RelimsControllerMode {
     private static ExecutorService bootingService;
 
     public static void main(String[] args) {
-        RelimsProperties.initialize();
+        RelimsProperties.setNetworkingMode(RelimsProperties.NetworkMode.CONTROLLER);
+        RelimsProperties.initialize(false);
         if (!RelimsProperties.getDebugMode()) {
             Logger.getRootLogger().setLevel(Level.ERROR);
         }

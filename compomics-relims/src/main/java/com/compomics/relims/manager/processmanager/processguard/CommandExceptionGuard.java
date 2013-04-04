@@ -74,7 +74,7 @@ public class CommandExceptionGuard extends Thread implements Callable {
 
     public CommandExceptionGuard(Process processus) {
         try {
-            this.output = new BufferedWriter(new FileWriter(RelimsProperties.getWorkSpace().getAbsolutePath() + "/commands.log", true));
+            this.output = new BufferedWriter(new FileWriter(RelimsProperties.getLogFolder().getAbsolutePath() + "/commands.log", true));
         } catch (IOException ex) {
             logger.error("Could not log commands to the resultfolder");
             logger.error(ex);
@@ -151,7 +151,7 @@ public class CommandExceptionGuard extends Thread implements Callable {
         }
 
         try {
-            output.write("Searhces were closed at " + Calendar.getInstance().getTime().toString());
+            output.write("Searches were closed at " + Calendar.getInstance().getTime().toString());
             output.flush();
             output.close();
         } catch (IOException ex) {
@@ -159,7 +159,9 @@ public class CommandExceptionGuard extends Thread implements Callable {
                 output = null;
             }
         }
-
+        if (output != null) {
+            output = null;
+        }
         return errorless;
     }
 
