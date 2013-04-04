@@ -141,10 +141,12 @@ public class RelimsJobController extends Observable implements ProjectRunner {
         setModificationResolver(modificationResolver = projectProvider.getModificationResolver());
         ProcessVariableManager.setProjectID(projectID);
         relimsProjectBean = projectProvider.getProject(projectID);
-        relimsProjectBean.setDataProvider(dataProvider);
-        relimsProjectBean.getSpectrumFile();
-        //make a searchparameters object
-        relimsProjectBean.createSearchParameters();
+        if (relimsProjectBean != null) {
+            relimsProjectBean.setDataProvider(dataProvider);
+            relimsProjectBean.getSpectrumFile();
+            //make a searchparameters object and file
+            relimsProjectBean.createSearchParameters();
+        }
         return relimsProjectBean;
     }
     //Prepare and run the searchgui job (different pathways to do so)
@@ -242,50 +244,55 @@ public class RelimsJobController extends Observable implements ProjectRunner {
 
         String provider = null;
         boolean runPeptideshaker;
-        try {
 
-            if (projectProvider.getClass().toString().contains("mslims")) {
-                provider = "mslims";
-            } else {
-                provider = "pride";
-            }
 
-            if (!RepositoryManager.hasBeenRun(provider, projectID)) {
-                logger.debug("Project was not located in repository. Building from scratch...");
-                relimsProjectBean = makeRelimsJobBean();
-            } else {
-                logger.debug("Project was located in repository. Building from files...");
-                File repositorySpectrumFile = new File(RelimsProperties.getWorkSpace() + "/" + projectID + ".mgf");
-                File repositorySearchParametersFile = new File(RelimsProperties.getWorkSpace() + "/SearchGUI.parameters");
-                relimsProjectBean = new RelimsProjectBean(projectID, repositorySpectrumFile, repositorySearchParametersFile);
-            }
-            runPeptideshaker = runSearchGUI();
-            if (runPeptideshaker && progressManager.getState() != Checkpoint.PROCESSFAILURE) {
-                logger.debug("Preparing peptideshaker");
-                prepareAndLaunchPeptideShaker();
-                progressManager.setEndState(Checkpoint.FINISHED);
-            }
-        } catch (Throwable e) {
-            e.printStackTrace();
-            logger.error("ERROR OCCURRED FOR PROJECT " + projectID);
-            logger.error(e);
-            if (e instanceof java.lang.IllegalArgumentException) {
-                progressManager.setEndState(Checkpoint.MODFAILURE);
-            } else {
-                if (provider.equals("pride")) {
-                    progressManager.setEndState(Checkpoint.PRIDEFAILURE);
+        if (projectProvider.getClass().toString().contains("mslims")) {
+            provider = "mslims";
+        } else {
+            provider = "pride";
+        }
+
+        if (!RepositoryManager.hasBeenRun(provider, projectID)) {
+            logger.debug("Project was not located in repository. Building from scratch...");
+            relimsProjectBean = makeRelimsJobBean();
+        } else {
+            logger.debug("Project was located in repository. Building from files...");
+            File repositorySpectrumFile = new File(RelimsProperties.getWorkSpace() + "/" + projectID + ".mgf");
+            File repositorySearchParametersFile = new File(RelimsProperties.getWorkSpace() + "/SearchGUI.parameters");
+            relimsProjectBean = new RelimsProjectBean(projectID, repositorySpectrumFile, repositorySearchParametersFile);
+        }
+        if (relimsProjectBean.getSpectrumFile() != null) {
+            try {
+                runPeptideshaker = runSearchGUI();
+                if (runPeptideshaker && progressManager.getState() != Checkpoint.PROCESSFAILURE) {
+                    logger.debug("Preparing peptideshaker");
+                    prepareAndLaunchPeptideShaker();
+                    progressManager.setEndState(Checkpoint.FINISHED);
+                }
+            } catch (Throwable e) {
+                e.printStackTrace();
+                logger.error("ERROR OCCURRED FOR PROJECT " + projectID);
+                logger.error(e);
+                if (e instanceof java.lang.IllegalArgumentException) {
+                    progressManager.setEndState(Checkpoint.MODFAILURE);
                 } else {
-                    progressManager.setState(Checkpoint.FAILED, e);
+                    if (provider.equals("pride")) {
+                        progressManager.setEndState(Checkpoint.PRIDEFAILURE);
+                    } else {
+                        progressManager.setState(Checkpoint.FAILED, e);
+                    }
+                }
+            } finally {
+                RelimsProperties.saveRelimsProperties();
+            }
+            //nullcheck to prevent standalone relims to delete its folders
+            if (ProcessVariableManager.getClassicMode()) {
+                if (progressManager.getEndState() == Checkpoint.FAILED || progressManager.getEndState() == Checkpoint.PRIDEFAILURE) {
+                    //              fileGrabber.deleteResultFolder();
                 }
             }
-        } finally {
-            RelimsProperties.saveRelimsProperties();
-        }
-        //nullcheck to prevent standalone relims to delete its folders
-        if (ProcessVariableManager.getClassicMode()) {
-            if (progressManager.getEndState() == Checkpoint.FAILED || progressManager.getEndState() == Checkpoint.PRIDEFAILURE) {
-                //              fileGrabber.deleteResultFolder();
-            }
+        } else {
+            logger.error("MGF file could not be built. Search was cancelled for project  " + projectID);
         }
         return "";
     }

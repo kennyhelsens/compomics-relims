@@ -116,7 +116,7 @@ public class RelimsProjectBean implements Cloneable {
         boolean importSucces = false;
         this.projectID = projectID;
         this.searchParametersFile = searchParametersFile;
-      
+
         if (spectrumFile.exists()) {
             this.spectrumFile = spectrumFile;
         } else {
@@ -296,6 +296,7 @@ public class RelimsProjectBean implements Cloneable {
         validateSearchParameters(searchParameters);
         //}
         logger.info("Searchparameters were loaded");
+        getSearchParamFile();
     }
 
     private void validateSearchParameters(SearchParameters searchParameters) {
@@ -423,6 +424,16 @@ public class RelimsProjectBean implements Cloneable {
             config.setProperty("used.mod." + varModList.indexOf(aMod), aMod);
             logger.debug("Var Modification : " + aMod);
         }
+        logger.debug("Writing parameters to a file...");
+
+        try {
+            searchParametersFile = new File(RelimsProperties.getWorkSpace().getAbsolutePath() + "/SearchGUI.parameters");
+            searchParameters.saveIdentificationParameters(searchParameters, searchParametersFile);
+        } catch (FileNotFoundException ex) {
+            logger.error(ex);
+        } catch (IOException | ClassNotFoundException ex) {
+            logger.error(ex);
+        }
 
     }
 
@@ -433,6 +444,7 @@ public class RelimsProjectBean implements Cloneable {
     public File getSpectrumFile() {
         if (spectrumFile == null) {
             try {
+                logger.debug("Attempting to extract MGF");
                 this.spectrumFile = dataProvider.getSpectraForProject(projectID);
             } catch (Exception e) {
                 logger.error("Could not load MGF");
@@ -447,13 +459,15 @@ public class RelimsProjectBean implements Cloneable {
 
     public File getSearchParamFile() {
         if (searchParametersFile == null) {
+            logger.warn("Saving searchparametersfile");
             searchParametersFile = new File(RelimsProperties.getWorkSpace().getAbsolutePath() + "/SearchGUI.parameters");
             try {
                 searchParameters.saveIdentificationParameters(searchParameters, searchParametersFile);
+                logger.debug("Created searchparametersfile");
             } catch (FileNotFoundException ex) {
-                java.util.logging.Logger.getLogger(RelimsProjectBean.class.getName()).log(Level.SEVERE, null, ex);
+                logger.error(ex);
             } catch (IOException | ClassNotFoundException ex) {
-                java.util.logging.Logger.getLogger(RelimsProjectBean.class.getName()).log(Level.SEVERE, null, ex);
+                logger.error(ex);
             }
         }
         return searchParametersFile;
