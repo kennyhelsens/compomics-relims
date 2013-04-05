@@ -7,6 +7,7 @@ import com.compomics.util.experiment.identification.SearchParameters;
 import org.apache.log4j.Logger;
 
 import java.io.File;
+import java.io.FilenameFilter;
 import java.util.List;
 
 /**
@@ -49,19 +50,26 @@ public class PeptideShakerJobBean {
         this.searchParameters = lRelimsProjectBean.getSearchParameters();
         this.spectraFolder = lRelimsProjectBean.getSpectrumParentFolder();
         this.resultFolder = RelimsProperties.getWorkSpace();
-       }
+    }
 
     public String findIdentificationFiles() {
-        File omxFile = new File(RelimsProperties.getWorkSpace() + "/" + projectId + ".omx");
-        File xTandemFile = new File(RelimsProperties.getWorkSpace() + "/" + projectId + "t.xml");
+        //find all the omx and t.xml in the workspace
+        File[] files = RelimsProperties.getWorkSpace().listFiles(new FilenameFilter() {
+            @Override
+            public boolean accept(File dir, String name) {
+                if (name.endsWith("t.xml") || name.endsWith(".omx")) {
+                    return true;
+                } else {
+                    return false;
+                }
+            }
+        });
 
-        if (omxFile.exists() && xTandemFile.exists()) {
-            identificationFiles = omxFile.getAbsolutePath() + "," + xTandemFile.getAbsolutePath();
-        } else if (omxFile.exists()) {
-            identificationFiles = omxFile.getAbsolutePath();
-        } else if (xTandemFile.exists()) {
-            identificationFiles = xTandemFile.getAbsolutePath();
+        StringBuilder idCommandLineArg = new StringBuilder();
+        for (File aFile : files) {
+            idCommandLineArg.append(aFile.getAbsolutePath() + ",");
         }
+        identificationFiles = idCommandLineArg.substring(0, idCommandLineArg.length() - 1);
         return identificationFiles;
     }
 
