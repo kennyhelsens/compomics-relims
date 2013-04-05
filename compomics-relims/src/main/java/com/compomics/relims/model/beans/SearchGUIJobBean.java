@@ -61,7 +61,7 @@ public class SearchGUIJobBean {
         }
     }
 
-    public String generateCommand() throws IOException, ConfigurationException {
+    public String generateCommand() throws IOException, ConfigurationException, NullPointerException {
 
         StringBuilder searchGUICommandLine = new StringBuilder();
 
@@ -140,11 +140,17 @@ public class SearchGUIJobBean {
         File searchGuiFolder = new File(RelimsProperties.getSearchGuiFolder());
         Command.setWorkFolder(searchGuiFolder);
         logger.debug("Launching searchgui from " + searchGuiFolder.getAbsolutePath());
-        String searchGUICommandLine = generateCommand();
+        String searchGUICommandLine = null;
+        try {
+            searchGUICommandLine = generateCommand();
+        } catch (NullPointerException e) {
+            logger.error(e);
+        }
         if (searchGUICommandLine != null) {
             logger.info(searchGUICommandLine);
             return Command.call(searchGUICommandLine);
         } else {
+            logger.error("Could not run searchgui...");
             return 1;
         }
     }

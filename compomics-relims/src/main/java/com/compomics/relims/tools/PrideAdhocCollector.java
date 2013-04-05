@@ -39,7 +39,7 @@ public class PrideAdhocCollector {
 
 
     public PrideAdhocCollector() {
-        RelimsProperties.initialize();
+        RelimsProperties.initialize(false);
 
         FileManager iFileGrabber = FileManager.getInstance();
         PrideXMLToMGFConverter iPrideXMLConverter = PrideXMLToMGFConverter.getInstance();

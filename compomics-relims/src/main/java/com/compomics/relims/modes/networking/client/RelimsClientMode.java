@@ -18,7 +18,8 @@ public class RelimsClientMode {
     private final static Logger logger = Logger.getLogger(NewProjectDialog.class);
 
     public static void main(String args[]) {
-        RelimsProperties.initialize();
+        RelimsProperties.setNetworkingMode(RelimsProperties.NetworkMode.CLIENT);
+        RelimsProperties.initialize(false);
         if (!RelimsProperties.getDebugMode()) {
             Logger.getRootLogger().setLevel(Level.ERROR);
         }

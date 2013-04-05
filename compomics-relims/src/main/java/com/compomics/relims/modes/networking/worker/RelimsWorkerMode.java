@@ -20,17 +20,17 @@ import org.apache.log4j.Logger;
  * @author Kenneth
  */
 public class RelimsWorkerMode {
-
+    
     private final static Logger logger = Logger.getLogger(RelimsWorkerMode.class);
     private static int workerPort;
     public static boolean connected = false;
     public static Map<String, Object> cliArgumentMap = new HashMap<String, Object>();
     private static Thread registrator;
     private static Thread reciever;
-
+    
     public static void main(String[] args) {
-
-        RelimsProperties.initialize();
+        RelimsProperties.setNetworkingMode(RelimsProperties.NetworkMode.WORKER);
+        RelimsProperties.initialize(false);
         ProcesRelocalizer.cleanCopy();
         if (!RelimsProperties.getDebugMode()) {
             Logger.getRootLogger().setLevel(Level.ERROR);
@@ -56,9 +56,9 @@ public class RelimsWorkerMode {
             System.out.println("x = the portnumber you want to run this software on");
             System.out.println("");
         }
-
+        
     }
-
+    
     public static void launchListeners() {
         logger.debug("Port was accepted...");
         //Start the registrator
@@ -70,13 +70,13 @@ public class RelimsWorkerMode {
         reciever.start();
         logger.debug("Started taskreciever-service...");
     }
-
+    
     public static void stopWorker() {
         registrator.interrupt();
         reciever.interrupt();
         logger.info("Worker interrupted");
     }
-
+    
     public static void launchWorkerCLI() {
         int port = ResourceManager.getWorkerPort();
         ArrayList<String> errors = new ArrayList<String>();
@@ -105,6 +105,6 @@ public class RelimsWorkerMode {
                 RelimsWorkerMode.connected = false;
             }
         }
-
+        
     }
 }

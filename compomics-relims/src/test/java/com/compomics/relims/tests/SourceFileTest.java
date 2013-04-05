@@ -124,7 +124,7 @@ public class SourceFileTest extends TestCase {
     public void testSearchParameters() {
         logger.debug("TESTING SEARCHPARAMETERS RESULTFILE");
         try {//TODO ADD ALL PARAMETERS !!!!
-            RelimsProperties.initializeForTesting();
+            RelimsProperties.initialize(true);
             File SEARCHPARAM_FILE = new File(superFolder + "SearchGUI.parameters");
             SearchParameters parameters = SearchParameters.getIdentificationParameters(SEARCHPARAM_FILE);
             List<String> erronousParameterList = new ArrayList<String>();

@@ -5,6 +5,7 @@ import com.compomics.pride_asa_pipeline.logic.PrideXmlSpectrumAnnotator;
 import com.compomics.pride_asa_pipeline.logic.modification.OmssaModificationMarshaller;
 import com.compomics.pride_asa_pipeline.logic.modification.impl.OmssaModificationMarshallerImpl;
 import com.compomics.pride_asa_pipeline.model.AnalyzerData;
+import com.compomics.pride_asa_pipeline.model.Identification;
 import com.compomics.pride_asa_pipeline.model.Modification;
 import com.compomics.pride_asa_pipeline.service.PrideXmlExperimentService;
 import com.compomics.pride_asa_pipeline.service.PrideXmlModificationService;
@@ -18,14 +19,14 @@ import com.compomics.relims.manager.progressmanager.ProgressManager;
 import com.compomics.relims.manager.variablemanager.ProcessVariableManager;
 import com.compomics.relims.model.beans.RelimsProjectBean;
 import com.compomics.relims.model.interfaces.DataProvider;
+import com.compomics.util.experiment.massspectrometry.Charge;
 import com.google.common.collect.Sets;
-import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.springframework.context.ApplicationContext;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.HashMap;
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -58,12 +59,7 @@ public class PrideXMLDataProvider implements DataProvider {
 
     public Set<AnalyzerData> getInstrumentsForProject(long aProjectID) {
         AnalyzerData lAnalyzerData;
-        try {
-            lAnalyzerData = iPrideService.getAnalyzerData();
-        } catch (NullPointerException e) {
-            //set DEFAULT analyzerdata TODO MAKE THIS RELIMSPROPERTY
-            lAnalyzerData = new AnalyzerData(1.0, 1.0, AnalyzerData.ANALYZER_FAMILY.ORBITRAP);
-        }
+        lAnalyzerData = iPrideService.getAnalyzerData();
         HashSet<AnalyzerData> lResults = Sets.newHashSet();
         lResults.add(lAnalyzerData);
         return lResults;
@@ -116,32 +112,40 @@ public class PrideXMLDataProvider implements DataProvider {
 
     @Override
     public RelimsProjectBean buildProjectBean(long aProjectid) {
-        logger.setLevel(Level.ALL);
         logger.debug(String.format("retrieving searchparameters and modifications for project %s", aProjectid));
         logger.debug("warning, if this is the first time the project is run, it might take a considerable amount of time to retrieve the suggested searchparameters...");
 
         ApplicationContext lContext = ApplicationContextProvider.getInstance().getApplicationContext();
-
         RelimsProjectBean lRelimsProjectBean = new RelimsProjectBean(aProjectid);
 
+
+
         if (RelimsProperties.appendPrideAsapAutomatic()) {
+            //get XML file
+            logger.debug("Finding prideXML file");
             File xmlFile = fileGrabber.getPrideXML(aProjectid);
-            logger.debug("estimating PTMs via Pride-asap");
+
+            logger.debug("Extracting SearchParameters file with pride-asa");
             // Run PRIDE asap automatic mode
 
+            logger.debug("Making pride-asa beans");
             lSpectrumAnnotator = (PrideXmlSpectrumAnnotator) lContext.getBean("prideXmlSpectrumAnnotator");
             PrideXmlModificationService lModificationService = (PrideXmlModificationService) lContext.getBean("prideXmlModificationService");
+            //set project ID in relimsbean
             lRelimsProjectBean.setProjectID((int) aProjectid);
             Set<Modification> lModificationSet = Sets.newHashSet();
-
-            logger.debug("estimating PTMs via inspecting the modified_sequence values of the PSMs");
-
-            // Do not run PRIDE asap automatic, but retrieve the PTMs from the modified sequence values.
-
+            UserModCollection lUserModCollection = new UserModCollection();
+            logger.debug("Initializing spectrumannotator");
+            List<Identification> idList = new ArrayList<Identification>();
             try {
-                lSpectrumAnnotator.initIdentifications(xmlFile);
-
-                if (lSpectrumAnnotator.getIdentifications().getCompleteIdentifications().isEmpty()) {
+                try {
+                    lSpectrumAnnotator.initIdentifications(xmlFile);
+                    idList = lSpectrumAnnotator.getIdentifications().getCompleteIdentifications();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    logger.error("Pride SpectrumAnnotator could not be initialized...Using all default values");
+                }
+                if (idList.isEmpty()) {
                     //ProgressManager.setState(Checkpoint.PRIDEFAILURE);
                     logger.error("Pride found no usefull identifications.");
                 }
@@ -150,47 +154,41 @@ public class PrideXMLDataProvider implements DataProvider {
                     logger.debug(String.format("Resolved PTM '%s' with mass '%f' from modified sequence", lModification.getName(), lModification.getMassShift()));
                     //PUT THEM IN THE PTM FACTORY AS NEW PTMS HERE !!!!
                 }
+                logger.error("Annotating spectra");
                 lSpectrumAnnotator.annotate(xmlFile);
-            } catch (Exception e) {
-                logger.error("Could not initiate spectrumAnnotator : no identifications found");
-            }
-            Map<Modification, Integer> lPrideAsapModificationsMap = new HashMap<Modification, Integer>();
-            try {
-                lPrideAsapModificationsMap = lModificationService.getUsedModifications(lSpectrumAnnotator.getSpectrumAnnotatorResult());
-            } catch (NullPointerException e) {
-                logger.error("Pride-asa did not resolve find modifications");
-            }
-            Set<Modification> lPrideAsapModifications = lPrideAsapModificationsMap.keySet();
-            logger.debug("Pride-ASAP additionally resolved :");
-            for (Modification lPrideAsapModification : lPrideAsapModifications) {
-                Modification lAsapModification = lPrideAsapModification;
-                if (lModificationSet.add(lAsapModification) == true) {
-                    logger.debug(lAsapModification.getName());
+                Map<Modification, Integer> lPrideAsapModificationsMap = lModificationService.getUsedModifications(lSpectrumAnnotator.getSpectrumAnnotatorResult());
+                Set<Modification> lPrideAsapModifications = lPrideAsapModificationsMap.keySet();
+                logger.debug("Pride-ASAP additionally resolved :");
+                for (Modification lPrideAsapModification : lPrideAsapModifications) {
+                    Modification lAsapModification = lPrideAsapModification;
+                    if (lModificationSet.add(lAsapModification) == true) {
+                        logger.debug(lAsapModification.getName());
+                    }
+                    OmssaModificationMarshaller marshaller = new OmssaModificationMarshallerImpl();
+                    lUserModCollection = marshaller.marshallModifications(lModificationSet);
+                    try {
+                        lUserModCollection.build(RelimsProperties.getSearchGuiUserModFile());
+                    } catch (IOException ex) {
+                        logger.error(ex);
+                    }
                 }
+            } catch (Throwable e) {
+                e.printStackTrace();
+                logger.error("Pride-asa did not resolve modifications :" + e);
+            } finally {
+                lRelimsProjectBean.setStandardModificationList(lUserModCollection);
             }
-            OmssaModificationMarshaller marshaller = new OmssaModificationMarshallerImpl();
-            UserModCollection lUserModCollection = marshaller.marshallModifications(lModificationSet);
-            try {
-                lUserModCollection.build(RelimsProperties.getSearchGuiUserModFile());
-            } catch (IOException ex) {
-                logger.error(ex);
-            }
-            lRelimsProjectBean.setStandardModificationList(lUserModCollection);
-
             // Set precursor and fragment errors
-            Set<AnalyzerData> lAnalyzerDataSet = getInstrumentsForProject(aProjectid);
-            // get the estimated chargeset from pride !
-            lRelimsProjectBean.setCharges(lSpectrumAnnotator.getConsideredChargeStates());
-
+            logger.debug("Retrieving machine parameters ");
             double lPrecursorError = 0.0;
             double lFragmentError = 0.0;
             try {
-
+                Set<AnalyzerData> lAnalyzerDataSet = getInstrumentsForProject(aProjectid);
                 for (AnalyzerData lNext : lAnalyzerDataSet) {
 
                     logger.warn(lNext.getAnalyzerFamily().toString()
                             + " (precursor error : " + lNext.getPrecursorMassError()
-                            + " , fragment error" + lNext.getFragmentMassError() + ")");
+                            + " , fragment error " + lNext.getFragmentMassError() + ")");
                     Double lNextPrecursorMassError = lNext.getPrecursorMassError();
 
                     if (lPrecursorError > 0.0 && lNextPrecursorMassError != lPrecursorError) {
@@ -203,19 +201,37 @@ public class PrideXMLDataProvider implements DataProvider {
                     }
                     lFragmentError = lNextFragmentMassError;
                 }
-            } catch (NullPointerException e) {
-                logger.error("A nullpointer exception occurred, setting precursorAcc and fragmentIonAcc to default");
-                lPrecursorError = 1.0;
-                lFragmentError = 1.0;
+
+                lRelimsProjectBean.setPrecursorError(lPrecursorError);
+                //26/03/2013 - setting the fragmentErrorType is not possible ---> need to keep it in da untill resolved
+                lRelimsProjectBean.setFragmentError(lFragmentError);
+            } catch (Exception e) {
+                logger.error("Could not resolve machine parameters. Setting to default");
+                lRelimsProjectBean.setPrecursorError(1.0);
+                lRelimsProjectBean.setPrecursorError(1.0);
             }
 
-            lRelimsProjectBean.setPrecursorError(lPrecursorError);
-            //26/03/2013 - setting the fragmentErrorType is not possible ---> need to keep it in da untill resolved
-            lRelimsProjectBean.setFragmentError(lFragmentError);
-        }
-        logger.setLevel(Level.DEBUG);
-        logger.debug("Retrieved searchparameters from Pride xml");
+            try {
+                lRelimsProjectBean.setCharges(lSpectrumAnnotator.getConsideredChargeStates());
+            } catch (NullPointerException e) {
+                //TODO make these parameters properties in relimsproperties
+                logger.error("A nullpointer exception occurred, setting charges to default");
+                Set<Charge> consideredCharges = new HashSet<Charge>();
+                consideredCharges.add(new Charge(1, 1));
+                consideredCharges.add(new Charge(1, 4));
+            }
 
+        }
+        logger.debug("Retrieved searchparameters from prideXml");
+
+        logger.debug("Extracting MGF file");
+        File MGFFile;
+        try {
+            MGFFile = getSpectraForProject(aProjectid);
+            lRelimsProjectBean.setSpectrumFile(MGFFile);
+        } catch (IOException ex) {
+            logger.error("Could not sucessfully create an MGF file for this project");
+        }
         return lRelimsProjectBean;
     }
 

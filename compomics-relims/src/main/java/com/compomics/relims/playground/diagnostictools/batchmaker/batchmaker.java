@@ -20,7 +20,7 @@ public class batchmaker {
         String osName = null;
         BufferedWriter out = null;
         try {
-            RelimsProperties.initialize();
+            RelimsProperties.initialize(false);
             if (System.getProperty("os.name").toLowerCase().contains("windows")) {
                 osName = "windows";
             } else if (System.getProperty("os.name").toLowerCase().contains("mac")) {

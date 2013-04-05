@@ -26,6 +26,10 @@ import java.util.Calendar;
 import java.util.List;
 
 import static com.google.common.base.Preconditions.checkNotNull;
+import java.io.BufferedWriter;
+import java.io.FileWriter;
+import org.apache.commons.io.FileUtils;
+import org.apache.log4j.Appender;
 
 /**
  * This class contains the Relims properties.
@@ -59,6 +63,12 @@ public class RelimsProperties {
      * the folderSeparator is system-dependent...
      */
     public static final String folderSeparator = System.getProperty("file.separator");
+    private static File searchguiLogFile;
+    private static File peptideshakerLogFile;
+    private static File logFolder;
+    private static PropertiesConfiguration log4JConfig;
+    private static File relimsLoggingFile;
+    private static NetworkMode networkingMode = NetworkMode.LOCAL;
 
     public static PriorityLevel getPriority() {
 
@@ -72,6 +82,14 @@ public class RelimsProperties {
 
     public static boolean getDebugMode() {
         return config.getBoolean("relims.debugmode");
+    }
+
+    public static void setNetworkingMode(NetworkMode mode) {
+        networkingMode = mode;
+    }
+
+    public static NetworkMode getNetworkingMode() {
+        return networkingMode;
     }
 
     public static int getBackupInterval() {
@@ -113,6 +131,7 @@ public class RelimsProperties {
 
     public static void setSearchGUIFolder(String searchGUIDir) {
         config.setProperty("searchgui.directory", searchGUIDir);
+        searchguiLogFile = new File(getSearchGuiFolder() + "/resources/SearchGUI.log");
     }
 
     public static File getUserModsFile() {
@@ -130,7 +149,11 @@ public class RelimsProperties {
     private static ProgressManager progressManager = ProgressManager.getInstance();
     // -------------------------- STATIC BLOCKS --------------------------
 
-    public static void initialize() {
+    public static void setConfigPath() {
+    }
+
+    public static void initialize(boolean test) {
+
         if (config == null) {
             try {
                 File lResource;
@@ -140,10 +163,12 @@ public class RelimsProperties {
                 if (rootPath.startsWith(".")) {
                     rootPath = "";
                 }
-
-                String path = rootPath;
-                path = path + "resources" + folderSeparator + "conf" + folderSeparator;
-
+                String path;
+                if (!test) {
+                    path = rootPath + "resources" + folderSeparator + "conf" + folderSeparator;
+                } else {
+                    path = "src" + folderSeparator + "test" + folderSeparator + "resources" + folderSeparator + "conf" + folderSeparator;
+                }
                 if (lOperatingSystem == Utilities.OS_MAC) {
                     path += "relims-mac.properties";
                 } else if (lOperatingSystem == Utilities.OS_WIN_OTHER) {
@@ -172,56 +197,23 @@ public class RelimsProperties {
                 //make the needed temp folders PER project ---> otherwise the temp folder gets cleared for ALL running projects...
                 File tempFolder = new File(lAsapProperties.getProperty("results_path_tmp").toString());
                 tempFolder.mkdirs();
+                //reroute the log4J if the program runs in workermode
+                try {
+                    File logForJDestination = new File(rootPath + "/log4j.properties");
+                    log4JConfig = new PropertiesConfiguration(logForJDestination.getAbsolutePath());
+                    File loggingFile = new File(rootPath + folderSeparator + "relims.log");
+                    loggingFile.deleteOnExit();
+                    log4JConfig.setProperty("log4j.appender.rollingFile.File", loggingFile.getAbsolutePath());
+                    relimsLoggingFile = new File((String) log4JConfig.getProperty("log4j.appender.rollingFile.File"));
+                } catch (ConfigurationException ex) {
+                    logger.error("Could not load relims Log4J properties");
+                }
             } catch (Exception e) {
                 e.printStackTrace();
                 logger.error(e.getMessage(), e);
                 progressManager.setState(Checkpoint.FAILED, e);;
                 //TODO set default values?
             }
-        }
-    }
-
-    public static void initializeForTesting() {
-        try {
-            File lResource;
-            int lOperatingSystem = Utilities.getOperatingSystem();
-
-            String path = "src" + folderSeparator + "test" + folderSeparator + "resources" + folderSeparator + "conf" + folderSeparator;
-
-            if (lOperatingSystem == Utilities.OS_MAC) {
-                path += "relims-mac.properties";
-            } else if (lOperatingSystem == Utilities.OS_WIN_OTHER) {
-                path += "relims-windows.properties";
-            } else {
-                path += "relims.properties";
-            }
-
-            String lRootFolder = new Properties().getRootFolder();
-            lResource = new File(lRootFolder, path);
-            if (lResource.exists()) {
-                logger.debug("Found relimsproperties");
-                config = new PropertiesConfiguration(lResource);
-                configFolder = new File(lResource.getParent());
-            } else {
-                throw new RelimsException(String.format("Could not find properties file %s", path));
-            }
-
-
-            // Override Pride-Asap properties
-            PropertiesConfigurationHolder lAsapProperties = PropertiesConfigurationHolder.getInstance();
-            lAsapProperties.setProperty("spectrum.limit", config.getBoolean("relims.asap.spectrum.limit"));
-            lAsapProperties.setProperty("spectrum.limit.size", config.getInt("relims.asap.spectrum.limit.size"));
-            lAsapProperties.setProperty("spectrum_peaks_cache.maximum_cache_size", config.getInt("spectrum_peaks_cache.maximum_cache_size"));
-            lAsapProperties.setProperty("spectrumannotator.annotate_modified_identifications_only", true);
-            lAsapProperties.setProperty("results_path_tmp_max", config.getInt("relims.results_path_tmp_max"));
-            lAsapProperties.setProperty("results_path", config.getString("relims.asap.results"));
-            lAsapProperties.setProperty("results_path_tmp", config.getString("relims.asap.results.tmp"));
-
-        } catch (Exception e) {
-            e.printStackTrace();
-            logger.error(e.getMessage(), e);
-            progressManager.setState(Checkpoint.FAILED, e);;
-            //TODO set default values?
         }
     }
 
@@ -254,6 +246,7 @@ public class RelimsProperties {
 
     public static void setPeptideShakerFolder(String peptideshakerDir) {
         config.setProperty("peptideshaker.directory", peptideshakerDir);
+        peptideshakerLogFile = new File(getPeptideShakerFolder() + "/resources/PeptideShaker.log");
     }
 
     public static String getPeptideShakerArchive() {
@@ -314,6 +307,9 @@ public class RelimsProperties {
         fileName.append(dateformatter.format(date.getTime()));
         workSpace = new File(getWorkSpacePath(), fileName.toString());
         workSpace.mkdir();
+        logFolder = new File(workSpace.getAbsolutePath() + "/processinfo/");
+        logFolder.mkdir();
+        config.setProperty("relims.log.folder", logFolder.getAbsolutePath());
         config.setProperty("relims.resultFolder", workSpace.getAbsolutePath());
         return workSpace;
     }
@@ -325,6 +321,10 @@ public class RelimsProperties {
 
     public static File getWorkSpace() {
         return workSpace;
+    }
+
+    public static File getLogFolder() {
+        return logFolder;
     }
 
     public static File getTmpFile(String aID) throws IOException {
@@ -722,11 +722,58 @@ public class RelimsProperties {
 
     public static void saveRelimsProperties() {
         try {
-            config.setProperty("used.workspace", getWorkSpace().getAbsolutePath());
-            config.save(new File(getWorkSpace().getAbsolutePath() + "/relimsproperties.properties"));
+            if (networkingMode.equals(NetworkMode.WORKER)) {
+                config.setProperty("used.workspace", getWorkSpace().getAbsolutePath());
+                config.save(new File(getLogFolder().getAbsolutePath() + "/relimsproperties.properties"));
+                bundleLogs();
+                resetProcessLoggers();
+            }
         } catch (ConfigurationException ex) {
             logger.error("Could not save relimsproperties \n" + ex);
         }
+    }
 
+    public static void resetProcessLoggers() {
+        searchguiLogFile = new File(getSearchGuiFolder() + "/resources/SearchGUI.log");
+        peptideshakerLogFile = new File(getPeptideShakerFolder() + "/resources/PeptideShaker.log");
+        clearLog(searchguiLogFile);
+        clearLog(peptideshakerLogFile);
+        clearLog(relimsLoggingFile);
+    }
+
+    private static void bundleLogs() {
+        try {
+            FileUtils.copyFile(searchguiLogFile, new File(getLogFolder().getAbsolutePath() + "/SearchGUI.log"), true);
+        } catch (Exception ex) {
+            logger.error("Could not save SearchGUI log file");
+        }
+        try {
+            FileUtils.copyFile(peptideshakerLogFile, new File(getLogFolder().getAbsolutePath() + "/PeptideShaker.log"), true);
+        } catch (Exception ex) {
+            logger.error("Could not save PeptideShaker log file");
+        }
+        try {
+            FileUtils.copyFile(relimsLoggingFile, new File(getLogFolder().getAbsolutePath() + "/Relims.log"), true);
+        } catch (Exception ex) {
+            logger.error("Could not save PeptideShaker log file");
+        }
+
+    }
+
+    private static void clearLog(File loggingFile) {
+
+        try (BufferedWriter bw = new BufferedWriter(new FileWriter(loggingFile.getAbsolutePath()))) {
+            bw.write("");
+            bw.flush();
+        } catch (IOException ioe) {
+            logger.error("Could not clear " + loggingFile.getAbsolutePath());
+            ioe.printStackTrace();
+        }
+    }
+
+    //HELPER ENUMS
+    public enum NetworkMode {
+
+        LOCAL, CONTROLLER, WORKER, CLIENT;
     }
 }
