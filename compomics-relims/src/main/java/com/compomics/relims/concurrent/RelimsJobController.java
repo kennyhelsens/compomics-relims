@@ -261,10 +261,9 @@ public class RelimsJobController extends Observable implements ProjectRunner {
             File repositorySearchParametersFile = new File(RelimsProperties.getWorkSpace() + "/SearchGUI.parameters");
             relimsProjectBean = new RelimsProjectBean(projectID, repositorySpectrumFile, repositorySearchParametersFile);
         }
-        if (relimsProjectBean.getSpectrumFile() != null) {
             try {
                 runPeptideshaker = runSearchGUI();
-                if (runPeptideshaker && progressManager.getState() != Checkpoint.PROCESSFAILURE) {
+                if (runPeptideshaker) {
                     logger.debug("Preparing peptideshaker");
                     prepareAndLaunchPeptideShaker();
                     progressManager.setEndState(Checkpoint.FINISHED);
@@ -283,7 +282,7 @@ public class RelimsJobController extends Observable implements ProjectRunner {
                     }
                 }
             } finally {
-                RelimsProperties.saveRelimsProperties();
+                RelimsProperties.saveLoggedFiles();
             }
             //nullcheck to prevent standalone relims to delete its folders
             if (ProcessVariableManager.getClassicMode()) {
@@ -291,9 +290,6 @@ public class RelimsJobController extends Observable implements ProjectRunner {
                     //              fileGrabber.deleteResultFolder();
                 }
             }
-        } else {
-            logger.error("MGF file could not be built. Search was cancelled for project  " + projectID);
-        }
         return "";
     }
 

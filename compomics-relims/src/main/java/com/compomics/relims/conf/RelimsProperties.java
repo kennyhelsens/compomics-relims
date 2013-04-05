@@ -199,19 +199,18 @@ public class RelimsProperties {
                 tempFolder.mkdirs();
                 //reroute the log4J if the program runs in workermode
                 try {
-                    File logForJDestination = new File(rootPath + "/log4j.properties");
+                    File logForJDestination = new File(rootPath + "/resources/conf/log4j.properties");
                     log4JConfig = new PropertiesConfiguration(logForJDestination.getAbsolutePath());
-                    File loggingFile = new File(rootPath + folderSeparator + "relims.log");
-                    loggingFile.deleteOnExit();
-                    log4JConfig.setProperty("log4j.appender.rollingFile.File", loggingFile.getAbsolutePath());
-                    relimsLoggingFile = new File((String) log4JConfig.getProperty("log4j.appender.rollingFile.File"));
+                    relimsLoggingFile = new File((String) log4JConfig.getProperty("log4j.appender.report.File"));
+                    relimsLoggingFile.deleteOnExit();
+                    System.out.println("");
                 } catch (ConfigurationException ex) {
+                    logger.error(ex);
                     logger.error("Could not load relims Log4J properties");
                 }
             } catch (Exception e) {
                 e.printStackTrace();
                 logger.error(e.getMessage(), e);
-                progressManager.setState(Checkpoint.FAILED, e);;
                 //TODO set default values?
             }
         }
@@ -720,7 +719,7 @@ public class RelimsProperties {
     }
     private static File configFolder;
 
-    public static void saveRelimsProperties() {
+    public static void saveLoggedFiles() {
         try {
             if (networkingMode.equals(NetworkMode.WORKER)) {
                 config.setProperty("used.workspace", getWorkSpace().getAbsolutePath());
