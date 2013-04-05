@@ -34,7 +34,7 @@ public class PeptideShakerJobBean {
     private final long projectId;
     private StringBuilder PSCommandLine;
     private File searchParametersFile;
-    private File spectra;
+    private File spectraFolder;
     private List<String> identifications;
     private String identificationFiles;
     private final File resultFolder;
@@ -47,11 +47,9 @@ public class PeptideShakerJobBean {
         this.projectId = lRelimsProjectBean.getProjectID();
         this.searchParametersFile = lRelimsProjectBean.getSearchParamFile();
         this.searchParameters = lRelimsProjectBean.getSearchParameters();
-        this.spectra = lRelimsProjectBean.getSpectrumFile();
+        this.spectraFolder = lRelimsProjectBean.getSpectrumParentFolder();
         this.resultFolder = RelimsProperties.getWorkSpace();
-        this.identificationFiles = resultFolder.getAbsolutePath() + "/" + projectId + ".omx," + resultFolder.getAbsolutePath() + "/" + projectId + ".t.xml";
-        logger.debug("Getting identification files from " + resultFolder.getAbsolutePath());
-    }
+       }
 
     public String findIdentificationFiles() {
         File omxFile = new File(RelimsProperties.getWorkSpace() + "/" + projectId + ".omx");
@@ -123,7 +121,7 @@ public class PeptideShakerJobBean {
         UpdateMaxPrecursorError();
         StringBuilder PSCommandLine = new StringBuilder();
 
-        if (this.spectra.length() > 0 && this.spectra.exists()) {
+        if (this.spectraFolder.exists()) {
             PSCommandLine.append("java ");
             PSCommandLine.append("-cp ");
             PSCommandLine.append(RelimsProperties.getPeptideShakerArchivePath());
@@ -136,7 +134,7 @@ public class PeptideShakerJobBean {
             PSCommandLine.append("-identification_files ");
             PSCommandLine.append(findIdentificationFiles());
             PSCommandLine.append(" -spectrum_files ");
-            PSCommandLine.append(this.spectra.getAbsolutePath().toString());
+            PSCommandLine.append(this.spectraFolder.getAbsolutePath().toString());
             PSCommandLine.append(" -search_params ");
             PSCommandLine.append(this.searchParametersFile.getAbsolutePath().toString());
             PSCommandLine.append(" -exclude_unknown_ptms ");
