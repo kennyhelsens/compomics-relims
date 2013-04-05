@@ -156,12 +156,27 @@ public class ResultManager {
 
     public static void removeJunk() {
         //omx
-        File omxFile = new File(RelimsProperties.getWorkSpace().getAbsolutePath() + "/" + ResourceManager.getProjectID() + ".omx");
-        File xtandemFile = new File(RelimsProperties.getWorkSpace().getAbsolutePath() + "/" + ResourceManager.getProjectID() + "t.xml");
-        File mgfFile = new File(RelimsProperties.getWorkSpace().getAbsolutePath() + "/" + ResourceManager.getProjectID() + ".mgf");
-        FileUtils.deleteQuietly(xtandemFile);
-        FileUtils.deleteQuietly(omxFile);
-        FileUtils.deleteQuietly(mgfFile);
+        logger.debug("Deleting working files to reduce foldersize ");
+        File[] allFilesInResults = RelimsProperties.getWorkSpace().listFiles();
+        String[] deleteMarkers = new String[]{".mgf",".xml","omx","SearchGUI_input"};
+        String absolutePath;
+        for (File aFile : allFilesInResults) {
+            absolutePath = aFile.getAbsolutePath();
+            //always delete these extensions
+            if (absolutePath.endsWith(".cui")) {
+                aFile.delete();
+                logger.debug("Deleted " + aFile.getName());
+            } else if (absolutePath.contains(".mgf") || absolutePath.contains(".omx") || absolutePath.contains(".xml")) {
+                aFile.delete();
+                logger.debug("Deleted " + aFile.getName());
+            } else if (absolutePath.contains("SearchGUI_input")) {
+                aFile.delete();
+                logger.debug("Deleted " + aFile.getName());
+            }
+            //only delete these extensions when the switch is on TODO
+
+        }
+
         logger.info("Removed searchengine result files to reduce foldersize");
     }
 }
