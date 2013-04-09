@@ -213,7 +213,6 @@ public class RelimsProperties {
                 try {
                     File logForJDestination = new File(rootPath + "/resources/conf/log4j.properties");
                     log4JConfig = new PropertiesConfiguration(logForJDestination.getAbsolutePath());
-                    relimsLoggingFile = new File((String) log4JConfig.getProperty("log4j.appender.report.File"));
                     System.out.println("");
                 } catch (ConfigurationException ex) {
                     logger.error(ex);
@@ -306,21 +305,23 @@ public class RelimsProperties {
     }
 
     public static File createWorkSpace(long projectID, String projectSource) {
-        //            iWorkSpace = Files.createTempDir();
-        //todo ake a nicer format for the analysis...Milliseconds = not telling much
-        // iWorkSpace = new File(getWorkSpacePath(), String.valueOf(System.currentTimeMillis()));
-        StringBuilder fileName = new StringBuilder();
-        Calendar date = Calendar.getInstance();
-        SimpleDateFormat dateformatter = new SimpleDateFormat("ddMMyyyy_hhmmss");
-        fileName.append("").append(projectID).append("_");
-        fileName.append(projectSource).append("_");
-        fileName.append(dateformatter.format(date.getTime()));
-        workSpace = new File(getWorkSpacePath(), fileName.toString());
-        workSpace.mkdir();
-        logFolder = new File(workSpace.getAbsolutePath() + "/processinfo/");
-        logFolder.mkdir();
-        config.setProperty("relims.log.folder", logFolder.getAbsolutePath());
-        config.setProperty("relims.resultFolder", workSpace.getAbsolutePath());
+        if (workSpace == null) {
+            System.out.println("Creating workspace for project " + projectID);
+            StringBuilder fileName = new StringBuilder();
+            Calendar date = Calendar.getInstance();
+            SimpleDateFormat dateformatter = new SimpleDateFormat("ddMMyyyy_hhmmss");
+            fileName.append("").append(projectID).append("_");
+            fileName.append(projectSource).append("_");
+            fileName.append(dateformatter.format(date.getTime()));
+            workSpace = new File(getWorkSpacePath(), fileName.toString());
+            workSpace.mkdir();
+            logFolder = new File(workSpace.getAbsolutePath() + "/processinfo/");
+            logFolder.mkdir();
+            config.setProperty("relims.log.folder", logFolder.getAbsolutePath());
+            config.setProperty("relims.resultFolder", workSpace.getAbsolutePath());
+            System.out.println("Redirecting logging to " + workSpace.getAbsolutePath());
+            Logger.getRootLogger().addAppender(new RelimsLoggingAppender());
+        }
         return workSpace;
     }
 
