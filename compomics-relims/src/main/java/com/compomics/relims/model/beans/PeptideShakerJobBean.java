@@ -3,11 +3,16 @@ package com.compomics.relims.model.beans;
 import com.compomics.relims.concurrent.Command;
 import com.compomics.relims.conf.RelimsProperties;
 import com.compomics.relims.manager.variablemanager.ProcessVariableManager;
+import com.compomics.software.CommandLineUtils;
 import com.compomics.util.experiment.identification.SearchParameters;
 import org.apache.log4j.Logger;
 
 import java.io.File;
+import java.io.FileReader;
 import java.io.FilenameFilter;
+import java.io.IOException;
+import java.io.LineNumberReader;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -142,7 +147,7 @@ public class PeptideShakerJobBean {
             PSCommandLine.append("-identification_files ");
             PSCommandLine.append(findIdentificationFiles());
             PSCommandLine.append(" -spectrum_files ");
-            PSCommandLine.append(this.spectraFolder.getAbsolutePath().toString());
+            PSCommandLine.append(getUsedMGFsFromSearchGUI());
             PSCommandLine.append(" -search_params ");
             PSCommandLine.append(this.searchParametersFile.getAbsolutePath().toString());
             PSCommandLine.append(" -exclude_unknown_ptms ");
@@ -192,6 +197,28 @@ public class PeptideShakerJobBean {
             this.maxPrecursorError = searchParameters.getPrecursorAccuracy();
         } catch (Exception e) {
             this.maxPrecursorError = 1.0;
+        }
+    }
+
+    private String getUsedMGFsFromSearchGUI() {
+        LineNumberReader reader = null;
+        ArrayList<File> mgfFiles = new ArrayList<File>();
+        try {
+            File searchGuiInputFile = new File(RelimsProperties.getWorkSpace().getAbsolutePath() + "/searchGUI_input.txt");
+            reader = new LineNumberReader(new FileReader(searchGuiInputFile));
+            String mgfLine;
+            while ((mgfLine = reader.readLine()) != null) {
+                mgfFiles.add(new File(mgfLine));
+            }
+        } catch (IOException e) {
+            logger.error(e);
+        } finally {
+            try {
+                reader.close();
+            } catch (IOException ex) {
+                logger.error(ex);
+            }
+            return CommandLineUtils.getCommandLineArgument(mgfFiles);
         }
     }
 }

@@ -460,16 +460,6 @@ public class RelimsProjectBean implements Cloneable {
                 this.spectrumParentFolder = new File(spectrumFile.getParentFile().getAbsolutePath() + "/");
             } catch (Exception e) {
                 logger.error("Could not load MGF");
-            } finally {
-                if (RelimsProperties.hasSpectraLimitForMGF()) {
-                    try {
-                        breakUpSpectrumFile(spectrumFile);
-                    } catch (FileNotFoundException ex) {
-                        logger.error(ex);
-                    } catch (IOException ex) {
-                        logger.error(ex);
-                    }
-                }
             }
         }
         return spectrumFile;
