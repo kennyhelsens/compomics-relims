@@ -305,23 +305,21 @@ public class RelimsProperties {
     }
 
     public static File createWorkSpace(long projectID, String projectSource) {
-        if (workSpace == null) {
-            System.out.println("Creating workspace for project " + projectID);
-            StringBuilder fileName = new StringBuilder();
-            Calendar date = Calendar.getInstance();
-            SimpleDateFormat dateformatter = new SimpleDateFormat("ddMMyyyy_hhmmss");
-            fileName.append("").append(projectID).append("_");
-            fileName.append(projectSource).append("_");
-            fileName.append(dateformatter.format(date.getTime()));
-            workSpace = new File(getWorkSpacePath(), fileName.toString());
-            workSpace.mkdir();
-            logFolder = new File(workSpace.getAbsolutePath() + "/processinfo/");
-            logFolder.mkdir();
-            config.setProperty("relims.log.folder", logFolder.getAbsolutePath());
-            config.setProperty("relims.resultFolder", workSpace.getAbsolutePath());
-            System.out.println("Redirecting logging to " + workSpace.getAbsolutePath());
-            Logger.getRootLogger().addAppender(new RelimsLoggingAppender());
-        }
+        System.out.println("Creating workspace for project " + projectID);
+        StringBuilder fileName = new StringBuilder();
+        Calendar date = Calendar.getInstance();
+        SimpleDateFormat dateformatter = new SimpleDateFormat("ddMMyyyy_hhmmss");
+        fileName.append("").append(projectID).append("_");
+        fileName.append(projectSource).append("_");
+        fileName.append(dateformatter.format(date.getTime()));
+        workSpace = new File(getWorkSpacePath(), fileName.toString());
+        workSpace.mkdir();
+        logFolder = new File(workSpace.getAbsolutePath() + "/processinfo/");
+        logFolder.mkdir();
+        config.setProperty("relims.log.folder", logFolder.getAbsolutePath());
+        config.setProperty("relims.resultFolder", workSpace.getAbsolutePath());
+        System.out.println("Redirecting logging to " + workSpace.getAbsolutePath());
+        Logger.getRootLogger().addAppender(new RelimsLoggingAppender());
         return workSpace;
     }
 
