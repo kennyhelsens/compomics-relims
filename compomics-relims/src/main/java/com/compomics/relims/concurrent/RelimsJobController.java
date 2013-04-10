@@ -201,8 +201,6 @@ public class RelimsJobController extends Observable implements ProjectRunner {
     private boolean prepareAndLaunchPeptideShaker() {
         //PEPTIDESHAKER -----------------------------------------------------------------------
         logger.debug("processing the search results with PeptideShaker");
-        File peptideShakerFolder = new File(RelimsProperties.getPeptideShakerArchivePath().replace(RelimsProperties.getPeptideShakerArchive(), ""));
-        Command.setWorkFolder(peptideShakerFolder);
         lPeptideShakerJobBean = new PeptideShakerJobBean(relimsProjectBean);
         double lFDR = RelimsProperties.getFDR();
         lPeptideShakerJobBean.setPepfdr(lFDR);
