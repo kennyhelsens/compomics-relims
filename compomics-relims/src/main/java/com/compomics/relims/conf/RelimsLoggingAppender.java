@@ -31,18 +31,22 @@ public class RelimsLoggingAppender extends AppenderSkeleton {
 
     @Override
     protected void append(LoggingEvent le) {
-
-        try {
-            logWriter = new BufferedWriter(new FileWriter(loggingFile, true));
-            logWriter.write(new Timestamp(new Date().getTime()) + " " + le.getLevel().toString() + " : " + le.getMessage() + System.lineSeparator()); //writes to file
-            logWriter.flush();
-        } catch (IOException ex) {
-            System.err.println("Could not write to log...");
-        } finally {
+//Exclude the unmarshaller...This clogs the debugger
+        if (!le.getMessage().toString().contains("DEBUG : Unmarshaller Initialized")
+                && !le.getMessage().toString().contains("Generating peptide modification holder")
+                && !le.getMessage().toString().contains("Finding modifications for percursor")) {
             try {
-                logWriter.close();
+                logWriter = new BufferedWriter(new FileWriter(loggingFile, true));
+                logWriter.write(new Timestamp(new Date().getTime()) + " " + le.getLevel().toString() + " : " + le.getMessage() + System.lineSeparator()); //writes to file
+                logWriter.flush();
             } catch (IOException ex) {
-                logWriter = null;
+                System.err.println("Could not write to log...");
+            } finally {
+                try {
+                    logWriter.close();
+                } catch (IOException ex) {
+                    logWriter = null;
+                }
             }
         }
     }
