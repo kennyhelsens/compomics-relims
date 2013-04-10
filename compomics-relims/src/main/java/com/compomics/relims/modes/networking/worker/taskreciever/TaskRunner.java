@@ -200,7 +200,7 @@ public class TaskRunner {
                         sentToServer = resultNotifier.sendResults(Checkpoint.valueOf(ResourceManager.getFinishState()));
                         ResultManager.transferToColims();
                         TaskReciever.locked = false;
-                        Thread.sleep(500);
+                        Thread.sleep(30000);
                         System.out.println("");
                     } catch (Exception ex) {
                         //catch a general exception to make sure the results are sent...
