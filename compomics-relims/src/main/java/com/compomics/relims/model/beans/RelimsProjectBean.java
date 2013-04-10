@@ -487,16 +487,7 @@ public class RelimsProjectBean implements Cloneable {
 
     public void setSpectrumFile(File spectrumFile) {
         this.spectrumFile = spectrumFile;
-        if (RelimsProperties.hasSpectraLimitForMGF()) {
-            try {
-                breakUpSpectrumFile(spectrumFile);
-            } catch (FileNotFoundException ex) {
-                logger.error(ex);
-            } catch (IOException ex) {
-                logger.error(ex);
-            }
-        }
-    }
+     }
 
     public void setSearchParameters(SearchParameters searchParameters) {
         this.searchParameters = searchParameters;
@@ -624,52 +615,7 @@ public class RelimsProjectBean implements Cloneable {
         this.searchParametersFile = searchParametersFile;
     }
 
-    private void breakUpSpectrumFile(File originalSpectrumFile) throws FileNotFoundException, IOException {
-
-        int limit = RelimsProperties.getMaxSpectraAllowedInMGF();
-        long maxFileSize = RelimsProperties.getMaxMGFFileSize();
-        int subFileCounter = 1;
-        if (originalSpectrumFile.length() >= maxFileSize) {
-            logger.debug("Reading spectrumfile...");
-            RandomAccessFile outputFile = null;
-            try (RandomAccessFile originalFile = new BufferedRandomAccessFile(originalSpectrumFile, "rw", 1024)) {
-                String strLine;
-                int spectraCounter = 0;
-                logger.debug("Breaking up spectrumfile in managable subfiles (" + limit + " spectra/file)");
-                outputFile = new RandomAccessFile(originalSpectrumFile.getAbsolutePath().replace(".mgf", "_" + subFileCounter + ".mgf"), "rw");
-                while (originalFile.getFilePointer() < originalFile.length()) {
-                    strLine = originalFile.readLine();
-                    if (strLine.startsWith("BEGIN")) {
-                        spectraCounter++;
-                    }
-                    if (spectraCounter > limit) {
-                        spectraCounter = 0;
-                        subFileCounter++;
-                        outputFile.close();
-                        outputFile = new RandomAccessFile(originalSpectrumFile.getAbsolutePath().replace(".mgf", "_" + subFileCounter + ".mgf"), "rw");
-                        logger.debug("Created new subfile : " + subFileCounter);
-                    }
-                    outputFile.writeBytes(strLine + System.lineSeparator());
-                }
-                if (subFileCounter == 1) {
-                    new File(originalSpectrumFile.getAbsolutePath().replace("_1.mgf", ".mgf"));
-                }
-            } catch (Exception e) {
-                e.printStackTrace();
-            } finally {
-                outputFile.close();
-                logger.debug("Finished splitting original MGF");
-                if (subFileCounter > 1) {
-                    logger.debug("Deleting original file...");
-                    boolean delete = originalSpectrumFile.delete();
-                }
-            }
-        }
-        logger.debug("Setting mgf folder to " + originalSpectrumFile.getParent());
-        setSpectrumParentFolder(originalSpectrumFile.getParentFile());
-    }
-
-    private void setSpectrumParentFolder(File spectrumParentFolder) {
+      private void setSpectrumParentFolder(File spectrumParentFolder) {
         this.spectrumParentFolder = spectrumParentFolder;
     }
 }
