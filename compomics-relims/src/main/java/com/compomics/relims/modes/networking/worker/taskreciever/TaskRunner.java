@@ -199,7 +199,7 @@ public class TaskRunner {
                         logger.info("Sending feedback to server...");
                         sentToServer = resultNotifier.sendResults(Checkpoint.valueOf(ResourceManager.getFinishState()));
                         TaskReciever.locked = false;
-                        Thread.sleep(500);
+                        Thread.sleep(30000);
                         System.out.println("");
                     } catch (Exception ex) {
                         //catch a general exception to make sure the results are sent...
