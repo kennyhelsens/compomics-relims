@@ -38,3 +38,5 @@ compomics-relims/src/test/resources/sourcefiles/Mimic_PrideFTP/PRIDE_Exp_Complet
 compomics-relims/src/test/resources/sourcefiles/Mimic_PrideFTP/PRIDE_Exp_Complete_Ac_8879.xml
 compomics-relims/src/test/resources/sourcefiles/Mimic_PrideFTP/PRIDE_Exp_Complete_Ac_8879.xml.gz
 compomics-relims\src\test\resources\sourcefiles/
+compomics-relims/src/test/resources/log4j.properties
+compomics-relims/src/test/resources/sourcefiles/Mimic_PrideFTP/PRIDE_Exp_Complete_Ac_8437.xml.gz
