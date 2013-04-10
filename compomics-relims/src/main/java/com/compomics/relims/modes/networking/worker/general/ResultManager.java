@@ -4,7 +4,9 @@
  */
 package com.compomics.relims.modes.networking.worker.general;
 
+import com.compomics.colims.core.exception.PeptideShakerIOException;
 import com.compomics.relims.conf.RelimsProperties;
+import com.compomics.relims.manager.colimsmanager.ColimsImporter;
 import com.compomics.util.experiment.biology.Enzyme;
 import com.compomics.util.experiment.identification.SearchParameters;
 import com.compomics.util.experiment.massspectrometry.Charge;
@@ -16,10 +18,8 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import org.apache.commons.io.FileUtils;
 import org.apache.log4j.Logger;
 
 /**
@@ -50,23 +50,28 @@ public class ResultManager {
 
     private static long getPsms() {
         File PSM_FILE = new File(RelimsProperties.getWorkSpace().getAbsolutePath() + "/PeptideShaker_" + ResourceManager.getProjectID() + "_AutoReprocessed_1_psms.txt");
-        logger.debug("Getting peptides from " + PSM_FILE.getAbsolutePath());
+
         int psmCounter = 0;
         try {
-            FileInputStream fin = new FileInputStream(PSM_FILE);
-            DataInputStream in = new DataInputStream(fin);
-            BufferedReader br = new BufferedReader(new InputStreamReader(in));
-            String strLine;
-            //Read File Line By Line
-            while ((strLine = br.readLine()) != null) {
-                // Print the content on the console
-                if (!strLine.startsWith("Protein")) {
-                    psmCounter++;
+            if (PSM_FILE.exists()) {
+                logger.debug("Getting peptides from " + PSM_FILE.getAbsolutePath());
+                FileInputStream fin = new FileInputStream(PSM_FILE);
+                DataInputStream in = new DataInputStream(fin);
+                BufferedReader br = new BufferedReader(new InputStreamReader(in));
+                String strLine;
+                //Read File Line By Line
+                while ((strLine = br.readLine()) != null) {
+                    // Print the content on the console
+                    if (!strLine.startsWith("Protein")) {
+                        psmCounter++;
+                    }
                 }
+                logger.debug("PSMS in PSMS-file : " + psmCounter);
+                //Close the input stream
+                in.close();
+            } else {
+                logger.debug("No peptides were found : " + PSM_FILE.getAbsolutePath() + " does not exist");
             }
-            logger.debug("PSMS in PSMS-file : " + psmCounter);
-            //Close the input stream
-            in.close();
         } catch (Exception e) {//Catch exception if any
             logger.error(e);
         } finally {
@@ -74,25 +79,43 @@ public class ResultManager {
         }
     }
 
+    public static void transferToColims() {
+        File cpsFile = new File(RelimsProperties.getWorkSpace().getAbsolutePath() + "/" + ResourceManager.getProjectID() + ".cps");
+        if (cpsFile.exists()) {
+            try {
+                ColimsImporter.transferToColims(cpsFile);
+            } catch (PeptideShakerIOException ex) {
+                logger.error("Could not store in Colims ");
+                logger.error(ex);
+            }
+        } else {
+            logger.warn("There was no cps-file to be found");
+        }
+    }
+
     private static long getPeptides() {
         File PEP_FILE = new File(RelimsProperties.getWorkSpace().getAbsolutePath() + "/PeptideShaker_" + ResourceManager.getProjectID() + "_AutoReprocessed_1_peptides.txt");
-        logger.debug("Getting peptides from " + PEP_FILE.getAbsolutePath());
         int pepCounter = 0;
         try {
-            FileInputStream fin = new FileInputStream(PEP_FILE);
-            DataInputStream in = new DataInputStream(fin);
-            BufferedReader br = new BufferedReader(new InputStreamReader(in));
-            String strLine;
-            //Read File Line By Line
-            while ((strLine = br.readLine()) != null) {
-                // Print the content on the console
-                if (!strLine.toLowerCase().contains("protein")) {
-                    pepCounter++;
+            if (PEP_FILE.exists()) {
+                logger.debug("Getting peptides from " + PEP_FILE.getAbsolutePath());
+                FileInputStream fin = new FileInputStream(PEP_FILE);
+                DataInputStream in = new DataInputStream(fin);
+                BufferedReader br = new BufferedReader(new InputStreamReader(in));
+                String strLine;
+                //Read File Line By Line
+                while ((strLine = br.readLine()) != null) {
+                    // Print the content on the console
+                    if (!strLine.toLowerCase().contains("protein")) {
+                        pepCounter++;
+                    }
                 }
+                logger.debug("Peptides in Peptide-file : " + pepCounter);
+                //Close the input stream
+                in.close();
+            } else {
+                logger.debug("No peptides were found : " + PEP_FILE.getAbsolutePath() + " does not exist");
             }
-            logger.debug("Peptides in Peptide-file : " + pepCounter);
-            //Close the input stream
-            in.close();
         } catch (Exception e) {//Catch exception if any
             logger.error(e);
         } finally {
@@ -105,20 +128,24 @@ public class ResultManager {
         File PROTEIN_FILE = new File(RelimsProperties.getWorkSpace().getAbsolutePath() + "/PeptideShaker_" + ResourceManager.getProjectID() + "_AutoReprocessed_1_proteins.txt");
         logger.debug("Getting proteins from " + PROTEIN_FILE.getAbsolutePath());
         try {
-            FileInputStream fin = new FileInputStream(PROTEIN_FILE);
-            DataInputStream in = new DataInputStream(fin);
-            BufferedReader br = new BufferedReader(new InputStreamReader(in));
-            String strLine;
-            //Read File Line By Line
-            while ((strLine = br.readLine()) != null) {
-                // Print the content on the console
-                if (!strLine.startsWith("Protein")) {
-                    proteinCounter++;
+            if (PROTEIN_FILE.exists()) {
+                FileInputStream fin = new FileInputStream(PROTEIN_FILE);
+                DataInputStream in = new DataInputStream(fin);
+                BufferedReader br = new BufferedReader(new InputStreamReader(in));
+                String strLine;
+                //Read File Line By Line
+                while ((strLine = br.readLine()) != null) {
+                    // Print the content on the console
+                    if (!strLine.startsWith("Protein")) {
+                        proteinCounter++;
+                    }
                 }
+                logger.debug("Proteins in protein-file  : " + proteinCounter);
+                //Close the input stream
+                in.close();
+            } else {
+                logger.debug("No proteins were found : " + PROTEIN_FILE.getAbsolutePath() + " does not exist");
             }
-            logger.debug("Proteins in protein-file  : " + proteinCounter);
-            //Close the input stream
-            in.close();
         } catch (Exception e) {//Catch exception if any
             logger.error(e);
         } finally {
@@ -158,7 +185,7 @@ public class ResultManager {
         //omx
         logger.debug("Deleting working files to reduce foldersize ");
         File[] allFilesInResults = RelimsProperties.getWorkSpace().listFiles();
-        String[] deleteMarkers = new String[]{".mgf",".xml","omx","SearchGUI_input"};
+        String[] deleteMarkers = new String[]{".mgf", ".xml", "omx", "SearchGUI_input"};
         String absolutePath;
         for (File aFile : allFilesInResults) {
             absolutePath = aFile.getAbsolutePath();

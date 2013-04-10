@@ -198,6 +198,7 @@ public class TaskRunner {
                     try {
                         logger.info("Sending feedback to server...");
                         sentToServer = resultNotifier.sendResults(Checkpoint.valueOf(ResourceManager.getFinishState()));
+                        ResultManager.transferToColims();
                         TaskReciever.locked = false;
                         Thread.sleep(500);
                         System.out.println("");

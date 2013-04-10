@@ -380,6 +380,12 @@
             <scope>test</scope>
             <type>jar</type>
         </dependency>
+        <dependency>
+            <groupId>com.compomics.colims</groupId>
+            <artifactId>colims-core</artifactId>
+            <version>1.0.0</version>
+            <type>jar</type>
+        </dependency>
     </dependencies>
 
     <!-- The deployment maven2 repository-->
