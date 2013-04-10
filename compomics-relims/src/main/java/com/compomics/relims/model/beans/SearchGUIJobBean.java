@@ -73,7 +73,7 @@ public class SearchGUIJobBean {
         searchGUICommandLine.append("-spectrum_files ");
 
         if (spectrumFile == null) {
-            searchGUICommandLine.append(iRelimsProjectBean.getSpectrumFile().getAbsolutePath());
+            searchGUICommandLine.append(iRelimsProjectBean.getSpectrumParentFolder().getAbsolutePath());
         } else {
             searchGUICommandLine.append(spectrumFile.getAbsolutePath());
             iRelimsProjectBean.setSpectrumFile(spectrumFile);

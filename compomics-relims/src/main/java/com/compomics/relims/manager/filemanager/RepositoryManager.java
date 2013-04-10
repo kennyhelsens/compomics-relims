@@ -77,19 +77,9 @@ public class RepositoryManager {
 
         File repositoryDirectory;
 
-        File[] mgffiles = resultsFolder.listFiles(new FilenameFilter() {
-            public boolean accept(File dir, String name) {
-                return name.toLowerCase().endsWith(".mgf");
-            }
-        });
-        File mgfFile = mgffiles[0];
+        File mgfFile = new File(RelimsProperties.getWorkSpace().getAbsolutePath()+"/mgf/");
 
-        File[] parameterfiles = resultsFolder.listFiles(new FilenameFilter() {
-            public boolean accept(File dir, String name) {
-                return name.toLowerCase().endsWith(".parameters");
-            }
-        });
-        File parametersFile = parameterfiles[0];
+        File parametersFile = new File(RelimsProperties.getWorkSpace().getAbsolutePath()+"/SearchGUI.parameters");;
 
         //store the files    
 

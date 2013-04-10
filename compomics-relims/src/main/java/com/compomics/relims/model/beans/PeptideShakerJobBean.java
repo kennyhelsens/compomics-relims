@@ -3,10 +3,16 @@ package com.compomics.relims.model.beans;
 import com.compomics.relims.concurrent.Command;
 import com.compomics.relims.conf.RelimsProperties;
 import com.compomics.relims.manager.variablemanager.ProcessVariableManager;
+import com.compomics.software.CommandLineUtils;
 import com.compomics.util.experiment.identification.SearchParameters;
 import org.apache.log4j.Logger;
 
 import java.io.File;
+import java.io.FileReader;
+import java.io.FilenameFilter;
+import java.io.IOException;
+import java.io.LineNumberReader;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -34,7 +40,7 @@ public class PeptideShakerJobBean {
     private final long projectId;
     private StringBuilder PSCommandLine;
     private File searchParametersFile;
-    private File spectra;
+    private File spectraFolder;
     private List<String> identifications;
     private String identificationFiles;
     private final File resultFolder;
@@ -47,23 +53,28 @@ public class PeptideShakerJobBean {
         this.projectId = lRelimsProjectBean.getProjectID();
         this.searchParametersFile = lRelimsProjectBean.getSearchParamFile();
         this.searchParameters = lRelimsProjectBean.getSearchParameters();
-        this.spectra = lRelimsProjectBean.getSpectrumFile();
+        this.spectraFolder = lRelimsProjectBean.getSpectrumParentFolder();
         this.resultFolder = RelimsProperties.getWorkSpace();
-        this.identificationFiles = resultFolder.getAbsolutePath() + "/" + projectId + ".omx," + resultFolder.getAbsolutePath() + "/" + projectId + ".t.xml";
-        logger.debug("Getting identification files from " + resultFolder.getAbsolutePath());
     }
 
     public String findIdentificationFiles() {
-        File omxFile = new File(RelimsProperties.getWorkSpace() + "/" + projectId + ".omx");
-        File xTandemFile = new File(RelimsProperties.getWorkSpace() + "/" + projectId + "t.xml");
+        //find all the omx and t.xml in the workspace
+        File[] files = RelimsProperties.getWorkSpace().listFiles(new FilenameFilter() {
+            @Override
+            public boolean accept(File dir, String name) {
+                if (name.endsWith("t.xml") || name.endsWith(".omx")) {
+                    return true;
+                } else {
+                    return false;
+                }
+            }
+        });
 
-        if (omxFile.exists() && xTandemFile.exists()) {
-            identificationFiles = omxFile.getAbsolutePath() + "," + xTandemFile.getAbsolutePath();
-        } else if (omxFile.exists()) {
-            identificationFiles = omxFile.getAbsolutePath();
-        } else if (xTandemFile.exists()) {
-            identificationFiles = xTandemFile.getAbsolutePath();
+        StringBuilder idCommandLineArg = new StringBuilder();
+        for (File aFile : files) {
+            idCommandLineArg.append(aFile.getAbsolutePath() + ",");
         }
+        identificationFiles = idCommandLineArg.substring(0, idCommandLineArg.length() - 1);
         return identificationFiles;
     }
 
@@ -123,7 +134,7 @@ public class PeptideShakerJobBean {
         UpdateMaxPrecursorError();
         StringBuilder PSCommandLine = new StringBuilder();
 
-        if (this.spectra.length() > 0 && this.spectra.exists()) {
+        if (this.spectraFolder.exists()) {
             PSCommandLine.append("java ");
             PSCommandLine.append("-cp ");
             PSCommandLine.append(RelimsProperties.getPeptideShakerArchivePath());
@@ -136,7 +147,7 @@ public class PeptideShakerJobBean {
             PSCommandLine.append("-identification_files ");
             PSCommandLine.append(findIdentificationFiles());
             PSCommandLine.append(" -spectrum_files ");
-            PSCommandLine.append(this.spectra.getAbsolutePath().toString());
+            PSCommandLine.append(getUsedMGFsFromSearchGUI());
             PSCommandLine.append(" -search_params ");
             PSCommandLine.append(this.searchParametersFile.getAbsolutePath().toString());
             PSCommandLine.append(" -exclude_unknown_ptms ");
@@ -186,6 +197,28 @@ public class PeptideShakerJobBean {
             this.maxPrecursorError = searchParameters.getPrecursorAccuracy();
         } catch (Exception e) {
             this.maxPrecursorError = 1.0;
+        }
+    }
+
+    private String getUsedMGFsFromSearchGUI() {
+        LineNumberReader reader = null;
+        ArrayList<File> mgfFiles = new ArrayList<File>();
+        try {
+            File searchGuiInputFile = new File(RelimsProperties.getWorkSpace().getAbsolutePath() + "/searchGUI_input.txt");
+            reader = new LineNumberReader(new FileReader(searchGuiInputFile));
+            String mgfLine;
+            while ((mgfLine = reader.readLine()) != null) {
+                mgfFiles.add(new File(mgfLine));
+            }
+        } catch (IOException e) {
+            logger.error(e);
+        } finally {
+            try {
+                reader.close();
+            } catch (IOException ex) {
+                logger.error(ex);
+            }
+            return CommandLineUtils.getCommandLineArgument(mgfFiles);
         }
     }
 }

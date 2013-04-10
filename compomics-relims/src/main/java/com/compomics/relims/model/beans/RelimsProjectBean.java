@@ -19,6 +19,7 @@ import com.google.common.collect.Sets;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.RandomAccessFile;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -31,6 +32,7 @@ import javax.annotation.Nullable;
 import no.uib.jsparklines.data.XYDataPoint;
 import org.apache.commons.configuration.PropertiesConfiguration;
 import org.apache.log4j.Logger;
+import uk.ac.ebi.pride.tools.braf.BufferedRandomAccessFile;
 
 /**
  * This class is a
@@ -42,7 +44,7 @@ public class RelimsProjectBean implements Cloneable {
      */
     private long projectID = -1;
     /**
-     * XML file that stores the usermods for this project
+     * XML originalFile that stores the usermods for this project
      */
     private UserModsFile iUserModsFile = new UserModsFile();
     /**
@@ -104,9 +106,10 @@ public class RelimsProjectBean implements Cloneable {
      */
     private File searchParametersFile = null;
     /**
-     * SearchParametersobject saved as a file
+     * SearchParametersobject saved as a originalFile
      */
     private final static Logger logger = Logger.getLogger(RelimsProjectBean.class);
+    private File spectrumParentFolder;
 
     public RelimsProjectBean(long projectID) {
         this.projectID = projectID;
@@ -227,6 +230,7 @@ public class RelimsProjectBean implements Cloneable {
         lProjectBean.setProjectID(getProjectID());
         lProjectBean.setCharges(getCharges());
         lProjectBean.setSpectrumFile(getSpectrumFile());
+        lProjectBean.setSpectrumParentFolder(getSpectrumParentFolder());
         lProjectBean.setSearchParameters(getSearchParameters());
         lProjectBean.setStandardModificationList(getStandardModificationList());
         lProjectBean.setExtraModificationList(getExtraModificationList());
@@ -300,7 +304,7 @@ public class RelimsProjectBean implements Cloneable {
     }
 
     private void validateSearchParameters(SearchParameters searchParameters) {
-        //Store the parameters in the config file that is saved with the results as well?
+        //Store the parameters in the config originalFile that is saved with the results as well?
         PropertiesConfiguration config = RelimsProperties.getConfig();
 
 // ======================================================EVALUATE ENZYME
@@ -441,11 +445,19 @@ public class RelimsProjectBean implements Cloneable {
         return searchParameters;
     }
 
+    public File getSpectrumParentFolder() {
+        if (this.spectrumParentFolder == null) {
+            this.spectrumParentFolder = new File(getSpectrumFile().getParentFile() + "/");
+        }
+        return this.spectrumParentFolder;
+    }
+
     public File getSpectrumFile() {
         if (spectrumFile == null) {
             try {
                 logger.debug("Attempting to extract MGF");
                 this.spectrumFile = dataProvider.getSpectraForProject(projectID);
+                this.spectrumParentFolder = new File(spectrumFile.getParentFile().getAbsolutePath() + "/");
             } catch (Exception e) {
                 logger.error("Could not load MGF");
             }
@@ -475,6 +487,15 @@ public class RelimsProjectBean implements Cloneable {
 
     public void setSpectrumFile(File spectrumFile) {
         this.spectrumFile = spectrumFile;
+        if (RelimsProperties.hasSpectraLimitForMGF()) {
+            try {
+                breakUpSpectrumFile(spectrumFile);
+            } catch (FileNotFoundException ex) {
+                logger.error(ex);
+            } catch (IOException ex) {
+                logger.error(ex);
+            }
+        }
     }
 
     public void setSearchParameters(SearchParameters searchParameters) {
@@ -601,5 +622,54 @@ public class RelimsProjectBean implements Cloneable {
 
     void setSearchParametersFile(File searchParametersFile) {
         this.searchParametersFile = searchParametersFile;
+    }
+
+    private void breakUpSpectrumFile(File originalSpectrumFile) throws FileNotFoundException, IOException {
+
+        int limit = RelimsProperties.getMaxSpectraAllowedInMGF();
+        long maxFileSize = RelimsProperties.getMaxMGFFileSize();
+        int subFileCounter = 1;
+        if (originalSpectrumFile.length() >= maxFileSize) {
+            logger.debug("Reading spectrumfile...");
+            RandomAccessFile outputFile = null;
+            try (RandomAccessFile originalFile = new BufferedRandomAccessFile(originalSpectrumFile, "rw", 1024)) {
+                String strLine;
+                int spectraCounter = 0;
+                logger.debug("Breaking up spectrumfile in managable subfiles (" + limit + " spectra/file)");
+                outputFile = new RandomAccessFile(originalSpectrumFile.getAbsolutePath().replace(".mgf", "_" + subFileCounter + ".mgf"), "rw");
+                while (originalFile.getFilePointer() < originalFile.length()) {
+                    strLine = originalFile.readLine();
+                    if (strLine.startsWith("BEGIN")) {
+                        spectraCounter++;
+                    }
+                    if (spectraCounter > limit) {
+                        spectraCounter = 0;
+                        subFileCounter++;
+                        outputFile.close();
+                        outputFile = new RandomAccessFile(originalSpectrumFile.getAbsolutePath().replace(".mgf", "_" + subFileCounter + ".mgf"), "rw");
+                        logger.debug("Created new subfile : " + subFileCounter);
+                    }
+                    outputFile.writeBytes(strLine + System.lineSeparator());
+                }
+                if (subFileCounter == 1) {
+                    new File(originalSpectrumFile.getAbsolutePath().replace("_1.mgf", ".mgf"));
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            } finally {
+                outputFile.close();
+                logger.debug("Finished splitting original MGF");
+                if (subFileCounter > 1) {
+                    logger.debug("Deleting original file...");
+                    boolean delete = originalSpectrumFile.delete();
+                }
+            }
+        }
+        logger.debug("Setting mgf folder to " + originalSpectrumFile.getParent());
+        setSpectrumParentFolder(originalSpectrumFile.getParentFile());
+    }
+
+    private void setSpectrumParentFolder(File spectrumParentFolder) {
+        this.spectrumParentFolder = spectrumParentFolder;
     }
 }

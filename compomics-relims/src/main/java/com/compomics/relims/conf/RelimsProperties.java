@@ -80,6 +80,14 @@ public class RelimsProperties {
         }
     }
 
+    public static int getMaxSpectraAllowedInMGF() {
+        return config.getInt("searchgui.max.spectra.in.mgf");
+    }
+
+    public static long getMaxMGFFileSize() {
+        return config.getInt("searchgui.max.mgf.filesize") * 1024 * 1024;
+    }
+
     public static boolean getDebugMode() {
         return config.getBoolean("relims.debugmode");
     }
@@ -136,6 +144,10 @@ public class RelimsProperties {
 
     public static File getUserModsFile() {
         return new File(getSearchGuiUserModFile().getAbsolutePath());
+    }
+
+    public static boolean hasSpectraLimitForMGF() {
+        return config.getBoolean("searchgui.use.spectrum.limit");
     }
     /**
      * the results will all be placed in a user-specific folder. Therefor, all
@@ -201,8 +213,6 @@ public class RelimsProperties {
                 try {
                     File logForJDestination = new File(rootPath + "/resources/conf/log4j.properties");
                     log4JConfig = new PropertiesConfiguration(logForJDestination.getAbsolutePath());
-                    relimsLoggingFile = new File((String) log4JConfig.getProperty("log4j.appender.report.File"));
-                    relimsLoggingFile.deleteOnExit();
                     System.out.println("");
                 } catch (ConfigurationException ex) {
                     logger.error(ex);
@@ -295,21 +305,23 @@ public class RelimsProperties {
     }
 
     public static File createWorkSpace(long projectID, String projectSource) {
-        //            iWorkSpace = Files.createTempDir();
-        //todo ake a nicer format for the analysis...Milliseconds = not telling much
-        // iWorkSpace = new File(getWorkSpacePath(), String.valueOf(System.currentTimeMillis()));
-        StringBuilder fileName = new StringBuilder();
-        Calendar date = Calendar.getInstance();
-        SimpleDateFormat dateformatter = new SimpleDateFormat("ddMMyyyy_hhmmss");
-        fileName.append("").append(projectID).append("_");
-        fileName.append(projectSource).append("_");
-        fileName.append(dateformatter.format(date.getTime()));
-        workSpace = new File(getWorkSpacePath(), fileName.toString());
-        workSpace.mkdir();
-        logFolder = new File(workSpace.getAbsolutePath() + "/processinfo/");
-        logFolder.mkdir();
-        config.setProperty("relims.log.folder", logFolder.getAbsolutePath());
-        config.setProperty("relims.resultFolder", workSpace.getAbsolutePath());
+        if (workSpace == null) {
+            System.out.println("Creating workspace for project " + projectID);
+            StringBuilder fileName = new StringBuilder();
+            Calendar date = Calendar.getInstance();
+            SimpleDateFormat dateformatter = new SimpleDateFormat("ddMMyyyy_hhmmss");
+            fileName.append("").append(projectID).append("_");
+            fileName.append(projectSource).append("_");
+            fileName.append(dateformatter.format(date.getTime()));
+            workSpace = new File(getWorkSpacePath(), fileName.toString());
+            workSpace.mkdir();
+            logFolder = new File(workSpace.getAbsolutePath() + "/processinfo/");
+            logFolder.mkdir();
+            config.setProperty("relims.log.folder", logFolder.getAbsolutePath());
+            config.setProperty("relims.resultFolder", workSpace.getAbsolutePath());
+            System.out.println("Redirecting logging to " + workSpace.getAbsolutePath());
+            Logger.getRootLogger().addAppender(new RelimsLoggingAppender());
+        }
         return workSpace;
     }
 
