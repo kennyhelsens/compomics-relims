@@ -140,6 +140,7 @@ public class PeptideShakerJobBean {
 
         if (this.spectraFolder.exists()) {
             PSCommandLine.append("java ");
+            PSCommandLine.append("-Xmx" + RelimsProperties.getAllowedRAM() + "M " );
             PSCommandLine.append("-cp ");
             PSCommandLine.append(RelimsProperties.getPeptideShakerArchive());
             PSCommandLine.append(" eu.isas.peptideshaker.cmd.PeptideShakerCLI ");
@@ -188,7 +189,7 @@ public class PeptideShakerJobBean {
         try {
             String psCommandLine = getPeptideShakerCommandString();
             if (psCommandLine != null) {
-                File peptideShakerFolder = new File(RelimsProperties.getPeptideShakerFolder()+"/");
+                File peptideShakerFolder = new File(RelimsProperties.getPeptideShakerFolder() + "/");
                 Command.setWorkFolder(peptideShakerFolder);
                 logger.debug("Launching peptideshaker from " + peptideShakerFolder.getAbsolutePath());
                 logger.info(psCommandLine);

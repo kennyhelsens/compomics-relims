@@ -181,6 +181,8 @@ public class PrideXMLDataProvider implements DataProvider {
                 logger.debug("Pride-ASAP additionally resolved :");
                 for (Modification lPrideAsapModification : lPrideAsapModifications) {
                     Modification lAsapModification = lPrideAsapModification;
+                    //peptideshaker has problems with "_"
+                    lAsapModification.setName(lAsapModification.getName().replace("_", "-"));
                     if (lModificationSet.add(lAsapModification) == true) {
                         logger.debug(lAsapModification.getName());
                     }

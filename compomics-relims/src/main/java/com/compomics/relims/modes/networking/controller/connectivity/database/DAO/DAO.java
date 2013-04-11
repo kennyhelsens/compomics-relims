@@ -93,7 +93,6 @@ public class DAO {
         return directory;
     }
 
-
     public static void initiate() {
         new DAO();
     }
@@ -188,10 +187,8 @@ public class DAO {
                     statement.execute("begin immediate");
                     if (protocol.contains("derby")) {
                         connectionInstance.setTransactionIsolation(4);
-                        RelimsProperties.setDbPrefix(dbName);
                     } else {
                         connectionInstance.setTransactionIsolation(Connection.TRANSACTION_READ_UNCOMMITTED);
-                        RelimsProperties.setDbPrefix("");
                     }
                     success = true;
                 } catch (SQLException ex) {
@@ -214,12 +211,10 @@ public class DAO {
                     connectionInstance = getConnection();
                     if (protocol.contains("derby")) {
                         //          connectionInstance.setTransactionIsolation(1);
-                        RelimsProperties.setDbPrefix(dbName);
                         statement = connectionInstance.createStatement();
                         statement.execute("begin deferred");
                     } else {
                         connectionInstance.setTransactionIsolation(Connection.TRANSACTION_READ_UNCOMMITTED);
-                        RelimsProperties.setDbPrefix("");
                     }
                     success = true;
                 } catch (SQLException ex) {
@@ -330,12 +325,12 @@ public class DAO {
                     + "Salt VARCHAR(50),"
                     + "eMail VARCHAR(100));");
         }
-        queryList.add("CREATE TABLE PRIDEDETAILS ("
+        queryList.add("CREATE TABLE PRIDEXMLERRORS ("
                 + "ProjectID VarChar(50),"
                 + "ErrorCode INTEGER,"
                 + "Description VarChar(150),"
                 + "SeverityLevel VarChar(25));");
-        queryList.add("CREATE TABLE Statistics ("
+        queryList.add("CREATE TABLE WorkerSpecs ("
                 //Taskrelated Parameters
                 + "TaskID BIGINT,"
                 + "TaskTime BIGINT,"
