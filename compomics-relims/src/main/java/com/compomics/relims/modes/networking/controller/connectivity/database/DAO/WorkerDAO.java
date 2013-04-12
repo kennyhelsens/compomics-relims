@@ -32,7 +32,7 @@ public class WorkerDAO {
             conn = DAO.getConnection();
             //      statement = conn.prepareStatement("BEGIN");
             //      statement.execute();
-            String query = "insert into " + RelimsProperties.getDbPrefix() + "Workers"
+            String query = "insert into Workers"
                     + "(HostName,workerPort,taskID) values (?, ?, ?)";
             statement = conn.prepareStatement(query);
             statement.setString(1, hostname);
@@ -75,7 +75,7 @@ public class WorkerDAO {
             conn = DAO.getConnection();
             //      statement = conn.prepareStatement("BEGIN");
             //      statement.execute();
-            String query = "select taskID " + RelimsProperties.getDbPrefix() + "Workers where Hostname = ? and workerPort = ?";
+            String query = "select taskID Workers where Hostname = ? and workerPort = ?";
             statement = conn.prepareStatement(query);
             statement.setString(1, hostname);
             statement.setInt(2, workerPort);
@@ -102,7 +102,7 @@ public class WorkerDAO {
             conn = DAO.getConnection();
             //      statement = conn.prepareStatement("BEGIN");
             //      statement.execute();
-            String query = "delete from " + RelimsProperties.getDbPrefix() + "Workers where Hostname = ? and workerPort = ?";
+            String query = "delete from Workers where Hostname = ? and workerPort = ?";
             statement = conn.prepareStatement(query);
             statement.setString(1, hostname);
             statement.setInt(2, workerPort);

@@ -7,8 +7,6 @@ import com.compomics.relims.model.beans.RelimsProjectBean;
 import com.compomics.relims.model.interfaces.DataProvider;
 import com.compomics.relims.model.interfaces.ModificationResolver;
 import com.compomics.relims.model.interfaces.ProjectListProvider;
-import com.compomics.relims.model.provider.projectlist.ProjectListProviderLocal;
-import com.compomics.relims.model.provider.projectlist.ProjectListProviderRedis;
 import org.apache.log4j.Logger;
 
 import java.util.Collection;
@@ -23,34 +21,25 @@ public abstract class ProjectProvider {
     protected ModificationResolver iModificationResolver = null;
 
     public abstract Collection<Long> getAllProjects();
+
     public abstract Collection<Long> getRandomProjects(int lSize);
 
     protected ProjectProvider() {
         iModificationResolver = new ModificationResolverImpl();
     }
 
-    public ModificationResolver getModificationResolver(){
+    public ModificationResolver getModificationResolver() {
         return iModificationResolver;
-    };
-
-
-    public ProjectListProvider getPreDefinedProjects() {
-
-        ProjectListProvider result = null;
-        if(RelimsProperties.useProjectListFromRedis()){
-            result = new ProjectListProviderRedis();
-        }else{
-            result = new ProjectListProviderLocal();
-        }
-        return result;
     }
+
+    ;
 
     public RelimsProjectBean getProject(long aProjectid) {
         return iDataProvider.buildProjectBean(aProjectid);
     }
 
-    public DataProvider getDataProvider(){
-        if(iDataProvider == null){
+    public DataProvider getDataProvider() {
+        if (iDataProvider == null) {
             throw new RelimsException("NOT YET CREATED BY PROJECTPROVIDER IMPLEMENTATION");
         }
         return iDataProvider;

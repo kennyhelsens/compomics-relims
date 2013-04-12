@@ -133,47 +133,7 @@ public class RelimsJob implements Callable, Closable {
             }
         } else {
             ProcessVariableManager.setClassicMode(true);
-            runClassicRelims();
             return lFutures;
-        }
-    }
-
-    private void runClassicRelims() {
-        //Run relims as it used to be run ...
-        Thread.setDefaultUncaughtExceptionHandler(new RelimsExceptionHandler());
-        ProcessVariableManager.setClassicMode(true);
-        progressManager.setUp();
-        Long lProjectID;
-        ProjectListProvider lPreDefinedProjects = projectProvider.getPreDefinedProjects();
-        ProcessVariableManager.setResultsFolder(" ");
-        while ((lProjectID = lPreDefinedProjects.nextProjectID()) != -1) {
-            try {
-                // Class searchStrategyClass = RelimsProperties.getRelimsSearchStrategyClass(iSearchStrategyID);
-                // SearchStrategy searchStrategy = (SearchStrategy) searchStrategyClass.newInstance();
-                ProjectRunner lProjectRunner = new RelimsJobController();
-                lProjectRunner.setProjectID(lProjectID);
-                lProjectRunner.setProjectProvider(projectProvider);
-                lProjectRunner.setPredicateManager(predicateManager);
-                //  lProjectRunner.setSearchStrategy(searchStrategy);
-
-                Observable lObservable = (Observable) lProjectRunner;
-                Future lFuture = executorService.submit(lProjectRunner);
-
-                while (lFuture.isCancelled() == false && lFuture.isDone() == false) {
-                    // Do nothing.
-                }
-
-                if (lFuture.isCancelled()) {
-                    logger.debug(String.format("Actively cancelled analysis of project %s. Continuing to next project.", lProjectID));
-                    initThreadExecutor();
-
-                } else if (lFuture.isDone()) {
-                    logger.debug(String.format("Finished analysis of project %s.", lProjectID));
-                }
-
-            } catch (Exception e) {
-                logger.error(e.getMessage(), e);
-            }
         }
     }
 

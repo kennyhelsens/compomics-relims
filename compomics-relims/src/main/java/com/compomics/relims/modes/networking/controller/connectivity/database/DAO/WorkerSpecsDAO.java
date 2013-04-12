@@ -20,13 +20,13 @@ import java.util.List;
  *
  * @author Kenneth
  */
-public class StatisticsDAO {
+public class WorkerSpecsDAO {
 
     private org.apache.log4j.Logger logger = org.apache.log4j.Logger.getLogger(DatabaseService.class);
     private Statement cStatement;
     private DatabaseService dds = DatabaseService.getInstance();
 
-    public boolean createTaskStatistics(HashMap<String, Object> statisticsMap, String workerHost) {
+    public boolean createTaskWorkerSpecs(HashMap<String, Object> WorkerSpecsMap, String workerHost) {
 
         PreparedStatement statement = null;
         ResultSet rs = null;
@@ -38,39 +38,39 @@ public class StatisticsDAO {
         try {
             conn = DAO.getConnection();
             //statement.execute("BEGIN");
-            String query = "insert into " + RelimsProperties.getDbPrefix() + "Statistics"
+            String query = "insert into WorkerSpecs"
                     + " values (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
-            logger.debug("Loading statistics into database...");
+            logger.debug("Loading WorkerSpecs into database...");
             statement = conn.prepareStatement(query);
-            statement.setLong(1, (Long) statisticsMap.get("taskID"));
+            statement.setLong(1, (Long) WorkerSpecsMap.get("taskID"));
             try {
-                statement.setLong(2, (Long) statisticsMap.get("taskTime"));
+                statement.setLong(2, (Long) WorkerSpecsMap.get("taskTime"));
             } catch (NullPointerException e) {
                 logger.error("Tasktime was not recorded due to taskfailure...");
                 statement.setLong(2, 0);
             }
-            statement.setInt(3, (Integer) statisticsMap.get("workerPort"));
+            statement.setInt(3, (Integer) WorkerSpecsMap.get("workerPort"));
             statement.setString(4, (String) workerHost);
-            statement.setLong(5, (Long) statisticsMap.get("committedvirtualmemorysize"));
-            statement.setLong(6, (Long) statisticsMap.get("freephysicalmemorysize"));
-            statement.setLong(7, (Long) statisticsMap.get("totalphysicalmemorysize"));
-            statement.setLong(8, (Long) statisticsMap.get("freeswapspacesize"));
-            statement.setLong(9, (Long) statisticsMap.get("totalswapspacesize"));
-            statement.setLong(10, (Long) statisticsMap.get("processcputime"));
-            statement.setInt(11, (Integer) statisticsMap.get("cores"));
-            statement.setString(12, (String) statisticsMap.get("osarch"));
-            statement.setString(13, (String) statisticsMap.get("osversion"));
-            statement.setString(14, (String) statisticsMap.get("osname"));
-            statement.setDouble(15, (Double) statisticsMap.get("systemcpuload"));
-            statement.setDouble(16, (Double) statisticsMap.get("processcpuload"));
-            statement.setString(17, (String) statisticsMap.get("javaversion"));
-            statement.setString(18, (String) statisticsMap.get("userid"));
+            statement.setLong(5, (Long) WorkerSpecsMap.get("committedvirtualmemorysize"));
+            statement.setLong(6, (Long) WorkerSpecsMap.get("freephysicalmemorysize"));
+            statement.setLong(7, (Long) WorkerSpecsMap.get("totalphysicalmemorysize"));
+            statement.setLong(8, (Long) WorkerSpecsMap.get("freeswapspacesize"));
+            statement.setLong(9, (Long) WorkerSpecsMap.get("totalswapspacesize"));
+            statement.setLong(10, (Long) WorkerSpecsMap.get("processcputime"));
+            statement.setInt(11, (Integer) WorkerSpecsMap.get("cores"));
+            statement.setString(12, (String) WorkerSpecsMap.get("osarch"));
+            statement.setString(13, (String) WorkerSpecsMap.get("osversion"));
+            statement.setString(14, (String) WorkerSpecsMap.get("osname"));
+            statement.setDouble(15, (Double) WorkerSpecsMap.get("systemcpuload"));
+            statement.setDouble(16, (Double) WorkerSpecsMap.get("processcpuload"));
+            statement.setString(17, (String) WorkerSpecsMap.get("javaversion"));
+            statement.setString(18, (String) WorkerSpecsMap.get("userid"));
             statement.setQueryTimeout(60);
             statement.execute();
             //statement.execute("COMMIT");
-            logger.debug("Statistics for task " + statisticsMap.get("taskID") + " were succesfully registered.");
+            logger.debug("WorkerSpecs for task " + WorkerSpecsMap.get("taskID") + " were succesfully registered.");
         } catch (Exception ex) {
-            logger.error("Error recording statistics");
+            logger.error("Error recording WorkerSpecs");
             logger.error(ex);
             ex.printStackTrace();
         } finally {
@@ -82,19 +82,19 @@ public class StatisticsDAO {
             } else {
                 createSucces = true;
             }
-            String projectID = dds.getProjectID((Long) statisticsMap.get("taskID"));
+            String projectID = dds.getProjectID((Long) WorkerSpecsMap.get("taskID"));
             if (createSucces) {
-                logger.info("SUCCESS : Stored results for task " + statisticsMap.get("taskID") + " - ProjectID : " + projectID);
+                logger.info("SUCCESS : Stored results for task " + WorkerSpecsMap.get("taskID") + " - ProjectID : " + projectID);
             } else {
-                logger.error("FAILURE : Could not run task " + statisticsMap.get("taskID") + " - ProjectID : " + projectID);
+                logger.error("FAILURE : Could not run task " + WorkerSpecsMap.get("taskID") + " - ProjectID : " + projectID);
             }
             return createSucces;
         }
     }
 
-    public HashMap<String, Object> getAverageStatistics() {
+    public HashMap<String, Object> getAverageWorkerSpecs() {
         DecimalFormat twoDForm = new DecimalFormat("#.##");
-        HashMap<String, Object> averageStatistics = new HashMap<String, Object>();
+        HashMap<String, Object> averageWorkerSpecs = new HashMap<String, Object>();
         PreparedStatement statement = null;
         ResultSet rs = null;
         Connection conn = null;
@@ -107,20 +107,20 @@ public class StatisticsDAO {
                     + "AVG(systemcpuload),"
                     + "AVG(committedVirtualMemorySize),"
                     + "AVG(cores)"
-                    + "FROM " + RelimsProperties.getDbPrefix()+"Statistics";
+                    + "FROM WorkerSpecs";
             statement = conn.prepareStatement(query);
             statement.setQueryTimeout(60);
             rs = statement.executeQuery();
             if (rs.next()) {
-                averageStatistics.put("taskTime", (twoDForm.format((double) rs.getLong(1) / (60 * 1000))));
-                averageStatistics.put("systemCPULoad", twoDForm.format(rs.getDouble(2) * 100));
-                averageStatistics.put("committedVirtualMemorySize", twoDForm.format((double) rs.getLong(3) / 1000000000));
-                averageStatistics.put("cores", rs.getInt(4));
+                averageWorkerSpecs.put("taskTime", (twoDForm.format((double) rs.getLong(1) / (60 * 1000))));
+                averageWorkerSpecs.put("systemCPULoad", twoDForm.format(rs.getDouble(2) * 100));
+                averageWorkerSpecs.put("committedVirtualMemorySize", twoDForm.format((double) rs.getLong(3) / 1000000000));
+                averageWorkerSpecs.put("cores", rs.getInt(4));
             } else {
-                averageStatistics.put("taskTime", 0L);
-                averageStatistics.put("systemCPULoad", 0L);
-                averageStatistics.put("committedVirtualMemorySize", 0L);
-                averageStatistics.put("cores", 0);
+                averageWorkerSpecs.put("taskTime", 0L);
+                averageWorkerSpecs.put("systemCPULoad", 0L);
+                averageWorkerSpecs.put("committedVirtualMemorySize", 0L);
+                averageWorkerSpecs.put("cores", 0);
             }
             //cStatement.execute("COMMIT");
             //cStatement.close();
@@ -131,7 +131,7 @@ public class StatisticsDAO {
 //                cStatement = null;
             }
             DAO.disconnect(conn, rs, statement);
-            return averageStatistics;
+            return averageWorkerSpecs;
         }
     }
 }
