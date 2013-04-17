@@ -1,0 +1,121 @@
+diff a/compomics-relims/src/main/java/com/compomics/relims/modes/networking/controller/connectivity/database/DAO/TaskDAO.java b/compomics-relims/src/main/java/com/compomics/relims/modes/networking/controller/connectivity/database/DAO/TaskDAO.java	(rejected hunks)
+@@ -50,7 +50,7 @@
+         Connection conn = null;
+         try {
+             conn = DAO.getConnection();
+-            String query = "update " + RelimsProperties.getDbPrefix() + "Tasks set TaskState = ? where TaskID=?";
++            String query = "update Tasks set TaskState = ? where TaskID=?";
+ //            statement = conn.prepareStatement("BEGIN");
+             //           statement.execute();
+             statement = conn.prepareStatement(query);
+@@ -89,7 +89,7 @@
+ 
+         try {
+             conn = DAO.getConnection();
+-            String query = "update " + RelimsProperties.getDbPrefix() + "Tasks set searchParameters = ? where TaskID=?";
++            String query = "update Tasks set searchParameters = ? where TaskID=?";
+ //            statement = conn.prepareStatement("BEGIN");
+             //           statement.execute();
+             statement = conn.prepareStatement(query);
+@@ -115,7 +115,7 @@
+             conn = DAO.getConnection();
+ //            statement = conn.prepareStatement("BEGIN");
+ //            statement.execute();
+-            String query = "delete from " + RelimsProperties.getDbPrefix() + "Tasks where TaskID = ?";
++            String query = "delete from Tasks where TaskID = ?";
+             statement = conn.prepareStatement(query);
+             statement.setLong(1, taskID);
+             statement.setQueryTimeout(60);
+@@ -137,7 +137,7 @@
+             conn = DAO.getConnection();
+ //            statement = conn.prepareStatement("BEGIN");
+ //            statement.execute();
+-            String query = "insert into " + RelimsProperties.getDbPrefix() + "Tasks"
++            String query = "insert into Tasks"
+                     + "(TaskState,ClientID,RelimsClientJob,TimeStamp) values (?, ?, ?, ?)";
+             statement = conn.prepareStatement(query, Statement.RETURN_GENERATED_KEYS);
+             statement.setString(1, "New");
+@@ -176,7 +176,7 @@
+ //            statement = conn.prepareStatement("BEGIN");
+ //            statement.execute();
+             //     String query = "select * from " + RelimsProperties.getTaskDatabaseName()+".Tasks where TaskID = ?";
+-            String query = "select * from " + RelimsProperties.getDbPrefix() + "Tasks where TaskID = ?";
++            String query = "select * from Tasks where TaskID = ?";
+             statement = conn.prepareStatement(query);
+             statement.setLong(1, taskID);
+             statement.setQueryTimeout(60);
+@@ -218,7 +218,7 @@
+             conn = DAO.getConnection();
+             //           statement = conn.prepareStatement("BEGIN");
+             //           statement.execute();
+-            String query = "select * from " + RelimsProperties.getDbPrefix() + "Tasks where (TaskState = ? or TaskState = ?) order by Timestamp LIMIT 1";
++            String query = "select * from Tasks where (TaskState = ? or TaskState = ?) order by Timestamp LIMIT 1";
+             statement = conn.prepareStatement(query);
+             statement.setString(1, "RESCHEDULED");
+             statement.setString(2, "NEW");
+@@ -295,7 +295,7 @@
+                 conn = DAO.getConnection();
+                 //         statement = conn.prepareStatement("BEGIN");
+                 //         statement.execute();
+-                String query = "update " + RelimsProperties.getDbPrefix() + "Tasks set TaskState = ? where TaskState=? OR TaskState=?";
++                String query = "update Tasks set TaskState = ? where TaskState=? OR TaskState=?";
+                 statement = conn.prepareStatement(query);
+                 statement.setString(1, "NEW");
+                 statement.setString(2, "RUNNING");
+@@ -359,7 +359,7 @@
+             //     statement.execute();
+             for (String aProjectID : aProjectIDList) {
+                 String query = "";
+-                query = " insert into " + RelimsProperties.getDbPrefix() + "Tasks"
++                query = " insert into Tasks"
+                         + " (ProjectID,TaskState,ClientID,StrategyID,SourceID,TimeStamp,ProjectID,usePride,searchparameters) values (?,?,?, ?, ?, ?, ?, ?,?)";
+                 success = false;
+                 int attempts = 0;
+@@ -466,9 +466,9 @@
+         StringBuilder query = new StringBuilder();
+         try {
+             if (queryParameters.equals("")) {
+-                query.append("select ProjectID," + RelimsProperties.getDbPrefix() + "Statistics.TaskID,TaskState,ProjectName from " + RelimsProperties.getDbPrefix() + "Tasks inner join " + RelimsProperties.getDbPrefix() + "Statistics on " + RelimsProperties.getDbPrefix() + "Tasks.TaskID = " + RelimsProperties.getDbPrefix() + "Statistics.TaskID where CLIENTID = ?");
++                query.append("select ProjectID,WorkerSpecs.TaskID,TaskState,ProjectName from Tasks inner join WorkerSpecs on Tasks.TaskID = WorkerSpecs.TaskID where CLIENTID = ?");
+             } else {
+-                query.append("select ProjectID," + RelimsProperties.getDbPrefix() + "Statistics.TaskID,TaskState,ProjectName from " + RelimsProperties.getDbPrefix() + "Tasks inner join " + RelimsProperties.getDbPrefix() + "Statistics on " + RelimsProperties.getDbPrefix() + "Tasks.TaskID = " + RelimsProperties.getDbPrefix() + "Statistics.TaskID where CLIENTID = ? and ").append(queryParameters);
++                query.append("select ProjectID,WorkerSpecs.TaskID,TaskState,ProjectName from Tasks inner join WorkerSpecs on Tasks.TaskID = WorkerSpecs.TaskID where CLIENTID = ? and ").append(queryParameters);
+             }
+ 
+             String queryString = query.toString();
+@@ -511,7 +511,7 @@
+                 conn = DAO.getConnection();
+                 //         statement = conn.prepareStatement("BEGIN");
+                 //         statement.execute();
+-                statement = conn.prepareStatement("update " + RelimsProperties.getDbPrefix() + "Tasks set TaskState = ? where TaskID=?");
++                statement = conn.prepareStatement("update Tasks set TaskState = ? where TaskID=?");
+                 statement.setString(1, "NEW");
+                 statement.setLong(2, taskID);
+                 statement.setQueryTimeout(60);
+@@ -535,7 +535,7 @@
+             conn = DAO.getConnection();
+             //     statement = conn.prepareStatement("BEGIN");
+             //     statement.execute();
+-            statement = conn.prepareStatement("update " + RelimsProperties.getDbPrefix() + "Tasks set TaskState ='NEW' where TaskState = 'FAILED'");
++            statement = conn.prepareStatement("update Tasks set TaskState ='NEW' where TaskState = 'FAILED'");
+             statement.setQueryTimeout(60);
+             restored = statement.executeUpdate();
+             //     statement = conn.prepareStatement("COMMIT");
+@@ -561,7 +561,7 @@
+             conn = DAO.getConnection();
+             //     statement = conn.prepareStatement("BEGIN");
+             //     statement.execute();
+-            statement = conn.prepareStatement("select * from " + RelimsProperties.getDbPrefix() + "Tasks inner join " + RelimsProperties.getDbPrefix() + "Statistics on " + RelimsProperties.getDbPrefix() + "Tasks.TaskID = " + RelimsProperties.getDbPrefix() + "Statistics.TaskID where " + RelimsProperties.getDbPrefix() + "Tasks.TaskID = ?");
++            statement = conn.prepareStatement("select * from Tasks inner join WorkerSpecs on Tasks.TaskID = WorkerSpecs.TaskID where Tasks.TaskID = ?");
+             statement.setLong(1, taskID);
+             myResults = statement.executeQuery();
+             try {
+@@ -599,7 +599,7 @@
+         conn = DAO.getConnection();
+         String projectID = "unknown";
+         try {
+-            String query = ("select ProjectID from " + RelimsProperties.getDbPrefix() + "Tasks where TaskID = ?");
++            String query = ("select ProjectID from Tasks where TaskID = ?");
+             //     statement = conn.prepareStatement("BEGIN");
+             //     statement.execute();
+             statement = conn.prepareStatement(query);

@@ -17,7 +17,7 @@ import org.apache.log4j.Logger;
 public class ProcesRelocalizer {
 
     private static File relimsTemp = RelimsProperties.getRelimsTempFolder();
-    private static File relimsPepTemp = new File(relimsTemp.getAbsolutePath() + "/peptideshaker/"+RelimsProperties.getPeptideShakerArchive().replace(".jar",""));
+    private static File relimsPepTemp = new File(relimsTemp.getAbsolutePath() + "/peptideshaker");
     private static File relimsSearchGuiTemp = new File(relimsTemp.getAbsolutePath() + "/searchgui");
     private static final Logger logger = Logger.getLogger(ProcesRelocalizer.class);
 

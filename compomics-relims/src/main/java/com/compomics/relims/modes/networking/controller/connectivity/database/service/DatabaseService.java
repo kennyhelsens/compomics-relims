@@ -7,9 +7,9 @@ package com.compomics.relims.modes.networking.controller.connectivity.database.s
 import com.compomics.pridexmltomgfconverter.errors.enums.ConversionError;
 import com.compomics.relims.conf.RelimsProperties;
 import com.compomics.relims.modes.networking.controller.connectivity.database.DAO.DAO;
-import com.compomics.relims.modes.networking.controller.connectivity.database.DAO.PrideDetailsDAO;
-import com.compomics.relims.modes.networking.controller.connectivity.database.DAO.ResultDAO;
-import com.compomics.relims.modes.networking.controller.connectivity.database.DAO.StatisticsDAO;
+import com.compomics.relims.modes.networking.controller.connectivity.database.DAO.PrideXMLErrorsDAO;
+import com.compomics.relims.modes.networking.controller.connectivity.database.DAO.ProjectResultDAO;
+import com.compomics.relims.modes.networking.controller.connectivity.database.DAO.WorkerSpecsDAO;
 import com.compomics.relims.modes.networking.controller.connectivity.database.DAO.TaskDAO;
 import com.compomics.relims.modes.networking.controller.connectivity.database.DAO.UserDAO;
 import com.compomics.relims.modes.networking.controller.connectivity.database.DAO.WorkerDAO;
@@ -31,9 +31,9 @@ public class DatabaseService {
     private final static TaskDAO TaskDAO = new TaskDAO();
     private final static UserDAO UserDAO = new UserDAO();
     private final static WorkerDAO WorkerDAO = new WorkerDAO();
-    private final static StatisticsDAO StatisticsDAO = new StatisticsDAO();
-    private final static PrideDetailsDAO prideDetailsDAO = new PrideDetailsDAO();
-    private final static ResultDAO projectResultDAO = new ResultDAO();
+    private final static WorkerSpecsDAO WorkerSpecsDAO = new WorkerSpecsDAO();
+    private final static PrideXMLErrorsDAO PRIDEXMLERRORSDAO = new PrideXMLErrorsDAO();
+    private final static ProjectResultDAO projectResultDAO = new ProjectResultDAO();
     private final static BackupService backupService = BackupService.getInstance();
     private final static ExecutorService dbExService = Executors.newSingleThreadExecutor();
 
@@ -218,14 +218,14 @@ public class DatabaseService {
     }
 
     //==========STATISTIC RELATED METHODS===============//
-    public synchronized void storeStatistics(HashMap<String, Object> statistics, String workerhost) {
+    public synchronized void storeWorkerSpecs(HashMap<String, Object> WorkerSpecs, String workerhost) {
 
-        StatisticsDAO.createTaskStatistics(statistics, workerhost);
+        WorkerSpecsDAO.createTaskWorkerSpecs(WorkerSpecs, workerhost);
     }
 
-    public synchronized HashMap<String, Object> getAverageStatistics() {
+    public synchronized HashMap<String, Object> getAverageWorkerSpecs() {
 
-        return StatisticsDAO.getAverageStatistics();
+        return WorkerSpecsDAO.getAverageWorkerSpecs();
     }
 
     public synchronized Map<String, Object> getTaskInformation(long taskID) {
@@ -239,7 +239,7 @@ public class DatabaseService {
     }
 
     public void storeErrorList(List<ConversionError> errorList, String projectID) {
-        prideDetailsDAO.createPrideDetails(errorList, projectID);
+        PRIDEXMLERRORSDAO.createPRIDEXMLERRORS(errorList, projectID);
     }
 
     //==========PROJECT RESULT RELATED METHODS===============//
