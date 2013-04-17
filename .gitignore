@@ -42,3 +42,4 @@ compomics-relims/src/test/resources/log4j.properties
 compomics-relims/src/test/resources/sourcefiles/Mimic_PrideFTP/PRIDE_Exp_Complete_Ac_8437.xml.gz
 compomics-relims/src/test/resources/sourcefiles/Fasta/windows/SP_130428_concatenated_target_decoy.fasta.00.phr
 compomics-relims/src/test/resources/sourcefiles/Mimic_PrideFTP/PRIDE_Exp_Complete_Ac_1982.xml.gz
+compomics-relims/src/main/java/com/compomics/relims/concurrent/RelimsJobController.java.rej

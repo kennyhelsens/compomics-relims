@@ -19,14 +19,16 @@ import com.compomics.relims.model.provider.ProjectProvider;
 import com.compomics.relims.model.provider.pride.PrideProjectProvider;
 import com.compomics.util.experiment.identification.SearchParameters;
 import com.google.common.base.Predicate;
-import java.io.File;
-import java.io.IOException;
-import static java.lang.String.format;
-import java.util.Collection;
-import java.util.Observable;
 import org.apache.commons.configuration.ConfigurationException;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
+
+import java.io.File;
+import java.io.IOException;
+import java.util.Collection;
+import java.util.Observable;
+
+import static java.lang.String.format;
 
 public class RelimsJobController extends Observable implements ProjectRunner {
 
@@ -94,7 +96,7 @@ public class RelimsJobController extends Observable implements ProjectRunner {
      */
     private ProgressManager progressManager = ProgressManager.getInstance();
     /**
-     * The filegrabber is a generic tool to aquire MGF files and
+     * The filegrabber is a generic tool to acquire MGF files and
      * searchparameters files in a resultfolder. //TODO : it currently only
      * grabs the first file with the required extension that is found. Should
      * these be put in a list? In theory, only ONE file per extension should be
@@ -179,7 +181,11 @@ public class RelimsJobController extends Observable implements ProjectRunner {
         try {
             searchGUIJobBean = new SearchGUIJobBean(relimsProjectBean);
             sampleID = searchGUIJobBean.getName();
+<<<<<<< HEAD
             logger.debug("aquiring the search results with SearchGUI");
+=======
+         logger.debug("acquiring the search results with SearchGUI");
+>>>>>>> d3d7c30f1d1077a8587085d81dd1cbfdb82382da
             if (searchGUIJobBean.launch() == 0) {
                 experimentID = sampleID;
                 return true;
