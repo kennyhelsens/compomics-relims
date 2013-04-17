@@ -17,9 +17,9 @@ import com.google.common.base.Function;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.io.RandomAccessFile;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -32,7 +32,6 @@ import javax.annotation.Nullable;
 import no.uib.jsparklines.data.XYDataPoint;
 import org.apache.commons.configuration.PropertiesConfiguration;
 import org.apache.log4j.Logger;
-import uk.ac.ebi.pride.tools.braf.BufferedRandomAccessFile;
 
 /**
  * This class is a
@@ -110,6 +109,7 @@ public class RelimsProjectBean implements Cloneable {
      */
     private final static Logger logger = Logger.getLogger(RelimsProjectBean.class);
     private File spectrumParentFolder;
+    private boolean validated;
 
     public RelimsProjectBean(long projectID) {
         this.projectID = projectID;
@@ -226,7 +226,6 @@ public class RelimsProjectBean implements Cloneable {
     @Override
     public RelimsProjectBean clone() throws CloneNotSupportedException {
         RelimsProjectBean lProjectBean = new RelimsProjectBean(this.projectID);
-
         lProjectBean.setProjectID(getProjectID());
         lProjectBean.setCharges(getCharges());
         lProjectBean.setSpectrumFile(getSpectrumFile());
@@ -240,7 +239,6 @@ public class RelimsProjectBean implements Cloneable {
         lProjectBean.setVariableMatchedPTMs(getVariableMatchedPTMs());
         lProjectBean.setPrecursorError(getPrecursorError());
         lProjectBean.setFragmentError(getFragmentError());
-
         return lProjectBean;
     }
 
@@ -454,13 +452,14 @@ public class RelimsProjectBean implements Cloneable {
 
     public File getSpectrumFile() {
         if (spectrumFile == null) {
+            logger.debug("Attempting to extract MGF");
             try {
-                logger.debug("Attempting to extract MGF");
                 this.spectrumFile = dataProvider.getSpectraForProject(projectID);
-                this.spectrumParentFolder = new File(spectrumFile.getParentFile().getAbsolutePath() + "/");
-            } catch (Exception e) {
-                logger.error("Could not load MGF");
+            } catch (IOException ex) {
+                logger.error(ex);
+                return null;
             }
+            this.spectrumParentFolder = new File(spectrumFile.getParentFile().getAbsolutePath() + "/");
         }
         return spectrumFile;
     }
@@ -487,7 +486,7 @@ public class RelimsProjectBean implements Cloneable {
 
     public void setSpectrumFile(File spectrumFile) {
         this.spectrumFile = spectrumFile;
-     }
+    }
 
     public void setSearchParameters(SearchParameters searchParameters) {
         this.searchParameters = searchParameters;
@@ -615,7 +614,7 @@ public class RelimsProjectBean implements Cloneable {
         this.searchParametersFile = searchParametersFile;
     }
 
-      private void setSpectrumParentFolder(File spectrumParentFolder) {
+    private void setSpectrumParentFolder(File spectrumParentFolder) {
         this.spectrumParentFolder = spectrumParentFolder;
     }
 }

@@ -185,7 +185,6 @@ public class RelimsProperties {
         config.setProperty("relims.log.folder", logFolder.getAbsolutePath());
         config.setProperty("relims.resultFolder", workSpace.getAbsolutePath());
         System.out.println("Redirecting logging to " + workSpace.getAbsolutePath());
-        Logger.getRootLogger().addAppender(new RelimsLoggingAppender());
         return workSpace;
     }
 
@@ -663,6 +662,7 @@ public class RelimsProperties {
     //HELPER ENUMS
 
     public enum NetworkMode {
+
         LOCAL, CONTROLLER, WORKER, CLIENT;
     }
 }

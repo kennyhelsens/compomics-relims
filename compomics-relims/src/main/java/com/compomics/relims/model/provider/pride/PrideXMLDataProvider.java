@@ -25,6 +25,7 @@ import org.apache.log4j.Logger;
 import org.springframework.context.ApplicationContext;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -99,15 +100,36 @@ public class PrideXMLDataProvider implements DataProvider {
                 if (destinationFile == null) {
                     logger.error("The Pride provider could not load an MGF-file.");
                     // try to get it from other source = good idea?
+                } else {
+                    //if the mgf is empty, return null
+                    if (!validateSpectrumFile(destinationFile)) {
+                        return null;
+                    }
                 }
             }
         } catch (Exception e) {
-            logger.error(e);
-            //  e.printStackTrace();
-            ProgressManager.setState(Checkpoint.FAILED, e);
-            logger.error("Pride caused a failure :" + e);
-        } finally {
-            return destinationFile;
+            if (e instanceof IOException) {
+                throw new IOException(e.getMessage());
+            } else {
+                logger.error(e);
+                //  e.printStackTrace();
+                ProgressManager.setState(Checkpoint.FAILED, e);
+                logger.error("Pride caused a failure :" + e);
+            }
+        }
+        return destinationFile;
+    }
+
+    private boolean validateSpectrumFile(File MGF) throws IOException {
+        FileInputStream fis;
+        fis = new FileInputStream(MGF);
+        int b = fis.read();
+        if (b == -1) {
+            logger.error("MGF is empty!");
+            throw new IOException("MGF is empty!");
+        } else {
+            logger.error("MGF is validated");
+            return true;
         }
     }
 
@@ -118,9 +140,6 @@ public class PrideXMLDataProvider implements DataProvider {
 
         ApplicationContext lContext = ApplicationContextProvider.getInstance().getApplicationContext();
         RelimsProjectBean lRelimsProjectBean = new RelimsProjectBean(aProjectid);
-
-
-
         if (RelimsProperties.appendPrideAsapAutomatic()) {
             //get XML file
             logger.debug("Finding prideXML file");
@@ -232,6 +251,7 @@ public class PrideXMLDataProvider implements DataProvider {
             lRelimsProjectBean.setSpectrumFile(MGFFile);
         } catch (IOException ex) {
             logger.error("Could not sucessfully create an MGF file for this project");
+            return null;
         }
         return lRelimsProjectBean;
     }

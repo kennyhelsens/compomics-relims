@@ -1,5 +1,6 @@
 package com.compomics.relims.concurrent;
 
+import com.compomics.relims.conf.RelimsLoggingAppender;
 import com.compomics.relims.conf.RelimsProperties;
 import com.compomics.relims.manager.filemanager.FileManager;
 import com.compomics.relims.manager.filemanager.RepositoryManager;
@@ -135,7 +136,7 @@ public class RelimsJobController extends Observable implements ProjectRunner {
     }
 
     private RelimsProjectBean makeRelimsJobBean() {
-         logger.debug("Building projectbean");
+        logger.debug("Building projectbean");
         //  ProcessVariableManager.setSearchResultFolder(searchResultFolder.getAbsolutePath().toString());
         setDataProvider(projectProvider.getDataProvider());
         setModificationResolver(modificationResolver = projectProvider.getModificationResolver());
@@ -178,7 +179,7 @@ public class RelimsJobController extends Observable implements ProjectRunner {
         try {
             searchGUIJobBean = new SearchGUIJobBean(relimsProjectBean);
             sampleID = searchGUIJobBean.getName();
-         logger.debug("aquiring the search results with SearchGUI");
+            logger.debug("aquiring the search results with SearchGUI");
             if (searchGUIJobBean.launch() == 0) {
                 experimentID = sampleID;
                 return true;
@@ -239,7 +240,8 @@ public class RelimsJobController extends Observable implements ProjectRunner {
         } else {
             searchResultFolder = RelimsProperties.createWorkSpace(projectID, "mslims");
         }
-
+        RelimsLoggingAppender appender = new RelimsLoggingAppender();
+        Logger.getRootLogger().addAppender(appender);
         String provider = null;
         boolean runPeptideshaker;
 
@@ -259,6 +261,7 @@ public class RelimsJobController extends Observable implements ProjectRunner {
             File repositorySearchParametersFile = new File(RelimsProperties.getWorkSpace() + "/SearchGUI.parameters");
             relimsProjectBean = new RelimsProjectBean(projectID, repositorySpectrumFile, repositorySearchParametersFile);
         }
+        if (relimsProjectBean != null) {
             try {
                 runPeptideshaker = runSearchGUI();
                 if (runPeptideshaker) {
@@ -288,7 +291,13 @@ public class RelimsJobController extends Observable implements ProjectRunner {
                     //              fileGrabber.deleteResultFolder();
                 }
             }
-        return "";
+            appender.close();
+            return "";
+        } else {
+            logger.error("Search was aborted for " + projectID);
+            appender.close();
+            return "";
+        }
     }
 
     private void storeInRepository() {
