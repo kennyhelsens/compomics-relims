@@ -37,27 +37,27 @@ import java.util.Set;
  * This class is a
  */
 public class PrideXMLDataProvider implements DataProvider {
-
+    
     private static Logger logger = Logger.getLogger(PrideXMLDataProvider.class);
     private PrideXmlExperimentService iPrideService;
     private ProgressManager progressManager = ProgressManager.getInstance();
     private FileManager fileGrabber = FileManager.getInstance();
     private ApplicationContext applicationContext = ApplicationContextProvider.getInstance().getApplicationContext();
     private PrideXmlSpectrumAnnotator lSpectrumAnnotator;
-
+    
     public PrideXMLDataProvider() {
         ApplicationContext lContext = ApplicationContextProvider.getInstance().getApplicationContext();
         iPrideService = (PrideXmlExperimentService) lContext.getBean("prideXmlExperimentService");
     }
-
+    
     public void clearResources() {
         lSpectrumAnnotator.clearTmpResources();
     }
-
+    
     public long getNumberOfSpectraForProject(long aProjectID) {
         return iPrideService.getNumberOfSpectra();
     }
-
+    
     public Set<AnalyzerData> getInstrumentsForProject(long aProjectID) {
         AnalyzerData lAnalyzerData;
         lAnalyzerData = iPrideService.getAnalyzerData();
@@ -65,11 +65,11 @@ public class PrideXMLDataProvider implements DataProvider {
         lResults.add(lAnalyzerData);
         return lResults;
     }
-
+    
     public HashSet<String> getProteinAccessionsForProject(long aProjectID) {
         return (HashSet) iPrideService.getProteinAccessions();
     }
-
+    
     public long getNumberOfPeptidesForProject(long aProjectID) {
         return iPrideService.getNumberOfPeptides();
     }
@@ -80,7 +80,7 @@ public class PrideXMLDataProvider implements DataProvider {
     public long getNumberOfSearchesForProject(long aProjectid) {
         throw new RelimsException("NOT YET IMPLEMENTED");
     }
-
+    
     @Override
     public File getSpectraForProject(long aProjectid) throws IOException {
         File destinationFile = null;
@@ -119,7 +119,7 @@ public class PrideXMLDataProvider implements DataProvider {
         }
         return destinationFile;
     }
-
+    
     private boolean validateSpectrumFile(File MGF) throws IOException {
         FileInputStream fis;
         fis = new FileInputStream(MGF);
@@ -132,19 +132,19 @@ public class PrideXMLDataProvider implements DataProvider {
             return true;
         }
     }
-
+    
     @Override
     public RelimsProjectBean buildProjectBean(long aProjectid) {
         logger.debug(String.format("retrieving searchparameters and modifications for project %s", aProjectid));
         logger.debug("warning, if this is the first time the project is run, it might take a considerable amount of time to retrieve the suggested searchparameters...");
-
+        
         ApplicationContext lContext = ApplicationContextProvider.getInstance().getApplicationContext();
         RelimsProjectBean lRelimsProjectBean = new RelimsProjectBean(aProjectid);
         if (RelimsProperties.appendPrideAsapAutomatic()) {
             //get XML file
             logger.debug("Finding prideXML file");
             File xmlFile = fileGrabber.getPrideXML(aProjectid);
-
+            
             logger.debug("Extracting SearchParameters file with pride-asa");
             // Run PRIDE asap automatic mode
 
@@ -173,6 +173,8 @@ public class PrideXMLDataProvider implements DataProvider {
                 for (Modification lModification : lModificationSet) {
                     logger.debug(String.format("Resolved PTM '%s' with mass '%f' from modified sequence", lModification.getName(), lModification.getMassShift()));
                     //PUT THEM IN THE PTM FACTORY AS NEW PTMS HERE !!!!
+                    //REMOVE ALL UNDERSCORES
+                    lModification.setName(lModification.getName().replace("_", "-"));
                 }
                 logger.error("Annotating spectra");
                 lSpectrumAnnotator.annotate(xmlFile);
@@ -207,12 +209,12 @@ public class PrideXMLDataProvider implements DataProvider {
             try {
                 Set<AnalyzerData> lAnalyzerDataSet = getInstrumentsForProject(aProjectid);
                 for (AnalyzerData lNext : lAnalyzerDataSet) {
-
+                    
                     logger.warn(lNext.getAnalyzerFamily().toString()
                             + " (precursor error : " + lNext.getPrecursorMassError()
                             + " , fragment error " + lNext.getFragmentMassError() + ")");
                     Double lNextPrecursorMassError = lNext.getPrecursorMassError();
-
+                    
                     if (lPrecursorError > 0.0 && lNextPrecursorMassError != lPrecursorError) {
                         throw new RelimsException("There are multiple Mass Analyzers with different Precursor Mass errors for this project!!");
                     }
@@ -223,7 +225,7 @@ public class PrideXMLDataProvider implements DataProvider {
                     }
                     lFragmentError = lNextFragmentMassError;
                 }
-
+                
                 lRelimsProjectBean.setPrecursorError(lPrecursorError);
                 //26/03/2013 - setting the fragmentErrorType is not possible ---> need to keep it in da untill resolved
                 lRelimsProjectBean.setFragmentError(lFragmentError);
@@ -232,7 +234,7 @@ public class PrideXMLDataProvider implements DataProvider {
                 lRelimsProjectBean.setPrecursorError(1.0);
                 lRelimsProjectBean.setPrecursorError(1.0);
             }
-
+            
             try {
                 lRelimsProjectBean.setCharges(lSpectrumAnnotator.getConsideredChargeStates());
             } catch (NullPointerException e) {
@@ -242,10 +244,10 @@ public class PrideXMLDataProvider implements DataProvider {
                 consideredCharges.add(new Charge(1, 1));
                 consideredCharges.add(new Charge(1, 4));
             }
-
+            
         }
         logger.debug("Retrieved searchparameters from prideXml");
-
+        
         logger.debug("Extracting MGF file");
         File MGFFile;
         try {
@@ -257,11 +259,11 @@ public class PrideXMLDataProvider implements DataProvider {
         }
         return lRelimsProjectBean;
     }
-
+    
     public String toString() {
         return "PrideDataProvider for PrideXML";
     }
-
+    
     @Override
     public boolean isProjectValuable(String experimentID) {
         return true;
