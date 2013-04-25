@@ -672,6 +672,15 @@ public class RelimsProperties {
             Thread.currentThread().interrupt();
         }
     }
+    
+    
+    //PREDICATES
+       public static int getMaxMS1Count() {
+        return config.getInt("project.predicates.maxMs1Count");
+    }
+    
+    
+    
     //HELPER ENUMS
 
     public enum NetworkMode {

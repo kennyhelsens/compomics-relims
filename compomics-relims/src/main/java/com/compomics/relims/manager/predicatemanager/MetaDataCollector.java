@@ -2,8 +2,9 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-package com.compomics.relims.playground;
+package com.compomics.relims.manager.predicatemanager;
 
+import com.compomics.relims.conf.RelimsProperties;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -11,8 +12,15 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.sql.Connection;
 import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  *
@@ -22,9 +30,10 @@ public class MetaDataCollector {
 
     private static int iTimeout = 30;
     private static String sDriverName = "org.sqlite.JDBC";
-    private static String sTempDb = "pridemeta.db";
+    private static String directoryPath = new File(RelimsProperties.getConfigFolder().getAbsolutePath().replace("conf", "databases")).getAbsolutePath();
+    private static String sTempDb = directoryPath + "/pridemeta.db";
     private static String sJdbc = "jdbc:sqlite";
-    private static String sDbUrl = sJdbc + ":" + sTempDb;
+    private static String metaDatabaseURL = sJdbc + ":" + sTempDb;
     private static File csvFile = new File("C:\\Users\\Kenneth\\Documents\\exampleTable.txt");
 
     private static void setup() throws ClassNotFoundException, Exception {
@@ -36,7 +45,7 @@ public class MetaDataCollector {
     private static void makeTable() throws Exception {
 
         String sMakeTable = "CREATE  TABLE pridemeta ("
-                + "  `Accession` INT NOT NULL ,"
+                + "  `Accession` BIGINT NOT NULL ,"
                 + "  `species` VARCHAR(255) NULL ,"
                 + "  `taxonomyID` VARCHAR(2555) NULL ,"
                 + "  `Tissue` VARCHAR(255) NULL ,"
@@ -70,7 +79,7 @@ public class MetaDataCollector {
                     }
                 }
                 String updateString = ("INSERT INTO pridemeta VALUES("
-                        + Integer.parseInt(values[0]) + ",'"
+                        + Long.parseLong(values[0]) + ",'"
                         + values[3] + "','"
                         + values[4] + "','"
                         + values[5] + "','"
@@ -124,7 +133,7 @@ public class MetaDataCollector {
 
     private static void doQuery(String query) throws SQLException {
         // create a database connection
-        Connection conn = DriverManager.getConnection(sDbUrl);
+        Connection conn = DriverManager.getConnection(metaDatabaseURL);
         try {
             Statement stmt = conn.createStatement();
             try {
@@ -143,6 +152,35 @@ public class MetaDataCollector {
             } catch (Exception ignore) {
             }
         }
+    }
+
+    public static Map<String, Object> lookUpMetaData(long projectID) throws SQLException {
+        Map<String, Object> projectMetaData = new LinkedHashMap<String, Object>();
+        Connection conn = null;
+        PreparedStatement prepstmt = null;
+        ResultSet resultSet = null;
+        try {
+            conn = DriverManager.getConnection(metaDatabaseURL);
+            prepstmt = conn.prepareStatement("SELECT * FROM pridemeta WHERE Accession = ?");
+            prepstmt.setLong(1, projectID);
+            resultSet = prepstmt.executeQuery();
+            //store everything in a returning map
+            List<Map<String, Object>> rows = new ArrayList<Map<String, Object>>();
+            ResultSetMetaData metaData = resultSet.getMetaData();
+            int columnCount = metaData.getColumnCount();
+            while (resultSet.next()) {
+                for (int i = 1; i <= columnCount; i++) {
+                    projectMetaData.put(metaData.getColumnLabel(i), resultSet.getObject(i));
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            conn.close();
+            prepstmt.close();
+            resultSet.close();
+        }
+        return projectMetaData;
     }
 
     public static void main(String[] args) throws Exception {
