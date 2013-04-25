@@ -973,9 +973,14 @@ public class NewProjectDialog extends javax.swing.JFrame {
             ProjectPredicate.setTaxonomyID(tfTaxonomyID.getText().toString());
         }
         SwingWorker worker = new SwingWorker() {
+            Thread waitingThread;
+
             @Override
             protected void done() {
                 filterDialog.dispose();
+                if (waitingThread.isAlive()) {
+                    waitingThread.interrupt();
+                }
             }
 
             @Override
@@ -993,11 +998,16 @@ public class NewProjectDialog extends javax.swing.JFrame {
                 filterDialog.setAlwaysOnTop(true);
                 filterDialog.setResizable(false);
                 filterDialog.pack();
-                filterDialog.setVisible(true);
                 filterDialog.addWindowListener(new java.awt.event.WindowAdapter() {
                 });
 
-
+                waitingThread = new Thread(new Runnable() {
+                    @Override
+                    public void run() {
+                        filterDialog.setVisible(true);
+                    }
+                });
+                waitingThread.start();
                 if (rdbSourceMSLIMS1.isSelected()) {
                     // make a connection to the MSLIMS database and retrieve the possible projects
                     getMSLIMSProjects();
