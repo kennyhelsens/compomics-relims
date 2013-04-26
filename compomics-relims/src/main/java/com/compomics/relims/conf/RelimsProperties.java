@@ -61,19 +61,7 @@ public class RelimsProperties {
      * A ProgressManager to store the state of the project and monitor it
      */
     private static ProgressManager progressManager = ProgressManager.getInstance();
-    /**
-     * the results will all be placed in a user-specific folder. Therefor, all
-     * "normal" relims projects that are not run via the automatic setup, will
-     * be placed in a folder called "default"
-     */
-    public String userID = "default";
-    /**
-     * A ProgressManager to store the state of the project and monitor it
-     */
-    private static ProgressManager progressManager = ProgressManager.getInstance();
-    /**
-     * Plain logger
-     */
+
     private static Logger logger = Logger.getLogger(RelimsProperties.class);
     /**
      * config stores the configurations from the file
@@ -682,18 +670,13 @@ public class RelimsProperties {
             Thread.currentThread().interrupt();
         }
     }
-<<<<<<< HEAD
     
     
     //PREDICATES
        public static int getMaxMS1Count() {
         return config.getInt("project.predicates.maxMs1Count");
     }
-    
-    
-    
-=======
->>>>>>> develop
+
     //HELPER ENUMS
 
     public enum NetworkMode {

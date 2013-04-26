@@ -146,15 +146,8 @@ public class DAO {
                     //connectionInstance.setAutoCommit(false);
                     statement = connectionInstance.createStatement();
                     statement.execute("begin immediate");
-<<<<<<< HEAD
-                    if (protocol.contains("derby")) {
-                        connectionInstance.setTransactionIsolation(4);
-                    } else {
-                        connectionInstance.setTransactionIsolation(Connection.TRANSACTION_READ_UNCOMMITTED);
-                    }
-=======
                     connectionInstance.setTransactionIsolation(Connection.TRANSACTION_READ_UNCOMMITTED);
->>>>>>> develop
+
                     success = true;
                 } catch (SQLException ex) {
                     if (!ex.toString().contains("cannot start a transaction within a transaction") && !ex.toString().contains("database is locked")) {
@@ -174,17 +167,7 @@ public class DAO {
                 Statement statement = null;
                 try {
                     connectionInstance = getConnection();
-<<<<<<< HEAD
-                    if (protocol.contains("derby")) {
-                        //          connectionInstance.setTransactionIsolation(1);
-                        statement = connectionInstance.createStatement();
-                        statement.execute("begin deferred");
-                    } else {
-                        connectionInstance.setTransactionIsolation(Connection.TRANSACTION_READ_UNCOMMITTED);
-                    }
-=======
                     connectionInstance.setTransactionIsolation(Connection.TRANSACTION_READ_UNCOMMITTED);
->>>>>>> develop
                     success = true;
                 } catch (SQLException ex) {
                     if (!ex.toString().contains("cannot start a transaction within a transaction")) {
@@ -254,48 +237,7 @@ public class DAO {
 
     private static void setupMajorInitiationQuery() {
 
-<<<<<<< HEAD
-        if (protocol.contains("derby")) {
-            queryList.add("CREATE SCHEMA TaskDatabase");
-            queryList.add("CREATE TABLE Tasks ("
-                    + "TaskID INTEGER NOT NULL GENERATED ALWAYS AS IDENTITY (START WITH 1, INCREMENT BY 1),"
-                    + "ProjectID VarChar(50),"
-                    + "STRATEGYID VarChar(50),"
-                    + "SOURCEID VarChar(50),"
-                    + "TaskState VARCHAR(20),"
-                    + "ClientID VARCHAR(100),"
-                    + "Timestamp TIMESTAMP,"
-                    + "ProjectName VarChar(255),"
-                    + "usePride BOOLEAN,"
-                    + "searchParameters BLOB"
-                    + "CONSTRAINT primary_key PRIMARY KEY (TaskID));");
-            queryList.add("CREATE TABLE Users ("
-                    + "UserID INTEGER NOT NULL GENERATED ALWAYS AS IDENTITY (START WITH 1, INCREMENT BY 1),"
-                    + "Username VARCHAR(30),"
-                    + "HashedP VARCHAR(256),"
-                    + "Salt VARCHAR(50),"
-                    + "eMail VARCHAR(100),"
-                    + "CONSTRAINT primary_userkey PRIMARY KEY (UserID));");
-        } else {
-            queryList.add("CREATE TABLE Tasks ("
-                    + "TaskID INTEGER PRIMARY KEY,"
-                    + "ProjectID VarChar(50),"
-                    + "STRATEGYID VarChar(50),"
-                    + "SOURCEID VarChar(50),"
-                    + "TaskState VARCHAR(20),"
-                    + "ClientID VARCHAR(100),"
-                    + "ProjectName VarChar(255),"
-                    + "Timestamp TIMESTAMP,"
-                    + "usePride BOOLEAN,"
-                    + "searchParameters BLOB);");
-            queryList.add("CREATE TABLE Users ("
-                    + "UserID INTEGER PRIMARY KEY,"
-                    + "Username VARCHAR(30),"
-                    + "HashedP VARCHAR(256),"
-                    + "Salt VARCHAR(50),"
-                    + "eMail VARCHAR(100));");
-        }
-=======
+
 // MAKE TASK TABLE____________________________________________TASK TABLE
         queryList.add("CREATE TABLE Tasks ("
                 + "TaskID INTEGER PRIMARY KEY,"
@@ -316,16 +258,13 @@ public class DAO {
                 + "Salt VARCHAR(50),"
                 + "eMail VARCHAR(100));");
 // MAKE TASK TABLE____________________________________________PRIDE DETAILS : TODO rename this
->>>>>>> develop
         queryList.add("CREATE TABLE PRIDEXMLERRORS ("
                 + "ProjectID VarChar(50),"
                 + "ErrorCode INTEGER,"
                 + "Description VarChar(150),"
                 + "SeverityLevel VarChar(25));");
-<<<<<<< HEAD
-=======
+
 // MAKE TASK WorkerSpecs_______________________________________TASK WorkerSpecs : TODO RENAME THIS
->>>>>>> develop
         queryList.add("CREATE TABLE WorkerSpecs ("
                 //Taskrelated Parameters
                 + "TaskID BIGINT,"
