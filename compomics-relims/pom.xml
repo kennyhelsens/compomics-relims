@@ -286,6 +286,11 @@
     <!-- Dependencies -->
     <dependencies>
         <dependency>
+            <groupId>com.compomics.colims</groupId>
+            <artifactId>colims-core</artifactId>
+            <version>1.0.0</version>
+        </dependency>
+        <dependency>
             <groupId>com.compomics</groupId>
             <artifactId>utilities</artifactId>
             <version>3.11.31</version>
@@ -303,6 +308,14 @@
                 <exclusion>
                     <artifactId>mysql</artifactId>
                     <groupId>mysql-connector-java</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>com.compomics</artifactId>
+                    <groupId>peptizer</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>com.compomics</artifactId>
+                    <groupId>rover</groupId>
                 </exclusion>
             </exclusions>
             <type>jar</type>
