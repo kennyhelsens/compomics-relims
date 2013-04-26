@@ -181,11 +181,9 @@ public class RelimsJobController extends Observable implements ProjectRunner {
         try {
             searchGUIJobBean = new SearchGUIJobBean(relimsProjectBean);
             sampleID = searchGUIJobBean.getName();
-<<<<<<< HEAD
+
             logger.debug("aquiring the search results with SearchGUI");
-=======
-         logger.debug("acquiring the search results with SearchGUI");
->>>>>>> d3d7c30f1d1077a8587085d81dd1cbfdb82382da
+
             if (searchGUIJobBean.launch() == 0) {
                 experimentID = sampleID;
                 return true;
