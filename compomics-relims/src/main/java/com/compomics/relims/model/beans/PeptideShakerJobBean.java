@@ -189,7 +189,11 @@ public class PeptideShakerJobBean {
         try {
             String psCommandLine = getPeptideShakerCommandString();
             if (psCommandLine != null) {
+<<<<<<< HEAD
                 File peptideShakerFolder = new File(RelimsProperties.getPeptideShakerFolder() + "/");
+=======
+                File peptideShakerFolder = new File(RelimsProperties.getPeptideShakerFolder()+"/");
+>>>>>>> develop
                 Command.setWorkFolder(peptideShakerFolder);
                 logger.debug("Launching peptideshaker from " + peptideShakerFolder.getAbsolutePath());
                 logger.info(psCommandLine);

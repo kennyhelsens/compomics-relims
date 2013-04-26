@@ -62,6 +62,16 @@ public class RelimsProperties {
      */
     private static ProgressManager progressManager = ProgressManager.getInstance();
     /**
+     * the results will all be placed in a user-specific folder. Therefor, all
+     * "normal" relims projects that are not run via the automatic setup, will
+     * be placed in a folder called "default"
+     */
+    public String userID = "default";
+    /**
+     * A ProgressManager to store the state of the project and monitor it
+     */
+    private static ProgressManager progressManager = ProgressManager.getInstance();
+    /**
      * Plain logger
      */
     private static Logger logger = Logger.getLogger(RelimsProperties.class);
@@ -672,6 +682,7 @@ public class RelimsProperties {
             Thread.currentThread().interrupt();
         }
     }
+<<<<<<< HEAD
     
     
     //PREDICATES
@@ -681,10 +692,33 @@ public class RelimsProperties {
     
     
     
+=======
+>>>>>>> develop
     //HELPER ENUMS
 
     public enum NetworkMode {
 
         LOCAL, CONTROLLER, WORKER, CLIENT;
+    }
+
+    public static String getColimsDbServer(){
+        return config.getString("relims.colims.db.server");
+
+    }
+    public static String getColimsDbSchema(){
+        return config.getString("relims.colims.db.schema");
+
+    }
+    public static int getColimsDbPort(){
+        return Integer.parseInt(config.getString("relims.colims.db.port"));
+
+    }
+    public static String getColimsDbUser(){
+        return config.getString("relims.colims.db.user");
+
+    }
+    public static String getColimsDbPassword(){
+        return config.getString("relims.colims.db.password");
+
     }
 }
