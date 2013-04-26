@@ -92,7 +92,6 @@ public class ColimsInitiator {
     public static void main(String[] args) throws SQLException {
         RelimsProperties.initialize(false);
         new ColimsInitiator();
-
     }
 
     /**
