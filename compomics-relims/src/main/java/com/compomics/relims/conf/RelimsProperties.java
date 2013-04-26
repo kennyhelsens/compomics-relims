@@ -787,4 +787,25 @@ public class RelimsProperties {
 
         LOCAL, CONTROLLER, WORKER, CLIENT;
     }
+
+    public static String getColimsDbServer(){
+        return config.getString("relims.colims.db.server");
+
+    }
+    public static String getColimsDbSchema(){
+        return config.getString("relims.colims.db.schema");
+
+    }
+    public static int getColimsDbPort(){
+        return Integer.parseInt(config.getString("relims.colims.db.port"));
+
+    }
+    public static String getColimsDbUser(){
+        return config.getString("relims.colims.db.user");
+
+    }
+    public static String getColimsDbPassword(){
+        return config.getString("relims.colims.db.password");
+
+    }
 }
