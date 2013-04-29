@@ -11,16 +11,11 @@ import com.compomics.util.experiment.biology.Enzyme;
 import com.compomics.util.experiment.identification.SearchParameters;
 import com.compomics.util.experiment.massspectrometry.Charge;
 import com.compomics.util.preferences.ModificationProfile;
-import java.io.BufferedReader;
-import java.io.DataInputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.InputStreamReader;
+import org.apache.log4j.Logger;
+
+import java.io.*;
 import java.util.HashMap;
 import java.util.List;
-import org.apache.log4j.Logger;
 
 /**
  *
@@ -79,14 +74,23 @@ public class ResultManager {
         }
     }
 
-    public static void transferToColims() {
+    public static void importToColims() {
         File cpsFile = new File(RelimsProperties.getWorkSpace().getAbsolutePath() + "/" + ResourceManager.getProjectID() + ".cps");
         if (cpsFile.exists()) {
             try {
-                ColimsImporter.transferToColims(cpsFile);
+
+                SearchParameters lSearchParameters = getSearchParameters();
+                File lFastaFile = lSearchParameters.getFastaFile();
+                File lMGFFile = new File(RelimsProperties.getWorkSpace().getAbsolutePath() + "/mgf/" + ResourceManager.getProjectID() + ".mgf");
+
+                ColimsImporter.getInstance().transferToColims(cpsFile, lFastaFile, lMGFFile);
             } catch (PeptideShakerIOException ex) {
                 logger.error("Could not store in Colims ");
                 logger.error(ex);
+            } catch (ClassNotFoundException e) {
+                logger.error(e.getMessage(), e);
+            } catch (IOException e) {
+                logger.error(e.getMessage(), e);
             }
         } else {
             logger.warn("There was no cps-file to be found");
@@ -153,11 +157,15 @@ public class ResultManager {
         }
     }
 
-    private void includeSearchParameters() {
+    public static SearchParameters getSearchParameters() throws IOException, ClassNotFoundException {
+        File SEARCHPARAM_FILE = new File(RelimsProperties.getWorkSpace() + "/SearchGUI.parameters");
+        logger.debug("Getting searchparameters from " + SEARCHPARAM_FILE.getAbsolutePath());
+        return SearchParameters.getIdentificationParameters(SEARCHPARAM_FILE);
+    }
+
+    private static void includeSearchParameters() {
         try {//TODO ADD ALL PARAMETERS !!!!
-            File SEARCHPARAM_FILE = new File(RelimsProperties.getWorkSpace() + "/SearchGUI.parameters");
-            logger.debug("Getting searchparameters from " + SEARCHPARAM_FILE.getAbsolutePath());
-            SearchParameters parameters = SearchParameters.getIdentificationParameters(SEARCHPARAM_FILE);
+            SearchParameters parameters = getSearchParameters();
             Enzyme enzyme = parameters.getEnzyme();
             resultMap.put("enzyme", enzyme.getName());
             File usedFasta = parameters.getFastaFile();

@@ -6,7 +6,6 @@ package com.compomics.relims.modes.networking.worker.taskreciever;
 
 import com.compomics.pridexmltomgfconverter.errors.enums.ConversionError;
 import com.compomics.relims.concurrent.RelimsJob;
-import com.compomics.relims.conf.RelimsProperties;
 import com.compomics.relims.manager.processmanager.processguard.RelimsException;
 import com.compomics.relims.manager.processmanager.processguard.RelimsExceptionHandler;
 import com.compomics.relims.manager.progressmanager.Checkpoint;
@@ -198,7 +197,7 @@ public class TaskRunner {
                     try {
                         logger.info("Sending feedback to server...");
                         sentToServer = resultNotifier.sendResults(Checkpoint.valueOf(ResourceManager.getFinishState()));
-                        ResultManager.transferToColims();
+                        ResultManager.importToColims();
                         TaskReciever.locked = false;
                         Thread.sleep(30000);
                         System.out.println("");
