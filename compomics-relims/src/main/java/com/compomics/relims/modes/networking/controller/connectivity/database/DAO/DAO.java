@@ -248,15 +248,7 @@ public class DAO {
                 + "ClientID VARCHAR(100),"
                 + "ProjectName VarChar(255),"
                 + "Timestamp TIMESTAMP,"
-                + "usePride BOOLEAN,"
-                + "searchParameters BLOB);");
-// MAKE USER TABLE____________________________________________TASK USERS : TODO this is obsolete
-        queryList.add("CREATE TABLE Users ("
-                + "UserID INTEGER PRIMARY KEY,"
-                + "Username VARCHAR(30),"
-                + "HashedP VARCHAR(256),"
-                + "Salt VARCHAR(50),"
-                + "eMail VARCHAR(100));");
+                + "usePride BOOLEAN);");
 // MAKE TASK TABLE____________________________________________PRIDE DETAILS : TODO rename this
         queryList.add("CREATE TABLE PRIDEXMLERRORS ("
                 + "ProjectID VarChar(50),"

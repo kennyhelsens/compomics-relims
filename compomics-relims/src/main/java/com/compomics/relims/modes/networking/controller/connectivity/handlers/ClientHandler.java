@@ -39,6 +39,7 @@ public class ClientHandler implements Runnable {
     private String password = null;
     private String email = null;
     private String queryParameters = null;
+    private Object taskInstructionMap;
 
     public ClientHandler(Socket sock, ObjectOutputStream sockOutput, ObjectInputStream sockInput) throws IOException {
         this.sock = sock;
@@ -59,52 +60,18 @@ public class ClientHandler implements Runnable {
                 try {
                     taskObject = (TaskContainer) sockInput.readObject();
 
-                    String taskInstruction = taskObject.getTaskInstruction();
-                    Map<String, String> taskInstructionMap = taskObject.getInstructionMap();
-
-                    clientID = taskInstructionMap.get("username");
-                    password = taskInstructionMap.get("password");
-                    email = taskInstructionMap.get("email");
-                    queryParameters = taskInstructionMap.get("queryParameters");
-
-                    //TODO this should be a switch...
-                    if (!taskInstruction.equals("doTasks")) {
-                        if (taskInstruction.equals("login")) {
-                            allow = derbyDatabaseService.isLoginCredentialsCorrect(clientID, password);
-                        } else {
-                            try {
-                                if (taskInstruction.equals("create")) {
-                                    allow = derbyDatabaseService.createUser(clientID, password, email);
-                                    sockOutput.writeBoolean(allow);
-                                    sockOutput.flush();
-                                }
-                            } catch (ArrayIndexOutOfBoundsException aioobe) {
-                            }
-
-                            if ((taskInstruction).equals("getTasks")) {
-                                List<String[]> tasks = derbyDatabaseService.getUserTasks(clientID, queryParameters);
-                                sockOutput.writeObject(tasks);
-                                sockOutput.flush();
-                            }
-
-                            if ((taskInstruction.equals("getSpecificTask"))) {
-                                long taskID = Long.parseLong(taskInstructionMap.get("taskID"));
-                                Map<String, Object> taskInformation = derbyDatabaseService.getTaskInformation(taskID);
-                                sockOutput.writeObject(taskInformation);
-                                sockOutput.flush();
-                            }
-                        }
+                    clientID = taskObject.getName();
+            
+                    if (taskObject.isValid()) {
+                        logger.debug(clientID + " provided a valid input...");
+                        Map<String, Long> generatedTaskIDs = derbyDatabaseService.pushTaskMapToDB(taskObject);
+                        sockOutput.writeObject(generatedTaskIDs);
+                        sockOutput.flush();
                     } else {
-                        if (taskObject.isValid()) {
-                            logger.debug(clientID + " provided a valid input...");
-                            Map<String, Long> generatedTaskIDs = derbyDatabaseService.pushTaskMapToDB(taskObject);
-                            sockOutput.writeObject(generatedTaskIDs);
-                            sockOutput.flush();
-                        } else {
-                            sockOutput.writeBoolean(allow);
-                            sockOutput.flush();
-                        }
+                        sockOutput.writeBoolean(allow);
+                        sockOutput.flush();
                     }
+
                 } catch (ClassNotFoundException CNFExc) {
                     logger.error(clientID + " provided an invalid input...");
                     logger.error(CNFExc);
@@ -120,7 +87,7 @@ public class ClientHandler implements Runnable {
             } catch (Throwable e) {
                 e.printStackTrace();
             } finally {
-                    try {
+                try {
                     sock.close();
                 } catch (IOException ex) {
                     sock = null;

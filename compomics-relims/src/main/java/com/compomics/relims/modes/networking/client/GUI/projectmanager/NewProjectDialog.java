@@ -45,8 +45,6 @@ public class NewProjectDialog extends javax.swing.JFrame {
     private DefaultListModel leftModel = new DefaultListModel();
     private File defaultFolderFile;
     private Logger logger = Logger.getLogger(NewProjectDialog.class);
-    private static RelimsClientJobStarter iRelimsClientJobStarter;
-    private SearchParameters searchParameters;
     private javax.swing.JRadioButton selectedStrategy;
     private javax.swing.JRadioButton selectedSource;
     String currentUser = "admin";
@@ -813,33 +811,13 @@ public class NewProjectDialog extends javax.swing.JFrame {
         if (rightModel.isEmpty()) {
             logger.error("Not allowed to send blank statements...");
         } else {
-            Map<String, String> currentUserMap = new HashMap<String, String>();
-            currentUserMap.put("username", taskContainerName.getText());
-            currentUserMap.put("password", RelimsProperties.getPassword());
             //setting up TaskObject
             TaskContainer tasksForServer = new TaskContainer();
-            tasksForServer.setInstructionMap(currentUserMap);
-            tasksForServer.updateInstruction("instruction", "doTasks");
+            tasksForServer.setName(taskContainerName.getText());
             tasksForServer.setStrategyID(selectedStrategy.getName());
             tasksForServer.setSourceID(selectedSource.getName());
-            //read the parameters used
-            try {
-                File currentParameters = new File(RelimsProperties.getConfigFolder().getAbsolutePath() + "/default_parameters.parameters");
-                loadedSearchParameters = SearchParameters.getIdentificationParameters(currentParameters);
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-            tasksForServer.setSearchParameters(loadedSearchParameters);
-
-            tasksForServer.updateInstruction("runpipeline", "allow");
-
-
-            //getting properties
-            //TODO MOVE TO LOGIN
-            //  String IP = IPfield.getText();
-            //   String port = portField.getText();
-
-            //making relimsJob object
+            tasksForServer.enablePipeline();
+            
 
             boolean allowToPass = true;
 

@@ -20,19 +20,11 @@ import java.util.Map;
  */
 public class TaskContainer implements Serializable {
 
-    private Map<String, String> instructionMap = new LinkedHashMap<>();
     private HashMap<String, String> TaskMap = new HashMap<>();
     private String sourceID;
     private String strategyID;
-    private SearchParameters searchParameters;
-
-    public SearchParameters getSearchParameters() {
-        return this.searchParameters;
-    }
-
-    public void setSearchParameters(SearchParameters searchParameters) {
-        this.searchParameters = searchParameters;
-    }
+    private String containerName;
+    private boolean usePrideAsa;
 
     public HashMap<String, String> getTaskList() {
         return TaskMap;
@@ -59,10 +51,6 @@ public class TaskContainer implements Serializable {
     }
 
     public TaskContainer() {
-        instructionMap.put("username", null);
-        instructionMap.put("password", null);
-        instructionMap.put("email", null);
-        instructionMap.put("instruction", null);
     }
 
     public boolean isValid() {
@@ -84,34 +72,6 @@ public class TaskContainer implements Serializable {
 
         return true;
 
-    }
-
-    public void updateInstruction(String key, String property) {
-        instructionMap.put(key, property);
-    }
-
-    public String getCurrentUser() {
-        return instructionMap.get("username");
-    }
-
-    public String getEmail() {
-        return instructionMap.get("email");
-    }
-
-    public String getPassword() {
-        return instructionMap.get("password");
-    }
-
-    public String getTaskInstruction() {
-        return instructionMap.get("instruction");
-    }
-
-    public Map<String, String> getInstructionMap() {
-        return this.instructionMap;
-    }
-
-    public void setInstructionMap(Map<String, String> instructionMap) {
-        this.instructionMap = instructionMap;
     }
 
     public HashMap<String, String> getList() {
@@ -143,5 +103,21 @@ public class TaskContainer implements Serializable {
             empty = true;
         }
         return empty;
+    }
+
+    public String getName() {
+        return this.containerName;
+    }
+
+    public void enablePipeline() {
+        this.usePrideAsa = true;
+    }
+
+    public boolean isPrideAsaEnabled() {
+        return usePrideAsa;
+    }
+
+    public void setName(String containerName) {
+        this.containerName = containerName;
     }
 }

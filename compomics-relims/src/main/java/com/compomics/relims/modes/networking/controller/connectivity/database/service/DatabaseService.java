@@ -11,7 +11,6 @@ import com.compomics.relims.modes.networking.controller.connectivity.database.DA
 import com.compomics.relims.modes.networking.controller.connectivity.database.DAO.ProjectResultDAO;
 import com.compomics.relims.modes.networking.controller.connectivity.database.DAO.WorkerSpecsDAO;
 import com.compomics.relims.modes.networking.controller.connectivity.database.DAO.TaskDAO;
-import com.compomics.relims.modes.networking.controller.connectivity.database.DAO.UserDAO;
 import com.compomics.relims.modes.networking.controller.connectivity.database.DAO.WorkerDAO;
 import com.compomics.relims.modes.networking.controller.connectivity.database.security.BackupService;
 import com.compomics.relims.modes.networking.controller.connectivity.taskobjects.Task;
@@ -29,7 +28,6 @@ public class DatabaseService {
 
     private static Logger logger;
     private final static TaskDAO TaskDAO = new TaskDAO();
-    private final static UserDAO UserDAO = new UserDAO();
     private final static WorkerDAO WorkerDAO = new WorkerDAO();
     private final static WorkerSpecsDAO WorkerSpecsDAO = new WorkerSpecsDAO();
     private final static PrideXMLErrorsDAO PRIDEXMLERRORSDAO = new PrideXMLErrorsDAO();
@@ -94,10 +92,6 @@ public class DatabaseService {
         logger.debug("Locating database at : " + directory + "...");
     }
 
-    public synchronized boolean createRootUser() {
-        return createUser("admin", "admin", "admin@compomics.com");
-    }
-
     private synchronized void loadDriver() {
 
         try {
@@ -118,30 +112,6 @@ public class DatabaseService {
     public synchronized long startupSweep() {
 
         return TaskDAO.startupSweep();
-
-    }
-
-    //==========USER RELATED METHODS===============//
-    public synchronized boolean isUsernameAvailable(String userID) {
-
-        return UserDAO.findUsername(userID);
-
-
-    }
-
-    public synchronized boolean createUser(String username, String password, String eMail) {
-
-        //first find out if the user exists...
-        if (!UserDAO.findUsername(username)) {
-            return UserDAO.createUser(username, password, eMail);
-        } else {
-            return false;
-        }
-    }
-
-    public synchronized boolean isLoginCredentialsCorrect(String username, String password) {
-
-        return UserDAO.isLoginCredentialsCorrect(username, password);
 
     }
 

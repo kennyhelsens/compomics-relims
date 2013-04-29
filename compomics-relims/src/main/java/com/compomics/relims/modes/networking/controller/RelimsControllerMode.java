@@ -80,15 +80,7 @@ public class RelimsControllerMode {
             while (future.get() != null) {
                 // wait for the future   
             }
-//creating root user
-            future = bootingService.submit(new Runnable() {
-                public void run() {
-                    dds.createRootUser();
-                }
-            });
-            while (future.get() != null) {
-                // wait for the future   
-            }
+
             logger.info("Loaded Database...");
             logger.info("Checking for incorrectly shut down tasks...");
             future = bootingService.submit(new Runnable() {

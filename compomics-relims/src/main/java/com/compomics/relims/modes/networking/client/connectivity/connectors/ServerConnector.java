@@ -50,150 +50,7 @@ public class ServerConnector {
         this.controllerPort = RelimsProperties.getControllerPort();
     }
 
-    public boolean createOnServer(TaskContainer taskMap) throws IOException {
-
-        boolean isAvailable = false;
-        logger.debug("Creating socket to '" + controllerIP + "' on port " + controllerPort);
-        boolean loading = true;
-        Map<Long, String> myCurrentProjects = null;
-        while (loading) {
-            try {
-                Thread.currentThread().sleep(1000);
-            } catch (InterruptedException ex) {
-                logger.error(ex);
-            }
-            socketConnection = new Socket(controllerIP, controllerPort);
-            output = new ObjectOutputStream(socketConnection.getOutputStream());
-            output.flush();
-
-            input = new ObjectInputStream(socketConnection.getInputStream());
-            logger.debug("Input- and outputstreams are ready...");
-
-            try {
-                output.writeInt(0);
-                output.writeObject(taskMap);
-                output.flush();
-                loading = false;
-            } catch (IOException IOExc) {
-                IOExc.printStackTrace();
-                logger.debug("Could not send results...");
-                loading = false;
-            }
-            try {
-                isAvailable = (boolean) input.readBoolean();
-                loading = false;
-            } catch (IOException IOExc) {
-                IOExc.printStackTrace();
-                loading = false;
-            }
-            if (!loading) {
-                logger.debug("Tasks were sent !");
-                socketConnection.close();
-                break;
-            }
-        }
-
-        return isAvailable;
-    }
-
-    public List<String[]> getFromServer(TaskContainer taskMap) throws IOException {
-        boolean loading = true;
-        List<String[]> myCurrentProjects = new LinkedList<String[]>();
-        while (loading) {
-            try {
-                Thread.currentThread().sleep(1000);
-            } catch (InterruptedException ex) {
-                logger.error(ex);
-            }
-            socketConnection = new Socket(controllerIP, controllerPort);
-            output = new ObjectOutputStream(socketConnection.getOutputStream());
-            output.flush();
-
-            input = new ObjectInputStream(socketConnection.getInputStream());
-
-            try {
-                output.writeInt(0);
-                output.writeObject(taskMap);
-                output.flush();
-
-            } catch (IOException IOExc) {
-                IOExc.printStackTrace();
-                logger.debug("Could not send results...");
-                loading = false;
-            }
-            try {
-                try {
-                    myCurrentProjects = (List<String[]>) input.readObject();
-                } catch (ClassNotFoundException ex) {
-                    logger.error(ex);
-                }
-            } catch (IOException IOExc) {
-                loading = false;
-            }
-            if (myCurrentProjects != null) {
-                loading = false;
-                logger.debug("Jobs retrieved from online database.");
-                socketConnection.close();
-
-            }
-            if (!loading || taskMap.getInstructionMap() != null) {
-                socketConnection.close();
-                break;
-            }
-        }
-
-        return myCurrentProjects;
-    }
-
-    public HashMap<String, Object> getSpecificFromServer(TaskContainer taskMap) throws IOException {
-        boolean loading = true;
-        HashMap<String, Object> myProjectInfo = new HashMap<String, Object>();
-        while (loading) {
-            try {
-                Thread.currentThread().sleep(1000);
-            } catch (InterruptedException ex) {
-                logger.error(ex);
-            }
-            socketConnection = new Socket(controllerIP, controllerPort);
-            output = new ObjectOutputStream(socketConnection.getOutputStream());
-            output.flush();
-
-            input = new ObjectInputStream(socketConnection.getInputStream());
-
-            try {
-                output.writeInt(0);
-                output.writeObject(taskMap);
-                output.flush();
-
-            } catch (IOException IOExc) {
-                IOExc.printStackTrace();
-                logger.debug("Could not send results...");
-                loading = false;
-            }
-            try {
-                try {
-                    myProjectInfo = (HashMap<String, Object>) input.readObject();
-                } catch (ClassNotFoundException ex) {
-                    logger.error(ex);
-                }
-            } catch (IOException IOExc) {
-                loading = false;
-            }
-            if (myProjectInfo != null) {
-                loading = false;
-                logger.debug("Task was retrieved from the server.");
-                socketConnection.close();
-            }
-            if (!loading || taskMap.getInstructionMap() != null) {
-                socketConnection.close();
-                break;
-            }
-        }
-        return myProjectInfo;
-    }
-
-    public Map<Long, Long> SendToServer(TaskContainer taskMap) throws IOException {
-
+    public Map<Long, Long> SendToServer(TaskContainer container) throws IOException {
 
         logger.debug("Creating socket to '" + controllerIP + "' on port " + controllerPort);
         boolean loading = true;
@@ -213,9 +70,8 @@ public class ServerConnector {
 
             try {
                 output.writeInt(0);
-                output.writeObject(taskMap);
+                output.writeObject(container);
                 output.flush();
-
             } catch (IOException IOExc) {
                 IOExc.printStackTrace();
                 logger.debug("Could not send results...");
@@ -234,70 +90,12 @@ public class ServerConnector {
                 loading = false;
                 logger.debug("Jobs submitted to online database.");
             }
-            if (!loading || taskMap.getInstructionMap() != null) {
-                socketConnection.close();
-                break;
-            }
-        }
-
-        return generatedTaskIDs;
-    }
-
-    public boolean loginToServer(TaskContainer taskMap) throws IOException {
-
-        logger.debug("Creating socket to '" + controllerIP + "' on port " + controllerPort);
-        boolean loading = true;
-        boolean loggedIn = false;
-        while (loading) {
-            socketConnection = new Socket(controllerIP, controllerPort);
-
-            output = new ObjectOutputStream(socketConnection.getOutputStream());
-            output.flush();
-            input = new ObjectInputStream(socketConnection.getInputStream());
-
-            logger.debug("Input- and outputstreams are ready...");
-
-            try {
-                output.writeInt(0);
-                output.flush();
-                output.writeObject(taskMap);
-                output.flush();
-
-            } catch (IOException IOExc) {
-                loading = false;
-                IOExc.printStackTrace();
-                logger.debug("Could not send results...");
-            }
-            try {
-                while (loading) {
-                    loggedIn = input.readBoolean();
-                    loading = false;
-                }
-            } catch (IOException IOExc) {
-                IOExc.printStackTrace();
-                loading = false;
-            }
-            if (loggedIn != false) {
-                loading = false;
-                logger.debug("Logged in to the service...");
-            }
             if (!loading) {
-                input.close();
-                output.close();
                 socketConnection.close();
                 break;
             }
         }
-        return loggedIn;
-    }
-
-    private static void setupStreams() throws IOException {
-
-        output = new ObjectOutputStream(socketConnection.getOutputStream());
-        output.flush();
-
-        input = new ObjectInputStream(socketConnection.getInputStream());
-        logger.debug("Input- and outputstreams are ready...");
+        return generatedTaskIDs;
     }
 
     public Socket stop() throws IOException {

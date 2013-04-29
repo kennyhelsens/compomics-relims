@@ -231,7 +231,7 @@ public class TaskDAO {
                 foundSource = rs.getString("SourceID");
                 foundUserID = rs.getString("ClientID");
                 foundAllowPipeline = rs.getBoolean("usePride");
-                foundSearchParameters = rs.getBytes("searchparameters");
+
                 relimsWorkingTask = new Task(foundTaskID, foundProjectID, foundStrategy, foundSource, foundUserID);
             }
         } catch (Exception ex) {
@@ -244,43 +244,10 @@ public class TaskDAO {
                 System.out.println(ex);
             }
         } finally {
+            DAO.disconnect(conn, rs, statement);
+            return relimsWorkingTask;
 
-            //convert the byteArray back to SearchParameters
-            try {
-                bais = new ByteArrayInputStream(foundSearchParameters);
-                ois = new ObjectInputStream(bais);
-                if (foundSearchParameters != null) {
-                    bais = new ByteArrayInputStream(foundSearchParameters);
-                    ois = new ObjectInputStream(in);
-                    relimsWorkingTask.setSearchParameters((SearchParameters) ois.readObject());
-                    relimsWorkingTask.setAllowPridePipeline(foundAllowPipeline);
-                    bais.close();
-                    ois.close();
-                }
-            } catch (ClassNotFoundException | IOException ex) {
-                System.out.println("Could not retrieve valid searchparameters from the database.Using default");
-            } finally {
-                if (bais != null) {
-                    try {
-                        bais.close();
-                    } catch (IOException ex) {
-                        bais = null;
-                    }
-                }
-                if (ois != null) {
-                    try {
-                        ois.close();
-                    } catch (IOException ex) {
-                        ois = null;
-                    }
-                }
-                DAO.disconnect(conn, rs, statement);
-                return relimsWorkingTask;
-            }
         }
-
-
-
     }
 
     public long startupSweep() {
@@ -323,34 +290,13 @@ public class TaskDAO {
         return updates;
     }
 
-    public boolean storeTasks(List<String> aProjectIDList, SearchParameters searchParameters, String allowPrideAsaPipeline) throws IOException {
+    public boolean storeTasks(List<String> aProjectIDList, boolean allowPrideAsaPipeline) throws IOException {
         // searchParameters = null;
         byte[] searchparameterToStore = null;
-        boolean usePrideAsaPipeline;
         PreparedStatement statement = null;
         ResultSet rs = null;
         Connection conn = null;
         boolean success = false;
-
-        //convert string to boolean (makeshift solution for now)
-
-        if (allowPrideAsaPipeline.equalsIgnoreCase("allow")) {
-            usePrideAsaPipeline = true;
-        } else {
-            usePrideAsaPipeline = false;
-        }
-        //convert searchparam to bytearray 
-        try {
-            ByteArrayOutputStream bos = new ByteArrayOutputStream();
-            ObjectOutputStream oos = new ObjectOutputStream(bos);
-            oos.writeObject(searchParameters);
-            oos.flush();
-            oos.close();
-            bos.close();
-            searchparameterToStore = bos.toByteArray();
-        } catch (IOException ex) {
-            logger.error("Could not resolve searchparameters. Not stored");
-        }
 
         try {
             // get the searchblob
@@ -360,7 +306,8 @@ public class TaskDAO {
             for (String aProjectID : aProjectIDList) {
                 String query = "";
                 query = " insert into Tasks"
-                        + " (ProjectID,TaskState,ClientID,StrategyID,SourceID,TimeStamp,ProjectID,usePride,searchparameters) values (?,?,?, ?, ?, ?, ?, ?,?)";
+                        + " (ProjectID,TaskState,ClientID,StrategyID,SourceID,TimeStamp,ProjectID,usePride) "
+                        + "values (?,?,?,?,?,?,?,?)";
                 success = false;
                 int attempts = 0;
                 while (!success) {
@@ -375,8 +322,7 @@ public class TaskDAO {
                         java.sql.Timestamp sqlDate = new java.sql.Timestamp(new java.util.Date().getTime());
                         statement.setTimestamp(6, sqlDate);
                         statement.setString(7, tasksToStore.get(aProjectID));
-                        statement.setBoolean(8, usePrideAsaPipeline);
-                        statement.setBytes(9, searchparameterToStore);
+                        statement.setBoolean(8, allowPrideAsaPipeline);
                         statement.setQueryTimeout(60);
                         statement.execute();
                         success = true;
@@ -411,8 +357,7 @@ public class TaskDAO {
         //WorkerPool.setDatabaseLocked(true);
         this.taskMap = taskMap;
         Map<String, Long> generatedTaskIDs = new HashMap<>();
-        clientID = taskMap.getCurrentUser();
-        loadedParameters = taskMap.getSearchParameters();
+        clientID = taskMap.getName();
         tasksToStore = taskMap.getTaskList();
         List<String> taskList = new ArrayList<>();
 
@@ -439,7 +384,7 @@ public class TaskDAO {
                     subList = taskList.subList(0, remainder);
                 }
                 //store tasks in a future object...
-                storeTasks(subList, taskMap.getSearchParameters(), taskMap.getInstructionMap().get("runpipeline"));
+                storeTasks(subList, taskMap.isPrideAsaEnabled());
                 taskList.removeAll(subList);
                 i++;
             } catch (Exception e) {

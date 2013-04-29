@@ -225,25 +225,12 @@ public class Simulator extends TestCase {
 
     public static void simulateClientInput(int projectId) {
 
-        Map<String, String> currentUserMap = new HashMap<String, String>();
-        currentUserMap.put("username", RelimsProperties.getUserID());
-        currentUserMap.put("password", "admin");
-        //setting up TaskObject
+       //setting up TaskObject
         TaskContainer tasksForServer = new TaskContainer();
-        tasksForServer.setInstructionMap(currentUserMap);
-        tasksForServer.updateInstruction("instruction", "doTasks");
         tasksForServer.setStrategyID("rdbVarMOD1");
         tasksForServer.setSourceID("pride");
-        //read the parameters used
-        try {
-            File currentParameters = new File(RelimsProperties.getConfigFolder().getAbsolutePath() + "/default_parameters.parameters");
-            loadedSearchParameters = SearchParameters.getIdentificationParameters(currentParameters);
-            loadedSearchParameters.setFastaFile(new File(RelimsProperties.getDefaultSearchDatabase()));
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        tasksForServer.setSearchParameters(loadedSearchParameters);
-        tasksForServer.updateInstruction("runpipeline", "allow");
+        tasksForServer.setName("TestingContainer");
+        tasksForServer.enablePipeline();
         tasksForServer.addJob("" + projectId, "TestingProject");
         ServerConnector connector = new ServerConnector();
         connector.setConnectionParameters(RelimsProperties.getControllerIP(), RelimsProperties.getControllerPort());
