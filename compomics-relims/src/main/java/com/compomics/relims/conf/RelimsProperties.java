@@ -28,6 +28,7 @@ import java.util.List;
 import static com.google.common.base.Preconditions.checkNotNull;
 import java.io.BufferedWriter;
 import java.io.FileWriter;
+import java.lang.management.ManagementFactory;
 import org.apache.commons.io.FileUtils;
 import org.apache.log4j.Appender;
 
@@ -38,6 +39,18 @@ import org.apache.log4j.Appender;
  */
 public class RelimsProperties {
 
+    public static String getDbPrefix() {
+        if (getTaskDatabaseDriver().toLowerCase().contains("derby")) {
+            return getTaskDatabaseName() + ".";
+        } else {
+            return "";
+        }
+    }
+
+    public static int getAllowedRAM() {
+        return (int) (0.9 * (((com.sun.management.OperatingSystemMXBean) ManagementFactory
+                .getOperatingSystemMXBean()).getTotalPhysicalMemorySize()) / 1024 / 1024);
+    }
     /**
      * the results will all be placed in a user-specific folder. Therefor, all
      * "normal" relims projects that are not run via the automatic setup, will
@@ -48,9 +61,7 @@ public class RelimsProperties {
      * A ProgressManager to store the state of the project and monitor it
      */
     private static ProgressManager progressManager = ProgressManager.getInstance();
-    /**
-     * Plain logger
-     */
+
     private static Logger logger = Logger.getLogger(RelimsProperties.class);
     /**
      * config stores the configurations from the file
@@ -659,6 +670,13 @@ public class RelimsProperties {
             Thread.currentThread().interrupt();
         }
     }
+    
+    
+    //PREDICATES
+       public static int getMaxMS1Count() {
+        return config.getInt("project.predicates.maxMs1Count");
+    }
+
     //HELPER ENUMS
 
     public enum NetworkMode {

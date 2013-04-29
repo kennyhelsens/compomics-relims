@@ -147,6 +147,7 @@ public class DAO {
                     statement = connectionInstance.createStatement();
                     statement.execute("begin immediate");
                     connectionInstance.setTransactionIsolation(Connection.TRANSACTION_READ_UNCOMMITTED);
+
                     success = true;
                 } catch (SQLException ex) {
                     if (!ex.toString().contains("cannot start a transaction within a transaction") && !ex.toString().contains("database is locked")) {
@@ -236,6 +237,7 @@ public class DAO {
 
     private static void setupMajorInitiationQuery() {
 
+
 // MAKE TASK TABLE____________________________________________TASK TABLE
         queryList.add("CREATE TABLE Tasks ("
                 + "TaskID INTEGER PRIMARY KEY,"
@@ -261,6 +263,7 @@ public class DAO {
                 + "ErrorCode INTEGER,"
                 + "Description VarChar(150),"
                 + "SeverityLevel VarChar(25));");
+
 // MAKE TASK WorkerSpecs_______________________________________TASK WorkerSpecs : TODO RENAME THIS
         queryList.add("CREATE TABLE WorkerSpecs ("
                 //Taskrelated Parameters

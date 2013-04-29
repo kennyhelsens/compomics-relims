@@ -45,3 +45,7 @@ compomics-relims/src/test/resources/sourcefiles/Mimic_PrideFTP/PRIDE_Exp_Complet
 compomics-relims/src/main/java/com/compomics/relims/concurrent/RelimsJobController.java.rej
 compomics-relims/src/test/resources/sourcefiles/Mimic_PrideFTP/PRIDE_Exp_Complete_Ac_3643.xml
 compomics-relims/src/test/resources/sourcefiles/Mimic_PrideFTP/PRIDE_Exp_Complete_Ac_3643.xml.gz
+<<<<<<< HEAD
+
+=======
+>>>>>>> develop

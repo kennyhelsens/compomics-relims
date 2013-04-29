@@ -140,6 +140,7 @@ public class PeptideShakerJobBean {
 
         if (this.spectraFolder.exists()) {
             PSCommandLine.append("java ");
+            PSCommandLine.append("-Xmx" + RelimsProperties.getAllowedRAM() + "M " );
             PSCommandLine.append("-cp ");
             PSCommandLine.append(RelimsProperties.getPeptideShakerArchive());
             PSCommandLine.append(" eu.isas.peptideshaker.cmd.PeptideShakerCLI ");

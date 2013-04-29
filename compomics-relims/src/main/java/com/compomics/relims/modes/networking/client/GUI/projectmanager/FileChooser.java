@@ -2,7 +2,7 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-package com.compomics.relims.modes.networking.client.GUI;
+package com.compomics.relims.modes.networking.client.GUI.projectmanager;
 
 import java.io.File;
 import javax.swing.JFileChooser;

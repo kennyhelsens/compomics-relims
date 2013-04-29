@@ -542,7 +542,7 @@ public class RelimsProjectBean implements Cloneable {
                         isInFactory = true;
                         aModPTM = lPTM;
                         //OMSSA is caps sensitive
-                        aModPTM.setName(aModPTM.getName().toLowerCase());
+                        aModPTM.setName(aModPTM.getName().toLowerCase().replace("_", "-"));
                         break;
                     }
                 }

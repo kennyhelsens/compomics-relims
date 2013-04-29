@@ -40,7 +40,7 @@ public class TaskDAO {
     private InputStream in;
     private TaskContainer taskMap;
     private String clientID;
-    private LinkedHashMap<String, String> tasksToStore = new LinkedHashMap<>();
+    private HashMap<String, String> tasksToStore = new LinkedHashMap<>();
     private SearchParameters loadedParameters;
     private List<String> subList;
 
