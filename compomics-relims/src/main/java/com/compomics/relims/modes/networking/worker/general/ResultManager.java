@@ -4,6 +4,7 @@
  */
 package com.compomics.relims.modes.networking.worker.general;
 
+import com.compomics.colims.core.exception.MappingException;
 import com.compomics.colims.core.exception.PeptideShakerIOException;
 import com.compomics.relims.conf.RelimsProperties;
 import com.compomics.relims.manager.colimsmanager.ColimsImporter;
@@ -83,13 +84,16 @@ public class ResultManager {
                 File lFastaFile = lSearchParameters.getFastaFile();
                 File lMGFFile = new File(RelimsProperties.getWorkSpace().getAbsolutePath() + "/mgf/" + ResourceManager.getProjectID() + ".mgf");
 
-                ColimsImporter.getInstance().transferToColims(cpsFile, lFastaFile, lMGFFile);
+                String lTitle = String.format("taskid-%d-projectid-%d", ResourceManager.getTaskID(), ResourceManager.getProjectID());
+                ColimsImporter.getInstance().transferToColims(cpsFile, lFastaFile, lMGFFile, lTitle);
             } catch (PeptideShakerIOException ex) {
                 logger.error("Could not store in Colims ");
                 logger.error(ex);
             } catch (ClassNotFoundException e) {
                 logger.error(e.getMessage(), e);
             } catch (IOException e) {
+                logger.error(e.getMessage(), e);
+            } catch (MappingException e) {
                 logger.error(e.getMessage(), e);
             }
         } else {
