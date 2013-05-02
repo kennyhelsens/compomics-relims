@@ -69,7 +69,7 @@ public class ResultHandler implements Runnable {
                     // set task to finished and worker back to IDLE
                     dds.updateTask(taskID, Checkpoint.FAILED.toString());
                     logger.debug("Task " + taskID + " was set to failed and re-entered the qeue for project : " + projectID);
-                    dds.storeStatistics((HashMap<String, Object>) resultMap.get("systemInfoMap"), sock.getInetAddress().getHostName());
+                    dds.storeWorkerSpecs((HashMap<String, Object>) resultMap.get("systemInfoMap"), sock.getInetAddress().getHostName());
                     dds.storeErrorList((List<ConversionError>) resultMap.get("PrideXMLErrorList"), projectID);
                     WorkerRunner runner = new WorkerRunner(sock.getInetAddress().getHostName(), workerPort);
                     WorkerPool.setWorkerState(runner, Checkpoint.FAILED);
@@ -80,8 +80,8 @@ public class ResultHandler implements Runnable {
                     dds.updateTask(taskID, Checkpoint.FINISHED.toString());
                     WorkerRunner runner = new WorkerRunner(sock.getInetAddress().getHostName(), workerPort);
                     logger.debug("Task " + taskID + " : attempting to store data for project : " + projectID);
-                    //store statistics !                  
-                    dds.storeStatistics((HashMap<String, Object>) resultMap.get("systemInfoMap"), sock.getInetAddress().getHostName());
+                    //store WorkerSpecs !                  
+                    dds.storeWorkerSpecs((HashMap<String, Object>) resultMap.get("systemInfoMap"), sock.getInetAddress().getHostName());
                     dds.storeErrorList((List<ConversionError>) resultMap.get("PrideXMLErrorList"), projectID);
                     //store project results
                     String projectId = dds.getProjectID(taskID);
@@ -106,8 +106,8 @@ public class ResultHandler implements Runnable {
                     dds.updateTask(taskID, Checkpoint.PRIDEFAILURE.toString());
                     WorkerRunner runner = new WorkerRunner(sock.getInetAddress().getHostName(), workerPort);
                     logger.debug("Task " + taskID + " : could not be run. Pride-asa-pipeline could not provide workable files for project : " + projectID);
-                    //store statistics !        
-                    dds.storeStatistics((HashMap<String, Object>) resultMap.get("systemInfoMap"), sock.getInetAddress().getHostName());
+                    //store WorkerSpecs !        
+                    dds.storeWorkerSpecs((HashMap<String, Object>) resultMap.get("systemInfoMap"), sock.getInetAddress().getHostName());
                     dds.storeErrorList((List<ConversionError>) resultMap.get("PrideXMLErrorList"), projectID);
                     //delete the worker from the active database ---> is this necessary?
                     // dds.deleteWorker(runner.getHost(), runner.getPort());
@@ -119,8 +119,8 @@ public class ResultHandler implements Runnable {
                     dds.updateTask(taskID, Checkpoint.PROCESSFAILURE.toString());
                     WorkerRunner runner = new WorkerRunner(sock.getInetAddress().getHostName(), workerPort);
                     logger.debug("Task " + taskID + " : could not be run. An error occurred while searching : " + projectID);
-                    //store statistics !        
-                    dds.storeStatistics((HashMap<String, Object>) resultMap.get("systemInfoMap"), sock.getInetAddress().getHostName());
+                    //store WorkerSpecs !        
+                    dds.storeWorkerSpecs((HashMap<String, Object>) resultMap.get("systemInfoMap"), sock.getInetAddress().getHostName());
                     dds.storeErrorList((List<ConversionError>) resultMap.get("PrideXMLErrorList"), projectID);
                     //delete the worker from the active database ---> is this necessary?
                     // dds.deleteWorker(runner.getHost(), runner.getPort());

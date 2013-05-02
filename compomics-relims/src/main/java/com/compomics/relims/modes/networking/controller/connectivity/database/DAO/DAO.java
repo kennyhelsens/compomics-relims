@@ -51,23 +51,6 @@ public class DAO {
         }
         this.dataSource = setupDataSource(protocol + directory + "/" + dbName);
     }
-    /*
-     private DAO() {
-     protocol = RelimsProperties.getTaskDatabaseProtocol();
-     directory = RelimsProperties.getTaskDatabaseLocation().getAbsolutePath();
-     dbName = RelimsProperties.getTaskDatabaseName();
-     if (!protocol.contains("derby")) {
-     //  dbName = dbName + ".db";
-     }
-     if (!directoryFile.exists()) {
-     boolean success = directoryFile.mkdirs();
-     if (success) {
-     System.out.println("");
-     }
-     }
-     this.dataSource = setupDataSource(protocol + directory + dbName);
-     }
-     */
 
     public void setProtocol(String protocol) {
         this.protocol = protocol;
@@ -92,7 +75,6 @@ public class DAO {
     public static String getDirectory() {
         return directory;
     }
-
 
     public static void initiate() {
         new DAO();
@@ -146,35 +128,13 @@ public class DAO {
     public synchronized void initializeConnectionPool() throws SQLException, InterruptedException {
         if (dataSource == null) {
             File directoryFile = new File(directory);
-            if (protocol.contains("derby")) {
-                dataSource = setupDataSource(protocol + directory + "/" + dbName);
-            } else {
-                dataSource = setupDataSource(protocol + directory + "/" + dbName + ".db");
-                if (!directoryFile.exists()) {
-                    directoryFile.mkdirs();
-                }
+            dataSource = setupDataSource(protocol + directory + "/" + dbName + ".db");
+            if (!directoryFile.exists()) {
+                directoryFile.mkdirs();
             }
         }
     }
-    //
 
-    /*  public synchronized Connection getConnection() throws SQLException {
-     Connection returningConnection = null;
-     while (returningConnection == null) {
-     if (dataSource != null) {
-     returningConnection = dataSource.getConnection();
-     } else {
-     try {
-     initializeConnectionPool();
-     Thread.sleep(1000);
-     } catch (InterruptedException ex) {
-     }
-     }
-     }
-     return returningConnection;
-
-     }*/
-    //Double method ---> might need to change specific parameters later (such as Isolationlevels / committing / ...)
     private static synchronized Connection prepareWritingConnection() {
         synchronized (lock) {
             Connection connectionInstance = null;
@@ -186,13 +146,8 @@ public class DAO {
                     //connectionInstance.setAutoCommit(false);
                     statement = connectionInstance.createStatement();
                     statement.execute("begin immediate");
-                    if (protocol.contains("derby")) {
-                        connectionInstance.setTransactionIsolation(4);
-                        RelimsProperties.setDbPrefix(dbName);
-                    } else {
-                        connectionInstance.setTransactionIsolation(Connection.TRANSACTION_READ_UNCOMMITTED);
-                        RelimsProperties.setDbPrefix("");
-                    }
+                    connectionInstance.setTransactionIsolation(Connection.TRANSACTION_READ_UNCOMMITTED);
+
                     success = true;
                 } catch (SQLException ex) {
                     if (!ex.toString().contains("cannot start a transaction within a transaction") && !ex.toString().contains("database is locked")) {
@@ -212,15 +167,7 @@ public class DAO {
                 Statement statement = null;
                 try {
                     connectionInstance = getConnection();
-                    if (protocol.contains("derby")) {
-                        //          connectionInstance.setTransactionIsolation(1);
-                        RelimsProperties.setDbPrefix(dbName);
-                        statement = connectionInstance.createStatement();
-                        statement.execute("begin deferred");
-                    } else {
-                        connectionInstance.setTransactionIsolation(Connection.TRANSACTION_READ_UNCOMMITTED);
-                        RelimsProperties.setDbPrefix("");
-                    }
+                    connectionInstance.setTransactionIsolation(Connection.TRANSACTION_READ_UNCOMMITTED);
                     success = true;
                 } catch (SQLException ex) {
                     if (!ex.toString().contains("cannot start a transaction within a transaction")) {
@@ -290,52 +237,35 @@ public class DAO {
 
     private static void setupMajorInitiationQuery() {
 
-        if (protocol.contains("derby")) {
-            queryList.add("CREATE SCHEMA TaskDatabase");
-            queryList.add("CREATE TABLE Tasks ("
-                    + "TaskID INTEGER NOT NULL GENERATED ALWAYS AS IDENTITY (START WITH 1, INCREMENT BY 1),"
-                    + "ProjectID VarChar(50),"
-                    + "STRATEGYID VarChar(50),"
-                    + "SOURCEID VarChar(50),"
-                    + "TaskState VARCHAR(20),"
-                    + "ClientID VARCHAR(100),"
-                    + "Timestamp TIMESTAMP,"
-                    + "ProjectName VarChar(255),"
-                    + "usePride BOOLEAN,"
-                    + "searchParameters BLOB"
-                    + "CONSTRAINT primary_key PRIMARY KEY (TaskID));");
-            queryList.add("CREATE TABLE Users ("
-                    + "UserID INTEGER NOT NULL GENERATED ALWAYS AS IDENTITY (START WITH 1, INCREMENT BY 1),"
-                    + "Username VARCHAR(30),"
-                    + "HashedP VARCHAR(256),"
-                    + "Salt VARCHAR(50),"
-                    + "eMail VARCHAR(100),"
-                    + "CONSTRAINT primary_userkey PRIMARY KEY (UserID));");
-        } else {
-            queryList.add("CREATE TABLE Tasks ("
-                    + "TaskID INTEGER PRIMARY KEY,"
-                    + "ProjectID VarChar(50),"
-                    + "STRATEGYID VarChar(50),"
-                    + "SOURCEID VarChar(50),"
-                    + "TaskState VARCHAR(20),"
-                    + "ClientID VARCHAR(100),"
-                    + "ProjectName VarChar(255),"
-                    + "Timestamp TIMESTAMP,"
-                    + "usePride BOOLEAN,"
-                    + "searchParameters BLOB);");
-            queryList.add("CREATE TABLE Users ("
-                    + "UserID INTEGER PRIMARY KEY,"
-                    + "Username VARCHAR(30),"
-                    + "HashedP VARCHAR(256),"
-                    + "Salt VARCHAR(50),"
-                    + "eMail VARCHAR(100));");
-        }
-        queryList.add("CREATE TABLE PRIDEDETAILS ("
+
+// MAKE TASK TABLE____________________________________________TASK TABLE
+        queryList.add("CREATE TABLE Tasks ("
+                + "TaskID INTEGER PRIMARY KEY,"
+                + "ProjectID VarChar(50),"
+                + "STRATEGYID VarChar(50),"
+                + "SOURCEID VarChar(50),"
+                + "TaskState VARCHAR(20),"
+                + "ClientID VARCHAR(100),"
+                + "ProjectName VarChar(255),"
+                + "Timestamp TIMESTAMP,"
+                + "usePride BOOLEAN,"
+                + "searchParameters BLOB);");
+// MAKE USER TABLE____________________________________________TASK USERS : TODO this is obsolete
+        queryList.add("CREATE TABLE Users ("
+                + "UserID INTEGER PRIMARY KEY,"
+                + "Username VARCHAR(30),"
+                + "HashedP VARCHAR(256),"
+                + "Salt VARCHAR(50),"
+                + "eMail VARCHAR(100));");
+// MAKE TASK TABLE____________________________________________PRIDE DETAILS : TODO rename this
+        queryList.add("CREATE TABLE PRIDEXMLERRORS ("
                 + "ProjectID VarChar(50),"
                 + "ErrorCode INTEGER,"
                 + "Description VarChar(150),"
                 + "SeverityLevel VarChar(25));");
-        queryList.add("CREATE TABLE Statistics ("
+
+// MAKE TASK WorkerSpecs_______________________________________TASK WorkerSpecs : TODO RENAME THIS
+        queryList.add("CREATE TABLE WorkerSpecs ("
                 //Taskrelated Parameters
                 + "TaskID BIGINT,"
                 + "TaskTime BIGINT,"
@@ -360,26 +290,29 @@ public class DAO {
                 + "JAVAVersion VARCHAR(25),"
                 //User related parameters
                 + "userID VARCHAR(100));");
+// MAKE WORKERS TABLE____________________________________________WORKERS TABLE
         queryList.add("CREATE TABLE Workers ("
                 + "HostName VARCHAR(75),"
                 + "workerPort INTEGER,"
                 + "taskID VARCHAR(30));");
+// MAKE TASK PROJECT RESULTS_____________________________________PROJECT RESULT TABLE
         queryList.add("CREATE TABLE ProjectResults ("
                 + "TaskID BIGINT,"
                 + "projectID VarChar(50),"
                 + "parameterName VarChar(30),"
                 + "parameterValue VarChar(200));");
+        /*// MAKE TASK PRIDE METADATA_____________________________________PRIDE META DATA TABLE
+         queryList.add("CREATE TABLE PrideMetaData ("
+         + "projectID VarChar(50),"
+         + "parameterName VarChar(30),"
+         + "parameterValue VarChar(200));");*/
     }
 
     public void setTimeOut(Connection connection) {
         Statement statement = null;
         try {
             statement = connection.createStatement();
-            if (RelimsProperties.getTaskDatabaseDriver().contains("derby")) {
-                statement.execute("CALL SYSCS_UTIL.SYSCS_SET_DATABASE_PROPERTY('derby.locks.deadlockTimeout', '30')");
-            } else {
-                statement.execute("CALL SYSCS_UTIL.SYSCS_SET_DATABASE_PROPERTY('sqlite.locks.deadlockTimeout', '30')");
-            }
+            statement.execute("CALL SYSCS_UTIL.SYSCS_SET_DATABASE_PROPERTY('sqlite.locks.deadlockTimeout', '30')");
             logger.debug("Set timeout configuration");
         } catch (SQLException e) {
             logger.debug("Could not set configuration");

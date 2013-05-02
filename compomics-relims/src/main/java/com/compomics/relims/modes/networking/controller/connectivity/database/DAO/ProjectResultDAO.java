@@ -4,7 +4,6 @@
  */
 package com.compomics.relims.modes.networking.controller.connectivity.database.DAO;
 
-import com.compomics.relims.conf.RelimsProperties;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -19,9 +18,9 @@ import org.apache.log4j.Logger;
  *
  * @author Kenneth
  */
-public class ResultDAO {
+public class ProjectResultDAO {
 
-    private final static Logger logger = Logger.getLogger(ResultDAO.class);
+    private final static Logger logger = Logger.getLogger(ProjectResultDAO.class);
 
     public boolean storeParameter(long taskID, String projectId, String parameterName, String parameter) {
         PreparedStatement statement = null;
@@ -34,7 +33,7 @@ public class ResultDAO {
             conn = DAO.getConnection();
             //     statement = conn.prepareStatement("BEGIN");
             //     statement.execute();
-            String query = "insert into " + RelimsProperties.getDbPrefix() + "ProjectResults"
+            String query = "insert into ProjectResults"
                     + "(TaskID,projectID,parameterName,parameterValue) values (?, ?, ?,?);";
             statement = conn.prepareStatement(query, Statement.RETURN_GENERATED_KEYS);
             statement.setLong(1, taskID);

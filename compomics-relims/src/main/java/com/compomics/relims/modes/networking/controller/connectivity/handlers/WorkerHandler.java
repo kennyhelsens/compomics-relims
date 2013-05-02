@@ -64,7 +64,7 @@ public class WorkerHandler implements Runnable {
                 registered = true;
                 workerpool.setOnline(worker);
             } else {
-                logger.debug(worker.getHost() + " sent heartbeat...");
+                logger.trace(worker.getHost() + " sent heartbeat...");
                 workerpool.setOnline(worker);
             }
         } catch (Throwable e) {

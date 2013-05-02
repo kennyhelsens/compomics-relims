@@ -17,9 +17,9 @@ import com.google.common.base.Function;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.io.RandomAccessFile;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -32,7 +32,6 @@ import javax.annotation.Nullable;
 import no.uib.jsparklines.data.XYDataPoint;
 import org.apache.commons.configuration.PropertiesConfiguration;
 import org.apache.log4j.Logger;
-import uk.ac.ebi.pride.tools.braf.BufferedRandomAccessFile;
 
 /**
  * This class is a
@@ -110,6 +109,7 @@ public class RelimsProjectBean implements Cloneable {
      */
     private final static Logger logger = Logger.getLogger(RelimsProjectBean.class);
     private File spectrumParentFolder;
+    private boolean validated;
 
     public RelimsProjectBean(long projectID) {
         this.projectID = projectID;
@@ -226,7 +226,6 @@ public class RelimsProjectBean implements Cloneable {
     @Override
     public RelimsProjectBean clone() throws CloneNotSupportedException {
         RelimsProjectBean lProjectBean = new RelimsProjectBean(this.projectID);
-
         lProjectBean.setProjectID(getProjectID());
         lProjectBean.setCharges(getCharges());
         lProjectBean.setSpectrumFile(getSpectrumFile());
@@ -240,7 +239,6 @@ public class RelimsProjectBean implements Cloneable {
         lProjectBean.setVariableMatchedPTMs(getVariableMatchedPTMs());
         lProjectBean.setPrecursorError(getPrecursorError());
         lProjectBean.setFragmentError(getFragmentError());
-
         return lProjectBean;
     }
 
@@ -454,13 +452,14 @@ public class RelimsProjectBean implements Cloneable {
 
     public File getSpectrumFile() {
         if (spectrumFile == null) {
+            logger.debug("Attempting to extract MGF");
             try {
-                logger.debug("Attempting to extract MGF");
                 this.spectrumFile = dataProvider.getSpectraForProject(projectID);
-                this.spectrumParentFolder = new File(spectrumFile.getParentFile().getAbsolutePath() + "/");
-            } catch (Exception e) {
-                logger.error("Could not load MGF");
+            } catch (IOException ex) {
+                logger.error(ex);
+                return null;
             }
+            this.spectrumParentFolder = new File(spectrumFile.getParentFile().getAbsolutePath() + "/");
         }
         return spectrumFile;
     }
@@ -487,15 +486,6 @@ public class RelimsProjectBean implements Cloneable {
 
     public void setSpectrumFile(File spectrumFile) {
         this.spectrumFile = spectrumFile;
-        if (RelimsProperties.hasSpectraLimitForMGF()) {
-            try {
-                breakUpSpectrumFile(spectrumFile);
-            } catch (FileNotFoundException ex) {
-                logger.error(ex);
-            } catch (IOException ex) {
-                logger.error(ex);
-            }
-        }
     }
 
     public void setSearchParameters(SearchParameters searchParameters) {
@@ -552,7 +542,7 @@ public class RelimsProjectBean implements Cloneable {
                         isInFactory = true;
                         aModPTM = lPTM;
                         //OMSSA is caps sensitive
-                        aModPTM.setName(aModPTM.getName().toLowerCase());
+                        aModPTM.setName(aModPTM.getName().toLowerCase().replace("_", "-"));
                         break;
                     }
                 }
@@ -622,51 +612,6 @@ public class RelimsProjectBean implements Cloneable {
 
     void setSearchParametersFile(File searchParametersFile) {
         this.searchParametersFile = searchParametersFile;
-    }
-
-    private void breakUpSpectrumFile(File originalSpectrumFile) throws FileNotFoundException, IOException {
-
-        int limit = RelimsProperties.getMaxSpectraAllowedInMGF();
-        long maxFileSize = RelimsProperties.getMaxMGFFileSize();
-        int subFileCounter = 1;
-        if (originalSpectrumFile.length() >= maxFileSize) {
-            logger.debug("Reading spectrumfile...");
-            RandomAccessFile outputFile = null;
-            try (RandomAccessFile originalFile = new BufferedRandomAccessFile(originalSpectrumFile, "rw", 1024)) {
-                String strLine;
-                int spectraCounter = 0;
-                logger.debug("Breaking up spectrumfile in managable subfiles (" + limit + " spectra/file)");
-                outputFile = new RandomAccessFile(originalSpectrumFile.getAbsolutePath().replace(".mgf", "_" + subFileCounter + ".mgf"), "rw");
-                while (originalFile.getFilePointer() < originalFile.length()) {
-                    strLine = originalFile.readLine();
-                    if (strLine.startsWith("BEGIN")) {
-                        spectraCounter++;
-                    }
-                    if (spectraCounter > limit) {
-                        spectraCounter = 0;
-                        subFileCounter++;
-                        outputFile.close();
-                        outputFile = new RandomAccessFile(originalSpectrumFile.getAbsolutePath().replace(".mgf", "_" + subFileCounter + ".mgf"), "rw");
-                        logger.debug("Created new subfile : " + subFileCounter);
-                    }
-                    outputFile.writeBytes(strLine + System.lineSeparator());
-                }
-                if (subFileCounter == 1) {
-                    new File(originalSpectrumFile.getAbsolutePath().replace("_1.mgf", ".mgf"));
-                }
-            } catch (Exception e) {
-                e.printStackTrace();
-            } finally {
-                outputFile.close();
-                logger.debug("Finished splitting original MGF");
-                if (subFileCounter > 1) {
-                    logger.debug("Deleting original file...");
-                    boolean delete = originalSpectrumFile.delete();
-                }
-            }
-        }
-        logger.debug("Setting mgf folder to " + originalSpectrumFile.getParent());
-        setSpectrumParentFolder(originalSpectrumFile.getParentFile());
     }
 
     private void setSpectrumParentFolder(File spectrumParentFolder) {

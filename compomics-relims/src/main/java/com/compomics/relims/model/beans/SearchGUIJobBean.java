@@ -8,6 +8,7 @@ import org.apache.commons.configuration.ConfigurationException;
 import org.apache.log4j.Logger;
 
 import java.io.*;
+import java.util.logging.Level;
 
 /**
  * This class is a
@@ -67,13 +68,18 @@ public class SearchGUIJobBean {
 
         //  searchGUICommandLine.append(RelimsProperties.getSearchGuiFolder());
         searchGUICommandLine.append("java ");
+        searchGUICommandLine.append("-Xmx" + RelimsProperties.getAllowedRAM() + "M ");
         searchGUICommandLine.append("-cp ");
         searchGUICommandLine.append(RelimsProperties.getSearchGuiFolder() + "/" + RelimsProperties.getSearchGuiArchive());
         searchGUICommandLine.append(" eu.isas.searchgui.cmd.SearchCLI ");
         searchGUICommandLine.append("-spectrum_files ");
 
         if (spectrumFile == null) {
-            searchGUICommandLine.append(iRelimsProjectBean.getSpectrumParentFolder().getAbsolutePath());
+            try {
+                searchGUICommandLine.append(iRelimsProjectBean.getSpectrumParentFolder().getAbsolutePath());
+            } catch (Exception ex) {
+                throw new IOException("MGF file could not be loaded into the searchgui bean :" + ex);
+            }
         } else {
             searchGUICommandLine.append(spectrumFile.getAbsolutePath());
             iRelimsProjectBean.setSpectrumFile(spectrumFile);
@@ -143,14 +149,15 @@ public class SearchGUIJobBean {
         String searchGUICommandLine = null;
         try {
             searchGUICommandLine = generateCommand();
-        } catch (NullPointerException e) {
+            if (searchGUICommandLine != null) {
+                logger.info(searchGUICommandLine);
+                return Command.call(searchGUICommandLine);
+            } else {
+                logger.error("Could not run searchgui...");
+                return 1;
+            }
+        } catch (Exception e) {
             logger.error(e);
-        }
-        if (searchGUICommandLine != null) {
-            logger.info(searchGUICommandLine);
-            return Command.call(searchGUICommandLine);
-        } else {
-            logger.error("Could not run searchgui...");
             return 1;
         }
     }

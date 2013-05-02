@@ -14,15 +14,15 @@ import junit.framework.TestSuite;
  *
  * @author Kenneth
  */
-public class IntegrityTestProject11954 extends TestCase {
+public class IntegrityTestProject3643 extends TestCase {
 
-    public IntegrityTestProject11954(String testName) {
+    public IntegrityTestProject3643(String testName) {
         super(testName);
     }
 
     public static Test suite() {
-        Simulator.setProjectID(11954);
-        SourceFileTest.setProjectID(11954);
+        Simulator.setProjectID(3643);
+        SourceFileTest.setProjectID(3643);
         SourceFileTest.setN_PSMS(1233);
         SourceFileTest.setN_PROTEIN(96);
         SourceFileTest.setN_PEPTIDE(689);

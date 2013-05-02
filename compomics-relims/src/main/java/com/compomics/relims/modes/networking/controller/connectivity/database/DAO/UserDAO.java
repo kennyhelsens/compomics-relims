@@ -37,7 +37,7 @@ public class UserDAO {
             //     statement.execute();
             String salt = KryptoDynamite.getSalt();
             String hashedP = KryptoDynamite.kryptonize(password + salt);
-            String query = "insert into " + RelimsProperties.getDbPrefix() + "Users"
+            String query = "insert into Users"
                     + "(Username,HashedP,Salt,eMail) values (?, ?, ?,?);";
             statement = conn.prepareStatement(query, Statement.RETURN_GENERATED_KEYS);
             statement.setString(1, username);
@@ -84,7 +84,7 @@ public class UserDAO {
             conn = DAO.getConnection();
             //     statement = conn.prepareStatement("BEGIN");
             //     statement.execute();
-            String query = "select HashedP,Salt from " + RelimsProperties.getDbPrefix() + "Users where Username = ?";
+            String query = "select HashedP,Salt from Users where Username = ?";
             statement = conn.prepareStatement(query);
             statement.setString(1, userID);
             statement.setQueryTimeout(60);
@@ -112,7 +112,7 @@ public class UserDAO {
             conn = DAO.getConnection();
             //     statement = conn.prepareStatement("BEGIN");
             //     statement.execute();
-            String query = "select * from " + RelimsProperties.getDbPrefix() + "Users where Username = ?";
+            String query = "select * from Users where Username = ?";
             statement = conn.prepareStatement(query);
             statement.setString(1, userID);
             statement.setQueryTimeout(60);
@@ -167,7 +167,7 @@ public class UserDAO {
             conn = DAO.getConnection();
             //     statement = conn.prepareStatement("BEGIN");
             //     statement.execute();
-            String query = "select * from " + RelimsProperties.getDbPrefix() + "Users where Username = ?";
+            String query = "select * from Users where Username = ?";
             statement = conn.prepareStatement(query);
             statement.setString(1, username);
             statement.setQueryTimeout(60);

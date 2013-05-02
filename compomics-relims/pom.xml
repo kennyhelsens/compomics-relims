@@ -5,7 +5,7 @@
     <groupId>com.compomics</groupId>
     <artifactId>compomics-relims</artifactId>
     <packaging>jar</packaging>
-    <version>0.9.1-beta</version>
+    <version>0.9.2-beta</version>
     <name>compomics-relims</name>
     <url>code.google.com/p/compomics-relims/</url>
 
@@ -286,14 +286,14 @@
     <!-- Dependencies -->
     <dependencies>
         <dependency>
+            <groupId>com.compomics</groupId>
+            <artifactId>utilities</artifactId>
+            <version>3.11.31</version>
+        </dependency>
+        <dependency>
             <groupId>com.compomics.colims</groupId>
             <artifactId>colims-core</artifactId>
             <version>1.0.0</version>
-        </dependency>
-        <dependency>
-            <groupId>com.compomics</groupId>
-            <artifactId>utilities</artifactId>
-            <version>3.11.10</version>
         </dependency>
         <dependency>
             <groupId>com.compomics.acromics</groupId>
@@ -309,14 +309,6 @@
                     <artifactId>mysql</artifactId>
                     <groupId>mysql-connector-java</groupId>
                 </exclusion>
-                <exclusion>
-                    <artifactId>com.compomics</artifactId>
-                    <groupId>peptizer</groupId>
-                </exclusion>
-                <exclusion>
-                    <artifactId>com.compomics</artifactId>
-                    <groupId>rover</groupId>
-                </exclusion>
             </exclusions>
             <type>jar</type>
         </dependency>
@@ -328,7 +320,7 @@
         <dependency>
             <groupId>com.compomics</groupId>
             <artifactId>PrideXMLValidator</artifactId>
-            <version>0.4</version>
+            <version>0.4.1</version>
         </dependency>
         <dependency>
             <groupId>com.compomics</groupId>
