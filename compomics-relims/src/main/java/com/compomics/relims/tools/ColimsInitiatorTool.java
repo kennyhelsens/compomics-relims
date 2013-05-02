@@ -23,9 +23,9 @@ import static com.compomics.relims.conf.RelimsProperties.getColimsDbServer;
  * This class holds everything to initiate the latest
  * compomics-colims database
  */
-public class ColimsInitiator {
+public class ColimsInitiatorTool {
 
-    private static Logger logger = Logger.getLogger(ColimsInitiator.class);
+    private static Logger logger = Logger.getLogger(ColimsInitiatorTool.class);
     private static boolean DROP_IF_EXISTS = true;
     private static String SQL_CHECK_DATABASE = "SELECT SCHEMA_NAME FROM INFORMATION_SCHEMA.SCHEMATA WHERE SCHEMA_NAME = '%s'";
     private static String SQL_DROP_SCHEMA = "DROP SCHEMA %s";
@@ -34,7 +34,7 @@ public class ColimsInitiator {
     private static String SQL_SOURCE_SQL = "SOURCE %s";
     private Connection iConn;
 
-    public ColimsInitiator() {
+    public ColimsInitiatorTool() {
         iConn = ColimsConnectionProvider.getConnection();
         try {
             handleSchema();
@@ -91,7 +91,7 @@ public class ColimsInitiator {
 
     public static void main(String[] args) throws SQLException {
         RelimsProperties.initialize(false);
-        new ColimsInitiator();
+        new ColimsInitiatorTool();
 
     }
 
