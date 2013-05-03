@@ -4,6 +4,7 @@
  */
 package com.compomics.relims.suites;
 
+import com.compomics.relims.conf.RelimsProperties;
 import com.compomics.relims.tests.SourceFileTest;
 import com.compomics.relims.simulator.Simulator;
 import junit.framework.Test;
@@ -14,15 +15,15 @@ import junit.framework.TestSuite;
  *
  * @author Kenneth
  */
-public class IntegrityTestProject11954 extends TestCase {
+public class IntegrityTestProject1982 extends TestCase {
 
-    public IntegrityTestProject11954(String testName) {
+    public IntegrityTestProject1982(String testName) {
         super(testName);
     }
 
     public static Test suite() {
-        Simulator.setProjectID(11954);
-        SourceFileTest.setProjectID(11954);
+        Simulator.setProjectID(1982);
+        SourceFileTest.setProjectID(1982);
         SourceFileTest.setN_PSMS(1233);
         SourceFileTest.setN_PROTEIN(96);
         SourceFileTest.setN_PEPTIDE(689);

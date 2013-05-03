@@ -98,8 +98,8 @@ public class ResultNotifier {
         }
     }
 
-    public boolean sendStatistics(HashMap<String, Object> resultMap) {
-        boolean sentStatistics = false;
+    public boolean sendWorkerSpecs(HashMap<String, Object> resultMap) {
+        boolean sentWorkerSpecs = false;
 
         try {
             try {
@@ -115,7 +115,7 @@ public class ResultNotifier {
                 sockOutput.writeObject(resultMap);
                 sockOutput.flush();
                 //sockInput.readBoolean();
-                sentStatistics = true;
+                sentWorkerSpecs = true;
             } catch (IOException e) {
                 e.printStackTrace(System.err);
             }
@@ -134,7 +134,7 @@ public class ResultNotifier {
                 System.err.println("Exception closing socket.");
                 e.printStackTrace(System.err);
             } finally {
-                return sentStatistics;
+                return sentWorkerSpecs;
             }
         }
     }

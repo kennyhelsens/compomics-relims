@@ -56,33 +56,22 @@ public class ColimsConnectionProvider {
 
 
         } catch (com.mysql.jdbc.exceptions.jdbc4.CommunicationsException e) {
-            ProgressManager.setState(Checkpoint.FAILED,e);;
-            Thread.currentThread().interrupt();
-            return;
+            e.printStackTrace();
+             return;
         } catch (InstantiationException e) {
             e.printStackTrace();
-            ProgressManager.setState(Checkpoint.FAILED,e);;
-            Thread.currentThread().interrupt();
             return;
         } catch (IllegalAccessException e) {
             e.printStackTrace();
-            ProgressManager.setState(Checkpoint.FAILED,e);;
-            Thread.currentThread().interrupt();
             return;
         } catch (ClassNotFoundException e) {
             e.printStackTrace();
-            ProgressManager.setState(Checkpoint.FAILED,e);;
-            Thread.currentThread().interrupt();
             return;
         } catch (SQLException e) {
             e.printStackTrace();
-            ProgressManager.setState(Checkpoint.FAILED,e);;
-            Thread.currentThread().interrupt();
             return;
-        }catch (Exception e) {
+        } catch (Exception e) {
             e.printStackTrace();
-            ProgressManager.setState(Checkpoint.FAILED,e);;
-            Thread.currentThread().interrupt();
             return;
         }
     }
@@ -106,7 +95,7 @@ public class ColimsConnectionProvider {
             }
         } catch (SQLException e) {
             logger.error(e.getMessage(), e);
-            ProgressManager.setState(Checkpoint.FAILED,e);;
+            ProgressManager.setState(Checkpoint.FAILED, e);;
             Thread.currentThread().interrupt();
         }
 

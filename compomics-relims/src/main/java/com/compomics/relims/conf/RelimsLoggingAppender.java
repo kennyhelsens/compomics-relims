@@ -8,11 +8,8 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.io.PrintWriter;
 import java.sql.Timestamp;
 import java.util.Date;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import org.apache.log4j.AppenderSkeleton;
 import org.apache.log4j.spi.LoggingEvent;
 
@@ -32,7 +29,7 @@ public class RelimsLoggingAppender extends AppenderSkeleton {
     @Override
     protected void append(LoggingEvent le) {
 //Exclude the unmarshaller...This clogs the debugger
-        if (!le.getMessage().toString().contains("DEBUG : Unmarshaller Initialized")
+        if (!le.getMessage().toString().contains("Unmarshaller Initialized")
                 && !le.getMessage().toString().contains("Generating peptide modification holder")
                 && !le.getMessage().toString().contains("Finding modifications for percursor")) {
             try {

@@ -28,25 +28,45 @@ import java.util.List;
 import static com.google.common.base.Preconditions.checkNotNull;
 import java.io.BufferedWriter;
 import java.io.FileWriter;
+import java.lang.management.ManagementFactory;
 import org.apache.commons.io.FileUtils;
 import org.apache.log4j.Appender;
 
 /**
  * This class contains the Relims properties.
  *
- * @author Kenny Helsens
+ * @author Kenny Helsens and Kenneth Verheggen
  */
 public class RelimsProperties {
 
+    public static String getDbPrefix() {
+        if (getTaskDatabaseDriver().toLowerCase().contains("derby")) {
+            return getTaskDatabaseName() + ".";
+        } else {
+            return "";
+        }
+    }
+
+    public static int getAllowedRAM() {
+        return (int) (0.9 * (((com.sun.management.OperatingSystemMXBean) ManagementFactory
+                .getOperatingSystemMXBean()).getTotalPhysicalMemorySize()) / 1024 / 1024);
+    }
     /**
-     * Plain logger
+     * the results will all be placed in a user-specific folder. Therefor, all
+     * "normal" relims projects that are not run via the automatic setup, will
+     * be placed in a folder called "default"
      */
+    public String userID = "default";
+    /**
+     * A ProgressManager to store the state of the project and monitor it
+     */
+    private static ProgressManager progressManager = ProgressManager.getInstance();
+
     private static Logger logger = Logger.getLogger(RelimsProperties.class);
     /**
      * config stores the configurations from the file
      */
     private static PropertiesConfiguration config;
-    private static String prefix;
     //TODO : not sure if these searchguiproperties should stay...they are called in a different manner now
     private static PropertiesConfiguration searchGUIPropertiesConfiguration;
     /**
@@ -63,107 +83,20 @@ public class RelimsProperties {
      * the folderSeparator is system-dependent...
      */
     public static final String folderSeparator = System.getProperty("file.separator");
+    /**
+     * These are the logging files
+     */
     private static File searchguiLogFile;
     private static File peptideshakerLogFile;
     private static File logFolder;
-    private static PropertiesConfiguration log4JConfig;
     private static File relimsLoggingFile;
+    /**
+     * Standard networking mode is local
+     */
     private static NetworkMode networkingMode = NetworkMode.LOCAL;
 
-    public static PriorityLevel getPriority() {
-
-        String level = config.getString("process.priority");
-        if (level == null) {
-            return PriorityLevel.BELOW_NORMAL;
-        } else {
-            return PriorityLevel.valueOf(level);
-        }
-    }
-
-    public static int getMaxSpectraAllowedInMGF() {
-        return config.getInt("searchgui.max.spectra.in.mgf");
-    }
-
-    public static long getMaxMGFFileSize() {
-        return config.getInt("searchgui.max.mgf.filesize") * 1024 * 1024;
-    }
-
-    public static boolean getDebugMode() {
-        return config.getBoolean("relims.debugmode");
-    }
-
-    public static void setNetworkingMode(NetworkMode mode) {
-        networkingMode = mode;
-    }
-
-    public static NetworkMode getNetworkingMode() {
-        return networkingMode;
-    }
-
-    public static int getBackupInterval() {
-        return config.getInt("relims.networking.db.backupInterval");
-    }
-
-    public static int getMaxBackups() {
-        return config.getInt("relims.networking.db.maxBackups");
-    }
-
-    public static String getTaskDatabaseFramework() {
-        return config.getString("relims.networking.db.framework");
-    }
-
-    public static void setDbPrefix(String dbName) {
-        RelimsProperties.prefix = dbName;
-    }
-
-    public static String getPassword() {
-        return config.getString("workspace.password");
-    }
-
-    public static String getDbPrefix() {
-        if (getTaskDatabaseDriver().toLowerCase().contains("derby")) {
-            return getTaskDatabaseName() + ".";
-
-        } else {
-            return "";
-        }
-    }
-
-    public static File getConfigFolder() {
-        return RelimsProperties.configFolder;
-    }
-
-    public static void setConfigFolder(String location) {
-        RelimsProperties.configFolder = new File(location);
-    }
-
-    public static void setSearchGUIFolder(String searchGUIDir) {
-        config.setProperty("searchgui.directory", searchGUIDir);
-        searchguiLogFile = new File(getSearchGuiFolder() + "/resources/SearchGUI.log");
-    }
-
-    public static File getUserModsFile() {
-        return new File(getSearchGuiUserModFile().getAbsolutePath());
-    }
-
-    public static boolean hasSpectraLimitForMGF() {
-        return config.getBoolean("searchgui.use.spectrum.limit");
-    }
-    /**
-     * the results will all be placed in a user-specific folder. Therefor, all
-     * "normal" relims projects that are not run via the automatic setup, will
-     * be placed in a folder called "default"
-     */
-    public String userID = "default";
-    /**
-     * A ProgressManager to store the state of the project and monitor it
-     */
-    private static ProgressManager progressManager = ProgressManager.getInstance();
-    // -------------------------- STATIC BLOCKS --------------------------
-
-    public static void setConfigPath() {
-    }
-
+    //PROJECT SPECIFIC METHODS
+    //RELIMS METHODS
     public static void initialize(boolean test) {
 
         if (config == null) {
@@ -212,7 +145,7 @@ public class RelimsProperties {
                 //reroute the log4J if the program runs in workermode
                 try {
                     File logForJDestination = new File(rootPath + "/resources/conf/log4j.properties");
-                    log4JConfig = new PropertiesConfiguration(logForJDestination.getAbsolutePath());
+                    PropertiesConfiguration log4JConfig = new PropertiesConfiguration(logForJDestination.getAbsolutePath());
                     System.out.println("");
                 } catch (ConfigurationException ex) {
                     logger.error(ex);
@@ -224,62 +157,6 @@ public class RelimsProperties {
                 //TODO set default values?
             }
         }
-    }
-
-    public static String getRepositoryPath() {
-        return config.getString("remote.relims.repository");
-    }
-
-    public static String getJavaExec() {
-        return config.getString("java.home");
-    }
-
-    public static File getRelimsTempFolder() {
-        File tempFolder = null;
-        try {
-            File locator = File.createTempFile("relimsTemp", Long.toString(System.nanoTime()));
-            locator.delete();
-            locator.mkdirs();
-            tempFolder = new File(locator.getParent() + "/relimsTemp");
-            tempFolder.deleteOnExit();
-        } catch (IOException ex) {
-            ex.printStackTrace();
-            logger.error("Could not create tempfolder!");
-        }
-        return tempFolder;
-    }
-
-    public static String getPeptideShakerFolder() {
-        return config.getString("peptideshaker.directory");
-    }
-
-    public static void setPeptideShakerFolder(String peptideshakerDir) {
-        config.setProperty("peptideshaker.directory", peptideshakerDir);
-        peptideshakerLogFile = new File(getPeptideShakerFolder() + "/resources/PeptideShaker.log");
-    }
-
-    public static String getPeptideShakerArchive() {
-        return config.getString("peptideshaker.jar");
-    }
-
-    public static void setPeptideShakerArchive(String peptideshakerJar) {
-        config.setProperty("peptideshaker.jar", peptideshakerJar);
-    }
-
-    public static String getPeptideShakerMemory() {
-        return config.getString("peptideshaker.heap.memory");
-    }
-
-    public static String getSearchGuiFolder() {
-        return config.getString("searchgui.directory");
-    }
-
-    public static String getSearchGuiArchive() {
-        return config.getString("searchgui.jar");
-    }
-
-    public static String getSearchGuiConfFolder() {
-        return config.getString("searchgui.directory") + folderSeparator + "resources" + folderSeparator + "conf";
     }
 
     public static File getWorkSpacePath() {
@@ -319,7 +196,6 @@ public class RelimsProperties {
         config.setProperty("relims.log.folder", logFolder.getAbsolutePath());
         config.setProperty("relims.resultFolder", workSpace.getAbsolutePath());
         System.out.println("Redirecting logging to " + workSpace.getAbsolutePath());
-        Logger.getRootLogger().addAppender(new RelimsLoggingAppender());
         return workSpace;
     }
 
@@ -336,22 +212,35 @@ public class RelimsProperties {
         return logFolder;
     }
 
-    public static File getTmpFile(String aID) throws IOException {
-        if (workSpace == null) {
-            workSpace = getWorkSpace();
-        }
-        File lFile = new File(workSpace, aID + ".tmp");
-        lFile.createNewFile();
-        return lFile;
+    public static boolean getDebugMode() {
+        return config.getBoolean("relims.debugmode");
     }
 
-    public static File getTmpFile(String aID, boolean aTimeStamp) throws IOException {
-        if (workSpace == null) {
-            workSpace = getWorkSpace();
-        }
-        File lFile = new File(workSpace, aID + "_" + System.currentTimeMillis() + ".tmp");
-        lFile.createNewFile();
-        return lFile;
+    //SUBPROCESS METHODS
+    //-----------------------searchgui
+    public static void setSearchGUIFolder(String searchGUIDir) {
+        config.setProperty("searchgui.directory", searchGUIDir);
+        searchguiLogFile = new File(getSearchGuiFolder() + "/resources/SearchGUI.log");
+    }
+
+    public static File getUserModsFile() {
+        return new File(getSearchGuiUserModFile().getAbsolutePath());
+    }
+
+    public static String getSearchGuiFolder() {
+        return config.getString("searchgui.directory");
+    }
+
+    public static String getSearchGuiArchive() {
+        return config.getString("searchgui.jar");
+    }
+
+    public static String getSearchGuiConfFolder() {
+        return config.getString("searchgui.directory") + folderSeparator + "resources" + folderSeparator + "conf";
+    }
+
+    public static String getSearchGuiArchivePath() {
+        return getSearchGuiFolder() + folderSeparator + getSearchGuiArchive();
     }
 
     public static File getSearchGuiUserModFile() {
@@ -398,36 +287,6 @@ public class RelimsProperties {
         return ptmFactory;
     }
 
-    public static PropertiesConfiguration getDefaultSearchGuiConfiguration() {
-        if (searchGUIPropertiesConfiguration == null) {
-
-            try {
-                File lPropertiesFile = new File(getSearchGuiFolder(),
-                        folderSeparator + "resources"
-                        + folderSeparator + "conf"
-                        + folderSeparator + "default_SearchGUI.properties");
-
-                searchGUIPropertiesConfiguration = new PropertiesConfiguration(lPropertiesFile);
-                return searchGUIPropertiesConfiguration;
-
-            } catch (ConfigurationException e) {
-                logger.error(e.getMessage(), e);
-                progressManager.setState(Checkpoint.FAILED, e);;
-                Thread.currentThread().interrupt();
-            }
-        }
-
-        return searchGUIPropertiesConfiguration;
-    }
-
-    public static String getSearchGuiArchivePath() {
-        return getSearchGuiFolder() + folderSeparator + getSearchGuiArchive();
-    }
-
-    public static String getPeptideShakerArchivePath() {
-        return getPeptideShakerFolder() + folderSeparator + getPeptideShakerArchive();
-    }
-
     public static ArrayList<UserMod> getRelimsMods() {
         String[] lRelimsModIds = config.getStringArray("relims.mod.ids");
         checkNotNull(lRelimsModIds);
@@ -464,25 +323,93 @@ public class RelimsProperties {
         return config.getBoolean("searchgui.engine.omssa");
     }
 
-    public static void logSettings() {
-        createWorkSpace();
-        try {
-            logger.debug("using omssa:" + String.valueOf(useOmssa()));
-            logger.debug("using tandem:" + String.valueOf(useTandem()));
-            logger.debug("workspace:" + getWorkSpace().getCanonicalPath());
-            logger.debug("searchgui:" + getSearchGuiFolder());
-            logger.debug("relims mods:" + Joiner.on(",").join(Lists.transform(getRelimsMods(), new Function<UserMod, Object>() {
-                public Object apply(@Nullable UserMod input) {
-                    return input.getModificationName();
-                }
-            })));
-        } catch (IOException e) {
-            logger.error(e.getMessage(), e);
-            progressManager.setState(Checkpoint.FAILED, e);;
-            Thread.currentThread().interrupt();
+    public static String getDefaultSearchDatabase() {
+        return config.getString("searchgui.fasta.default");
+    }
+
+    public static Integer getMissedCleavages() {
+        return config.getInt("searchgui.missed.cleavages");
+    }
+    //-----------------------peptideshaker
+
+    public static String getPeptideShakerFolder() {
+        return config.getString("peptideshaker.directory");
+    }
+
+    public static void setPeptideShakerFolder(String peptideshakerDir) {
+        config.setProperty("peptideshaker.directory", peptideshakerDir);
+        peptideshakerLogFile = new File(getPeptideShakerFolder() + "/resources/PeptideShaker.log");
+    }
+
+    public static String getPeptideShakerArchive() {
+        return config.getString("peptideshaker.jar");
+    }
+
+    public static void setPeptideShakerArchive(String peptideshakerJar) {
+        config.setProperty("peptideshaker.jar", peptideshakerJar);
+    }
+
+    public static String getPeptideShakerArchivePath() {
+        return getPeptideShakerFolder() + folderSeparator + getPeptideShakerArchive();
+    }
+
+    public static double getFDR() {
+        return config.getDouble("peptideshaker.export.fdr");
+    }
+
+    public static boolean getPeptideShakerCPSOutput() {
+        return config.getBoolean("peptideshaker.export.cps");
+    }
+
+    public static boolean getPeptideShakerTSVOutput() {
+        return config.getBoolean("peptideshaker.export.tsv");
+    }
+
+    public static boolean getPeptideShakerUniprotOutput() {
+        return config.getBoolean("peptideshaker.export.uniprot");
+    }
+    //-----------------------pride-asa
+
+    public static Boolean appendPrideAsapAutomatic() {
+        return config.getBoolean("relims.asap.automatic.append");
+    }
+
+    public static String getPrideMGFSource() {
+        return config.getString("pride.MGF.source");
+    }
+
+    public static String getLocalPrideXMLRepository() {
+        return config.getString("pride.prideXML.repository");
+    }
+
+    public static void setAppendPrideAsapAutomatic(boolean b) {
+        config.setProperty("relims.asap.automatic.append", b);
+    }
+
+    public static boolean getPrideDataSource() {
+        return config.getBoolean("relims.asap.datasource.xml");
+    }
+
+    public static void setPrideDataSource(boolean useXML) {
+        config.setProperty("relims.asap.datasource.xml", useXML);
+    }
+
+    public static String getRepositoryPath() {
+        return config.getString("remote.relims.repository");
+    }
+    //-----------------------general
+
+    public static PriorityLevel getPriority() {
+
+        String level = config.getString("process.priority");
+        if (level == null) {
+            return PriorityLevel.BELOW_NORMAL;
+        } else {
+            return PriorityLevel.valueOf(level);
         }
     }
 
+    //DATASOURCE METHODS
     public static String getDbUserName() {
         return config.getString("db.user");
     }
@@ -498,31 +425,97 @@ public class RelimsProperties {
     public static String getDbAdress() {
         return config.getString("db.ip");
     }
+    //NETWORKING METHODS
 
-    public static int getMaxSucces() {
-        return config.getInt("program.param.max.succes");
+    public static int getControllerPort() {
+        try {
+            return Integer.parseInt(config.getString("relims.networking.controller.port"));
+        } catch (NumberFormatException ex) {
+            return 6789;
+        }
     }
 
-    public static int getRandomProjectAttempts() {
-        return config.getInt("program.param.attempt.count");
+    public static int getWorkerPort() {
+        try {
+            return Integer.parseInt(config.getString("relims.networking.worker.port"));
+        } catch (NumberFormatException ex) {
+            return 11554;
+        }
     }
 
-    public static boolean hasSpectrumLimit() {
-        return config.getBoolean("program.param.spectrum.limit.boolean");
+    public static String getControllerIP() {
+        return config.getString("relims.networking.controller.IP");
     }
 
-    public static int getSpectrumLimitCount() {
-        return config.getInt("program.param.spectrum.limit.count");
+    public static void setNetworkingMode(NetworkMode mode) {
+        networkingMode = mode;
     }
 
-    public static String getDefaultSearchDatabase() {
-        return config.getString("searchgui.fasta.default");
+    public static NetworkMode getNetworkingMode() {
+        return networkingMode;
+    }
+
+    public static int getBackupInterval() {
+        return config.getInt("relims.networking.db.backupInterval");
+    }
+
+    public static int getMaxBackups() {
+        return config.getInt("relims.networking.db.maxBackups");
+    }
+
+    public static String getTaskDatabaseFramework() {
+        return config.getString("relims.networking.db.framework");
+    }
+
+    public static String getPassword() {
+        return config.getString("workspace.password");
+    }
+
+    public static String getJavaExec() {
+        return config.getString("java.home");
+    }
+
+    public static File getRelimsTempFolder() {
+        File tempFolder = null;
+        try {
+            File locator = File.createTempFile("relimsTemp", Long.toString(System.nanoTime()));
+            locator.delete();
+            locator.mkdirs();
+            tempFolder = new File(locator.getParent() + "/relimsTemp");
+            tempFolder.deleteOnExit();
+        } catch (IOException ex) {
+            ex.printStackTrace();
+            logger.error("Could not create tempfolder!");
+        }
+        return tempFolder;
+    }
+
+    public static int getMaxJobHours() {
+        return config.getInt("max.job.time.hours");
+    }
+
+    public static int getMaxJobMinutes() {
+        return config.getInt("max.job.time.minutes");
+    }
+
+    public static int getPollingTime() {
+        return config.getInt("max.job.time.polling.seconds");
     }
 
     public static PropertiesConfiguration getConfig() {
         return config;
     }
 
+    //GENERAL CONFIGURATION
+    public static File getConfigFolder() {
+        return RelimsProperties.configFolder;
+    }
+
+    public static void setConfigFolder(String location) {
+        RelimsProperties.configFolder = new File(location);
+    }
+
+    //PREDICATES METHODS
     public static int getMinimumNumberOfSpectra() {
         return config.getInt("predicate.project.spectrum.min");
     }
@@ -562,110 +555,11 @@ public class RelimsProperties {
         }
     }
 
-    public static String getDatabaseFilename(String aDbVarID) {
-        return config.getString("relims.db." + aDbVarID + ".file");
-    }
-
-    public static String getDatabaseTitle(String aDbVarID) {
-        return config.getString("relims.db." + aDbVarID + ".name");
-    }
-
-    public static String[] getDatabaseVarIDs() {
-        return config.getStringArray("relims.db.ids");
-    }
-
-    public static String[] getRelimsClassList() {
-        return config.getStringArray("relims.strategy.ids");
-    }
-
-    public static String[] getRelimsSourceList() {
-        return config.getStringArray("relims.source.ids");
-    }
-
-    public static Class getRelimsSearchStrategyClass(String aStrategyID) throws ClassNotFoundException {
-        String lClassname = config.getString("relims.strategy.class." + aStrategyID);
-        return Class.forName(lClassname);
-    }
-
-    public static Class getRelimsSourceClass(String aSourceID) throws ClassNotFoundException {
-        String lClassname = config.getString("relims.source.class." + aSourceID);
-        return Class.forName(lClassname);
-    }
-
-    public static List<Long> getPredifinedProjects() {
-        String[] lProjectStrings = config.getStringArray("relims.projects.list");
-        List<Long> lProjectIds = Lists.newArrayList();
-
-        for (String lProjectString : lProjectStrings) {
-            lProjectIds.add(Long.parseLong(lProjectString));
-        }
-        return lProjectIds;
-    }
-
-    public static Integer getMissedCleavages() {
-        return config.getInt("searchgui.missed.cleavages");
-    }
-
-    public static Boolean appendPrideAsapAutomatic() {
-        return config.getBoolean("relims.asap.automatic.append");
-    }
-
     public static String[] getAllowedInstruments() {
         return config.getStringArray("predicate.project.instrument");
     }
 
-    public static int getMaxJobHours() {
-        return config.getInt("max.job.time.hours");
-    }
-
-    public static int getMaxJobMinutes() {
-        return config.getInt("max.job.time.minutes");
-    }
-
-    public static int getPollingTime() {
-        return config.getInt("max.job.time.polling.seconds");
-    }
-
-    public static boolean useProjectListFromRedis() {
-        return config.getBoolean("relims.project.redis");
-    }
-
-    public static String getRedisServer() {
-        return config.getString("relims.project.redis.server");
-    }
-
-    public static String getRedisProjectKey() {
-        return config.getString("relims.project.redis.key");
-    }
-
-    public static String getPeptideShakerResultsFolder() {
-        return config.getString("peptideshaker.export");
-    }
-
-    public static double getFDR() {
-        return config.getDouble("peptideshaker.export.fdr");
-    }
-
-    public static String getPrideMGFSource() {
-        return config.getString("pride.MGF.source");
-    }
-
-    public static String getLocalPrideXMLRepository() {
-        return config.getString("pride.prideXML.repository");
-    }
-
-    public static void setAppendPrideAsapAutomatic(boolean b) {
-        config.setProperty("relims.asap.automatic.append", b);
-    }
-
-    public static boolean getPrideDataSource() {
-        return config.getBoolean("relims.asap.datasource.xml");
-    }
-
-    public static void setPrideDataSource(boolean b) {
-        config.setProperty("relims.asap.datasource.xml", b);
-    }
-
+    //TaskDatabase and WORKERPOOL Methods
     public static String getTaskDatabaseName() {
         return config.getString("relims.networking.db.name");
     }
@@ -695,40 +589,7 @@ public class RelimsProperties {
         }
     }
 
-    public static String getControllerIP() {
-        return config.getString("relims.networking.controller.IP");
-    }
-
-    public static boolean getPeptideShakerCPSOutput() {
-        return config.getBoolean("peptideshaker.export.cps");
-    }
-
-    public static boolean getPeptideShakerTSVOutput() {
-        return config.getBoolean("peptideshaker.export.tsv");
-    }
-
-    public static boolean getPeptideShakerUniprotOutput() {
-        return config.getBoolean("peptideshaker.export.uniprot");
-    }
-
-    public static int getControllerPort() {
-        try {
-            return Integer.parseInt(config.getString("relims.networking.controller.port"));
-        } catch (NumberFormatException ex) {
-            return 6789;
-        }
-    }
-
-    public static int getWorkerPort() {
-        try {
-            return Integer.parseInt(config.getString("relims.networking.worker.port"));
-        } catch (NumberFormatException ex) {
-            return 11554;
-        }
-
-    }
-    private static File configFolder;
-
+    //LOGGING
     public static void saveLoggedFiles() {
         try {
             if (networkingMode.equals(NetworkMode.WORKER)) {
@@ -779,8 +640,45 @@ public class RelimsProperties {
             ioe.printStackTrace();
         }
     }
+    //MARKED FOR DEPRECATION
+
+    public static String[] getRelimsClassList() {
+        return config.getStringArray("relims.strategy.ids");
+    }
+
+    public static String[] getRelimsSourceList() {
+        return config.getStringArray("relims.source.ids");
+    }
+    private static File configFolder;
+
+    public static void logSettings() {
+        createWorkSpace();
+        try {
+            logger.debug("using omssa:" + String.valueOf(useOmssa()));
+            logger.debug("using tandem:" + String.valueOf(useTandem()));
+            logger.debug("workspace:" + getWorkSpace().getCanonicalPath());
+            logger.debug("searchgui:" + getSearchGuiFolder());
+            logger.debug("relims mods:" + Joiner.on(",").join(Lists.transform(getRelimsMods(), new Function<UserMod, Object>() {
+                @Override
+                public Object apply(@Nullable UserMod input) {
+                    return input.getModificationName();
+                }
+            })));
+        } catch (IOException e) {
+            logger.error(e.getMessage(), e);
+            progressManager.setState(Checkpoint.FAILED, e);;
+            Thread.currentThread().interrupt();
+        }
+    }
+    
+    
+    //PREDICATES
+       public static int getMaxMS1Count() {
+        return config.getInt("project.predicates.maxMs1Count");
+    }
 
     //HELPER ENUMS
+
     public enum NetworkMode {
 
         LOCAL, CONTROLLER, WORKER, CLIENT;

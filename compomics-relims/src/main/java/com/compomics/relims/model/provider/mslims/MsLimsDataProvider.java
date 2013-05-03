@@ -243,11 +243,8 @@ public class MsLimsDataProvider implements DataProvider {
 
         // for debugging purposes
         int lMaxSpectra;
-        if (RelimsProperties.hasSpectrumLimit()) {
-            lMaxSpectra = RelimsProperties.getSpectrumLimitCount();
-        } else {
-            lMaxSpectra = Integer.MAX_VALUE;
-        }
+        lMaxSpectra = Integer.MAX_VALUE;
+
 
         File output = new File(RelimsProperties.getWorkSpace(), aProjectID + ".mgf");
         logger.debug("getting all spectra from project " + aProjectID + " in a local file " + output.getCanonicalPath());
