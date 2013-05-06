@@ -135,7 +135,7 @@ public class RelimsToColimsImporterTool {
         if(args.length == 1){
             lRelimsResult = args[0];
         }else{
-            lRelimsResult = "/Users/kennyhelsens/tmp/11954_pride_30042013_123103";
+            lRelimsResult = "C:\\Users\\Kenneth\\Desktop\\11954_pride_30042013_123103";
         }
         new RelimsToColimsImporterTool(lRelimsResult);
 

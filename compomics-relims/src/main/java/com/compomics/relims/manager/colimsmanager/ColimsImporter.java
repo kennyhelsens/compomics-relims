@@ -8,7 +8,7 @@ import com.compomics.colims.core.exception.MappingException;
 import com.compomics.colims.core.exception.PeptideShakerIOException;
 import com.compomics.colims.core.io.PeptideShakerIO;
 import com.compomics.colims.core.io.impl.PeptideShakerIOImpl;
-import com.compomics.colims.core.io.mapper.ExperimentMapper;
+import com.compomics.colims.core.io.mapper.UtilitiesExperimentMapper;
 import com.compomics.colims.core.io.model.PeptideShakerImport;
 import com.compomics.colims.core.service.ProjectService;
 import com.compomics.colims.model.Experiment;
@@ -30,7 +30,7 @@ public class ColimsImporter {
     private static ColimsImporter singleton = null;
 
     // instance variables
-    private ExperimentMapper experimentMapper;
+    private UtilitiesExperimentMapper experimentMapper;
     private ProjectService projectService;
     private Project project;
 
@@ -44,7 +44,7 @@ public class ColimsImporter {
 
     public ColimsImporter() {
         ApplicationContext applicationContext = new ClassPathXmlApplicationContext("colims-core-context.xml");
-        experimentMapper = (ExperimentMapper) applicationContext.getBean("experimentMapper");
+        experimentMapper = (UtilitiesExperimentMapper) applicationContext.getBean("experimentMapper");
         projectService = (ProjectService) applicationContext.getBean("projectService");
     }
 

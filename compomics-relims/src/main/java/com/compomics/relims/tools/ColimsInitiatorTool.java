@@ -20,8 +20,7 @@ import static com.compomics.relims.conf.RelimsProperties.getColimsDbSchema;
 import static com.compomics.relims.conf.RelimsProperties.getColimsDbServer;
 
 /**
- * This class holds everything to initiate the latest
- * compomics-colims database
+ * This class holds everything to initiate the latest compomics-colims database
  */
 public class ColimsInitiatorTool {
 
@@ -45,7 +44,9 @@ public class ColimsInitiatorTool {
             logger.error(e.getMessage(), e);
         } catch (IOException e) {
             logger.error(e.getMessage(), e);
-        } finally{
+        } catch (Throwable e) {
+            e.printStackTrace();
+        } finally {
             try {
                 logger.debug("closing database connection");
                 iConn.close();
@@ -90,15 +91,19 @@ public class ColimsInitiatorTool {
     }
 
     public static void main(String[] args) throws SQLException {
-        RelimsProperties.initialize(false);
-        new ColimsInitiatorTool();
+        try {
+            RelimsProperties.initialize(false);
+            new ColimsInitiatorTool();
+        } catch (Throwable e) {
+            e.printStackTrace();
+        }
 
-        
     }
 
     /**
-     * This method checks whether the schema exists, and drops the schema if needed.
-     * If the constraints are passed, it will create a new schema on which the tables can be created.
+     * This method checks whether the schema exists, and drops the schema if
+     * needed. If the constraints are passed, it will create a new schema on
+     * which the tables can be created.
      *
      * @throws SQLException
      */
@@ -145,13 +150,13 @@ public class ColimsInitiatorTool {
 
         // Loop through the SQL file statements
         Statement currentStatement = null;
-        while(scanner.hasNext()) {
+        while (scanner.hasNext()) {
 
             // Get statement
             String rawStatement = scanner.next() + delimiter;
             try {
                 // Execute statement
-                if(!rawStatement.equals("\n;")){
+                if (!rawStatement.equals("\n;")) {
                     currentStatement = iConn.createStatement();
                     currentStatement.execute(rawStatement);
                 }

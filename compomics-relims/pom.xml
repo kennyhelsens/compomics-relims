@@ -309,6 +309,10 @@
                     <artifactId>mysql</artifactId>
                     <groupId>mysql-connector-java</groupId>
                 </exclusion>
+                <exclusion>
+                    <artifactId>spring-core</artifactId>
+                    <groupId>org.springframework</groupId>
+                </exclusion>
             </exclusions>
             <type>jar</type>
         </dependency>
@@ -327,6 +331,12 @@
             <artifactId>pride-asa-pipeline</artifactId>
             <version>1.5.6</version>
             <type>jar</type>
+            <exclusions>
+                <exclusion>
+                    <artifactId>spring-core</artifactId>
+                    <groupId>org.springframework</groupId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <dependency>
             <groupId>com.google.guava</groupId>
@@ -384,6 +394,11 @@
             <artifactId>colims-core</artifactId>
             <version>1.0.0</version>
             <type>jar</type>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-core</artifactId>
+            <version>3.1.4.RELEASE</version>
         </dependency>
     </dependencies>
 
