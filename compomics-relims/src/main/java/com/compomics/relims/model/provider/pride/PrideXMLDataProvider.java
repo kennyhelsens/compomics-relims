@@ -171,6 +171,7 @@ public class PrideXMLDataProvider implements DataProvider {
                 }
                 lModificationSet = lModificationService.loadExperimentModifications();
                 for (Modification lModification : lModificationSet) {
+                    lModification.setName(lModification.getName().replace("_", "-"));
                     logger.debug(String.format("Resolved PTM '%s' with mass '%f' from modified sequence", lModification.getName(), lModification.getMassShift()));
                     //PUT THEM IN THE PTM FACTORY AS NEW PTMS HERE !!!!
                 }
@@ -277,4 +278,3 @@ public class PrideXMLDataProvider implements DataProvider {
          }*/
     }
 }
- 
