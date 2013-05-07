@@ -1,13 +1,8 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package com.compomics.relims.manager.predicatemanager;
 
 import com.compomics.relims.conf.RelimsProperties;
 import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.sql.Connection;
@@ -18,117 +13,92 @@ import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import org.apache.log4j.Logger;
 
-/**
- *
- * @author Kenneth
- */
 public class MetaDataCollector {
 
     private static int iTimeout = 30;
     private static String sDriverName = "org.sqlite.JDBC";
-    private static String directoryPath = new File(RelimsProperties.getConfigFolder().getAbsolutePath().replace("conf", "databases")).getAbsolutePath();
-    private static String sTempDb = directoryPath + "/pridemeta.db";
+    private static String directoryPath;
+    private static String sTempDb;
     private static String sJdbc = "jdbc:sqlite";
-    private static String metaDatabaseURL = sJdbc + ":" + sTempDb;
-    private static File csvFile = new File("C:\\Users\\Kenneth\\Documents\\exampleTable.txt");
+    private static String metaDatabaseURL;
+    private static String[] columnNames = null;
+    private static Logger logger = Logger.getLogger(MetaDataCollector.class);
+    //TODO make this a property
+    private static File csvFile = new File("C:\\Users\\Kenneth\\Documents\\GitHub\\compomics-relims\\compomics-relims\\resources\\pride_meta_enriched_20130502.csv");
 
     private static void setup() throws ClassNotFoundException, Exception {
+        directoryPath = RelimsProperties.getTaskDatabaseLocation().getAbsolutePath();
+        new File(directoryPath).mkdirs();
+        sTempDb = directoryPath + "/pridemeta.db";
+        metaDatabaseURL = sJdbc + ":" + sTempDb;
+        File tempDB = new File(sTempDb);
         Class.forName(sDriverName);
-        makeTable();
-        fillDatabase(csvFile);
+        if (!tempDB.exists()) {
+            setupTable();
+            fillDb();
+        }
     }
 
-    private static void makeTable() throws Exception {
-
-        String sMakeTable = "CREATE  TABLE pridemeta ("
-                + "  `Accession` BIGINT NOT NULL ,"
-                + "  `species` VARCHAR(255) NULL ,"
-                + "  `taxonomyID` VARCHAR(2555) NULL ,"
-                + "  `Tissue` VARCHAR(255) NULL ,"
-                + "  `BrendaID` VARCHAR(255) NULL ,"
-                + "  `PTM` VARCHAR(255) NULL ,"
-                + "  `SpectraCount` INT NULL ,"
-                + "  `ProteinCount` INT NULL ,"
-                + "  `PeptideCount` INT NULL ,"
-                + "  `enzyme` VARCHAR(45) NULL DEFAULT 'Trypsin' ,"
-                + "  `ms1` INT NULL ,"
-                + "  `ms2` INT NULL ,"
-                + "  `other` VARCHAR(255) NULL ,"
-                + "  PRIMARY KEY (`Accession`) )";
-        doQuery(sMakeTable);
+    private static String[] getHeaders() {
+        try {
+            FileReader fr = new FileReader(csvFile);
+            BufferedReader reader = new BufferedReader(fr);
+            String st = "";
+            String headerLine = reader.readLine();
+            columnNames = headerLine.split("\t");
+        } catch (IOException ex) {
+            ex.printStackTrace();
+        } finally {
+            return columnNames;
+        }
     }
 
-    private static void fillDatabase(File csvFile) throws FileNotFoundException, IOException {
-        BufferedReader br = new BufferedReader(new FileReader(csvFile));
-        String line;
-        while ((line = br.readLine()) != null) {
-            line.replace(";", ":");
-            line.replace("--", "-");
-            line.replace("'", "");
-            String[] values = line.split("\t");    //your seperator
-            //Convert String to right type. Integer, double, date etc.
-            if (!values[0].contains("Accession")) {
-                //Trim String Values
-                for (String aValue : values) {
-                    if (aValue.length() > 255) {
-                        aValue = aValue.substring(0, 254);
-                    }
-                }
-                String updateString = ("INSERT INTO pridemeta VALUES("
-                        + Long.parseLong(values[0]) + ",'"
-                        + values[3] + "','"
-                        + values[4] + "','"
-                        + values[5] + "','"
-                        + values[6] + "','"
-                        + values[7] + "',"
-                        + Integer.parseInt(values[8]) + ","
-                        + Integer.parseInt(values[9]) + ","
-                        + Integer.parseInt(values[10]) + ",'"
-                        + values[13] + "','"
-                        + Integer.parseInt(values[14]) + "','"
-                        + Integer.parseInt(values[15]) + "','"
-                        + values[16] + "');");
+    private static void fillDb() throws SQLException {
+        FileReader fr = null;
+        try {
+            fr = new FileReader(csvFile);
+            BufferedReader reader = new BufferedReader(fr);
+            String st = "";
+            String headerLine = reader.readLine();
+            while ((st = reader.readLine()) != null) {
                 try {
-                    doQuery(updateString);
-                } catch (Exception e) {
-                    e.printStackTrace();
-                    System.out.println("Could not store");
+                    storeEntry(st.split("\t"));
+                } catch (Exception ex) {
+                    ex.printStackTrace();
                 }
             }
-        }
-        br.close();
-    }
-
-    private static void updateEnzymes(File csvFile) throws FileNotFoundException, IOException {
-        BufferedReader br = new BufferedReader(new FileReader(csvFile));
-        String line;
-        while ((line = br.readLine()) != null) {
-            line.replace(";", ":");
-            line.replace("--", "-");
-            line.replace("'", "");
-            String[] values = line.split("\t");    //your seperator
-            //Convert String to right type. Integer, double, date etc.
-            if (!values[0].contains("Accession")) {
-                //Trim String Values
-                for (String aValue : values) {
-                    if (aValue.length() > 255) {
-                        aValue = aValue.substring(0, 254);
-                    }
-                }
-                String updateString = ("UPDATE pridemeta SET enzyme = " + values[1] + " where Accession = " + values[0] + ";");
-                try {
-                    doQuery(updateString);
-                } catch (Exception e) {
-                    e.printStackTrace();
-                    System.out.println("Could not store");
-                }
+        } catch (IOException ex) {
+            logger.error(ex);
+        } finally {
+            try {
+                fr.close();
+            } catch (IOException ex) {
+                logger.error(ex);
             }
         }
-        br.close();
+
+
+    }
+
+    private static boolean setupTable() throws SQLException {
+        StringBuilder creationQuery = new StringBuilder("CREATE TABLE pridemeta (");
+        String[] columnNames = getHeaders();
+        if (columnNames == null) {
+            throw new SQLException("No headers found");
+        } else {
+            for (String aColumn : columnNames) {
+                creationQuery.append(aColumn).append(",");
+            }
+            creationQuery.replace(creationQuery.lastIndexOf(","), creationQuery.length(), ");");
+        }
+        doQuery(creationQuery.toString());
+        return true;
     }
 
     private static void doQuery(String query) throws SQLException {
@@ -154,6 +124,37 @@ public class MetaDataCollector {
         }
     }
 
+    public static HashMap<String, String> getProjects(String query) throws SQLException {
+        HashMap<String, String> availableProjects = new HashMap<String, String>();
+        // create a database connection
+        Connection conn = DriverManager.getConnection(metaDatabaseURL);
+        ResultSet rs = null;
+        try {
+            Statement stmt = conn.createStatement();
+            try {
+                stmt.setQueryTimeout(iTimeout);
+                rs = stmt.executeQuery(query);
+                System.out.println("Executed : " + query);
+                while (rs.next()) {
+                    availableProjects.put(rs.getString(1), rs.getString(2));
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            } finally {
+                try {
+                    stmt.close();
+                } catch (Exception ignore) {
+                }
+                return availableProjects;
+            }
+        } finally {
+            try {
+                conn.close();
+            } catch (Exception ignore) {
+            }
+        }
+    }
+
     public static Map<String, Object> lookUpMetaData(long projectID) throws SQLException {
         Map<String, Object> projectMetaData = new LinkedHashMap<String, Object>();
         Connection conn = null;
@@ -161,7 +162,7 @@ public class MetaDataCollector {
         ResultSet resultSet = null;
         try {
             conn = DriverManager.getConnection(metaDatabaseURL);
-            prepstmt = conn.prepareStatement("SELECT * FROM pridemeta WHERE Accession = ?");
+            prepstmt = conn.prepareStatement("SELECT * FROM pridemeta WHERE accession = ?");
             prepstmt.setLong(1, projectID);
             resultSet = prepstmt.executeQuery();
             //store everything in a returning map
@@ -185,5 +186,43 @@ public class MetaDataCollector {
 
     public static void main(String[] args) throws Exception {
         setup();
+
+    }
+
+    private static void storeEntry(String[] split) throws SQLException {
+        StringBuilder query = new StringBuilder("INSERT INTO pridemeta VALUES (");
+        for (String aValue : split) {
+            query.append("'").append(aValue).append("',");
+        }
+        query.replace(query.lastIndexOf(","), query.length(), "").append(")");
+        doQuery(query.toString());
+    }
+
+    public static List<String> getEnzymes() {
+        List<String> enzymeList = new ArrayList<String>();
+        Connection conn = null;
+        PreparedStatement prepstmt = null;
+        ResultSet resultSet = null;
+        try {
+            conn = DriverManager.getConnection(metaDatabaseURL);
+            prepstmt = conn.prepareStatement("SELECT distinct enzyme FROM pridemeta");
+            resultSet = prepstmt.executeQuery();
+            //store everything in a returning map
+            List<Map<String, Object>> rows = new ArrayList<Map<String, Object>>();
+            while (resultSet.next()) {
+                enzymeList.add(resultSet.getString("enzyme"));
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            try {
+                conn.close();
+                prepstmt.close();
+                resultSet.close();
+            } catch (SQLException ex) {
+                logger.error(ex);
+            }
+        }
+        return enzymeList;
     }
 }
