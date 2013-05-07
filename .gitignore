@@ -46,3 +46,4 @@ compomics-relims/src/main/java/com/compomics/relims/concurrent/RelimsJobControll
 compomics-relims/src/test/resources/sourcefiles/Mimic_PrideFTP/PRIDE_Exp_Complete_Ac_3643.xml
 compomics-relims/src/test/resources/sourcefiles/Mimic_PrideFTP/PRIDE_Exp_Complete_Ac_3643.xml.gz
 compomics-relims/src/test/resources/sourcefiles/Mimic_PrideFTP/PRIDE_Exp_Complete_Ac_8227.xml.gz
+compomics-relims/src/test/resources/sourcefiles/Mimic_PrideFTP/PRIDE_Exp_Complete_Ac_8437.xml
