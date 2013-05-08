@@ -1,5 +1,6 @@
 package com.compomics.relims.model.provider.pride;
 
+import com.compomics.omssa.xsd.UserMod;
 import com.compomics.omssa.xsd.UserModCollection;
 import com.compomics.pride_asa_pipeline.logic.PrideXmlSpectrumAnnotator;
 import com.compomics.pride_asa_pipeline.logic.modification.OmssaModificationMarshaller;
@@ -7,6 +8,7 @@ import com.compomics.pride_asa_pipeline.logic.modification.impl.OmssaModificatio
 import com.compomics.pride_asa_pipeline.model.AnalyzerData;
 import com.compomics.pride_asa_pipeline.model.Identification;
 import com.compomics.pride_asa_pipeline.model.Modification;
+import com.compomics.pride_asa_pipeline.model.SpectrumAnnotatorResult;
 import com.compomics.pride_asa_pipeline.service.PrideXmlExperimentService;
 import com.compomics.pride_asa_pipeline.service.PrideXmlModificationService;
 import com.compomics.pride_asa_pipeline.spring.ApplicationContextProvider;
@@ -178,6 +180,8 @@ public class PrideXMLDataProvider implements DataProvider {
                 logger.error("Annotating spectra");
                 lSpectrumAnnotator.annotate(xmlFile);
                 Map<Modification, Integer> lPrideAsapModificationsMap = lModificationService.getUsedModifications(lSpectrumAnnotator.getSpectrumAnnotatorResult());
+                SpectrumAnnotatorResult spectrumAnnotatorResult = lSpectrumAnnotator.getSpectrumAnnotatorResult();
+                Map<Modification, Double> lModificationRates = lModificationService.estimateModificationRate(lPrideAsapModificationsMap, spectrumAnnotatorResult,0.8);
                 Set<Modification> lPrideAsapModifications = lPrideAsapModificationsMap.keySet();
                 logger.debug("Pride-ASAP additionally resolved :");
                 for (Modification lPrideAsapModification : lPrideAsapModifications) {
@@ -187,6 +191,18 @@ public class PrideXMLDataProvider implements DataProvider {
                     }
                     OmssaModificationMarshaller marshaller = new OmssaModificationMarshallerImpl();
                     lUserModCollection = marshaller.marshallModifications(lModificationSet);
+                    //set fixed/var according to a treshold and print the ratio's 
+                    for (UserMod aUserMod : lUserModCollection) {
+                        for (Modification aMod : lModificationRates.keySet()) {
+                            if (aMod.getName().equals(aUserMod.getModificationName())) {
+                                if (lModificationRates.get(aMod) >= 0.8) {
+                                    aUserMod.setFixed(true);
+                                }else{
+                                    aUserMod.setFixed(false);
+                                }
+                            }
+                        }
+                    }
                     try {
                         lUserModCollection.build(RelimsProperties.getSearchGuiUserModFile());
                     } catch (IOException ex) {
