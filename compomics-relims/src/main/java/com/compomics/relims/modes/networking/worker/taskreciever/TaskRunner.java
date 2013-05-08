@@ -197,7 +197,8 @@ public class TaskRunner {
                     try {
                         logger.info("Sending feedback to server...");
                         sentToServer = resultNotifier.sendResults(Checkpoint.valueOf(ResourceManager.getFinishState()));
-                        ResultManager.importToColims();
+                        //TODO re-activate later
+                        //    ResultManager.importToColims();
                         TaskReciever.locked = false;
                         Thread.sleep(30000);
                         System.out.println("");
