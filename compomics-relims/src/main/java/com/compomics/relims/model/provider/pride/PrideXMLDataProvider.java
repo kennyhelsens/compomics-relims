@@ -34,6 +34,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import org.apache.log4j.Level;
 
 /**
  * This class is a
@@ -181,7 +182,7 @@ public class PrideXMLDataProvider implements DataProvider {
                 lSpectrumAnnotator.annotate(xmlFile);
                 Map<Modification, Integer> lPrideAsapModificationsMap = lModificationService.getUsedModifications(lSpectrumAnnotator.getSpectrumAnnotatorResult());
                 SpectrumAnnotatorResult spectrumAnnotatorResult = lSpectrumAnnotator.getSpectrumAnnotatorResult();
-                Map<Modification, Double> lModificationRates = lModificationService.estimateModificationRate(lPrideAsapModificationsMap, spectrumAnnotatorResult,0.8);
+                Map<Modification, Double> lModificationRates = lModificationService.estimateModificationRate(lPrideAsapModificationsMap, spectrumAnnotatorResult, 0.8);
                 Set<Modification> lPrideAsapModifications = lPrideAsapModificationsMap.keySet();
                 logger.debug("Pride-ASAP additionally resolved :");
                 for (Modification lPrideAsapModification : lPrideAsapModifications) {
@@ -197,7 +198,7 @@ public class PrideXMLDataProvider implements DataProvider {
                             if (aMod.getName().equals(aUserMod.getModificationName())) {
                                 if (lModificationRates.get(aMod) >= 0.8) {
                                     aUserMod.setFixed(true);
-                                }else{
+                                } else {
                                     aUserMod.setFixed(false);
                                 }
                             }
@@ -264,8 +265,12 @@ public class PrideXMLDataProvider implements DataProvider {
         logger.debug("Extracting MGF file");
         File MGFFile;
         try {
+            Logger.getRootLogger().setLevel(Level.ERROR);
             MGFFile = getSpectraForProject(aProjectid);
             lRelimsProjectBean.setSpectrumFile(MGFFile);
+            if (RelimsProperties.getDebugMode()) {
+                Logger.getRootLogger().setLevel(Level.DEBUG);
+            }
         } catch (IOException ex) {
             logger.error("Could not sucessfully create an MGF file for this project");
             return null;
