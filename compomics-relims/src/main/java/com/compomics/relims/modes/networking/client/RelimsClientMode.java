@@ -29,6 +29,7 @@ public class RelimsClientMode {
         try {
             MetaDataCollector.main(args);
         } catch (Exception ex) {
+            ex.printStackTrace();
             logger.error("Could not build pride-metadata table. Filtering might be an issue !");
         }
         NewProjectDialog gui = new NewProjectDialog(intermediateClient, RelimsProperties.getControllerIP(), RelimsProperties.getControllerPort(), "pride", "varmod");

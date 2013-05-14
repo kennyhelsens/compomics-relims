@@ -65,7 +65,8 @@ public class NewProjectDialog extends javax.swing.JFrame {
         setLocationRelativeTo(null);
         Toolkit t = Toolkit.getDefaultToolkit();
         Dimension d = t.getScreenSize();
-        this.setSize(d.width / 2, 800);
+        this.setResizable(true);
+        this.setSize(800, 1000);
         getContentPane().setBackground(Color.WHITE);
         this.setLayout(new BorderLayout());
         Container contentPane = this.getContentPane();

@@ -9,10 +9,6 @@ import com.compomics.relims.manager.processmanager.gearbox.interfaces.ProcessMan
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  *
@@ -70,7 +66,7 @@ public class LinuxProcessManager extends MainProcessManager implements ProcessMa
     public boolean isProcessRunning(String serviceName) {
         try {
             //in other words, is the PID in the tasklist ! 
-            Process process = Runtime.getRuntime().exec("$(pidof " + serviceName + ")");
+            Process process = Runtime.getRuntime().exec("pidof " + serviceName);
             BufferedReader br = new BufferedReader(new InputStreamReader(process.getInputStream()));
             String ps = br.readLine();
             try {

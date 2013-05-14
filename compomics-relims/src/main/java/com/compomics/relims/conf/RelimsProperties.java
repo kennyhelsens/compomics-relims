@@ -51,6 +51,8 @@ public class RelimsProperties {
         return (int) (0.9 * (((com.sun.management.OperatingSystemMXBean) ManagementFactory
                 .getOperatingSystemMXBean()).getTotalPhysicalMemorySize()) / 1024 / 1024);
     }
+
+  
     /**
      * the results will all be placed in a user-specific folder. Therefor, all
      * "normal" relims projects that are not run via the automatic setup, will
@@ -474,6 +476,10 @@ public class RelimsProperties {
         return config.getString("java.home");
     }
 
+      public static File getPrideMetaDataFile() {
+        return new File(config.getString("pride.metadata.file"));
+    }
+    
     public static File getRelimsTempFolder() {
         File tempFolder = null;
         try {

@@ -29,11 +29,11 @@ public class MetaDataCollector {
     private static String metaDatabaseURL;
     private static String[] columnNames = null;
     private static Logger logger = Logger.getLogger(MetaDataCollector.class);
-    //TODO make this a property
-    private static File csvFile = new File("C:\\Users\\Kenneth\\Documents\\GitHub\\compomics-relims\\compomics-relims\\resources\\pride_meta_enriched_20130502.csv");
+    private static File csvFile;
 
     private static void setup() throws ClassNotFoundException, Exception {
         directoryPath = RelimsProperties.getTaskDatabaseLocation().getAbsolutePath();
+        csvFile = RelimsProperties.getPrideMetaDataFile();
         new File(directoryPath).mkdirs();
         sTempDb = directoryPath + "/pridemeta.db";
         metaDatabaseURL = sJdbc + ":" + sTempDb;
