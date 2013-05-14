@@ -1,5 +1,6 @@
 package com.compomics.relims.model.provider.pride;
 
+import com.compomics.omssa.xsd.UserMod;
 import com.compomics.omssa.xsd.UserModCollection;
 import com.compomics.pride_asa_pipeline.logic.PrideXmlSpectrumAnnotator;
 import com.compomics.pride_asa_pipeline.logic.modification.OmssaModificationMarshaller;
@@ -7,6 +8,7 @@ import com.compomics.pride_asa_pipeline.logic.modification.impl.OmssaModificatio
 import com.compomics.pride_asa_pipeline.model.AnalyzerData;
 import com.compomics.pride_asa_pipeline.model.Identification;
 import com.compomics.pride_asa_pipeline.model.Modification;
+import com.compomics.pride_asa_pipeline.model.SpectrumAnnotatorResult;
 import com.compomics.pride_asa_pipeline.service.PrideXmlExperimentService;
 import com.compomics.pride_asa_pipeline.service.PrideXmlModificationService;
 import com.compomics.pride_asa_pipeline.spring.ApplicationContextProvider;
@@ -32,6 +34,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import org.apache.log4j.Level;
 
 /**
  * This class is a
@@ -171,12 +174,15 @@ public class PrideXMLDataProvider implements DataProvider {
                 }
                 lModificationSet = lModificationService.loadExperimentModifications();
                 for (Modification lModification : lModificationSet) {
+                    lModification.setName(lModification.getName().replace("_", "-"));
                     logger.debug(String.format("Resolved PTM '%s' with mass '%f' from modified sequence", lModification.getName(), lModification.getMassShift()));
                     //PUT THEM IN THE PTM FACTORY AS NEW PTMS HERE !!!!
                 }
                 logger.error("Annotating spectra");
                 lSpectrumAnnotator.annotate(xmlFile);
                 Map<Modification, Integer> lPrideAsapModificationsMap = lModificationService.getUsedModifications(lSpectrumAnnotator.getSpectrumAnnotatorResult());
+                SpectrumAnnotatorResult spectrumAnnotatorResult = lSpectrumAnnotator.getSpectrumAnnotatorResult();
+                Map<Modification, Double> lModificationRates = lModificationService.estimateModificationRate(lPrideAsapModificationsMap, spectrumAnnotatorResult, 0.8);
                 Set<Modification> lPrideAsapModifications = lPrideAsapModificationsMap.keySet();
                 logger.debug("Pride-ASAP additionally resolved :");
                 for (Modification lPrideAsapModification : lPrideAsapModifications) {
@@ -186,6 +192,18 @@ public class PrideXMLDataProvider implements DataProvider {
                     }
                     OmssaModificationMarshaller marshaller = new OmssaModificationMarshallerImpl();
                     lUserModCollection = marshaller.marshallModifications(lModificationSet);
+                    //set fixed/var according to a treshold and print the ratio's 
+                    for (UserMod aUserMod : lUserModCollection) {
+                        for (Modification aMod : lModificationRates.keySet()) {
+                            if (aMod.getName().equals(aUserMod.getModificationName())) {
+                                if (lModificationRates.get(aMod) >= 0.8) {
+                                    aUserMod.setFixed(true);
+                                } else {
+                                    aUserMod.setFixed(false);
+                                }
+                            }
+                        }
+                    }
                     try {
                         lUserModCollection.build(RelimsProperties.getSearchGuiUserModFile());
                     } catch (IOException ex) {
@@ -247,8 +265,12 @@ public class PrideXMLDataProvider implements DataProvider {
         logger.debug("Extracting MGF file");
         File MGFFile;
         try {
+            Logger.getRootLogger().setLevel(Level.ERROR);
             MGFFile = getSpectraForProject(aProjectid);
             lRelimsProjectBean.setSpectrumFile(MGFFile);
+            if (RelimsProperties.getDebugMode()) {
+                Logger.getRootLogger().setLevel(Level.DEBUG);
+            }
         } catch (IOException ex) {
             logger.error("Could not sucessfully create an MGF file for this project");
             return null;
@@ -277,4 +299,3 @@ public class PrideXMLDataProvider implements DataProvider {
          }*/
     }
 }
- 

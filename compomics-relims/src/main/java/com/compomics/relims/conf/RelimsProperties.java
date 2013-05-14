@@ -61,7 +61,6 @@ public class RelimsProperties {
      * A ProgressManager to store the state of the project and monitor it
      */
     private static ProgressManager progressManager = ProgressManager.getInstance();
-
     private static Logger logger = Logger.getLogger(RelimsProperties.class);
     /**
      * config stores the configurations from the file
@@ -508,6 +507,9 @@ public class RelimsProperties {
 
     //GENERAL CONFIGURATION
     public static File getConfigFolder() {
+        if (configFolder == null) {
+            RelimsProperties.configFolder = new File(".");
+        }
         return RelimsProperties.configFolder;
     }
 
@@ -670,37 +672,39 @@ public class RelimsProperties {
             Thread.currentThread().interrupt();
         }
     }
-    
-    
+
     //PREDICATES
-       public static int getMaxMS1Count() {
+    public static int getMaxMS1Count() {
         return config.getInt("project.predicates.maxMs1Count");
     }
 
     //HELPER ENUMS
-
     public enum NetworkMode {
 
         LOCAL, CONTROLLER, WORKER, CLIENT;
     }
 
-    public static String getColimsDbServer(){
+    public static String getColimsDbServer() {
         return config.getString("relims.colims.db.server");
 
     }
-    public static String getColimsDbSchema(){
+
+    public static String getColimsDbSchema() {
         return config.getString("relims.colims.db.schema");
 
     }
-    public static int getColimsDbPort(){
+
+    public static int getColimsDbPort() {
         return Integer.parseInt(config.getString("relims.colims.db.port"));
 
     }
-    public static String getColimsDbUser(){
+
+    public static String getColimsDbUser() {
         return config.getString("relims.colims.db.user");
 
     }
-    public static String getColimsDbPassword(){
+
+    public static String getColimsDbPassword() {
         return config.getString("relims.colims.db.password");
 
     }

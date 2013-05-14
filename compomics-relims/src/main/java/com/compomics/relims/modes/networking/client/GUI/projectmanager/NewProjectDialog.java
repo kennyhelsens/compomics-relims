@@ -1,6 +1,7 @@
 package com.compomics.relims.modes.networking.client.GUI.projectmanager;
 
 import com.compomics.relims.conf.RelimsProperties;
+import com.compomics.relims.manager.predicatemanager.MetaDataCollector;
 import com.compomics.relims.manager.predicatemanager.ProjectPredicate;
 import com.compomics.relims.manager.predicatemanager.ProjectPredicateManager;
 import com.compomics.relims.modes.networking.client.RelimsClientMode;
@@ -30,6 +31,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Level;
 import javax.swing.*;
 import static javax.swing.WindowConstants.DISPOSE_ON_CLOSE;
 import org.apache.log4j.Logger;
@@ -129,11 +131,12 @@ public class NewProjectDialog extends javax.swing.JFrame {
 //            rdbTextfile1.setSelected(true);
 //            selectedSource = rdbTextfile1;
         }
-        List<String> availableEnzymes = new ArrayList<String>();
-        availableEnzymes.add("Trypsin");
-        availableEnzymes.add("Cofradic");
+        List<String> availableEnzymes = MetaDataCollector.getEnzymes();
+        // availableEnzymes.add("Trypsin");
+        //    availableEnzymes.add("Cofradic");
         SpinnerListModel enzymeSpinnerModel = new SpinnerListModel();
         enzymeSpinnerModel.setList(availableEnzymes);
+        enzymeSpinnerModel.setValue(availableEnzymes.get(0));
         spEnzyme.setModel(enzymeSpinnerModel);
         ProjectPredicateManager.initialize();
 
@@ -914,90 +917,149 @@ public class NewProjectDialog extends javax.swing.JFrame {
     }//GEN-LAST:event_manualProjectNameFieldActionPerformed
 
     private void ImportListsActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_ImportListsActionPerformed
-        //Set predicates from filters...
 
+        StringBuilder query = new StringBuilder().append("Select * from pridemeta where ");
+        List<String> filters = new ArrayList<String>();
+        leftModel.clear();
+        ImportedList.setModel(leftModel);
         if (cbMaxMS1Count.isSelected()) {
             ProjectPredicate.MS1MAX.enable();
             ProjectPredicate.setMaxMS1Count(tfMaxMS1Spectra.getText());
+            filters.add("MS1 < " + "'" + tfMaxMS1Spectra.getText() + "'");
         }
 
         if (cbMaxMS2Count.isSelected()) {
             ProjectPredicate.MS2MAX.enable();
             ProjectPredicate.setMaxMS1Count(tfMaxMS2Spectra.getText());
+            filters.add("MS2 < " + "'" + tfMaxMS2Spectra.getText() + "'");
         }
 
         if (cbMinMS1Count.isSelected()) {
             ProjectPredicate.MS1MIN.enable();
             ProjectPredicate.setMinMS1Count(tfMinMS1Spectra.getText());
+            filters.add("MS1 > " + "'" + tfMaxMS1Spectra.getText() + "'");
         }
 
         if (cbMinMS2Count.isSelected()) {
             ProjectPredicate.MS2MIN.enable();
             ProjectPredicate.setMinMS1Count(tfMinMS2Spectra.getText());
+            filters.add("MS2 > " + "'" + tfMaxMS2Spectra.getText() + "'");
         }
 
         if (cbEnzyme.isSelected()) {
             ProjectPredicate.ENZYME.enable();
             ProjectPredicate.setEnzyme(spEnzyme.getValue().toString());
+            filters.add("enzyme = '" + spEnzyme.getValue().toString() + "'");
         }
 
         if (cbTaxonomy.isSelected()) {
             ProjectPredicate.TAXONOMYID.enable();
             ProjectPredicate.setTaxonomyID(tfTaxonomyID.getText().toString());
+            filters.add("taxid = '" + tfTaxonomyID.getText().toString() + "'");
         }
-        SwingWorker worker = new SwingWorker() {
-            Thread waitingThread;
+        for (String aFilterQuery : filters) {
+            query.append(aFilterQuery + " AND ");
+        }
+        query.replace(query.lastIndexOf(" AND "), query.length(), "");
 
-            @Override
-            protected void done() {
-                filterDialog.dispose();
-                if (waitingThread.isAlive()) {
-                    waitingThread.interrupt();
-                }
+        HashMap<String, String> availableProjects;
+        try {
+            availableProjects = MetaDataCollector.getProjects(query.toString());
+            for (String aProjectID : availableProjects.keySet()) {
+                ProjectListEntry entry = new ProjectListEntry(aProjectID, availableProjects.get(aProjectID));
+                leftModel.addElement(entry);
+                ImportedList.setVisibleRowCount(leftModel.getSize());
             }
+        } catch (SQLException ex) {
+            logger.error(ex);
+        } finally {
+            ImportedList.setModel(leftModel);
+        }
+        /*
+         //Set predicates from filters...
 
-            @Override
-            protected Object doInBackground() throws Exception {
-                //set filterdialog
-                filterDialog = new JDialog();
-                filterDialog.setLocationRelativeTo(null);
-                filterDialog.setTitle("Please Wait...");
-                filterDialog.setBackground(Color.GRAY);
-                filterDialog.add(new JLabel("Filtering ... ", JLabel.CENTER));
-                filterDialog.validate();
-                filterDialog.setSize(300, 150);
-                filterDialog.setDefaultCloseOperation(DISPOSE_ON_CLOSE);
-                filterDialog.setModalityType(Dialog.ModalityType.APPLICATION_MODAL);
-                filterDialog.setAlwaysOnTop(true);
-                filterDialog.setResizable(false);
-                filterDialog.pack();
-                filterDialog.addWindowListener(new java.awt.event.WindowAdapter() {
-                });
-
-                waitingThread = new Thread(new Runnable() {
-                    @Override
-                    public void run() {
-                        filterDialog.setVisible(true);
-                    }
-                });
-                waitingThread.start();
-                if (rdbSourceMSLIMS1.isSelected()) {
-                    // make a connection to the MSLIMS database and retrieve the possible projects
-                    getMSLIMSProjects();
-                }
-
-                if (rdbSourcePRIDE1.isSelected()) {
-                    getPrideProjects();
-                }
-
-                if (rdbSourceFile.isSelected()) {
-                    getTextFileProjects();
-                }
-                return null;
-            }
-        };
-        worker.execute();
-
+         if (cbMaxMS1Count.isSelected()) {
+         ProjectPredicate.MS1MAX.enable();
+         ProjectPredicate.setMaxMS1Count(tfMaxMS1Spectra.getText());
+         }
+        
+         if (cbMaxMS2Count.isSelected()) {
+         ProjectPredicate.MS2MAX.enable();
+         ProjectPredicate.setMaxMS1Count(tfMaxMS2Spectra.getText());
+         }
+        
+         if (cbMinMS1Count.isSelected()) {
+         ProjectPredicate.MS1MIN.enable();
+         ProjectPredicate.setMinMS1Count(tfMinMS1Spectra.getText());
+         }
+        
+         if (cbMinMS2Count.isSelected()) {
+         ProjectPredicate.MS2MIN.enable();
+         ProjectPredicate.setMinMS1Count(tfMinMS2Spectra.getText());
+         }
+        
+         if (cbEnzyme.isSelected()) {
+         ProjectPredicate.ENZYME.enable();
+         ProjectPredicate.setEnzyme(spEnzyme.getValue().toString());
+         }
+        
+         if (cbTaxonomy.isSelected()) {
+         ProjectPredicate.TAXONOMYID.enable();
+         ProjectPredicate.setTaxonomyID(tfTaxonomyID.getText().toString());
+         }
+         SwingWorker worker = new SwingWorker() {
+         Thread waitingThread;
+            
+         @Override
+         protected void done() {
+         filterDialog.dispose();
+         if (waitingThread.isAlive()) {
+         waitingThread.interrupt();
+         }
+         }
+            
+         @Override
+         protected Object doInBackground() throws Exception {
+         //set filterdialog
+         filterDialog = new JDialog();
+         filterDialog.setLocationRelativeTo(null);
+         filterDialog.setTitle("Please Wait...");
+         filterDialog.setBackground(Color.GRAY);
+         filterDialog.add(new JLabel("Filtering ... ", JLabel.CENTER));
+         filterDialog.validate();
+         filterDialog.setSize(300, 150);
+         filterDialog.setDefaultCloseOperation(DISPOSE_ON_CLOSE);
+         filterDialog.setModalityType(Dialog.ModalityType.APPLICATION_MODAL);
+         filterDialog.setAlwaysOnTop(true);
+         filterDialog.setResizable(false);
+         filterDialog.pack();
+         filterDialog.addWindowListener(new java.awt.event.WindowAdapter() {
+         });
+                
+         waitingThread = new Thread(new Runnable() {
+         @Override
+         public void run() {
+         filterDialog.setVisible(true);
+         }
+         });
+         waitingThread.start();
+         if (rdbSourceMSLIMS1.isSelected()) {
+         // make a connection to the MSLIMS database and retrieve the possible projects
+         getMSLIMSProjects();
+         }
+                
+         if (rdbSourcePRIDE1.isSelected()) {
+         getPrideProjects();
+         }
+                
+         if (rdbSourceFile.isSelected()) {
+         getTextFileProjects();
+         }
+         return null;
+         }
+         };
+         worker.execute();
+         */
     }//GEN-LAST:event_ImportListsActionPerformed
 
     private void rdbSourceMSLIMS1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_rdbSourceMSLIMS1ActionPerformed
