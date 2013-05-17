@@ -245,7 +245,7 @@ public class RelimsJobController extends Observable implements ProjectRunner {
         }
         RelimsLoggingAppender appender = new RelimsLoggingAppender();
         Logger.getRootLogger().addAppender(appender);
-        if(!RelimsProperties.getDebugMode()){
+        if (!RelimsProperties.getDebugMode()) {
             Logger.getRootLogger().setLevel(Level.ERROR);
         }
         String provider = null;
@@ -289,6 +289,8 @@ public class RelimsJobController extends Observable implements ProjectRunner {
                     }
                 }
             } finally {
+                appender.export();
+                appender.close();
                 RelimsProperties.saveLoggedFiles();
             }
             //nullcheck to prevent standalone relims to delete its folders
@@ -297,15 +299,14 @@ public class RelimsJobController extends Observable implements ProjectRunner {
                     //              fileGrabber.deleteResultFolder();
                 }
             }
-            appender.close();
             return "";
         } else {
             logger.error("Search was aborted for " + projectID);
-            appender.close();
             return "";
         }
         //Copy the logfile into the resultfolder
-      }
+
+    }
 
     private void storeInRepository() {
         if (projectProvider.getClass().toString().contains("mslims")) {

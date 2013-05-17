@@ -15,7 +15,6 @@ import java.util.logging.Logger;
 import org.apache.commons.io.FileUtils;
 import org.apache.log4j.AppenderSkeleton;
 import org.apache.log4j.Level;
-import org.apache.log4j.Priority;
 import org.apache.log4j.spi.LoggingEvent;
 
 /**
@@ -65,10 +64,12 @@ public class RelimsLoggingAppender extends AppenderSkeleton {
         }
     }
 
-    @Override
-    public void close() {
+    public File getLoggingFile() {
+        return loggingFile;
+    }
+
+    public void export() {
         try {
-            //copy this loggingfile into the resultfolder !
             FileUtils.copyFile(loggingFile, new File(RelimsProperties.getLogFolder().getAbsolutePath() + "/relims.log"));
             System.out.println("Saved loggingfile in " + RelimsProperties.getLogFolder());
         } catch (IOException ex) {
@@ -77,11 +78,12 @@ public class RelimsLoggingAppender extends AppenderSkeleton {
     }
 
     @Override
-    public boolean requiresLayout() {
-        throw new UnsupportedOperationException("Not supported yet.");
+    public void close() {
+        System.out.print("Cleaning appender"); //To change body of generated methods, choose Tools | Templates.
     }
 
-    public File getLoggingFile() {
-        return loggingFile;
+    @Override
+    public boolean requiresLayout() {
+        return false;
     }
 }

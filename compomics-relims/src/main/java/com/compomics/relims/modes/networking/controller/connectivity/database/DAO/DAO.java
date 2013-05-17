@@ -293,11 +293,8 @@ public class DAO {
                 + "projectID VarChar(50),"
                 + "parameterName VarChar(30),"
                 + "parameterValue VarChar(200));");
-        /*// MAKE TASK PRIDE METADATA_____________________________________PRIDE META DATA TABLE
-         queryList.add("CREATE TABLE PrideMetaData ("
-         + "projectID VarChar(50),"
-         + "parameterName VarChar(30),"
-         + "parameterValue VarChar(200));");*/
+ //Set PRAGMA-MODE
+         queryList.add("PRAGMA journal_mode = OFF");
     }
 
     public void setTimeOut(Connection connection) {
