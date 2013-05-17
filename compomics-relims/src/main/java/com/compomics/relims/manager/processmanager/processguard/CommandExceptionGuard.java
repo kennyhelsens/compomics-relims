@@ -68,17 +68,11 @@ public class CommandExceptionGuard extends Thread implements Callable {
     long timeOut = (long) System.currentTimeMillis() + (long) maxTimeOutMinutes * 60L * 1000L;
     //returns a system dependent manager for the process...
     private ProcessManager manager = MainProcessManager.getPriorityManager();
-    private BufferedWriter output = null;
 
     ;
 
     public CommandExceptionGuard(Process processus) {
-        try {
-            this.output = new BufferedWriter(new FileWriter(RelimsProperties.getLogFolder().getAbsolutePath() + "/commands.log", true));
-        } catch (IOException ex) {
-            logger.error("Could not log commands to the resultfolder");
-            logger.error(ex);
-        }
+
         this.process = processus;
         this.ois = processus.getInputStream();
         this.eis = processus.getErrorStream();
@@ -99,20 +93,12 @@ public class CommandExceptionGuard extends Thread implements Callable {
         BufferedReader processOutputStream = new BufferedReader(new InputStreamReader(mergedInputStream));
         String line;
         logger.debug("An errorguard was hooked to the process. Timeout = " + maxTimeOutMinutes + " minutes.");
-        try {
-            output.write("Attempting to start searches at " + Calendar.getInstance().getTime().toString());
-            output.flush();
-        } catch (IOException ex) {
-            logger.error(ex);
-        }
         while (errorless && !this.isInterrupted()) {
             Thread priorityThread = new Thread(new PrioritySetter());
             priorityThread.start();
             try {
                 while ((line = processOutputStream.readLine()) != null) {
-                    logger.debug(line);
-                    output.write(line + System.lineSeparator());
-                    output.flush();
+                    logger.info(line);
                     if (!line.isEmpty() || !line.equals("")) {
                         //reset the timer if the process returned output 
                         resetTimer();
@@ -122,45 +108,18 @@ public class CommandExceptionGuard extends Thread implements Callable {
                             progressManager.setState(Checkpoint.PROCESSFAILURE);
                             process.destroy();
                             killSearchEngines();
-                            if (line.contains(aKeyword)) {
-                                output.write("Keyword " + aKeyword + " was detected...");
-                                output.flush();
-                            }
-                            if (isTimeUp()) {
-                                output.write("Process has timed out !");
-                                output.flush();
-                            }
                             return false;
                         }
                     }
                 }
             } catch (IOException ex) {
-                try {
-                    progressManager.setState(Checkpoint.PROCESSFAILURE, ex);
-                    errorless = false;
-                    process.destroy();
-                    output.write("Process has been terminated");
-                    output.flush();
-                    break;
-                } catch (IOException ex1) {
-                    logger.error(ex1);
-                }
+                progressManager.setState(Checkpoint.PROCESSFAILURE, ex);
+                errorless = false;
+                process.destroy();
+                break;
             }
             this.interrupt();
             return errorless;
-        }
-
-        try {
-            output.write("Searches were closed at " + Calendar.getInstance().getTime().toString());
-            output.flush();
-            output.close();
-        } catch (IOException ex) {
-            if (output != null) {
-                output = null;
-            }
-        }
-        if (output != null) {
-            output = null;
         }
         return errorless;
     }

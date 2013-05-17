@@ -53,31 +53,43 @@ public class ResultNotifier {
 
     public boolean sendResults(Checkpoint state) {
         boolean sucess = false;
-        try {
+        int failCounter = 0;
+        Map<String, Object> resultMap = new HashMap<String, Object>();
+        while (!sucess) {
             try {
-                sock = new Socket(serverHostname, serverPort);
-                sockInput = new ObjectInputStream(sock.getInputStream());
-                sockOutput = new ObjectOutputStream(sock.getOutputStream());
-            } catch (IOException e) {
-                e.printStackTrace(System.err);
-                return false;
-            }
-            try {
-                Map<String, Object> resultMap = new HashMap<String, Object>();
-                resultMap.put("finishState", state.toString());
-                resultMap.put("workerPort", ResourceManager.getWorkerPort());
-                resultMap.put("taskID", ResourceManager.getTaskID());
-                resultMap.put("projectID", ResourceManager.getProjectID());
-                resultMap.put("systemInfoMap", ResourceManager.getAllSystemInfo());
-                resultMap.put("PrideXMLErrorList", ResourceManager.getConversionErrors());
-                ResultManager resultManager = new ResultManager();
-                Map<String, Object> projectResultMap = resultManager.buildResultMap();
-                if (projectResultMap == null) {
-                    logger.error("Projectresultmap could not be built : null");
-                } else if (projectResultMap.isEmpty()) {
-                    logger.error("Projectresultmap could not be built : empty");
+                try {
+                    sock = new Socket(serverHostname, serverPort);
+                    sockInput = new ObjectInputStream(sock.getInputStream());
+                    sockOutput = new ObjectOutputStream(sock.getOutputStream());
+                } catch (IOException e) {
+                    sucess = false;
+                    failCounter++;
+                    if (failCounter > 10) {
+                        logger.error(e);
+                    }
                 }
-                resultMap.put("projectResult", projectResultMap);
+                try {
+                    resultMap.put("finishState", state.toString());
+                    resultMap.put("workerPort", ResourceManager.getWorkerPort());
+                    resultMap.put("taskID", ResourceManager.getTaskID());
+                    resultMap.put("projectID", ResourceManager.getProjectID());
+                    resultMap.put("systemInfoMap", ResourceManager.getAllSystemInfo());
+                    resultMap.put("PrideXMLErrorList", ResourceManager.getConversionErrors());
+                    ResultManager resultManager = new ResultManager();
+                    Map<String, Object> projectResultMap = resultManager.buildResultMap();
+                    if (projectResultMap == null) {
+                        logger.error("Projectresultmap could not be built : null");
+                    } else if (projectResultMap.isEmpty()) {
+                        logger.error("Projectresultmap could not be built : empty");
+                    }
+                    resultMap.put("projectResult", projectResultMap);
+                } catch (Exception e) {
+                    sucess = false;
+                    failCounter++;
+                    if (failCounter > 10) {
+                        logger.error(e);
+                    }
+                }
                 sockOutput.writeInt(1);
                 sockOutput.flush();
                 sockOutput.writeObject(resultMap);
@@ -86,16 +98,24 @@ public class ResultNotifier {
                 sucess = true;
             } catch (IOException e) {
                 sucess = false;
-                e.printStackTrace(System.err);
+                failCounter++;
+                if (failCounter > 10) {
+                    logger.error(e);
+                }
             }
             try {
-                Thread.sleep(500);
+                Thread.sleep(1000*60*2);
             } catch (Exception e) {
+                sucess = false;
+                failCounter++;
+                if (failCounter > 10) {
+                    logger.error(e);
+                }
+            } finally {
+                return sucess;
             }
-
-        } finally {
-             return sucess;
         }
+        return sucess;
     }
 
     public boolean sendWorkerSpecs(HashMap<String, Object> resultMap) {

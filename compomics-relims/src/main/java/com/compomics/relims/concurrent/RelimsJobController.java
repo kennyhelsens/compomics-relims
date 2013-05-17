@@ -245,6 +245,9 @@ public class RelimsJobController extends Observable implements ProjectRunner {
         }
         RelimsLoggingAppender appender = new RelimsLoggingAppender();
         Logger.getRootLogger().addAppender(appender);
+        if(!RelimsProperties.getDebugMode()){
+            Logger.getRootLogger().setLevel(Level.ERROR);
+        }
         String provider = null;
         boolean runPeptideshaker;
 
@@ -301,7 +304,8 @@ public class RelimsJobController extends Observable implements ProjectRunner {
             appender.close();
             return "";
         }
-    }
+        //Copy the logfile into the resultfolder
+      }
 
     private void storeInRepository() {
         if (projectProvider.getClass().toString().contains("mslims")) {

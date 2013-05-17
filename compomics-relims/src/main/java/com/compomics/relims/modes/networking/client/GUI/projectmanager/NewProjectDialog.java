@@ -236,7 +236,7 @@ public class NewProjectDialog extends javax.swing.JFrame {
 
         TitleLabel.setBackground(new java.awt.Color(255, 255, 255));
         TitleLabel.setFont(new java.awt.Font("Lucida Grande", 1, 36)); // NOI18N
-        TitleLabel.setText("Colims Processing");
+        TitleLabel.setText("Respin - Automatic Reprocessing Pipeline");
 
         jPanel3.setBackground(new java.awt.Color(255, 255, 255));
         jPanel3.setBorder(javax.swing.BorderFactory.createTitledBorder(null, "Task container", javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION, javax.swing.border.TitledBorder.DEFAULT_POSITION, new java.awt.Font("Tahoma", 1, 18))); // NOI18N

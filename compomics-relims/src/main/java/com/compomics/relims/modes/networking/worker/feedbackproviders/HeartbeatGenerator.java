@@ -37,6 +37,7 @@ public class HeartbeatGenerator implements Runnable {
     }
 
     public void sendHeartbeat() throws IOException {
+        int failcounter = 0;
         while (true) {
             try {
                 try {
@@ -44,16 +45,14 @@ public class HeartbeatGenerator implements Runnable {
                     sockInput = new ObjectInputStream(sock.getInputStream());
                     sockOutput = new ObjectOutputStream(sock.getOutputStream());
                 } catch (IOException e) {
-                    logger.error("Server could not be reached...Retrying...");
+                 logger.warn("Server could not be reached...retrying");
                 }
                 try {
                     if (sockOutput == null) {
-                        logger.error("The socket Output is null");
-                        if (RelimsProperties.getControllerIP() == null) {
-                              logger.error("IP is null");
-                        }
-                        if (RelimsProperties.getControllerPort() == 0) {
-                              logger.error("port is null");
+                        failcounter++;
+                        if(failcounter>=10){
+                              logger.error("Server did not send responds within 10 attempts...sleeping for 30 minutes");
+                              Thread.sleep(1000*60*30);
                         }
                     } else {
                         if (ResourceManager.getWorkerPort() != 0) {
@@ -70,7 +69,7 @@ public class HeartbeatGenerator implements Runnable {
                         logger.error(e.getMessage());
                     }
                 }
- 
+
                 try {
                     Thread.sleep(30000);
                 } catch (InterruptedException ex) {

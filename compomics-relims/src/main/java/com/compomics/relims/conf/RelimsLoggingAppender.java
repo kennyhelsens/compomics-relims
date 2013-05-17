@@ -4,13 +4,18 @@
  */
 package com.compomics.relims.conf;
 
+import com.compomics.relims.modes.networking.worker.general.ResourceManager;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.sql.Timestamp;
 import java.util.Date;
+import java.util.logging.Logger;
+import org.apache.commons.io.FileUtils;
 import org.apache.log4j.AppenderSkeleton;
+import org.apache.log4j.Level;
+import org.apache.log4j.Priority;
 import org.apache.log4j.spi.LoggingEvent;
 
 /**
@@ -19,11 +24,19 @@ import org.apache.log4j.spi.LoggingEvent;
  */
 public class RelimsLoggingAppender extends AppenderSkeleton {
 
-    private final File loggingFile;
+    private File loggingFile = null;
     private BufferedWriter logWriter = null;
+    private Boolean debugMode = false;
 
     public RelimsLoggingAppender() {
-        this.loggingFile = new File(RelimsProperties.getWorkSpace().getAbsolutePath() + "/processinfo/relims.log");
+        try {
+            // this.loggingFile = new File(RelimsProperties.getWorkSpace().getAbsolutePath() + "/processinfo/relims.log");
+            this.loggingFile = File.createTempFile(ResourceManager.getProjectID() + "_relims", ".log");
+            System.out.println(loggingFile.getAbsolutePath() + " has been created");
+        } catch (IOException ex) {
+            Logger.getLogger(RelimsLoggingAppender.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+        }
+        this.debugMode = RelimsProperties.getDebugMode();
     }
 
     @Override
@@ -33,9 +46,13 @@ public class RelimsLoggingAppender extends AppenderSkeleton {
                 && !le.getMessage().toString().contains("Generating peptide modification holder")
                 && !le.getMessage().toString().contains("Finding modifications for percursor")) {
             try {
-                logWriter = new BufferedWriter(new FileWriter(loggingFile, true));
-                logWriter.write(new Timestamp(new Date().getTime()) + " " + le.getLevel().toString() + " : " + le.getMessage() + System.lineSeparator()); //writes to file
-                logWriter.flush();
+                if (!debugMode && !le.getLevel().isGreaterOrEqual(Level.ERROR)) {
+                    //don't append anything that is smaller than ERROR!
+                } else {
+                    logWriter = new BufferedWriter(new FileWriter(loggingFile, true));
+                    logWriter.write(new Timestamp(new Date().getTime()) + " " + le.getLevel().toString() + " : " + le.getMessage() + System.lineSeparator()); //writes to file
+                    logWriter.flush();
+                }
             } catch (IOException ex) {
                 System.err.println("Could not write to log...");
             } finally {
@@ -50,11 +67,21 @@ public class RelimsLoggingAppender extends AppenderSkeleton {
 
     @Override
     public void close() {
-        System.out.println("Logger was terminated");
+        try {
+            //copy this loggingfile into the resultfolder !
+            FileUtils.copyFile(loggingFile, new File(RelimsProperties.getLogFolder().getAbsolutePath() + "/relims.log"));
+            System.out.println("Saved loggingfile in " + RelimsProperties.getLogFolder());
+        } catch (IOException ex) {
+            System.out.println("Logger was incorrectly terminated");
+        }
     }
 
     @Override
     public boolean requiresLayout() {
         throw new UnsupportedOperationException("Not supported yet.");
+    }
+
+    public File getLoggingFile() {
+        return loggingFile;
     }
 }
