@@ -938,13 +938,13 @@ public class NewProjectDialog extends javax.swing.JFrame {
         if (cbMinMS1Count.isSelected()) {
             ProjectPredicate.MS1MIN.enable();
             ProjectPredicate.setMinMS1Count(tfMinMS1Spectra.getText());
-            filters.add("MS1 > " + "'" + tfMaxMS1Spectra.getText() + "'");
+            filters.add("MS1 > " + "'" + tfMinMS1Spectra.getText() + "'");
         }
 
         if (cbMinMS2Count.isSelected()) {
             ProjectPredicate.MS2MIN.enable();
             ProjectPredicate.setMinMS1Count(tfMinMS2Spectra.getText());
-            filters.add("MS2 > " + "'" + tfMaxMS2Spectra.getText() + "'");
+            filters.add("MS2 > " + "'" + tfMinMS2Spectra.getText() + "'");
         }
 
         if (cbEnzyme.isSelected()) {
