@@ -12,7 +12,7 @@ import com.compomics.relims.manager.progressmanager.Checkpoint;
 import com.compomics.relims.modes.networking.controller.connectivity.taskobjects.Task;
 import com.compomics.relims.modes.networking.worker.feedbackproviders.ResultNotifier;
 import com.compomics.relims.modes.networking.worker.general.ResourceManager;
-import com.compomics.relims.modes.networking.worker.general.ResultManager;
+import com.compomics.relims.modes.networking.worker.resultmanager.ResultManager;
 import com.compomics.util.experiment.identification.SearchParameters;
 import java.util.List;
 import java.util.concurrent.Callable;

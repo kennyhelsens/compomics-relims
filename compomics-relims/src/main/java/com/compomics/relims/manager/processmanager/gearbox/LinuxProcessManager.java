@@ -26,12 +26,10 @@ public class LinuxProcessManager extends MainProcessManager implements ProcessMa
 
         for (String processName : processList) {
             try {
-                Runtime.getRuntime().exec("renice " + priority.getLinuxCode() + "  $(pidof " + processName + ")");
-                logger.debug("Changed " + processName + " to priority : " + priority);
+                Runtime.getRuntime().exec("renice " + priority.getLinuxCode() + "  $(pidof " + processName + ")");        
             } catch (IOException ex) {
                 logger.error("Could not change priority for process with name : " + processName);
             }
-
         }
         return false;
     }
@@ -39,8 +37,7 @@ public class LinuxProcessManager extends MainProcessManager implements ProcessMa
     public boolean setPriorityFromPID(int PID, PriorityLevel priority) {
         try {
             Runtime.getRuntime().exec("renice " + priority.getLinuxCode() + " " + PID);
-            logger.debug("Changed process with " + PID + " to priority : " + priority);
-        } catch (IOException ex) {
+            } catch (IOException ex) {
             logger.error("Could not change priority for process with PID : " + PID);
         }
         return false;

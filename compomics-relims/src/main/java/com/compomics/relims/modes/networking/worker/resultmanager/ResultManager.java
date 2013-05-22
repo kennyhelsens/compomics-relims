@@ -2,12 +2,13 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-package com.compomics.relims.modes.networking.worker.general;
+package com.compomics.relims.modes.networking.worker.resultmanager;
 
 import com.compomics.colims.core.exception.MappingException;
 import com.compomics.colims.core.exception.PeptideShakerIOException;
 import com.compomics.relims.conf.RelimsProperties;
 import com.compomics.relims.manager.colimsmanager.ColimsImporter;
+import com.compomics.relims.modes.networking.worker.general.ResourceManager;
 import com.compomics.util.experiment.biology.Enzyme;
 import com.compomics.util.experiment.identification.SearchParameters;
 import com.compomics.util.experiment.massspectrometry.Charge;

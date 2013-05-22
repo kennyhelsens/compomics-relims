@@ -145,9 +145,9 @@ public class PeptideShakerJobBean {
             PSCommandLine.append(RelimsProperties.getPeptideShakerArchive());
             PSCommandLine.append(" eu.isas.peptideshaker.cmd.PeptideShakerCLI ");
             PSCommandLine.append("-experiment ");
-            PSCommandLine.append(ProcessVariableManager.getProjectId() + " ");
+            PSCommandLine.append(projectId + " ");
             PSCommandLine.append("-sample ");
-            PSCommandLine.append("AutoReprocessed " + ProcessVariableManager.getProjectId() + " ");
+            PSCommandLine.append("AutoReprocessed " + projectId + " ");
             PSCommandLine.append("-replicate 1 ");
             PSCommandLine.append("-identification_files ");
             PSCommandLine.append(findIdentificationFiles());

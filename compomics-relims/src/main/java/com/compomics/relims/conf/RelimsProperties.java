@@ -397,6 +397,11 @@ public class RelimsProperties {
     public static String getRepositoryPath() {
         return config.getString("remote.relims.repository");
     }
+    
+      public static String getParameterStorageMode() {
+        return config.getString("remote.relims.repository.mode");
+    }
+    
     //-----------------------general
 
     public static PriorityLevel getPriority() {
@@ -475,10 +480,10 @@ public class RelimsProperties {
         return config.getString("java.home");
     }
 
-      public static File getPrideMetaDataFile() {
+    public static File getPrideMetaDataFile() {
         return new File(config.getString("pride.metadata.file"));
     }
-    
+
     public static File getRelimsTempFolder() {
         File tempFolder = null;
         try {

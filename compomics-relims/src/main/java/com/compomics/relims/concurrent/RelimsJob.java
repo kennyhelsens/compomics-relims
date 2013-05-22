@@ -3,7 +3,6 @@ package com.compomics.relims.concurrent;
 import com.compomics.pride_asa_pipeline.logic.PrideSpectrumAnnotator;
 import com.compomics.pride_asa_pipeline.spring.ApplicationContextProvider;
 import com.compomics.relims.conf.RelimsProperties;
-import com.compomics.relims.manager.filemanager.RepositoryManager;
 import com.compomics.relims.manager.processmanager.processguard.RelimsException;
 import com.compomics.relims.manager.processmanager.processguard.RelimsExceptionHandler;
 import com.compomics.relims.manager.progressmanager.Checkpoint;
@@ -115,7 +114,6 @@ public class RelimsJob implements Callable, Closable {
     public Object call() {
 
         initThreadExecutor();
-        RepositoryManager.initializeRepository();
         Thread.setDefaultUncaughtExceptionHandler(new RelimsExceptionHandler());
         progressManager.setUp();
         List<Future> lFutures = Lists.newArrayList();

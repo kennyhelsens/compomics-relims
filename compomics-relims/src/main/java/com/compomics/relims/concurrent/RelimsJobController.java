@@ -3,7 +3,6 @@ package com.compomics.relims.concurrent;
 import com.compomics.relims.conf.RelimsLoggingAppender;
 import com.compomics.relims.conf.RelimsProperties;
 import com.compomics.relims.manager.filemanager.FileManager;
-import com.compomics.relims.manager.filemanager.RepositoryManager;
 import com.compomics.relims.manager.progressmanager.Checkpoint;
 import com.compomics.relims.manager.progressmanager.ProgressManager;
 import com.compomics.relims.manager.variablemanager.ProcessVariableManager;
@@ -17,6 +16,12 @@ import com.compomics.relims.model.interfaces.ProjectRunner;
 import com.compomics.relims.model.interfaces.SearchStrategy;
 import com.compomics.relims.model.provider.ProjectProvider;
 import com.compomics.relims.model.provider.pride.PrideProjectProvider;
+import com.compomics.relims.modes.networking.worker.resultmanager.cleanup.CleanupManager;
+import com.compomics.relims.modes.networking.worker.resultmanager.storage.searchparameterstorage.SearchParamFileRepository;
+import com.compomics.relims.modes.networking.worker.resultmanager.storage.searchparameterstorage.SearchParamSQLite;
+import com.compomics.relims.modes.networking.worker.resultmanager.storage.searchparameterstorage.SearchParamStorage;
+import com.compomics.relims.modes.networking.worker.resultmanager.storage.spectrumstorage.SpectrumFileRepository;
+import com.compomics.relims.modes.networking.worker.resultmanager.storage.spectrumstorage.SpectrumStorage;
 import com.compomics.util.experiment.identification.SearchParameters;
 import com.google.common.base.Predicate;
 import org.apache.commons.configuration.ConfigurationException;
@@ -24,11 +29,13 @@ import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.Observable;
 
 import static java.lang.String.format;
+import org.apache.commons.io.FileUtils;
 
 public class RelimsJobController extends Observable implements ProjectRunner {
 
@@ -103,7 +110,13 @@ public class RelimsJobController extends Observable implements ProjectRunner {
      * generated anyway...
      */
     private FileManager fileGrabber = FileManager.getInstance();
+    private SearchParamStorage searchParamManager;
+    private SpectrumStorage spectrumManager;
+    private boolean storeInRepository = true;
 
+    /**
+     * A ProgressManager to store the state of the project and monitor it
+     */
     @Override
     public void setPredicateManager(PredicateManager aPredicateManager) {
         predicateManager = aPredicateManager;
@@ -196,7 +209,6 @@ public class RelimsJobController extends Observable implements ProjectRunner {
             e.printStackTrace();
             progressManager.setState(Checkpoint.FAILED, e);
         } finally {
-            dataProvider.clearResources();
             return true;
         }
     }
@@ -227,7 +239,15 @@ public class RelimsJobController extends Observable implements ProjectRunner {
                     "finished PeptideShakerCLI on project '%s', sample '%s'",
                     experimentID,
                     sampleID));
-            storeInRepository();
+            try {
+                if (storeInRepository) {
+                    storeInRepository(SearchParameters.getIdentificationParameters(relimsProjectBean.getSearchParamFile()), relimsProjectBean.getSpectrumFile());
+                }
+            } catch (FileNotFoundException ex) {
+                logger.error("Could not store files to repositories : " + ex.getMessage());
+            } catch (IOException | ClassNotFoundException ex) {
+                logger.error("Could not store files to repositories : " + ex.getMessage());
+            }
             return true;
         } else {
             progressManager.setState(Checkpoint.PROCESSFAILURE);
@@ -251,22 +271,34 @@ public class RelimsJobController extends Observable implements ProjectRunner {
         String provider = null;
         boolean runPeptideshaker;
 
-
         if (projectProvider.getClass().toString().contains("mslims")) {
             provider = "mslims";
         } else {
             provider = "pride";
         }
 
-        if (!RepositoryManager.hasBeenRun(provider, projectID)) {
-            logger.debug("Project was not located in repository. Building from scratch...");
-            relimsProjectBean = makeRelimsJobBean();
+        if (RelimsProperties.getParameterStorageMode().toUpperCase().contains("FILE")) {
+            searchParamManager = new SearchParamFileRepository(new File(RelimsProperties.getRepositoryPath()), provider);
+            spectrumManager = new SpectrumFileRepository(new File(RelimsProperties.getRepositoryPath()), provider);
         } else {
-            logger.debug("Project was located in repository. Building from files...");
-            File repositorySpectrumFile = new File(RelimsProperties.getWorkSpace() + "/" + projectID + ".mgf");
-            File repositorySearchParametersFile = new File(RelimsProperties.getWorkSpace() + "/SearchGUI.parameters");
-            relimsProjectBean = new RelimsProjectBean(projectID, repositorySpectrumFile, repositorySearchParametersFile);
+            searchParamManager = new SearchParamSQLite(new File(RelimsProperties.getRepositoryPath()));
+            spectrumManager = new SpectrumFileRepository(new File(RelimsProperties.getRepositoryPath()), provider);
         }
+
+        if (!searchParamManager.hasBeenRun(String.valueOf(projectID)) & !spectrumManager.hasBeenRun(String.valueOf(projectID))) {
+            logger.debug("Not all required files could be located in repository. Building from scratch...");
+            relimsProjectBean = makeRelimsJobBean();
+            storeInRepository = true;
+        } else {
+            logger.debug("All required files were located in repository. Building from files...");
+            //MakeCleanMGF
+            File repositorySpectrumFile = makeCleanMGF();
+            File repositorySearchParametersFile = makeCleanSearchParameters();
+            relimsProjectBean = new RelimsProjectBean(projectID, repositorySpectrumFile, repositorySearchParametersFile);
+            storeInRepository = false;
+        }
+
+
         if (relimsProjectBean != null) {
             try {
                 runPeptideshaker = runSearchGUI();
@@ -299,22 +331,57 @@ public class RelimsJobController extends Observable implements ProjectRunner {
                     //              fileGrabber.deleteResultFolder();
                 }
             }
+            CleanupManager.cleanResultFolder();
             return "";
         } else {
             logger.error("Search was aborted for " + projectID);
+            CleanupManager.cleanResultFolder();
             return "";
         }
-        //Copy the logfile into the resultfolder
+        //CLEANUP FILES
+
 
     }
 
-    private void storeInRepository() {
-        if (projectProvider.getClass().toString().contains("mslims")) {
-            RepositoryManager.copyToRepository("mslims", RelimsProperties.getWorkSpace(), projectID);
-            logger.debug("Stored sourcefiles (MGF / SearchParameters) to MSLIMS repository");
-        } else {
-            RepositoryManager.copyToRepository("pride", RelimsProperties.getWorkSpace(), projectID);
-            logger.debug("Stored sourcefiles (MGF / SearchParameters) to PRIDE repository");
+    private File makeCleanSearchParameters() {
+        //MakeCleanSearchParameters
+        File repositorySearchParametersFile = new File(RelimsProperties.getWorkSpace() + "/SearchGUI.parameters");
+        try {
+            SearchParameters parameters = searchParamManager.retrieveParameters(String.valueOf(projectID));
+            SearchParameters.saveIdentificationParameters(parameters, repositorySearchParametersFile);
+        } catch (IOException ex) {
+            logger.error("Could not retrieve searchparameters");
+        } catch (ClassNotFoundException ex) {
+            logger.error("Could not retrieve searchparameters");
+        } finally {
+            return repositorySearchParametersFile;
         }
+    }
+
+    private File makeCleanMGF() {
+        //MakeCleanSearchParameters
+        File MgfFile = null;
+        try {
+            MgfFile = new File(RelimsProperties.getWorkSpace() + "/" + projectID + ".mgf");
+            File repositoryMgfFile = spectrumManager.retrieveMGF(String.valueOf(projectID));
+            FileUtils.copyFile(repositoryMgfFile, MgfFile, true);
+        } catch (IOException e) {
+            logger.error("Could not retrieve MGF-file");
+        } finally {
+            return MgfFile;
+        }
+    }
+
+    private void storeInRepository(SearchParameters searchParameters, File MGF) throws IOException {
+        storeSearchParametersInRepository(searchParameters);
+        storeMGFInRepository(MGF);
+    }
+
+    private void storeSearchParametersInRepository(SearchParameters searchParameters) throws IOException {
+        searchParamManager.storeParameters(String.valueOf(projectID), searchParameters);
+    }
+
+    private void storeMGFInRepository(File MGF) throws IOException {
+        spectrumManager.storeMGF(String.valueOf(projectID), MGF);
     }
 }
