@@ -35,6 +35,7 @@ public class MetaDataCollector {
         directoryPath = RelimsProperties.getTaskDatabaseLocation().getAbsolutePath();
         csvFile = RelimsProperties.getPrideMetaDataFile();
         new File(directoryPath).mkdirs();
+        System.out.println(directoryPath);
         sTempDb = directoryPath + "/pridemeta.db";
         metaDatabaseURL = sJdbc + ":" + sTempDb;
         File tempDB = new File(sTempDb);

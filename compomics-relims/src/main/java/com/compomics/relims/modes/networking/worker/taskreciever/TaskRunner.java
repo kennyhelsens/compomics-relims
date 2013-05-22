@@ -185,6 +185,7 @@ public class TaskRunner {
 
         @Override
         public void run() {
+            int failcounter = 0;
             try {
                 Checkpoint finishedState = this.call();
                 ResourceManager.setFinishState(finishedState);
@@ -192,11 +193,11 @@ public class TaskRunner {
                 ResourceManager.setFinishState(Checkpoint.FAILED);
                 this.stop();
             } finally {
-                boolean sentToServer = false;
-                while (!sentToServer) {
+                boolean finished = false;
+                while (!finished) {
                     try {
                         logger.info("Sending feedback to server...");
-                        sentToServer = resultNotifier.sendResults(Checkpoint.valueOf(ResourceManager.getFinishState()));
+                        finished = resultNotifier.sendResults(Checkpoint.valueOf(ResourceManager.getFinishState()));
                         //TODO re-activate later
                         //    ResultManager.importToColims();
                         TaskReciever.locked = false;
@@ -204,8 +205,13 @@ public class TaskRunner {
                         System.out.println("");
                     } catch (Exception ex) {
                         //catch a general exception to make sure the results are sent...
+                        failcounter++;
+                        if(failcounter==10){
                         logger.error("Server could not be contacted succesfully. Retrying...");
                         logger.error(ex);
+                        failcounter=0;
+                        finished=true;
+                        }
                     }
                 }
                 logger.debug("Waiting for new task");

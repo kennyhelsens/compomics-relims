@@ -53,7 +53,6 @@ public class ResultNotifier {
 
     public boolean sendResults(Checkpoint state) {
         boolean sucess = false;
-        int failCounter = 0;
         Map<String, Object> resultMap = new HashMap<String, Object>();
         while (!sucess) {
             try {
@@ -63,10 +62,6 @@ public class ResultNotifier {
                     sockOutput = new ObjectOutputStream(sock.getOutputStream());
                 } catch (IOException e) {
                     sucess = false;
-                    failCounter++;
-                    if (failCounter > 10) {
-                        logger.error(e);
-                    }
                 }
                 try {
                     resultMap.put("finishState", state.toString());
@@ -85,10 +80,6 @@ public class ResultNotifier {
                     resultMap.put("projectResult", projectResultMap);
                 } catch (Exception e) {
                     sucess = false;
-                    failCounter++;
-                    if (failCounter > 10) {
-                        logger.error(e);
-                    }
                 }
                 sockOutput.writeInt(1);
                 sockOutput.flush();
@@ -98,19 +89,6 @@ public class ResultNotifier {
                 sucess = true;
             } catch (IOException e) {
                 sucess = false;
-                failCounter++;
-                if (failCounter > 10) {
-                    logger.error(e);
-                }
-            }
-            try {
-                Thread.sleep(1000*60*2);
-            } catch (Exception e) {
-                sucess = false;
-                failCounter++;
-                if (failCounter > 10) {
-                    logger.error(e);
-                }
             } finally {
                 return sucess;
             }
