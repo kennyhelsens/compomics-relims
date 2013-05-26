@@ -1,7 +1,7 @@
 package com.compomics.relims.modes.networking.worker.feedbackproviders;
 
 import com.compomics.relims.conf.RelimsProperties;
-import com.compomics.relims.modes.networking.worker.general.ResourceManager;
+import com.compomics.relims.manager.resourcemanager.ResourceManager;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;

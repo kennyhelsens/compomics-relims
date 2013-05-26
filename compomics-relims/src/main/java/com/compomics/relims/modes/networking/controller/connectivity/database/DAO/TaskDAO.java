@@ -4,10 +4,9 @@
  */
 package com.compomics.relims.modes.networking.controller.connectivity.database.DAO;
 
-import com.compomics.relims.conf.RelimsProperties;
 import com.compomics.relims.modes.networking.controller.connectivity.database.service.DatabaseService;
-import com.compomics.relims.modes.networking.controller.connectivity.taskobjects.Task;
-import com.compomics.relims.modes.networking.controller.connectivity.taskobjects.TaskContainer;
+import com.compomics.relims.modes.networking.controller.taskobjects.Task;
+import com.compomics.relims.modes.networking.controller.taskobjects.TaskContainer;
 import com.compomics.util.experiment.identification.SearchParameters;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -235,13 +234,12 @@ public class TaskDAO {
                 relimsWorkingTask = new Task(foundTaskID, foundProjectID, foundStrategy, foundSource, foundUserID);
             }
         } catch (Exception ex) {
-            System.out.println("TaskDistributor Failed : ");
+            logger.error("TaskDistributor Failed : ");
             if (!ex.toString().contains("The database file is locked)")) {
                 logger.error(ex);
-                System.out.println(ex);
                 ex.printStackTrace();
             } else {
-                System.out.println(ex);
+               logger.error(ex);
             }
         } finally {
             DAO.disconnect(conn, rs, statement);
@@ -254,7 +252,7 @@ public class TaskDAO {
         PreparedStatement statement = null;
         ResultSet rs = null;
         Connection conn = null;
-        logger.debug("Sweeping memory...");
+        logger.info("Sweeping database for incorrectly shutdown tasks...");
         long updates = 0L;
         boolean sweeped = false;
         while (!sweeped) {
@@ -282,7 +280,7 @@ public class TaskDAO {
                 }
             } finally {
                 if (sweeped) {
-                    System.out.println("Reset " + updates + " tasks");
+                    logger.info("Reset " + updates + " tasks");
                     DAO.disconnect(conn, rs, statement);
                 }
             }

@@ -2,7 +2,7 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-package com.compomics.relims.modes.networking.controller.connectivity.workerpool;
+package com.compomics.relims.modes.networking.controller.workerpool;
 
 import java.util.Objects;
 

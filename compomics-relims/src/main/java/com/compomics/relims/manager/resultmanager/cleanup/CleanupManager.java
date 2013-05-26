@@ -2,7 +2,7 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-package com.compomics.relims.modes.networking.worker.resultmanager.cleanup;
+package com.compomics.relims.manager.resultmanager.cleanup;
 
 import com.compomics.relims.conf.RelimsProperties;
 import java.io.File;

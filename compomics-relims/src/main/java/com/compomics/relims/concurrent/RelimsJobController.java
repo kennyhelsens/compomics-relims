@@ -16,12 +16,12 @@ import com.compomics.relims.model.interfaces.ProjectRunner;
 import com.compomics.relims.model.interfaces.SearchStrategy;
 import com.compomics.relims.model.provider.ProjectProvider;
 import com.compomics.relims.model.provider.pride.PrideProjectProvider;
-import com.compomics.relims.modes.networking.worker.resultmanager.cleanup.CleanupManager;
-import com.compomics.relims.modes.networking.worker.resultmanager.storage.searchparameterstorage.SearchParamFileRepository;
-import com.compomics.relims.modes.networking.worker.resultmanager.storage.searchparameterstorage.SearchParamSQLite;
-import com.compomics.relims.modes.networking.worker.resultmanager.storage.searchparameterstorage.SearchParamStorage;
-import com.compomics.relims.modes.networking.worker.resultmanager.storage.spectrumstorage.SpectrumFileRepository;
-import com.compomics.relims.modes.networking.worker.resultmanager.storage.spectrumstorage.SpectrumStorage;
+import com.compomics.relims.manager.resultmanager.cleanup.CleanupManager;
+import com.compomics.relims.manager.resultmanager.storage.searchparameterstorage.SearchParamFileRepository;
+import com.compomics.relims.manager.resultmanager.storage.searchparameterstorage.SearchParamSQLite;
+import com.compomics.relims.manager.resultmanager.storage.searchparameterstorage.SearchParamStorage;
+import com.compomics.relims.manager.resultmanager.storage.spectrumstorage.SpectrumFileRepository;
+import com.compomics.relims.manager.resultmanager.storage.spectrumstorage.SpectrumStorage;
 import com.compomics.util.experiment.identification.SearchParameters;
 import com.google.common.base.Predicate;
 import org.apache.commons.configuration.ConfigurationException;
@@ -257,17 +257,15 @@ public class RelimsJobController extends Observable implements ProjectRunner {
 
     @Override
     public String call() {
-        logger.setLevel(Level.DEBUG);
+
+       
         if (projectProvider instanceof PrideProjectProvider) {
             searchResultFolder = RelimsProperties.createWorkSpace(projectID, "pride");
         } else {
             searchResultFolder = RelimsProperties.createWorkSpace(projectID, "mslims");
         }
-        RelimsLoggingAppender appender = new RelimsLoggingAppender();
-        Logger.getRootLogger().addAppender(appender);
-        if (!RelimsProperties.getDebugMode()) {
-            Logger.getRootLogger().setLevel(Level.ERROR);
-        }
+
+
         String provider = null;
         boolean runPeptideshaker;
 
@@ -321,8 +319,6 @@ public class RelimsJobController extends Observable implements ProjectRunner {
                     }
                 }
             } finally {
-                appender.export();
-                appender.close();
                 RelimsProperties.saveLoggedFiles();
             }
             //nullcheck to prevent standalone relims to delete its folders

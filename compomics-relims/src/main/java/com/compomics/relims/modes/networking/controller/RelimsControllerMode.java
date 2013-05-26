@@ -8,7 +8,7 @@ import com.compomics.relims.conf.RelimsProperties;
 import com.compomics.relims.modes.networking.controller.connectivity.database.security.BackupService;
 import com.compomics.relims.modes.networking.controller.connectivity.database.service.DatabaseService;
 import com.compomics.relims.modes.networking.controller.connectivity.listeners.PortListener;
-import com.compomics.relims.modes.networking.controller.connectivity.workerpool.WorkerPool;
+import com.compomics.relims.modes.networking.controller.workerpool.WorkerPool;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
@@ -23,29 +23,20 @@ public class RelimsControllerMode {
 
     private static DatabaseService dds;
     private static BackupService bs;
-    private static Logger logger;
+    private static Logger logger = Logger.getLogger(RelimsControllerMode.class);
     private static ExecutorService bootingService;
 
     public static void main(String[] args) {
         RelimsProperties.setNetworkingMode(RelimsProperties.NetworkMode.CONTROLLER);
         RelimsProperties.initialize(false);
         if (!RelimsProperties.getDebugMode()) {
-            Logger.getRootLogger().setLevel(Level.ERROR);
+            Logger.getRootLogger().setLevel(Level.INFO);
         }
         dds = DatabaseService.getInstance();
         bs = BackupService.getInstance();
         logger = Logger.getLogger(RelimsControllerMode.class);
         bootingService = Executors.newSingleThreadExecutor();
         try {
-            //set logger
-
-
-            /*        if (args[1].equalsIgnoreCase("-nogui")) {
-             } else {
-             if (args.length <= 0) {
-             MAINGUI maingui = new MAINGUI();
-             }
-             }*/
 
             System.out.println("-----------------------------------");
             System.out.println("------------RemoteRelims-----------");
@@ -56,9 +47,7 @@ public class RelimsControllerMode {
             System.out.println("-----------------------------------");
             System.out.println("");
 
-            System.out.println("Validating properties file...");
-            //if driver in Config file is missing ---> remake using default settings !
-
+            logger.info("Validating properties file...");
             //++++++++++++++++++++BOOTING THE DATABASE
 //making a connection
 

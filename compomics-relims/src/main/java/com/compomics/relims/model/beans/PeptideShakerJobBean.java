@@ -37,7 +37,7 @@ public class PeptideShakerJobBean {
     private String sample = "default_sample";
     private String idFilesFolder = null;
     private String spectrumFolder = null;
-    private final long projectId;
+    private long projectId;
     private StringBuilder PSCommandLine;
     private File searchParametersFile;
     private File spectraFolder;
@@ -140,15 +140,15 @@ public class PeptideShakerJobBean {
 
         if (this.spectraFolder.exists()) {
             PSCommandLine.append("java ");
-            PSCommandLine.append("-Xmx" + RelimsProperties.getAllowedRAM() + "M " );
+            PSCommandLine.append("-Xmx").append(RelimsProperties.getAllowedRAM()).append("M ");
             PSCommandLine.append("-cp ");
             PSCommandLine.append(RelimsProperties.getPeptideShakerArchive());
             PSCommandLine.append(" eu.isas.peptideshaker.cmd.PeptideShakerCLI ");
             PSCommandLine.append("-experiment ");
-            PSCommandLine.append(projectId + " ");
+            PSCommandLine.append(projectId).append(" ");
             PSCommandLine.append("-sample ");
-            PSCommandLine.append("AutoReprocessed " + projectId + " ");
-            PSCommandLine.append("-replicate 1 ");
+            PSCommandLine.append("respin_").append(projectId).append(" ");
+            PSCommandLine.append("-replicate 0 ");
             PSCommandLine.append("-identification_files ");
             PSCommandLine.append(findIdentificationFiles());
             PSCommandLine.append(" -spectrum_files ");
@@ -165,7 +165,7 @@ public class PeptideShakerJobBean {
             PSCommandLine.append("1");
             if (RelimsProperties.getPeptideShakerCPSOutput()) {
                 PSCommandLine.append(" -out ");
-                PSCommandLine.append(resultFolder.getAbsolutePath().toString() + "/" + ProcessVariableManager.getProjectId() + ".cps");
+                PSCommandLine.append(resultFolder.getAbsolutePath().toString()).append("/").append(projectId).append(".cps");
             }
             //Required for R
             if (RelimsProperties.getPeptideShakerTSVOutput()) {
@@ -177,7 +177,6 @@ public class PeptideShakerJobBean {
                 PSCommandLine.append(" -out_txt_2 ");
                 PSCommandLine.append(resultFolder.getAbsolutePath().toString());
             }
-            logger.debug("Generated peptideshaker command : " + PSCommandLine.toString());
             return PSCommandLine.toString();
         } else {
             return null;

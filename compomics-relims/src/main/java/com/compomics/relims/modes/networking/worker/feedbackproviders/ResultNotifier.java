@@ -14,8 +14,8 @@ package com.compomics.relims.modes.networking.worker.feedbackproviders;
 // http://darksleep.com/player
 import com.compomics.relims.conf.RelimsProperties;
 import com.compomics.relims.manager.progressmanager.Checkpoint;
-import com.compomics.relims.modes.networking.worker.general.ResourceManager;
-import com.compomics.relims.modes.networking.worker.resultmanager.ResultManager;
+import com.compomics.relims.manager.resourcemanager.ResourceManager;
+import com.compomics.relims.manager.resultmanager.ResultManager;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;

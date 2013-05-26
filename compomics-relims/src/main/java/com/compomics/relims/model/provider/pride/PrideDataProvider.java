@@ -107,10 +107,8 @@ public class PrideDataProvider implements DataProvider {
 
     @Override
     public RelimsProjectBean buildProjectBean(long aProjectid) {
-        logger.setLevel(Level.ALL);
         logger.debug(String.format("retrieving searchparameters and modifications for project %s", aProjectid));
         logger.debug("warning, if this is the first time the project is run, it might take a considerable amount of time to retrieve the suggested searchparameters...");
-        logger.setLevel(Level.ERROR);
         ApplicationContext lContext = ApplicationContextProvider.getInstance().getApplicationContext();
 
         RelimsProjectBean lRelimsProjectBean = new RelimsProjectBean(aProjectid);
@@ -185,7 +183,6 @@ public class PrideDataProvider implements DataProvider {
             lRelimsProjectBean.setPrecursorError(lPrecursorError);
             lRelimsProjectBean.setFragmentError(lFragmentError);
         }
-        logger.setLevel(Level.DEBUG);
         logger.debug("Retrieved searchparameters from remote Pride");
         PrideSpectrumAnnotator lSpectrumAnnotator;
         lSpectrumAnnotator = (PrideSpectrumAnnotator) applicationContext.getBean("prideSpectrumAnnotator");

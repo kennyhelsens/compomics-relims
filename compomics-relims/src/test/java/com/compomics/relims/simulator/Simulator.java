@@ -6,9 +6,9 @@ package com.compomics.relims.simulator;
 
 import com.compomics.relims.conf.RelimsProperties;
 import com.compomics.relims.modes.gui.util.Properties;
-import com.compomics.relims.modes.networking.client.connectivity.connectors.ServerConnector;
+import com.compomics.relims.modes.networking.client.connection.ServerConnector;
 import com.compomics.relims.modes.networking.controller.RelimsControllerMode;
-import com.compomics.relims.modes.networking.controller.connectivity.taskobjects.TaskContainer;
+import com.compomics.relims.modes.networking.controller.taskobjects.TaskContainer;
 import com.compomics.relims.modes.networking.worker.RelimsWorkerMode;
 import com.compomics.util.experiment.identification.SearchParameters;
 import junit.framework.TestCase;

@@ -5,8 +5,8 @@
 package com.compomics.relims.modes.networking.worker.taskreciever;
 
 import com.compomics.relims.conf.RelimsProperties;
-import com.compomics.relims.modes.networking.controller.connectivity.taskobjects.Task;
-import com.compomics.relims.modes.networking.worker.general.ResourceManager;
+import com.compomics.relims.modes.networking.controller.taskobjects.Task;
+import com.compomics.relims.manager.resourcemanager.ResourceManager;
 import java.io.EOFException;
 import java.io.IOException;
 import java.io.ObjectInputStream;

@@ -2,10 +2,10 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-package com.compomics.relims.modes.networking.client.connectivity.connectors;
+package com.compomics.relims.modes.networking.client.connection;
 
 import com.compomics.relims.conf.RelimsProperties;
-import com.compomics.relims.modes.networking.controller.connectivity.taskobjects.TaskContainer;
+import com.compomics.relims.modes.networking.controller.taskobjects.TaskContainer;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;

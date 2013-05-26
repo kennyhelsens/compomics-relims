@@ -68,6 +68,7 @@ public class BackupService implements Runnable {
     }
 
     public static void backupSQLliteDatabase(Connection conn) throws SQLException {
+        logger.info("Attempt to back up taskdatabase to : " + backupdirectory);
         try {
             dbLocation = RelimsProperties.getConfigFolder().getAbsolutePath().replace("conf", "databases");
             Calendar calendar = Calendar.getInstance();
@@ -78,7 +79,7 @@ public class BackupService implements Runnable {
             File originalDatabase = new File(dbLocation + "/" + RelimsProperties.getTaskDatabaseName() + ".db");
             backupDirectoryFile.mkdirs();
             FileUtils.copyFileToDirectory(originalDatabase, backupDirectoryFile);
-            logger.warn("Backed up databases to " + backupdirectory);
+            logger.info("Backed up databases to " + backupdirectory);
             clearBackups();
         } catch (Exception e) {
             e.printStackTrace();
@@ -178,7 +179,7 @@ public class BackupService implements Runnable {
             maxBackups = 10;
         }
 
-        System.out.println("Backing up every " + backupMinutes + " minutes. Max amount of backups = " + maxBackups + ".");
+        logger.info("Backing up every " + backupMinutes + " minutes. Max amount of backups = " + maxBackups + ".");
         while (true) {
             try {
                 try {

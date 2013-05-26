@@ -4,7 +4,7 @@
  */
 package com.compomics.relims.modes.networking.controller.connectivity.handlers;
 
-import com.compomics.relims.modes.networking.controller.connectivity.workerpool.WorkerRunner;
+import com.compomics.relims.modes.networking.controller.workerpool.WorkerRunner;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;

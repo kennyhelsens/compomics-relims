@@ -4,8 +4,8 @@
  */
 package com.compomics.relims.modes.networking.controller.connectivity.handlers;
 
-import com.compomics.relims.modes.networking.controller.connectivity.workerpool.WorkerPool;
-import com.compomics.relims.modes.networking.controller.connectivity.workerpool.WorkerRunner;
+import com.compomics.relims.modes.networking.controller.workerpool.WorkerPool;
+import com.compomics.relims.modes.networking.controller.workerpool.WorkerRunner;
 
 /**
  *

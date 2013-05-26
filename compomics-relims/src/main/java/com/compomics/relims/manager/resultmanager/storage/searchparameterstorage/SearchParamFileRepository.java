@@ -2,55 +2,60 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-package com.compomics.relims.modes.networking.worker.resultmanager.storage.spectrumstorage;
+package com.compomics.relims.manager.resultmanager.storage.searchparameterstorage;
 
 import com.compomics.relims.conf.RelimsProperties;
+import com.compomics.util.experiment.identification.SearchParameters;
+
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
-import org.apache.commons.io.FileUtils;
 import org.apache.log4j.Logger;
 
 /**
  *
  * @author Kenneth
  */
-public class SpectrumFileRepository implements SpectrumStorage {
+public class SearchParamFileRepository implements SearchParamStorage {
 
     private final File repository;
     private String provider = "pride";
     private File projectRepositoryDirectory;
-    private static final Logger logger = Logger.getLogger(SpectrumFileRepository.class);
+    private static final Logger logger = Logger.getLogger(SearchParamFileRepository.class);
 
-    public SpectrumFileRepository(File repository, String provider) {
+    public SearchParamFileRepository(File repository, String provider) {
         this.repository = repository;
         this.provider = provider;
     }
 
     @Override
-    public File retrieveMGF(String projectID) throws IOException {
-        return new File(projectRepositoryDirectory.getAbsolutePath() + "/" + projectID + ".mgf");
+    public SearchParameters retrieveParameters(String projectID) throws IOException {
+        File storageLocation = new File(projectRepositoryDirectory.getAbsolutePath() + "/SearchGUI.parameters");
+        try {
+            return SearchParameters.getIdentificationParameters(storageLocation);
+        } catch (FileNotFoundException | ClassNotFoundException ex) {
+            logger.error(ex);
+            return null;
+        }
     }
 
     @Override
-    public boolean storeMGF(String projectID, File MGF) throws IOException {
+    public boolean storeParameters(String projectID, SearchParameters searchParameters) throws IOException {
         if (!projectRepositoryDirectory.exists()) {
             projectRepositoryDirectory.mkdirs();
         }
-        File storageLocation = new File(projectRepositoryDirectory.getAbsolutePath() + "/" + projectID + ".mgf");
-       
+        File storageLocation = new File(projectRepositoryDirectory.getAbsolutePath() + "/SearchGUI.parameters");
         try {
-            FileUtils.copyFile(MGF, storageLocation, true);
-        return true;
-    }
-    catch (Exception e
-
-    
-        ) {
+            SearchParameters.saveIdentificationParameters(searchParameters, storageLocation);
+            return true;
+        } catch (FileNotFoundException | ClassNotFoundException ex) {
+            logger.error(ex);
             return false;
+        }
     }
-}
-@Override
-        public boolean hasBeenRun(String projectID) {
+
+    @Override
+    public boolean hasBeenRun(String projectID) {
         File repositoryDirectory;
         try {
             File resultFolder = RelimsProperties.getWorkSpace();

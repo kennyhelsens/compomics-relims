@@ -2,7 +2,7 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-package com.compomics.relims.modes.networking.worker.resultmanager.storage.searchparameterstorage;
+package com.compomics.relims.manager.resultmanager.storage.searchparameterstorage;
 
 import com.compomics.util.experiment.identification.SearchParameters;
 import java.io.IOException;

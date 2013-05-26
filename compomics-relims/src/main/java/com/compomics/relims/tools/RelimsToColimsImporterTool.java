@@ -5,7 +5,7 @@ import com.compomics.colims.core.exception.PeptideShakerIOException;
 import com.compomics.relims.conf.RelimsProperties;
 import com.compomics.relims.manager.colimsmanager.ColimsImporter;
 import com.compomics.relims.model.provider.ColimsConnectionProvider;
-import com.compomics.relims.modes.networking.worker.general.ResourceManager;
+import com.compomics.relims.manager.resourcemanager.ResourceManager;
 import com.compomics.util.experiment.identification.SearchParameters;
 import org.apache.log4j.Logger;
 

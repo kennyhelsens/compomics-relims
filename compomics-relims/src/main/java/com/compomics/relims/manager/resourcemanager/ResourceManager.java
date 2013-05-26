@@ -2,7 +2,7 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-package com.compomics.relims.modes.networking.worker.general;
+package com.compomics.relims.manager.resourcemanager;
 
 import com.compomics.pridexmltomgfconverter.errors.enums.ConversionError;
 import com.compomics.relims.manager.progressmanager.Checkpoint;

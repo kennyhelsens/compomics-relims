@@ -2,6 +2,7 @@ package com.compomics.relims.concurrent;
 
 import com.compomics.pride_asa_pipeline.logic.PrideSpectrumAnnotator;
 import com.compomics.pride_asa_pipeline.spring.ApplicationContextProvider;
+import com.compomics.relims.conf.RelimsLoggingAppender;
 import com.compomics.relims.conf.RelimsProperties;
 import com.compomics.relims.manager.processmanager.processguard.RelimsException;
 import com.compomics.relims.manager.processmanager.processguard.RelimsExceptionHandler;
@@ -21,6 +22,7 @@ import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
+import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.springframework.context.ApplicationContext;
 
@@ -64,10 +66,14 @@ public class RelimsJob implements Callable, Closable {
      * A ProgressManager to store the state of the project and monitor it
      */
     private ProgressManager progressManager = ProgressManager.getInstance();
+    private RelimsLoggingAppender appender;
 
     public RelimsJob(String aSearchStrategyID, String aProjectProviderID) {
+        //Initialize the logger
+        initializeLogger();
         //Initialize the progressmanager
-        ProgressManager.setUp();
+        progressManager.setUp();
+        Thread.setDefaultUncaughtExceptionHandler(new RelimsExceptionHandler());
         if (aProjectProviderID.toUpperCase().contains("PRIDE")) {
             projectProvider = new PrideProjectProvider();
         } else {
@@ -78,6 +84,9 @@ public class RelimsJob implements Callable, Closable {
     }
 
     public RelimsJob(String aSearchStrategyID, String aProjectProviderID, long aProjectID, long aTaskID, int aworkerPort, SearchParameters searchParameters, Boolean usePrideAsap) {
+        //Initialize the logger
+        initializeLogger();
+        //Initialize the progressmanager
         Thread.setDefaultUncaughtExceptionHandler(new RelimsExceptionHandler());
         progressManager.setUp();
 
@@ -112,31 +121,34 @@ public class RelimsJob implements Callable, Closable {
 
     @Override
     public Object call() {
-
-        initThreadExecutor();
-        Thread.setDefaultUncaughtExceptionHandler(new RelimsExceptionHandler());
-        progressManager.setUp();
-        List<Future> lFutures = Lists.newArrayList();
-        Object[] relimsResultObjects = new Object[]{Checkpoint.FAILED, ProcessVariableManager.getSearchParameters()};
-        if (this.projectID != -1) {
-            Checkpoint endState;
-            try {
-                progressManager.setState(Checkpoint.RUNRELIMS);
-                endState = runRelims(projectID);
-                relimsResultObjects = new Object[]{endState, ProcessVariableManager.getSearchParameters(), ProcessVariableManager.getConversionErrorList()};
-            } catch (Exception ex) {
-                relimsResultObjects = new Object[]{Checkpoint.FAILED, ProcessVariableManager.getSearchParameters(), ProcessVariableManager.getConversionErrorList()};
-            } finally {
-                return relimsResultObjects;
+        try {
+            initThreadExecutor();
+            Thread.setDefaultUncaughtExceptionHandler(new RelimsExceptionHandler());
+            progressManager.setUp();
+            List<Future> lFutures = Lists.newArrayList();
+            Object[] relimsResultObjects = new Object[]{Checkpoint.FAILED, ProcessVariableManager.getSearchParameters()};
+            if (this.projectID != -1) {
+                Checkpoint endState;
+                try {
+                    progressManager.setState(Checkpoint.RUNRELIMS);
+                    endState = runRelims(projectID);
+                    relimsResultObjects = new Object[]{endState, ProcessVariableManager.getSearchParameters(), ProcessVariableManager.getConversionErrorList()};
+                } catch (Exception ex) {
+                    relimsResultObjects = new Object[]{Checkpoint.FAILED, ProcessVariableManager.getSearchParameters(), ProcessVariableManager.getConversionErrorList()};
+                } finally {
+                    return relimsResultObjects;
+                }
+            } else {
+                ProcessVariableManager.setClassicMode(true);
+                return lFutures;
             }
-        } else {
-            ProcessVariableManager.setClassicMode(true);
-            return lFutures;
+        } finally {
+            appender.export();
+            appender.close();
         }
     }
 
     private Checkpoint runRelims(long lProjectID) {
-        //   ProcessVariableManager.setResultsFolder(RelimsProperties.createWorkSpace().getAbsolutePath().toString());
         Thread.setDefaultUncaughtExceptionHandler(relimsErrorHandler);
         ProcessVariableManager.setClassicMode(false);
         ProcessVariableManager.setResultsFolder(" ");
@@ -177,14 +189,11 @@ public class RelimsJob implements Callable, Closable {
             e.printStackTrace();
             progressManager.setState(Checkpoint.FAILED, e);;
         } finally {
-            // Clean MGF resources after project success
-            // in finally block because it can't fail anymore...if it fails, then it's the cleanup...
             try {
                 //cleanup pride
                 PrideSpectrumAnnotator lSpectrumAnnotator;
                 lSpectrumAnnotator = (PrideSpectrumAnnotator) applicationContext.getBean("prideSpectrumAnnotator");
                 lSpectrumAnnotator.clearTmpResources();
-                //TODO cleanup others
             } catch (Exception e) {
                 logger.error("An error occurred during cleanup...");
                 logger.error(e);
@@ -208,7 +217,25 @@ public class RelimsJob implements Callable, Closable {
                 logger.debug("shutting down " + lRunnable.toString());
             }
         }
-        //TODO : CLEANUP HERE? Remove unnecessary files from repository/results folder
-        //Analyze results perhaps?
+    }
+
+    private void initializeLogger() {
+        //initialize the logging appender
+        appender = new RelimsLoggingAppender();
+        Logger.getRootLogger().addAppender(appender);
+        try {
+            if (!RelimsProperties.getDebugMode()) {
+                Logger.getRootLogger().setLevel(Level.INFO);
+            }
+        } catch (Exception e) {
+            Logger.getRootLogger().setLevel(Level.DEBUG);
+            System.out.println("Could not set logger to non-debugging");
+            logger.error(e);
+        }
+    }
+
+    private void exportLogger() {
+        appender.export();
+        appender.close();
     }
 }

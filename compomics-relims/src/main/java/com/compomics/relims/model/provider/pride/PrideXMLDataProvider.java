@@ -265,12 +265,8 @@ public class PrideXMLDataProvider implements DataProvider {
         logger.debug("Extracting MGF file");
         File MGFFile;
         try {
-            Logger.getRootLogger().setLevel(Level.ERROR);
             MGFFile = getSpectraForProject(aProjectid);
             lRelimsProjectBean.setSpectrumFile(MGFFile);
-            if (RelimsProperties.getDebugMode()) {
-                Logger.getRootLogger().setLevel(Level.DEBUG);
-            }
         } catch (IOException ex) {
             logger.error("Could not sucessfully create an MGF file for this project");
             return null;

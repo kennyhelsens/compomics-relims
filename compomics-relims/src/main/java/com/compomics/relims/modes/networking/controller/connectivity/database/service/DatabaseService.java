@@ -13,8 +13,8 @@ import com.compomics.relims.modes.networking.controller.connectivity.database.DA
 import com.compomics.relims.modes.networking.controller.connectivity.database.DAO.TaskDAO;
 import com.compomics.relims.modes.networking.controller.connectivity.database.DAO.WorkerDAO;
 import com.compomics.relims.modes.networking.controller.connectivity.database.security.BackupService;
-import com.compomics.relims.modes.networking.controller.connectivity.taskobjects.Task;
-import com.compomics.relims.modes.networking.controller.connectivity.taskobjects.TaskContainer;
+import com.compomics.relims.modes.networking.controller.taskobjects.Task;
+import com.compomics.relims.modes.networking.controller.taskobjects.TaskContainer;
 import java.io.File;
 import java.sql.*;
 import java.util.HashMap;

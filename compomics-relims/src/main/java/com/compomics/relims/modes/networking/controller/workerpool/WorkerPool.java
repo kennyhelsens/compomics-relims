@@ -2,11 +2,11 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-package com.compomics.relims.modes.networking.controller.connectivity.workerpool;
+package com.compomics.relims.modes.networking.controller.workerpool;
 
 import com.compomics.relims.manager.progressmanager.Checkpoint;
 import com.compomics.relims.modes.networking.controller.connectivity.database.service.DatabaseService;
-import com.compomics.relims.modes.networking.controller.connectivity.taskobjects.Task;
+import com.compomics.relims.modes.networking.controller.taskobjects.Task;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
 import java.net.Socket;

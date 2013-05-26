@@ -99,8 +99,6 @@ public class SearchGUIJobBean {
         }
         searchGUICommandLine.append(" -ppm ");
         searchGUICommandLine.append("2");
-        System.out.println(searchGUICommandLine.toString());
-
         return searchGUICommandLine.toString();
 
     }

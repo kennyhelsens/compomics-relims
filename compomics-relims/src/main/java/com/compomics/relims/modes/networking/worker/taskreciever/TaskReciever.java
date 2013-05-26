@@ -4,7 +4,7 @@
  */
 package com.compomics.relims.modes.networking.worker.taskreciever;
 
-import com.compomics.relims.modes.networking.worker.general.ResourceManager;
+import com.compomics.relims.manager.resourcemanager.ResourceManager;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;

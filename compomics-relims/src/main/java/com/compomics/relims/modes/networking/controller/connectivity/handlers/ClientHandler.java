@@ -10,8 +10,8 @@ package com.compomics.relims.modes.networking.controller.connectivity.handlers;
  */
 import com.compomics.relims.conf.RelimsProperties;
 import com.compomics.relims.modes.networking.controller.connectivity.database.service.DatabaseService;
-import com.compomics.relims.modes.networking.controller.connectivity.taskobjects.TaskContainer;
-import com.compomics.relims.modes.networking.controller.connectivity.workerpool.WorkerRunner;
+import com.compomics.relims.modes.networking.controller.taskobjects.TaskContainer;
+import com.compomics.relims.modes.networking.controller.workerpool.WorkerRunner;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;

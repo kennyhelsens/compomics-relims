@@ -9,10 +9,10 @@ import com.compomics.relims.concurrent.RelimsJob;
 import com.compomics.relims.manager.processmanager.processguard.RelimsException;
 import com.compomics.relims.manager.processmanager.processguard.RelimsExceptionHandler;
 import com.compomics.relims.manager.progressmanager.Checkpoint;
-import com.compomics.relims.modes.networking.controller.connectivity.taskobjects.Task;
+import com.compomics.relims.modes.networking.controller.taskobjects.Task;
 import com.compomics.relims.modes.networking.worker.feedbackproviders.ResultNotifier;
-import com.compomics.relims.modes.networking.worker.general.ResourceManager;
-import com.compomics.relims.modes.networking.worker.resultmanager.ResultManager;
+import com.compomics.relims.manager.resourcemanager.ResourceManager;
+import com.compomics.relims.manager.resultmanager.ResultManager;
 import com.compomics.util.experiment.identification.SearchParameters;
 import java.util.List;
 import java.util.concurrent.Callable;
@@ -77,7 +77,6 @@ public class TaskRunner {
         @Override
         public Checkpoint call() {
             try {
-                logger.setLevel(Level.ALL);
                 ResourceManager.setTaskTime(System.currentTimeMillis());
                 lSearchParameters = task.getSearchParameters();
                 lSearchStrategyID = task.getStrategyID();
@@ -206,11 +205,11 @@ public class TaskRunner {
                     } catch (Exception ex) {
                         //catch a general exception to make sure the results are sent...
                         failcounter++;
-                        if(failcounter==10){
-                        logger.error("Server could not be contacted succesfully. Retrying...");
-                        logger.error(ex);
-                        failcounter=0;
-                        finished=true;
+                        if (failcounter == 10) {
+                            logger.error("Server could not be contacted succesfully. Retrying...");
+                            logger.error(ex);
+                            failcounter = 0;
+                            finished = true;
                         }
                     }
                 }

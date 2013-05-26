@@ -41,10 +41,10 @@ public class Command {
 
 // -------------------------- STATIC METHODS --------------------------
     public static int call(String aCommand) {
+        long runningTime = System.currentTimeMillis();
         try {
             try {
-                long startTime = System.currentTimeMillis();
-                logger.debug("Running process:\t" + aCommand);
+                logger.info("Running process: " + System.lineSeparator() + aCommand);
                 Process processus = Runtime.getRuntime().exec(aCommand, null, workFolder);
                 errorGuard = new CommandExceptionGuard(processus);
                 boolean errorless = (Boolean) errorGuard.call();
@@ -68,11 +68,21 @@ public class Command {
             } finally {
                 errorGuard.release();
                 errorGuard = null;
+                runningTime = System.currentTimeMillis() - runningTime;
+                logger.info("Finished command in " + convertTime(runningTime));
             }
         } catch (Throwable ex) {
             progressManager.setState(Checkpoint.FAILED, ex);
         }
         return processExitValue;
+    }
+
+    private static String convertTime(long milliseconds) {
+        StringBuilder time = new StringBuilder();
+        int seconds = (int) (milliseconds / 1000) % 60;
+        int minutes = (int) ((milliseconds / (1000 * 60)) % 60);
+        int hours = (int) ((milliseconds / (1000 * 60 * 60)) % 24);
+        return time.append(hours).append(":").append(minutes).append(":").append(seconds).toString();
     }
 
     /**
