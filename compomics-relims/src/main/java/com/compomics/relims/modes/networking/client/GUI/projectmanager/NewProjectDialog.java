@@ -76,16 +76,12 @@ public class NewProjectDialog extends javax.swing.JFrame {
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         selectedSource = rdbSourcePRIDE1;
         selectedSource.setName("pride");
-        StrategyButtonGroup.add(rdbVarDB1);
-        StrategyButtonGroup.add(rdbVarMOD1);
         StrategyButtonGroup.add(rdbStraight1);
 
         SourceButtonGroup.add(rdbSourceMSLIMS1);
         SourceButtonGroup.add(rdbSourcePRIDE1);
         SourceButtonGroup.add(rdbSourceFile);
 
-        rdbVarDB1.setName("dbvar");
-        rdbVarMOD1.setName("modvar");
         rdbStraight1.setName("straight");
 
         rdbSourceMSLIMS1.setName("mslims");
@@ -95,25 +91,12 @@ public class NewProjectDialog extends javax.swing.JFrame {
          prioritySlider.setMajorTickSpacing(1);
          prioritySlider.setPaintTicks(true);
          */
-        selectedStrategy = rdbVarMOD1;
         selectedSource = rdbSourcePRIDE1;
-
+        strategy = "STRAIGHT";
         if (strategy.equals(
                 "STRAIGHT")) {
             rdbStraight1.setSelected(true);
             selectedStrategy = rdbStraight1;
-        }
-
-        if (strategy.equals(
-                "VARDB")) {
-            rdbVarDB1.setSelected(true);
-            selectedStrategy = rdbVarDB1;
-        }
-
-        if (strategy.equals(
-                "VARMOD")) {
-            rdbVarMOD1.setSelected(true);
-            selectedStrategy = rdbVarMOD1;
         }
 
         if (source.equals(
@@ -176,14 +159,11 @@ public class NewProjectDialog extends javax.swing.JFrame {
         toRunLabel = new javax.swing.JLabel();
         jScrollPane2 = new javax.swing.JScrollPane();
         ScheduledList = new javax.swing.JList();
-        jToggleButton1 = new javax.swing.JToggleButton();
         okButton = new javax.swing.JButton();
         cbShuffle = new javax.swing.JCheckBox();
         jTabbedPane1 = new javax.swing.JTabbedPane();
         jPanel2 = new javax.swing.JPanel();
         jLabel14 = new javax.swing.JLabel();
-        rdbVarDB1 = new javax.swing.JRadioButton();
-        rdbVarMOD1 = new javax.swing.JRadioButton();
         rdbStraight1 = new javax.swing.JRadioButton();
         jLabel15 = new javax.swing.JLabel();
         taskContainerName = new javax.swing.JTextField();
@@ -251,7 +231,7 @@ public class NewProjectDialog extends javax.swing.JFrame {
         ImportedList.setDebugGraphicsOptions(javax.swing.DebugGraphics.NONE_OPTION);
         ImportedList.setDragEnabled(true);
         ImportedList.setLayoutOrientation(javax.swing.JList.VERTICAL_WRAP);
-        ImportedList.setMaximumSize(new java.awt.Dimension(80, 20000));
+        ImportedList.setMaximumSize(new java.awt.Dimension(80, 200));
         ImportedList.setMinimumSize(new java.awt.Dimension(80, 200));
         ImportedList.setPreferredSize(null);
         ImportedList.setRequestFocusEnabled(false);
@@ -296,17 +276,10 @@ public class NewProjectDialog extends javax.swing.JFrame {
         ScheduledList.setAutoscrolls(false);
         ScheduledList.setDragEnabled(true);
         ScheduledList.setDropMode(javax.swing.DropMode.ON);
-        ScheduledList.setMaximumSize(new java.awt.Dimension(80, 20000));
+        ScheduledList.setMaximumSize(new java.awt.Dimension(80, 200));
         ScheduledList.setMinimumSize(new java.awt.Dimension(80, 200));
         ScheduledList.setPreferredSize(null);
         jScrollPane2.setViewportView(ScheduledList);
-
-        jToggleButton1.setText("dev");
-        jToggleButton1.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jToggleButton1ActionPerformed(evt);
-            }
-        });
 
         okButton.setText("OK");
         okButton.addActionListener(new java.awt.event.ActionListener() {
@@ -335,8 +308,7 @@ public class NewProjectDialog extends javax.swing.JFrame {
                 .addGap(18, 18, 18)
                 .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                     .addGroup(jPanel3Layout.createSequentialGroup()
-                        .addComponent(jToggleButton1, javax.swing.GroupLayout.PREFERRED_SIZE, 90, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(18, 18, 18)
+                        .addGap(108, 108, 108)
                         .addComponent(toRunLabel))
                     .addGroup(jPanel3Layout.createSequentialGroup()
                         .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -356,11 +328,10 @@ public class NewProjectDialog extends javax.swing.JFrame {
         jPanel3Layout.setVerticalGroup(
             jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel3Layout.createSequentialGroup()
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addContainerGap(39, Short.MAX_VALUE)
                 .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
                     .addComponent(toRunLabel)
-                    .addComponent(Importedlabels)
-                    .addComponent(jToggleButton1, javax.swing.GroupLayout.PREFERRED_SIZE, 42, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(Importedlabels))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
                     .addGroup(javax.swing.GroupLayout.Alignment.LEADING, jPanel3Layout.createSequentialGroup()
@@ -389,28 +360,6 @@ public class NewProjectDialog extends javax.swing.JFrame {
         jLabel14.setFont(new java.awt.Font("Lucida Grande", 1, 12)); // NOI18N
         jLabel14.setText("Searchstrategy");
         jLabel14.setPreferredSize(null);
-
-        rdbVarDB1.setText("Variable DB");
-        rdbVarDB1.setIconTextGap(10);
-        rdbVarDB1.setOpaque(false);
-        rdbVarDB1.setPreferredSize(null);
-        rdbVarDB1.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                rdbVarDB1ActionPerformed(evt);
-            }
-        });
-
-        rdbVarMOD1.setSelected(true);
-        rdbVarMOD1.setText("Variable MODS");
-        rdbVarMOD1.setIconTextGap(10);
-        rdbVarMOD1.setName(""); // NOI18N
-        rdbVarMOD1.setOpaque(false);
-        rdbVarMOD1.setPreferredSize(null);
-        rdbVarMOD1.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                rdbVarMOD1ActionPerformed(evt);
-            }
-        });
 
         rdbStraight1.setText("Straight");
         rdbStraight1.setIconTextGap(10);
@@ -462,26 +411,24 @@ public class NewProjectDialog extends javax.swing.JFrame {
                 .addGap(24, 24, 24)
                 .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(jPanel2Layout.createSequentialGroup()
-                        .addComponent(jLabel14, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(74, 74, 74)
-                        .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
                             .addGroup(jPanel2Layout.createSequentialGroup()
+                                .addComponent(jLabel14, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                .addComponent(ManualSchedule, javax.swing.GroupLayout.PREFERRED_SIZE, 80, javax.swing.GroupLayout.PREFERRED_SIZE))
+                            .addGroup(jPanel2Layout.createSequentialGroup()
+                                .addGap(162, 162, 162)
+                                .addComponent(rdbStraight1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 139, Short.MAX_VALUE)
                                 .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                    .addComponent(rdbVarMOD1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                    .addComponent(rdbStraight1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 107, Short.MAX_VALUE)
-                                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                                    .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                        .addGroup(jPanel2Layout.createSequentialGroup()
-                                            .addGap(9, 9, 9)
-                                            .addComponent(jLabel6, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                                        .addGroup(jPanel2Layout.createSequentialGroup()
-                                            .addComponent(manualProjectNameField, javax.swing.GroupLayout.PREFERRED_SIZE, 221, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                            .addGap(18, 18, 18)
-                                            .addComponent(manualInputField, javax.swing.GroupLayout.PREFERRED_SIZE, 124, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                                    .addComponent(ManualSchedule, javax.swing.GroupLayout.PREFERRED_SIZE, 80, javax.swing.GroupLayout.PREFERRED_SIZE))
-                                .addGap(19, 19, 19))
-                            .addComponent(rdbVarDB1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                                    .addGroup(jPanel2Layout.createSequentialGroup()
+                                        .addGap(9, 9, 9)
+                                        .addComponent(jLabel6, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                    .addGroup(jPanel2Layout.createSequentialGroup()
+                                        .addComponent(manualProjectNameField, javax.swing.GroupLayout.PREFERRED_SIZE, 221, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                        .addGap(18, 18, 18)
+                                        .addComponent(manualInputField, javax.swing.GroupLayout.PREFERRED_SIZE, 124, javax.swing.GroupLayout.PREFERRED_SIZE)))))
+                        .addGap(19, 19, 19))
                     .addGroup(jPanel2Layout.createSequentialGroup()
                         .addComponent(jLabel15)
                         .addGap(35, 35, 35)
@@ -496,13 +443,8 @@ public class NewProjectDialog extends javax.swing.JFrame {
                     .addComponent(taskContainerName, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addGap(18, 18, 18)
                 .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(jPanel2Layout.createSequentialGroup()
-                        .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                            .addComponent(jLabel14, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(rdbVarDB1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                        .addGap(5, 5, 5)
-                        .addComponent(rdbVarMOD1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                    .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                        .addComponent(jLabel14, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addComponent(rdbStraight1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addGroup(jPanel2Layout.createSequentialGroup()
                         .addComponent(jLabel6, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -821,7 +763,7 @@ public class NewProjectDialog extends javax.swing.JFrame {
             tasksForServer.setStrategyID(selectedStrategy.getName());
             tasksForServer.setSourceID(selectedSource.getName());
             tasksForServer.enablePipeline();
-            
+
 
             boolean allowToPass = true;
 
@@ -862,10 +804,6 @@ public class NewProjectDialog extends javax.swing.JFrame {
 
 //GEN-LAST:event_okButtonActionPerformed
 
-    private void jToggleButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jToggleButton1ActionPerformed
-        okButtonActionPerformed(evt);
-    }//GEN-LAST:event_jToggleButton1ActionPerformed
-
     private void cbEnzymeActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cbEnzymeActionPerformed
         // TODO add your handling code here:
     }//GEN-LAST:event_cbEnzymeActionPerformed
@@ -885,14 +823,6 @@ public class NewProjectDialog extends javax.swing.JFrame {
     private void rdbStraight1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_rdbStraight1ActionPerformed
         selectedStrategy = rdbStraight1;
     }//GEN-LAST:event_rdbStraight1ActionPerformed
-
-    private void rdbVarMOD1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_rdbVarMOD1ActionPerformed
-        selectedStrategy = rdbVarMOD1;
-    }//GEN-LAST:event_rdbVarMOD1ActionPerformed
-
-    private void rdbVarDB1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_rdbVarDB1ActionPerformed
-        selectedStrategy = rdbVarDB1;
-    }//GEN-LAST:event_rdbVarDB1ActionPerformed
 
     private void ManualScheduleActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_ManualScheduleActionPerformed
 
@@ -919,148 +849,153 @@ public class NewProjectDialog extends javax.swing.JFrame {
 
     private void ImportListsActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_ImportListsActionPerformed
 
-        StringBuilder query = new StringBuilder().append("Select * from pridemeta where ");
-        List<String> filters = new ArrayList<String>();
-        leftModel.clear();
-        ImportedList.setModel(leftModel);
-        if (cbMaxMS1Count.isSelected()) {
-            ProjectPredicate.MS1MAX.enable();
-            ProjectPredicate.setMaxMS1Count(tfMaxMS1Spectra.getText());
-            filters.add("MS1 < " + "'" + tfMaxMS1Spectra.getText() + "'");
-        }
+        if (rdbSourceFile.isSelected()) {
+            getTextFileProjects();
+        } else {
 
-        if (cbMaxMS2Count.isSelected()) {
-            ProjectPredicate.MS2MAX.enable();
-            ProjectPredicate.setMaxMS1Count(tfMaxMS2Spectra.getText());
-            filters.add("MS2 < " + "'" + tfMaxMS2Spectra.getText() + "'");
-        }
-
-        if (cbMinMS1Count.isSelected()) {
-            ProjectPredicate.MS1MIN.enable();
-            ProjectPredicate.setMinMS1Count(tfMinMS1Spectra.getText());
-            filters.add("MS1 > " + "'" + tfMinMS1Spectra.getText() + "'");
-        }
-
-        if (cbMinMS2Count.isSelected()) {
-            ProjectPredicate.MS2MIN.enable();
-            ProjectPredicate.setMinMS1Count(tfMinMS2Spectra.getText());
-            filters.add("MS2 > " + "'" + tfMinMS2Spectra.getText() + "'");
-        }
-
-        if (cbEnzyme.isSelected()) {
-            ProjectPredicate.ENZYME.enable();
-            ProjectPredicate.setEnzyme(spEnzyme.getValue().toString());
-            filters.add("enzyme = '" + spEnzyme.getValue().toString() + "'");
-        }
-
-        if (cbTaxonomy.isSelected()) {
-            ProjectPredicate.TAXONOMYID.enable();
-            ProjectPredicate.setTaxonomyID(tfTaxonomyID.getText().toString());
-            filters.add("taxid = '" + tfTaxonomyID.getText().toString() + "'");
-        }
-        for (String aFilterQuery : filters) {
-            query.append(aFilterQuery + " AND ");
-        }
-        query.replace(query.lastIndexOf(" AND "), query.length(), "");
-
-        HashMap<String, String> availableProjects;
-        try {
-            availableProjects = MetaDataCollector.getProjects(query.toString());
-            for (String aProjectID : availableProjects.keySet()) {
-                ProjectListEntry entry = new ProjectListEntry(aProjectID, availableProjects.get(aProjectID));
-                leftModel.addElement(entry);
-                ImportedList.setVisibleRowCount(leftModel.getSize());
-            }
-        } catch (SQLException ex) {
-            logger.error(ex);
-        } finally {
+            StringBuilder query = new StringBuilder().append("Select * from pridemeta where ");
+            List<String> filters = new ArrayList<String>();
+            leftModel.clear();
             ImportedList.setModel(leftModel);
-        }
-        /*
-         //Set predicates from filters...
+            if (cbMaxMS1Count.isSelected()) {
+                ProjectPredicate.MS1MAX.enable();
+                ProjectPredicate.setMaxMS1Count(tfMaxMS1Spectra.getText());
+                filters.add("MS1 < " + "'" + tfMaxMS1Spectra.getText() + "'");
+            }
 
-         if (cbMaxMS1Count.isSelected()) {
-         ProjectPredicate.MS1MAX.enable();
-         ProjectPredicate.setMaxMS1Count(tfMaxMS1Spectra.getText());
-         }
+            if (cbMaxMS2Count.isSelected()) {
+                ProjectPredicate.MS2MAX.enable();
+                ProjectPredicate.setMaxMS1Count(tfMaxMS2Spectra.getText());
+                filters.add("MS2 < " + "'" + tfMaxMS2Spectra.getText() + "'");
+            }
+
+            if (cbMinMS1Count.isSelected()) {
+                ProjectPredicate.MS1MIN.enable();
+                ProjectPredicate.setMinMS1Count(tfMinMS1Spectra.getText());
+                filters.add("MS1 > " + "'" + tfMinMS1Spectra.getText() + "'");
+            }
+
+            if (cbMinMS2Count.isSelected()) {
+                ProjectPredicate.MS2MIN.enable();
+                ProjectPredicate.setMinMS1Count(tfMinMS2Spectra.getText());
+                filters.add("MS2 > " + "'" + tfMinMS2Spectra.getText() + "'");
+            }
+
+            if (cbEnzyme.isSelected()) {
+                ProjectPredicate.ENZYME.enable();
+                ProjectPredicate.setEnzyme(spEnzyme.getValue().toString());
+                filters.add("enzyme = '" + spEnzyme.getValue().toString() + "'");
+            }
+
+            if (cbTaxonomy.isSelected()) {
+                ProjectPredicate.TAXONOMYID.enable();
+                ProjectPredicate.setTaxonomyID(tfTaxonomyID.getText().toString());
+                filters.add("taxid = '" + tfTaxonomyID.getText().toString() + "'");
+            }
+            for (String aFilterQuery : filters) {
+                query.append(aFilterQuery + " AND ");
+            }
+            query.replace(query.lastIndexOf(" AND "), query.length(), "");
+
+            HashMap<String, String> availableProjects;
+            try {
+                availableProjects = MetaDataCollector.getProjects(query.toString());
+                for (String aProjectID : availableProjects.keySet()) {
+                    ProjectListEntry entry = new ProjectListEntry(aProjectID, availableProjects.get(aProjectID));
+                    leftModel.addElement(entry);
+                    ImportedList.setVisibleRowCount(leftModel.getSize());
+                }
+            } catch (SQLException ex) {
+                logger.error(ex);
+            } finally {
+                ImportedList.setModel(leftModel);
+            }
+            /*
+             //Set predicates from filters...
+
+             if (cbMaxMS1Count.isSelected()) {
+             ProjectPredicate.MS1MAX.enable();
+             ProjectPredicate.setMaxMS1Count(tfMaxMS1Spectra.getText());
+             }
         
-         if (cbMaxMS2Count.isSelected()) {
-         ProjectPredicate.MS2MAX.enable();
-         ProjectPredicate.setMaxMS1Count(tfMaxMS2Spectra.getText());
-         }
+             if (cbMaxMS2Count.isSelected()) {
+             ProjectPredicate.MS2MAX.enable();
+             ProjectPredicate.setMaxMS1Count(tfMaxMS2Spectra.getText());
+             }
         
-         if (cbMinMS1Count.isSelected()) {
-         ProjectPredicate.MS1MIN.enable();
-         ProjectPredicate.setMinMS1Count(tfMinMS1Spectra.getText());
-         }
+             if (cbMinMS1Count.isSelected()) {
+             ProjectPredicate.MS1MIN.enable();
+             ProjectPredicate.setMinMS1Count(tfMinMS1Spectra.getText());
+             }
         
-         if (cbMinMS2Count.isSelected()) {
-         ProjectPredicate.MS2MIN.enable();
-         ProjectPredicate.setMinMS1Count(tfMinMS2Spectra.getText());
-         }
+             if (cbMinMS2Count.isSelected()) {
+             ProjectPredicate.MS2MIN.enable();
+             ProjectPredicate.setMinMS1Count(tfMinMS2Spectra.getText());
+             }
         
-         if (cbEnzyme.isSelected()) {
-         ProjectPredicate.ENZYME.enable();
-         ProjectPredicate.setEnzyme(spEnzyme.getValue().toString());
-         }
+             if (cbEnzyme.isSelected()) {
+             ProjectPredicate.ENZYME.enable();
+             ProjectPredicate.setEnzyme(spEnzyme.getValue().toString());
+             }
         
-         if (cbTaxonomy.isSelected()) {
-         ProjectPredicate.TAXONOMYID.enable();
-         ProjectPredicate.setTaxonomyID(tfTaxonomyID.getText().toString());
-         }
-         SwingWorker worker = new SwingWorker() {
-         Thread waitingThread;
+             if (cbTaxonomy.isSelected()) {
+             ProjectPredicate.TAXONOMYID.enable();
+             ProjectPredicate.setTaxonomyID(tfTaxonomyID.getText().toString());
+             }
+             SwingWorker worker = new SwingWorker() {
+             Thread waitingThread;
             
-         @Override
-         protected void done() {
-         filterDialog.dispose();
-         if (waitingThread.isAlive()) {
-         waitingThread.interrupt();
-         }
-         }
+             @Override
+             protected void done() {
+             filterDialog.dispose();
+             if (waitingThread.isAlive()) {
+             waitingThread.interrupt();
+             }
+             }
             
-         @Override
-         protected Object doInBackground() throws Exception {
-         //set filterdialog
-         filterDialog = new JDialog();
-         filterDialog.setLocationRelativeTo(null);
-         filterDialog.setTitle("Please Wait...");
-         filterDialog.setBackground(Color.GRAY);
-         filterDialog.add(new JLabel("Filtering ... ", JLabel.CENTER));
-         filterDialog.validate();
-         filterDialog.setSize(300, 150);
-         filterDialog.setDefaultCloseOperation(DISPOSE_ON_CLOSE);
-         filterDialog.setModalityType(Dialog.ModalityType.APPLICATION_MODAL);
-         filterDialog.setAlwaysOnTop(true);
-         filterDialog.setResizable(false);
-         filterDialog.pack();
-         filterDialog.addWindowListener(new java.awt.event.WindowAdapter() {
-         });
+             @Override
+             protected Object doInBackground() throws Exception {
+             //set filterdialog
+             filterDialog = new JDialog();
+             filterDialog.setLocationRelativeTo(null);
+             filterDialog.setTitle("Please Wait...");
+             filterDialog.setBackground(Color.GRAY);
+             filterDialog.add(new JLabel("Filtering ... ", JLabel.CENTER));
+             filterDialog.validate();
+             filterDialog.setSize(300, 150);
+             filterDialog.setDefaultCloseOperation(DISPOSE_ON_CLOSE);
+             filterDialog.setModalityType(Dialog.ModalityType.APPLICATION_MODAL);
+             filterDialog.setAlwaysOnTop(true);
+             filterDialog.setResizable(false);
+             filterDialog.pack();
+             filterDialog.addWindowListener(new java.awt.event.WindowAdapter() {
+             });
                 
-         waitingThread = new Thread(new Runnable() {
-         @Override
-         public void run() {
-         filterDialog.setVisible(true);
-         }
-         });
-         waitingThread.start();
-         if (rdbSourceMSLIMS1.isSelected()) {
-         // make a connection to the MSLIMS database and retrieve the possible projects
-         getMSLIMSProjects();
-         }
+             waitingThread = new Thread(new Runnable() {
+             @Override
+             public void run() {
+             filterDialog.setVisible(true);
+             }
+             });
+             waitingThread.start();
+             if (rdbSourceMSLIMS1.isSelected()) {
+             // make a connection to the MSLIMS database and retrieve the possible projects
+             getMSLIMSProjects();
+             }
                 
-         if (rdbSourcePRIDE1.isSelected()) {
-         getPrideProjects();
-         }
+             if (rdbSourcePRIDE1.isSelected()) {
+             getPrideProjects();
+             }
                 
-         if (rdbSourceFile.isSelected()) {
-         getTextFileProjects();
-         }
-         return null;
-         }
-         };
-         worker.execute();
-         */
+             if (rdbSourceFile.isSelected()) {
+             getTextFileProjects();
+             }
+             return null;
+             }
+             };
+             worker.execute();
+             */
+        }
     }//GEN-LAST:event_ImportListsActionPerformed
 
     private void rdbSourceMSLIMS1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_rdbSourceMSLIMS1ActionPerformed
@@ -1327,7 +1262,6 @@ public class NewProjectDialog extends javax.swing.JFrame {
     private javax.swing.JScrollPane jScrollPane3;
     private javax.swing.JTabbedPane jTabbedPane1;
     private javax.swing.JTextPane jTextPane1;
-    private javax.swing.JToggleButton jToggleButton1;
     private javax.swing.JTextField manualInputField;
     private javax.swing.JTextField manualProjectNameField;
     private javax.swing.JPopupMenu modificationOptionsPopupMenu;
@@ -1336,8 +1270,6 @@ public class NewProjectDialog extends javax.swing.JFrame {
     private javax.swing.JRadioButton rdbSourceMSLIMS1;
     private javax.swing.JRadioButton rdbSourcePRIDE1;
     private javax.swing.JRadioButton rdbStraight1;
-    private javax.swing.JRadioButton rdbVarDB1;
-    private javax.swing.JRadioButton rdbVarMOD1;
     private javax.swing.JSpinner spEnzyme;
     private javax.swing.JTextField taskContainerName;
     private javax.swing.JTextField tfMaxMS1Spectra;
