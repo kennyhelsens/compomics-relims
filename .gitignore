@@ -47,3 +47,13 @@ compomics-relims/src/test/resources/sourcefiles/Mimic_PrideFTP/PRIDE_Exp_Complet
 compomics-relims/src/test/resources/sourcefiles/Mimic_PrideFTP/PRIDE_Exp_Complete_Ac_3643.xml.gz
 compomics-relims/src/test/resources/sourcefiles/Mimic_PrideFTP/PRIDE_Exp_Complete_Ac_8227.xml.gz
 compomics-relims/src/test/resources/sourcefiles/Mimic_PrideFTP/PRIDE_Exp_Complete_Ac_8437.xml
+compomics-relims/src/test/resources/sourcefiles/Fasta/windows/SP_130428_concatenated_target_decoy.fasta
+compomics-relims/src/test/resources/sourcefiles/Fasta/windows/WH_130523_concatenated_target_decoy.fasta
+compomics-relims/src/test/resources/sourcefiles/Fasta/windows/WH_130523_concatenated_target_decoy.fasta.cui
+compomics-relims/src/test/resources/sourcefiles/Fasta/windows/WH_130523_concatenated_target_decoy.fasta.phr
+compomics-relims/src/test/resources/sourcefiles/Fasta/windows/WH_130523_concatenated_target_decoy.fasta.pin
+compomics-relims/src/test/resources/sourcefiles/Fasta/windows/WH_130523_concatenated_target_decoy.fasta.psq
+compomics-relims/src/test/resources/sourcefiles/Mimic_PrideFTP/PRIDE_Exp_Complete_Ac_11954.xml.gz
+compomics-relims/src/test/resources/sourcefiles/Mimic_PrideFTP/PRIDE_Exp_Complete_Ac_3.xml.gz
+compomics-relims/src/test/resources/sourcefiles/Mimic_PrideFTP/PRIDE_Exp_Complete_Ac_9777.xml.gz
+compomics-relims/src/test/resources/sourcefiles/Fasta/mac/TESTING.FASTA
