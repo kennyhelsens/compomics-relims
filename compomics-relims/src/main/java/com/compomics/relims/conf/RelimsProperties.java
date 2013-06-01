@@ -39,6 +39,9 @@ import org.apache.log4j.Appender;
  */
 public class RelimsProperties {
 
+    private static File tempFolder;
+    private static File localworkSpace;
+
     public static String getDbPrefix() {
         if (getTaskDatabaseDriver().toLowerCase().contains("derby")) {
             return getTaskDatabaseName() + ".";
@@ -51,8 +54,6 @@ public class RelimsProperties {
         return (int) (0.9 * (((com.sun.management.OperatingSystemMXBean) ManagementFactory
                 .getOperatingSystemMXBean()).getTotalPhysicalMemorySize()) / 1024 / 1024);
     }
-
-  
     /**
      * the results will all be placed in a user-specific folder. Therefor, all
      * "normal" relims projects that are not run via the automatic setup, will
@@ -202,8 +203,8 @@ public class RelimsProperties {
     public static File createWorkSpace() {
         workSpace = getWorkSpacePath();
         return workSpace;
-    }
-
+    }   
+    
     public static File getWorkSpace() {
         return workSpace;
     }
@@ -397,13 +398,12 @@ public class RelimsProperties {
     public static String getRepositoryPath() {
         return config.getString("remote.relims.repository");
     }
-    
-      public static String getParameterStorageMode() {
+
+    public static String getParameterStorageMode() {
         return config.getString("remote.relims.repository.mode");
     }
-    
-    //-----------------------general
 
+    //-----------------------general
     public static PriorityLevel getPriority() {
 
         String level = config.getString("process.priority");
@@ -485,16 +485,17 @@ public class RelimsProperties {
     }
 
     public static File getRelimsTempFolder() {
-        File tempFolder = null;
-        try {
-            File locator = File.createTempFile("relimsTemp", Long.toString(System.nanoTime()));
-            locator.delete();
-            locator.mkdirs();
-            tempFolder = new File(locator.getParent() + "/relimsTemp");
-            tempFolder.deleteOnExit();
-        } catch (IOException ex) {
-            ex.printStackTrace();
-            logger.error("Could not create tempfolder!");
+        if (tempFolder == null) {
+            try {
+                File locator = File.createTempFile("relimsTemp", Long.toString(System.nanoTime()));
+                locator.delete();
+                locator.mkdirs();
+                tempFolder = new File(locator.getParent() + "/relimsTemp");
+                tempFolder.deleteOnExit();
+            } catch (IOException ex) {
+                ex.printStackTrace();
+                logger.error("Could not create tempfolder!");
+            }
         }
         return tempFolder;
     }

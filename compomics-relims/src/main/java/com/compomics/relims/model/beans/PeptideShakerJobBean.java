@@ -3,6 +3,7 @@ package com.compomics.relims.model.beans;
 import com.compomics.relims.concurrent.Command;
 import com.compomics.relims.conf.RelimsProperties;
 import com.compomics.relims.manager.variablemanager.ProcessVariableManager;
+import com.compomics.relims.modes.networking.worker.general.ProcessRelocalizer;
 import com.compomics.software.CommandLineUtils;
 import com.compomics.util.experiment.identification.SearchParameters;
 import org.apache.log4j.Logger;
@@ -54,12 +55,12 @@ public class PeptideShakerJobBean {
         this.searchParametersFile = lRelimsProjectBean.getSearchParamFile();
         this.searchParameters = lRelimsProjectBean.getSearchParameters();
         this.spectraFolder = lRelimsProjectBean.getSpectrumParentFolder();
-        this.resultFolder = RelimsProperties.getWorkSpace();
+        this.resultFolder = ProcessRelocalizer.getLocalResultFolder();
     }
 
     public String findIdentificationFiles() throws Exception {
         //find all the omx and t.xml in the workspace
-        File[] files = RelimsProperties.getWorkSpace().listFiles(new FilenameFilter() {
+        File[] files = ProcessRelocalizer.getLocalResultFolder().listFiles(new FilenameFilter() {
             @Override
             public boolean accept(File dir, String name) {
                 if (name.endsWith("t.xml") || name.endsWith(".omx")) {
@@ -197,6 +198,7 @@ public class PeptideShakerJobBean {
                 return 1; //System exit value of 1 means a failed process
             }
         } catch (Exception e) {
+            e.printStackTrace();
             logger.error(e);
             return 1;
         }
@@ -214,7 +216,7 @@ public class PeptideShakerJobBean {
         LineNumberReader reader = null;
         ArrayList<File> mgfFiles = new ArrayList<File>();
         try {
-            File searchGuiInputFile = new File(RelimsProperties.getWorkSpace().getAbsolutePath() + "/searchGUI_input.txt");
+            File searchGuiInputFile = new File(ProcessRelocalizer.getLocalResultFolder() + "/searchGUI_input.txt");
             reader = new LineNumberReader(new FileReader(searchGuiInputFile));
             String mgfLine;
             while ((mgfLine = reader.readLine()) != null) {

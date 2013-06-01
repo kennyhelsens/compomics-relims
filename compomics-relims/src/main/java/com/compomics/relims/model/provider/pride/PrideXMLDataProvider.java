@@ -18,9 +18,12 @@ import com.compomics.relims.manager.filemanager.FileManager;
 import com.compomics.relims.manager.processmanager.processguard.RelimsException;
 import com.compomics.relims.manager.progressmanager.Checkpoint;
 import com.compomics.relims.manager.progressmanager.ProgressManager;
+import com.compomics.relims.manager.resultmanager.storage.spectrumstorage.SpectrumFileRepository;
+import com.compomics.relims.manager.resultmanager.storage.spectrumstorage.SpectrumStorage;
 import com.compomics.relims.manager.variablemanager.ProcessVariableManager;
 import com.compomics.relims.model.beans.RelimsProjectBean;
 import com.compomics.relims.model.interfaces.DataProvider;
+import com.compomics.relims.modes.networking.worker.general.ProcessRelocalizer;
 import com.compomics.util.experiment.massspectrometry.Charge;
 import com.google.common.collect.Sets;
 import org.apache.log4j.Logger;
@@ -34,7 +37,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import org.apache.log4j.Level;
 
 /**
  * This class is a
@@ -94,11 +96,13 @@ public class PrideXMLDataProvider implements DataProvider {
             prideXMLFile = fileGrabber.getPrideXML(aProjectid);
             // MAKE AN MGF FILE
             if (prideXMLFile != null) {
-                destinationFile = new File(RelimsProperties.getWorkSpace().getAbsolutePath() + "/mgf/" + aProjectid + ".mgf");
+                destinationFile = new File(ProcessRelocalizer.getLocalMGFFolder() + "/" + aProjectid + ".mgf");
                 destinationFile.getParentFile().mkdirs();
-                //Save the MGF file in the resultFolder       
                 errorList = iPrideService.getSpectraAsMgf(prideXMLFile, destinationFile);
                 //Get the errorList and store it in the results later
+                //Save the MGF file in the repository 
+                SpectrumStorage manager = new SpectrumFileRepository(new File(RelimsProperties.getRepositoryPath()), "pride");
+                manager.storeMGF(String.valueOf(aProjectid), destinationFile);
                 ProcessVariableManager.setConversionErrorList(errorList);
                 if (destinationFile == null) {
                     logger.error("The Pride provider could not load an MGF-file.");
@@ -111,6 +115,7 @@ public class PrideXMLDataProvider implements DataProvider {
                 }
             }
         } catch (Exception e) {
+            e.printStackTrace();
             if (e instanceof IOException) {
                 throw new IOException(e.getMessage());
             } else {

@@ -5,7 +5,7 @@
     <groupId>com.compomics</groupId>
     <artifactId>compomics-relims</artifactId>
     <packaging>jar</packaging>
-    <version>0.9.1-beta</version>
+    <version>0.9.2-beta</version>
     <name>compomics-relims</name>
     <url>code.google.com/p/compomics-relims/</url>
 

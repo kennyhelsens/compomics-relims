@@ -26,11 +26,12 @@ public class SearchParamFileRepository implements SearchParamStorage {
     public SearchParamFileRepository(File repository, String provider) {
         this.repository = repository;
         this.provider = provider;
+        this.projectRepositoryDirectory = new File(repository.getAbsolutePath() + "/" + provider + "/");
     }
 
     @Override
     public SearchParameters retrieveParameters(String projectID) throws IOException {
-        File storageLocation = new File(projectRepositoryDirectory.getAbsolutePath() + "/SearchGUI.parameters");
+        File storageLocation = new File(projectRepositoryDirectory.getAbsolutePath() + "/" + projectID + "/SearchGUI.parameters");
         try {
             return SearchParameters.getIdentificationParameters(storageLocation);
         } catch (FileNotFoundException | ClassNotFoundException ex) {
@@ -44,7 +45,7 @@ public class SearchParamFileRepository implements SearchParamStorage {
         if (!projectRepositoryDirectory.exists()) {
             projectRepositoryDirectory.mkdirs();
         }
-        File storageLocation = new File(projectRepositoryDirectory.getAbsolutePath() + "/SearchGUI.parameters");
+          File storageLocation = new File(projectRepositoryDirectory.getAbsolutePath() + "/" + projectID + "/SearchGUI.parameters");
         try {
             SearchParameters.saveIdentificationParameters(searchParameters, storageLocation);
             return true;

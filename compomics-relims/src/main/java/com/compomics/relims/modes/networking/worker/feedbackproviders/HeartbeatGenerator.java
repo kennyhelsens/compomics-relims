@@ -50,8 +50,8 @@ public class HeartbeatGenerator implements Runnable {
                 try {
                     if (sockOutput == null) {
                         failcounter++;
-                        if(failcounter>=10){
-                              logger.error("Server did not send responds within 10 attempts...sleeping for 30 minutes");
+                        if(failcounter>=40){
+                              logger.error("Server did not send responds for 20 minutes...sleeping for 30 minutes");
                               Thread.sleep(1000*60*30);
                         }
                     } else {

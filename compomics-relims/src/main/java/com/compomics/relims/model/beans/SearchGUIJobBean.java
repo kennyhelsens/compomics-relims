@@ -3,6 +3,7 @@ package com.compomics.relims.model.beans;
 import com.compomics.relims.concurrent.Command;
 import com.compomics.relims.conf.RelimsProperties;
 import com.compomics.relims.manager.progressmanager.ProgressManager;
+import com.compomics.relims.modes.networking.worker.general.ProcessRelocalizer;
 import com.compomics.util.experiment.identification.SearchParameters;
 import org.apache.commons.configuration.ConfigurationException;
 import org.apache.log4j.Logger;
@@ -87,7 +88,7 @@ public class SearchGUIJobBean {
 
         searchGUICommandLine.append(" -output_folder ");
         //figure out what the projectprovider was
-        searchGUICommandLine.append(RelimsProperties.getWorkSpace().getAbsolutePath() + "/");
+        searchGUICommandLine.append(ProcessRelocalizer.getLocalResultFolder());
 
         searchGUICommandLine.append(" -search_params ");
 
@@ -128,14 +129,13 @@ public class SearchGUIJobBean {
     }
 
     public void setParametersFile(File repositoryParametersFile) {
-        this.searchParametersFile = repositoryParametersFile;
         try {
+            this.searchParametersFile = ProcessRelocalizer.localizeSearchParameters(repositoryParametersFile);
             searchParameters = SearchParameters.getIdentificationParameters(repositoryParametersFile);
             searchParameters.setFastaFile(new File(RelimsProperties.getDefaultSearchDatabase()));
-        } catch (FileNotFoundException ex) {
-            ex.printStackTrace();
-        } catch (IOException | ClassNotFoundException ex) {
-            ex.printStackTrace();
+          } catch (IOException | ClassNotFoundException ex) {
+            logger.error("Could not localize searchparameters. Using remote file");
+            this.searchParametersFile = repositoryParametersFile;
         }
     }
 

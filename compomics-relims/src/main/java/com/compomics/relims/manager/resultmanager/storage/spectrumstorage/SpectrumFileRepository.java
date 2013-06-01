@@ -24,11 +24,12 @@ public class SpectrumFileRepository implements SpectrumStorage {
     public SpectrumFileRepository(File repository, String provider) {
         this.repository = repository;
         this.provider = provider;
+        this.projectRepositoryDirectory = new File(repository.getAbsolutePath() + "/" + provider + "/");
     }
 
     @Override
     public File retrieveMGF(String projectID) throws IOException {
-        return new File(projectRepositoryDirectory.getAbsolutePath() + "/" + projectID + ".mgf");
+        return new File(projectRepositoryDirectory.getAbsolutePath() + "/" + projectID + "/" + projectID + ".mgf");
     }
 
     @Override
@@ -36,21 +37,18 @@ public class SpectrumFileRepository implements SpectrumStorage {
         if (!projectRepositoryDirectory.exists()) {
             projectRepositoryDirectory.mkdirs();
         }
-        File storageLocation = new File(projectRepositoryDirectory.getAbsolutePath() + "/" + projectID + ".mgf");
-       
+        File storageLocation = new File(projectRepositoryDirectory.getAbsolutePath() + "/" + projectID + "/" + projectID + ".mgf");
+
         try {
             FileUtils.copyFile(MGF, storageLocation, true);
-        return true;
-    }
-    catch (Exception e
-
-    
-        ) {
+            return true;
+        } catch (Exception e) {
             return false;
+        }
     }
-}
-@Override
-        public boolean hasBeenRun(String projectID) {
+
+    @Override
+    public boolean hasBeenRun(String projectID) {
         File repositoryDirectory;
         try {
             File resultFolder = RelimsProperties.getWorkSpace();

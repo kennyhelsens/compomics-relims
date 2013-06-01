@@ -2,8 +2,12 @@ package com.compomics.relims.model.beans;
 
 import com.compomics.omssa.xsd.UserMod;
 import com.compomics.relims.conf.RelimsProperties;
+import com.compomics.relims.manager.resultmanager.storage.searchparameterstorage.SearchParamFileRepository;
+import com.compomics.relims.manager.resultmanager.storage.searchparameterstorage.SearchParamStorage;
+import com.compomics.relims.manager.variablemanager.ProcessVariableManager;
 import com.compomics.relims.model.UserModsFile;
 import com.compomics.relims.model.interfaces.DataProvider;
+import com.compomics.relims.modes.networking.worker.general.ProcessRelocalizer;
 import com.compomics.util.experiment.biology.AminoAcid;
 import com.compomics.util.experiment.biology.AminoAcidPattern;
 import com.compomics.util.experiment.biology.Enzyme;
@@ -17,7 +21,6 @@ import com.google.common.base.Function;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -27,7 +30,6 @@ import java.util.HashSet;
 
 import java.util.List;
 import java.util.Set;
-import java.util.logging.Level;
 import javax.annotation.Nullable;
 import no.uib.jsparklines.data.XYDataPoint;
 import org.apache.commons.configuration.PropertiesConfiguration;
@@ -118,14 +120,14 @@ public class RelimsProjectBean implements Cloneable {
     public RelimsProjectBean(long projectID, File spectrumFile, File searchParametersFile) {
         boolean importSucces = false;
         this.projectID = projectID;
-        this.searchParametersFile = searchParametersFile;
-
-        if (spectrumFile.exists()) {
+        try {
+            this.searchParametersFile = ProcessRelocalizer.localizeSearchParameters(searchParametersFile);
+            this.spectrumFile = ProcessRelocalizer.localizeMGF(spectrumFile);
+        } catch (IOException ex) {
+            logger.error("Could not put all files locally...Using remote files");
+            this.searchParametersFile = searchParametersFile;
             this.spectrumFile = spectrumFile;
-        } else {
-            logger.error("MGF file could not be found !");
         }
-
         try {
             updateParameters();
             importSucces = true;
@@ -253,7 +255,11 @@ public class RelimsProjectBean implements Cloneable {
     public void createSearchParameters() {
 
         File fastaFile = new File(RelimsProperties.getDefaultSearchDatabase());
-
+        try {
+            fastaFile = ProcessRelocalizer.localizeFasta(fastaFile);
+        } catch (IOException ex) {
+            logger.error("Could not localize fasta, using remote file");
+        }
 
         searchParameters = new SearchParameters();// this should be default..;
 
@@ -427,10 +433,12 @@ public class RelimsProjectBean implements Cloneable {
             logger.debug("Var Modification : " + aMod);
         }
         logger.debug("Writing parameters to a file...");
-
         try {
-            searchParametersFile = new File(RelimsProperties.getWorkSpace().getAbsolutePath() + "/SearchGUI.parameters");
+            searchParametersFile = new File(ProcessRelocalizer.getLocalParametersFolder() + "/SearchGUI.parameters");
             searchParameters.saveIdentificationParameters(searchParameters, searchParametersFile);
+            File repository = new File(RelimsProperties.getRepositoryPath());
+            SearchParamStorage storage = new SearchParamFileRepository(repository, "pride");
+            storage.storeParameters(String.valueOf(projectID), searchParameters);
         } catch (FileNotFoundException ex) {
             logger.error(ex);
         } catch (IOException | ClassNotFoundException ex) {
@@ -469,12 +477,14 @@ public class RelimsProjectBean implements Cloneable {
     }
 
     public File getSearchParamFile() {
+        SearchParamStorage manager = new SearchParamFileRepository(new File(RelimsProperties.getRepositoryPath()), "pride");
         if (searchParametersFile == null) {
             logger.warn("Saving searchparametersfile");
-            searchParametersFile = new File(RelimsProperties.getWorkSpace().getAbsolutePath() + "/SearchGUI.parameters");
+            searchParametersFile = new File(ProcessRelocalizer.getLocalParametersFolder() + "/SearchGUI.parameters");
             try {
                 searchParameters.saveIdentificationParameters(searchParameters, searchParametersFile);
                 logger.debug("Created searchparametersfile");
+                manager.storeParameters(String.valueOf(projectID), searchParameters);
             } catch (FileNotFoundException ex) {
                 logger.error(ex);
             } catch (IOException | ClassNotFoundException ex) {

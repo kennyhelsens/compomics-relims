@@ -4,7 +4,7 @@
  */
 package com.compomics.relims.manager.resultmanager.cleanup;
 
-import com.compomics.relims.conf.RelimsProperties;
+import com.compomics.relims.modes.networking.worker.general.ProcessRelocalizer;
 import java.io.File;
 import java.io.IOException;
 import org.apache.commons.io.FileUtils;
@@ -21,7 +21,7 @@ public class CleanupManager {
 
     public static void cleanResultFolder() {
         //get current workingFolder
-        workingFolder = RelimsProperties.getWorkSpace();
+        workingFolder = ProcessRelocalizer.getLocalResultFolder();
         logger.debug("Cleaning up resultfiles at : " + workingFolder.getAbsolutePath());
         //delete MGF-folder
         logger.debug("Deleting " + workingFolder.getAbsolutePath() + "/mgf");

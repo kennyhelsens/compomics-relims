@@ -6,7 +6,7 @@ package com.compomics.relims.modes.networking.worker;
 
 import com.compomics.relims.conf.RelimsProperties;
 import com.compomics.relims.modes.networking.worker.feedbackproviders.HeartbeatGenerator;
-import com.compomics.relims.modes.networking.worker.general.ProcesRelocalizer;
+import com.compomics.relims.modes.networking.worker.general.ProcessRelocalizer;
 import com.compomics.relims.manager.resourcemanager.ResourceManager;
 import com.compomics.relims.modes.networking.worker.taskreciever.TaskReciever;
 import java.util.ArrayList;
@@ -31,7 +31,7 @@ public class RelimsWorkerMode {
     public static void main(String[] args) {
         RelimsProperties.setNetworkingMode(RelimsProperties.NetworkMode.WORKER);
         RelimsProperties.initialize(false);
-        ProcesRelocalizer.cleanCopy();
+        ProcessRelocalizer.cleanCopy();
         try {
             workerPort = RelimsProperties.getWorkerPort();
             for (int i = 0; i < args.length; i++) {
