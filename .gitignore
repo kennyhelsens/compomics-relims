@@ -57,3 +57,5 @@ compomics-relims/src/test/resources/sourcefiles/Mimic_PrideFTP/PRIDE_Exp_Complet
 compomics-relims/src/test/resources/sourcefiles/Mimic_PrideFTP/PRIDE_Exp_Complete_Ac_3.xml.gz
 compomics-relims/src/test/resources/sourcefiles/Mimic_PrideFTP/PRIDE_Exp_Complete_Ac_9777.xml.gz
 compomics-relims/src/test/resources/sourcefiles/Fasta/mac/TESTING.FASTA
+compomics-relims/src/test/resources/sourcefiles/Mimic_PrideFTP/PRIDE_Exp_Complete_Ac_9982.xml
+compomics-relims/src/test/resources/sourcefiles/Mimic_PrideFTP/PRIDE_Exp_Complete_Ac_9982.xml.gz
