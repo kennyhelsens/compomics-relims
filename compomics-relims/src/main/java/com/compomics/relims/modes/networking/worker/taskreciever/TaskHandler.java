@@ -7,6 +7,7 @@ package com.compomics.relims.modes.networking.worker.taskreciever;
 import com.compomics.relims.conf.RelimsProperties;
 import com.compomics.relims.modes.networking.controller.taskobjects.Task;
 import com.compomics.relims.manager.resourcemanager.ResourceManager;
+import com.compomics.relims.manager.variablemanager.ProcessVariableManager;
 import java.io.EOFException;
 import java.io.IOException;
 import java.io.ObjectInputStream;
@@ -56,6 +57,7 @@ class TaskHandler implements Runnable {
                         TaskReciever.locked = true;
                         //Unlocked when the task is done...
                         logger.debug("Setting up worker to run for project " + newTask.getProjectID());
+                        ProcessVariableManager.setProjectID(Long.parseLong(newTask.getProjectID()));
                         ResourceManager.setTaskID(newTask.getTaskID());
                         RelimsProperties.setUserID(newTask.getUserID());
                         taskRunner = new TaskRunner(newTask);

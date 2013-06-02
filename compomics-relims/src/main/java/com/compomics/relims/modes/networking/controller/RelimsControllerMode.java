@@ -97,6 +97,7 @@ public class RelimsControllerMode {
                 @Override
                 public void run() {
                     WorkerPool workerPool = WorkerPool.getInstance();
+                    workerPool.updateFromDb();
                 }
             });
 

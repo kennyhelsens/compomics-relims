@@ -1,7 +1,9 @@
 package com.compomics.relims.manager.progressmanager;
 
 import com.compomics.relims.conf.RelimsProperties;
+import com.compomics.relims.manager.usernotificationmanager.MailEngine;
 import com.compomics.relims.manager.variablemanager.ProcessVariableManager;
+import com.compomics.relims.modes.networking.worker.general.ProcessRelocalizer;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
@@ -13,6 +15,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintStream;
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Arrays;
 import org.apache.log4j.Logger;
 
@@ -24,11 +27,19 @@ public class ProgressManager {
     private static Checkpoint endState;
     private static MyProgress newProgress = new MyProgress();
     private static ProgressManager progressManager;
+    private static final ArrayList<Checkpoint> failingList = new ArrayList();
 
     private ProgressManager() {
     }
 
     public static ProgressManager getInstance() {
+        if (failingList.isEmpty()) {
+            failingList.add(Checkpoint.MODFAILURE);
+            failingList.add(Checkpoint.FAILED);
+            failingList.add(Checkpoint.PROCESSFAILURE);
+            failingList.add(Checkpoint.PRIDEFAILURE);
+            failingList.add(Checkpoint.TIMEOUTFAILURE);
+        }
         return ProgressManager.progressManager;
     }
 
@@ -141,6 +152,20 @@ public class ProgressManager {
                 } else {
                     logger.debug("Task passed a checkpoint : " + evt.getNewValue());
                     this.state = (Checkpoint) evt.getNewValue();
+                    if (failingList.contains(state)) {
+                        try {
+                            File logfile = ProcessRelocalizer.getLocalLoggingFile();
+
+                            if (!logfile.exists()) {
+                                logger.error(logfile.getAbsolutePath() + " doesn't exist");
+                                logfile = null;
+                            }
+                            MailEngine.sendMail("Project " + ProcessVariableManager.getProjectId() + " has failed !", "See attached logfile for further details", logfile);
+                        } catch (Exception ex) {
+                            ex.printStackTrace();
+                            logger.error("Could not send logfile...");
+                        }
+                    }
                     if (state == Checkpoint.FINISHED && endState != Checkpoint.FAILED) {
                         ProgressManager.endState = Checkpoint.FINISHED;
                     }

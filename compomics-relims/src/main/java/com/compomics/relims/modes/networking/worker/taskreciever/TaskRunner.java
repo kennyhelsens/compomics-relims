@@ -6,6 +6,7 @@ package com.compomics.relims.modes.networking.worker.taskreciever;
 
 import com.compomics.pridexmltomgfconverter.errors.enums.ConversionError;
 import com.compomics.relims.concurrent.RelimsJob;
+import com.compomics.relims.conf.RelimsProperties;
 import com.compomics.relims.manager.processmanager.processguard.RelimsException;
 import com.compomics.relims.manager.processmanager.processguard.RelimsExceptionHandler;
 import com.compomics.relims.manager.progressmanager.Checkpoint;
@@ -13,10 +14,12 @@ import com.compomics.relims.modes.networking.controller.taskobjects.Task;
 import com.compomics.relims.modes.networking.worker.feedbackproviders.ResultNotifier;
 import com.compomics.relims.manager.resourcemanager.ResourceManager;
 import com.compomics.relims.manager.resultmanager.ResultManager;
+import com.compomics.relims.manager.usernotificationmanager.MailEngine;
 import com.compomics.util.experiment.identification.SearchParameters;
+import java.io.File;
 import java.util.List;
 import java.util.concurrent.Callable;
-import org.apache.log4j.Level;
+import java.util.logging.Level;
 import org.apache.log4j.Logger;
 
 /**
@@ -24,20 +27,20 @@ import org.apache.log4j.Logger;
  * @author Kenneth
  */
 public class TaskRunner {
-
+    
     private static final Logger logger = Logger.getLogger(TaskRunner.class);
     private Task task;
-
+    
     public TaskRunner(Task task) {
         this.task = task;
     }
     Thread runner = new Thread(new RelimsJobStarter());
     Thread jobStarter = null;
-
+    
     public void launch() {
-
+        
         Thread.setDefaultUncaughtExceptionHandler(new RelimsExceptionHandler());
-
+        
         try {
             logger.info("Preparing the search...This might take a long period of time.");
             jobStarter = new Thread(new RelimsJobStarter());
@@ -50,7 +53,7 @@ public class TaskRunner {
             }
         }
     }
-
+    
     public boolean isRunning() {
         if (jobStarter == null) {
             return false;
@@ -59,9 +62,9 @@ public class TaskRunner {
         }
         return false;
     }
-
+    
     private class RelimsJobStarter implements Callable, Runnable {
-
+        
         private Thread updateThread;
         private RelimsJob iRelimsJob;
         private ResultNotifier resultNotifier = new ResultNotifier();
@@ -73,7 +76,7 @@ public class TaskRunner {
         private SearchParameters lSearchParameters;
         private Boolean usePrideAsa;
         private List<ConversionError> conversionErrorList;
-
+        
         @Override
         public Checkpoint call() {
             try {
@@ -163,25 +166,25 @@ public class TaskRunner {
                     } else {
                         return Checkpoint.valueOf(ResourceManager.getFinishState());
                     }
-
+                    
                 }
             }
         }
-
+        
         public void start() {
             if (updateThread == null) {
                 updateThread = new Thread(this);
                 updateThread.start();
             }
         }
-
+        
         public void stop() {
             if (updateThread != null) {
                 updateThread.interrupt();
                 updateThread = null;
             }
         }
-
+        
         @Override
         public void run() {
             int failcounter = 0;

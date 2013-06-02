@@ -5,6 +5,7 @@
 package com.compomics.relims.modes.networking.controller.workerpool;
 
 import com.compomics.relims.manager.progressmanager.Checkpoint;
+import com.compomics.relims.manager.usernotificationmanager.MailEngine;
 import com.compomics.relims.modes.networking.controller.connectivity.database.service.DatabaseService;
 import com.compomics.relims.modes.networking.controller.taskobjects.Task;
 import java.io.IOException;
@@ -15,6 +16,7 @@ import java.sql.SQLException;
 import java.text.SimpleDateFormat;
 import java.util.EnumMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Random;
 import java.util.concurrent.ConcurrentHashMap;
@@ -25,7 +27,7 @@ import org.apache.log4j.Logger;
  * @author Kenneth
  */
 public class WorkerPool {
-
+    
     private static Logger logger;
     private static Map<Checkpoint, HashSet<WorkerRunner>> workerMap;
     private static ConcurrentHashMap<WorkerRunner, Boolean> totalServerPool;
@@ -33,18 +35,18 @@ public class WorkerPool {
     private static DatabaseService dds;
     private static WorkerPool workerpool;
     private static Checkpoint[] checkpoints;
-
+    
     private WorkerPool() {
         initializeWorkerPool();
     }
-
+    
     public static WorkerPool getInstance() {
         if (workerpool == null) {
             workerpool = new WorkerPool();
         }
         return workerpool;
     }
-
+    
     public static void initializeWorkerPool() {
         try {
             checkpoints = new Checkpoint[]{Checkpoint.IDLE, Checkpoint.REGISTER, Checkpoint.CANCELLED, Checkpoint.FAILED, Checkpoint.FINISHED, Checkpoint.RUNNING};
@@ -57,7 +59,7 @@ public class WorkerPool {
         } catch (Throwable e) {
             e.printStackTrace();
         }
-
+        
         for (Checkpoint aState : checkpoints) {
             HashSet<WorkerRunner> workerList = new HashSet<>();
             workerMap.put(aState, workerList);
@@ -69,13 +71,13 @@ public class WorkerPool {
         Thread workerManager = new Thread(new WorkerManager());
         workerManager.start();
     }
-
+    
     public synchronized static WorkerRunner getWorker() {
-//should return null if there is no worker !
+//should return null if there is no potentialWorker !
         WorkerRunner selectedWorker = null;
         //List IDLE workers 
         HashSet<WorkerRunner> workerList = workerMap.get(Checkpoint.IDLE);
-        //shuffle the idle workers so that they all get a task rather than one clogging the set
+        //shuffle the idle workers so that they all get a potentialTask rather than one clogging the set
         if (!workerList.isEmpty()) {
             int size = workerList.size();
             int item = new Random().nextInt(size);
@@ -89,11 +91,11 @@ public class WorkerPool {
         }
         return selectedWorker;
     }
-
+    
     public synchronized static boolean isRegistered(WorkerRunner worker) {
         //intermediate solution...
         boolean isRegistered = false;
-
+        
         for (WorkerRunner aConnector : totalServerPool.keySet()) {
             if (aConnector != null) {
                 if (aConnector.equals(worker)) {
@@ -105,31 +107,31 @@ public class WorkerPool {
         }
         return isRegistered;
     }
-
+    
     public synchronized static void register(WorkerRunner worker) {
         workerMap.get(Checkpoint.REGISTER).add(worker);
         totalServerPool.put(worker, true);
         setWorkerState(worker, Checkpoint.IDLE);
     }
-
+    
     public synchronized static void deRegister(WorkerRunner worker) {
         try {
             totalServerPool.remove(worker);
             SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS");
             System.out.println(sdf.format(new java.util.Date().getTime()) + " : " + worker.getHost() + "( " + worker.getPort() + " )could not send a heartbeat within the timespan and will be deregistered");
-            //System.out.println("Deleting faulty worker : " + worker.getHost() + " ( " + worker.getPort() + " )");
+            //System.out.println("Deleting faulty potentialWorker : " + potentialWorker.getHost() + " ( " + potentialWorker.getPort() + " )");
             for (Checkpoint aState : checkpoints) {
                 try {
                     if (!workerMap.get(aState).isEmpty()) {
                         workerMap.get(aState).remove(worker);
-                        // remove the tasks the worker was running and reset them...
+                        // remove the tasks the potentialWorker was running and reset them...
                         try {
                             long taskID = dds.getTaskID(worker.getHost(), worker.getPort());
                             if (taskID != 0L) {
                                 dds.updateTask(taskID, Checkpoint.FAILED.toString());
                             }
                             dds.deleteWorker(worker.getHost(), worker.getPort());
-
+                            
                         } catch (Exception e) {
                             e.printStackTrace();
                             System.out.println("Could not reset the task...");
@@ -143,7 +145,7 @@ public class WorkerPool {
             logger.error("Worker was already removed from the WorkerPool...");
         }
     }
-
+    
     public synchronized static void setWorkerState(WorkerRunner worker, Checkpoint state) {
         //ignore requests for inexistent lists...
         boolean contains = false;
@@ -165,23 +167,23 @@ public class WorkerPool {
             WorkerPool.deRegister(worker);
         }
     }
-
+    
     public synchronized static ConcurrentHashMap<WorkerRunner, Boolean> getTotalServerPool() {
         return totalServerPool;
     }
-
+    
     public synchronized static void setOffline() {
         for (WorkerRunner aWorker : totalServerPool.keySet()) {
             totalServerPool.put(aWorker, false);
         }
     }
-
+    
     public synchronized static void setOnline(WorkerRunner aWorker) {
         totalServerPool.put(aWorker, true);
     }
-
+    
     public synchronized static void deregisterOffline() {
-
+        
         try {
             for (WorkerRunner aWorker : totalServerPool.keySet()) {
                 if (totalServerPool.get(aWorker) == false) {
@@ -201,31 +203,39 @@ public class WorkerPool {
             e.printStackTrace();
         }
     }
-
+    
     static Map<Checkpoint, HashSet<WorkerRunner>> getWorkerMap() {
         return WorkerPool.workerMap;
     }
-
+    
     private static void setWorkerToDelete(WorkerRunner aWorker) {
         WorkerPool.workerToDelete = aWorker;
     }
-
+    
     private static WorkerRunner getWorkerToDelete() {
         return WorkerPool.workerToDelete;
     }
-
     private static WorkerRunner workerToDelete;
-
+    
+    public void updateFromDb() {
+        logger.info("Looking for workers that are still active");
+        List<WorkerRunner> activeWorkers = dds.getActiveWorkers();
+        for (WorkerRunner aRunner : activeWorkers) {
+            workerMap.get(Checkpoint.RUNNING).add(aRunner);
+            logger.info(aRunner.getHost() + " was still running and was readded to the pool");
+        }
+    }
+    
     private static class TaskDistributor implements Runnable {
-
+        
         private static final Logger innerlogger = Logger.getLogger(TaskDistributor.class);
         static DatabaseService dds = DatabaseService.getInstance();
         static Task newTask = null;
         static WorkerRunner worker = null;
-
+        
         private TaskDistributor() {
         }
-
+        
         private synchronized static Task checkForTasks() {
             try {
                 newTask = dds.findNewTask();
@@ -234,12 +244,12 @@ public class WorkerPool {
             }
             return newTask;
         }
-
+        
         private synchronized static WorkerRunner checkForIDLEWorker() {
             worker = WorkerPool.getWorker();
             return worker;
         }
-
+        
         private synchronized static void sendTaskToWorker() {
             try {
                 String hostname = worker.getHost();
@@ -262,32 +272,50 @@ public class WorkerPool {
                 System.out.println(ex);
             }
         }
-
+        
         @Override
         public void run() {
             logger.debug("Taskdistributor was started...");
-            Task task;
-            WorkerRunner worker;
+            Task potentialTask;
+            WorkerRunner potentialWorker;
+            int tasksSinceStartup = 0;
             while (true) {
-                task = checkForTasks();
-                worker = checkForIDLEWorker();
+                potentialTask = checkForTasks();
+                potentialWorker = checkForIDLEWorker();
                 try {
                     Thread.sleep(1000);
                 } catch (InterruptedException ex) {
                     logger.error(ex);
                 }
-                if (task != null && worker != null) {
+                if (potentialTask != null && potentialWorker != null) {
                     sendTaskToWorker();
+                    tasksSinceStartup++;
+                    if (tasksSinceStartup % 100 == 0 || tasksSinceStartup == 1) {
+                        try {
+                            StringBuilder onlineWorkers = new StringBuilder();
+                            int workers = 0;
+                            for (Checkpoint checkpoint : workerMap.keySet()) {
+                                onlineWorkers.append(System.lineSeparator()).append(checkpoint.toString());
+                                for (WorkerRunner runner : workerMap.get(checkpoint)) {
+                                    onlineWorkers.append(System.lineSeparator()).append(runner.getHost()).append(":").append(runner.getPort());
+                                    workers++;
+                                }
+                            }
+                            MailEngine.sendMail("Controller has started " + tasksSinceStartup + " task(s) on " + workers + " machines", onlineWorkers.toString(), null);
+                        } catch (Exception ex) {
+                            logger.error(ex);
+                        }
+                    }
                 }
             }
         }
     }
-
+    
     private static class WorkerManager implements Runnable {
-
+        
         private WorkerManager() {
         }
-
+        
         private synchronized void cleanUpFailedWorkers() {
             int i = 0;
             for (WorkerRunner worker : workerMap.get(Checkpoint.FAILED)) {
@@ -298,18 +326,18 @@ public class WorkerPool {
                 logger.debug("Deregistered " + i + " failed worker(s).");
             }
         }
-
+        
         private synchronized void cleanUpFailedTasks() {
             int restoredTasks = dds.restoreTasks();
             if (restoredTasks != 0) {
                 logger.debug("Restored " + restoredTasks + " tasks.");
             }
         }
-
+        
         @Override
         public void run() {
             logger.debug("WorkerManager was started...");
-
+            
             while (true) {
                 try {
                     Thread.sleep(120000);

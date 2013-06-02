@@ -2,6 +2,7 @@ package com.compomics.relims.model.beans;
 
 import com.compomics.relims.concurrent.Command;
 import com.compomics.relims.conf.RelimsProperties;
+import com.compomics.relims.manager.usernotificationmanager.MailEngine;
 import com.compomics.relims.manager.variablemanager.ProcessVariableManager;
 import com.compomics.relims.modes.networking.worker.general.ProcessRelocalizer;
 import com.compomics.software.CommandLineUtils;
@@ -189,7 +190,7 @@ public class PeptideShakerJobBean {
         try {
             String psCommandLine = getPeptideShakerCommandString();
             if (psCommandLine != null) {
-                File peptideShakerFolder = new File(RelimsProperties.getPeptideShakerFolder()+"/");
+                File peptideShakerFolder = new File(RelimsProperties.getPeptideShakerFolder() + "/");
                 Command.setWorkFolder(peptideShakerFolder);
                 logger.debug("Launching peptideshaker from " + peptideShakerFolder.getAbsolutePath());
                 logger.info(psCommandLine);

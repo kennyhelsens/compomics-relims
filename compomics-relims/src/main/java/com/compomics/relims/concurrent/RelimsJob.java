@@ -234,6 +234,10 @@ public class RelimsJob implements Callable, Closable {
         }
     }
 
+    public RelimsLoggingAppender getAppender(){
+        return appender;
+    }
+    
     private void exportLogger() {
         appender.export();
         appender.close();

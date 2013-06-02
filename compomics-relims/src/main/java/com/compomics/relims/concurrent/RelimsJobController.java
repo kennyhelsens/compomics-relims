@@ -21,6 +21,7 @@ import com.compomics.relims.manager.resultmanager.storage.searchparameterstorage
 import com.compomics.relims.manager.resultmanager.storage.searchparameterstorage.SearchParamStorage;
 import com.compomics.relims.manager.resultmanager.storage.spectrumstorage.SpectrumFileRepository;
 import com.compomics.relims.manager.resultmanager.storage.spectrumstorage.SpectrumStorage;
+import com.compomics.relims.manager.usernotificationmanager.MailEngine;
 import com.compomics.relims.modes.networking.worker.general.ProcessRelocalizer;
 import com.compomics.util.experiment.identification.SearchParameters;
 import org.apache.commons.configuration.ConfigurationException;
@@ -31,6 +32,8 @@ import java.io.IOException;
 import java.util.Observable;
 
 import static java.lang.String.format;
+import java.util.logging.Level;
+import javax.mail.MessagingException;
 
 public class RelimsJobController extends Observable implements ProjectRunner {
 
@@ -164,25 +167,16 @@ public class RelimsJobController extends Observable implements ProjectRunner {
 
     private boolean runSearchGUI() throws IOException, ConfigurationException {
         long lProjectId = relimsProjectBean.getProjectID();
-        try {
-            searchGUIJobBean = new SearchGUIJobBean(relimsProjectBean);
-            sampleID = searchGUIJobBean.getName();
-            logger.debug("aquiring the search results with SearchGUI");
+        searchGUIJobBean = new SearchGUIJobBean(relimsProjectBean);
+        sampleID = searchGUIJobBean.getName();
+        logger.debug("aquiring the search results with SearchGUI");
 
-            if (searchGUIJobBean.launch() == 0) {
-                experimentID = sampleID;
-                return true;
-            } else {
-                progressManager.setEndState(Checkpoint.PROCESSFAILURE);
-                return false;
-            }
-        } catch (Exception e) {
-            logger.error("ERROR OCCURRED FOR PROJECT " + lProjectId);
-            logger.error(e);
-            e.printStackTrace();
-            progressManager.setState(Checkpoint.FAILED, e);
-        } finally {
+        if (searchGUIJobBean.launch() == 0) {
+            experimentID = sampleID;
             return true;
+        } else {
+            progressManager.setEndState(Checkpoint.PROCESSFAILURE);
+            return false;
         }
     }
 
@@ -290,6 +284,12 @@ public class RelimsJobController extends Observable implements ProjectRunner {
             return "";
         } else {
             logger.error("Search was aborted for " + projectID);
+            try {
+                File logFile = new File(RelimsProperties.getWorkSpace().getAbsolutePath() + "/processinfo/relimsLog.log");
+                MailEngine.sendMail("A project has failed ", ProcessVariableManager.getProjectId() + " has failed...", logFile);
+            } catch (Exception ex) {
+                logger.error(ex);
+            }
             CleanupManager.cleanResultFolder();
             return "";
         }

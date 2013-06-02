@@ -6,6 +6,7 @@ package com.compomics.relims.modes.networking.controller.connectivity.database.D
 
 import com.compomics.relims.conf.RelimsProperties;
 import com.compomics.relims.modes.networking.controller.connectivity.database.service.DatabaseService;
+import com.compomics.relims.modes.networking.controller.workerpool.WorkerRunner;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -114,6 +115,41 @@ public class WorkerDAO {
             logger.error(ex);
         } finally {
             DAO.disconnect(conn, rs, statement);
+        }
+    }
+
+    public List<WorkerRunner> getActiveWorkers() {
+        PreparedStatement statement = null;
+        ResultSet rs = null;
+        Connection conn = null;
+        List<WorkerRunner> activeWorkers = new ArrayList<>();
+        try {
+            conn = DAO.getConnection();
+            //      statement = conn.prepareStatement("BEGIN");
+            //      statement.execute();
+            String query = "select * from Workers";
+            statement = conn.prepareStatement(query);
+            statement.setQueryTimeout(60);
+            rs = statement.executeQuery();
+
+            //      statement = conn.prepareStatement("COMMIT");
+            //      statement.execute();
+            while (rs.next()) {
+                WorkerRunner runner = new WorkerRunner(rs.getString("HostName"), rs.getInt("workerPort"));
+                activeWorkers.add(runner);
+            }
+        } catch (Exception ex) {
+            logger.error(ex);
+            logger.error(ex.getCause());
+        }
+        try {
+            DAO.disconnect(conn, rs, statement);
+        } catch (NullPointerException npe) {
+            npe.printStackTrace();
+            logger.error(npe);
+
+        } finally {
+            return activeWorkers;
         }
     }
 }

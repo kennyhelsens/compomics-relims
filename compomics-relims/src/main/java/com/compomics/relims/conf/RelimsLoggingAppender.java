@@ -5,6 +5,7 @@
 package com.compomics.relims.conf;
 
 import com.compomics.relims.manager.resourcemanager.ResourceManager;
+import com.compomics.relims.modes.networking.worker.general.ProcessRelocalizer;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
@@ -14,7 +15,6 @@ import java.util.Date;
 import org.apache.commons.io.FileUtils;
 import org.apache.log4j.AppenderSkeleton;
 import org.apache.log4j.Level;
-import org.apache.log4j.Logger;
 import org.apache.log4j.spi.LoggingEvent;
 
 /**
@@ -30,6 +30,7 @@ public class RelimsLoggingAppender extends AppenderSkeleton {
     public RelimsLoggingAppender() {
         try {
             this.loggingFile = File.createTempFile(ResourceManager.getProjectID() + "_relims", ".log");
+            ProcessRelocalizer.setLocalLoggingFile(loggingFile);
             System.out.println(loggingFile.getAbsolutePath() + " has been created");
         } catch (IOException ex) {
         }
@@ -72,9 +73,9 @@ public class RelimsLoggingAppender extends AppenderSkeleton {
 
     public void export() {
         try {
-            FileUtils.copyFile(loggingFile, new File(RelimsProperties.getLogFolder().getAbsolutePath() + "/relims.log"));
+            FileUtils.copyFile(loggingFile, new File(ProcessRelocalizer.getLocalResultFolder() + "/processinfo/relims.log"));
             System.out.println("Saved loggingfile in " + RelimsProperties.getLogFolder());
-        } catch (IOException ex) {
+        } catch (Exception ex) {
             System.out.println("Logger was incorrectly terminated");
         }
     }

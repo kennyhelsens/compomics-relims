@@ -73,6 +73,7 @@ public class ResultHandler implements Runnable {
                     dds.storeErrorList((List<ConversionError>) resultMap.get("PrideXMLErrorList"), projectID);
                     WorkerRunner runner = new WorkerRunner(sock.getInetAddress().getHostName(), workerPort);
                     WorkerPool.setWorkerState(runner, Checkpoint.FAILED);
+                    dds.deleteWorker(runner.getHost(), runner.getPort());
                 }
 
                 if (finishState != null && finishState.equalsIgnoreCase(Checkpoint.FINISHED.toString())) {
@@ -98,6 +99,7 @@ public class ResultHandler implements Runnable {
                         logger.error("Projectresults could not be stored");
                         e.printStackTrace();
                     }
+                    dds.deleteWorker(runner.getHost(), runner.getPort());
                     WorkerPool.setWorkerState(runner, Checkpoint.IDLE);
                 }
 
@@ -110,7 +112,7 @@ public class ResultHandler implements Runnable {
                     dds.storeWorkerSpecs((HashMap<String, Object>) resultMap.get("systemInfoMap"), sock.getInetAddress().getHostName());
                     dds.storeErrorList((List<ConversionError>) resultMap.get("PrideXMLErrorList"), projectID);
                     //delete the worker from the active database ---> is this necessary?
-                    // dds.deleteWorker(runner.getHost(), runner.getPort());
+                    dds.deleteWorker(runner.getHost(), runner.getPort());
                     WorkerPool.setWorkerState(runner, Checkpoint.IDLE);
                 }
 
@@ -123,7 +125,7 @@ public class ResultHandler implements Runnable {
                     dds.storeWorkerSpecs((HashMap<String, Object>) resultMap.get("systemInfoMap"), sock.getInetAddress().getHostName());
                     dds.storeErrorList((List<ConversionError>) resultMap.get("PrideXMLErrorList"), projectID);
                     //delete the worker from the active database ---> is this necessary?
-                    // dds.deleteWorker(runner.getHost(), runner.getPort());
+                    dds.deleteWorker(runner.getHost(), runner.getPort());
                     WorkerPool.setWorkerState(runner, Checkpoint.IDLE);
                 }
 

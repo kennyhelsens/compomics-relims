@@ -28,6 +28,7 @@ public class ProcessRelocalizer {
     private static File resultFolder;
     private static File prideAsaTemp;
     private static File prideAsaTempFolder;
+    private static File loggingFile;
 
     public synchronized static void cleanCopy() {
         try {
@@ -182,5 +183,13 @@ public class ProcessRelocalizer {
 
     public static File getLocalPrideTempFolder() {
         return prideAsaTempFolder;
+    }
+
+    public static void setLocalLoggingFile(File loggingFile) {
+        ProcessRelocalizer.loggingFile = loggingFile;
+    }
+
+    public static File getLocalLoggingFile() {
+        return loggingFile;
     }
 }

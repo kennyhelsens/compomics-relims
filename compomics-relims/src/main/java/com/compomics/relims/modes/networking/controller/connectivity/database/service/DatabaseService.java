@@ -15,6 +15,7 @@ import com.compomics.relims.modes.networking.controller.connectivity.database.DA
 import com.compomics.relims.modes.networking.controller.connectivity.database.security.BackupService;
 import com.compomics.relims.modes.networking.controller.taskobjects.Task;
 import com.compomics.relims.modes.networking.controller.taskobjects.TaskContainer;
+import com.compomics.relims.modes.networking.controller.workerpool.WorkerRunner;
 import java.io.File;
 import java.sql.*;
 import java.util.HashMap;
@@ -215,5 +216,9 @@ public class DatabaseService {
     //==========PROJECT RESULT RELATED METHODS===============//
     public void storeResults(long taskID, String projectId, HashMap<String, Object> resultMap) {
         projectResultDAO.storeProjectResults(taskID, projectId, resultMap);
+    }
+
+    public List<WorkerRunner> getActiveWorkers() {
+        return WorkerDAO.getActiveWorkers();
     }
 }
