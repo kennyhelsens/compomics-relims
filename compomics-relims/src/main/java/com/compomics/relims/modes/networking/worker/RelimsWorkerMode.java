@@ -5,6 +5,7 @@
 package com.compomics.relims.modes.networking.worker;
 
 import com.compomics.relims.conf.RelimsProperties;
+import com.compomics.relims.manager.processmanager.shutdownhooks.WorkerShutdownHook;
 import com.compomics.relims.modes.networking.worker.feedbackproviders.HeartbeatGenerator;
 import com.compomics.relims.modes.networking.worker.general.ProcessRelocalizer;
 import com.compomics.relims.manager.resourcemanager.ResourceManager;
@@ -12,7 +13,6 @@ import com.compomics.relims.modes.networking.worker.taskreciever.TaskReciever;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
-import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 
 /**
@@ -29,6 +29,7 @@ public class RelimsWorkerMode {
     private static Thread reciever;
     
     public static void main(String[] args) {
+        Runtime.getRuntime().addShutdownHook(new WorkerShutdownHook());
         RelimsProperties.setNetworkingMode(RelimsProperties.NetworkMode.WORKER);
         RelimsProperties.initialize(false);
         ProcessRelocalizer.cleanCopy();

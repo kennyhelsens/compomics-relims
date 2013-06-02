@@ -26,12 +26,13 @@ import org.apache.log4j.Logger;
 
 public class ResultNotifier {
 
+    private static boolean shutdownsignal = false;
     String serverHostname;
     int serverPort;
     private byte[] data = null;
-    private Socket sock = null;
-    private ObjectInputStream sockInput = null;
-    private ObjectOutputStream sockOutput = null;
+    private static Socket sock = null;
+    private static ObjectInputStream sockInput = null;
+    private static ObjectOutputStream sockOutput = null;
     private static final Logger logger = Logger.getLogger(ResultNotifier.class);
 
     public ResultNotifier() {
@@ -53,86 +54,116 @@ public class ResultNotifier {
 
     public boolean sendResults(Checkpoint state) {
         boolean sucess = false;
-        Map<String, Object> resultMap = new HashMap<String, Object>();
-        while (!sucess) {
+        if (!shutdownsignal) {
+            Map<String, Object> resultMap = new HashMap<String, Object>();
+            while (!sucess) {
+                try {
+                    try {
+                        sock = new Socket(serverHostname, serverPort);
+                        sockInput = new ObjectInputStream(sock.getInputStream());
+                        sockOutput = new ObjectOutputStream(sock.getOutputStream());
+                    } catch (IOException e) {
+                        sucess = false;
+                    }
+                    try {
+                        resultMap.put("finishState", state.toString());
+                        resultMap.put("workerPort", ResourceManager.getWorkerPort());
+                        resultMap.put("taskID", ResourceManager.getTaskID());
+                        resultMap.put("projectID", ResourceManager.getProjectID());
+                        resultMap.put("systemInfoMap", ResourceManager.getAllSystemInfo());
+                        resultMap.put("PrideXMLErrorList", ResourceManager.getConversionErrors());
+                        ResultManager resultManager = new ResultManager();
+                        Map<String, Object> projectResultMap = resultManager.buildResultMap();
+                        if (projectResultMap == null) {
+                            logger.error("Projectresultmap could not be built : null");
+                        } else if (projectResultMap.isEmpty()) {
+                            logger.error("Projectresultmap could not be built : empty");
+                        }
+                        resultMap.put("projectResult", projectResultMap);
+                    } catch (Exception e) {
+                        sucess = false;
+                    }
+                    sockOutput.writeInt(1);
+                    sockOutput.flush();
+                    sockOutput.writeObject(resultMap);
+                    sockOutput.flush();
+                    //sockInput.readBoolean();
+                    sucess = true;
+                } catch (IOException e) {
+                    sucess = false;
+                } finally {
+                    return sucess;
+                }
+            }
+            return sucess;
+        }
+        return true;
+    }
+
+    public boolean sendWorkerSpecs(HashMap<String, Object> resultMap) {
+        boolean sentWorkerSpecs = false;
+        if (!shutdownsignal) {
             try {
                 try {
                     sock = new Socket(serverHostname, serverPort);
                     sockInput = new ObjectInputStream(sock.getInputStream());
                     sockOutput = new ObjectOutputStream(sock.getOutputStream());
                 } catch (IOException e) {
-                    sucess = false;
+                    e.printStackTrace(System.err);
                 }
                 try {
-                    resultMap.put("finishState", state.toString());
-                    resultMap.put("workerPort", ResourceManager.getWorkerPort());
-                    resultMap.put("taskID", ResourceManager.getTaskID());
-                    resultMap.put("projectID", ResourceManager.getProjectID());
-                    resultMap.put("systemInfoMap", ResourceManager.getAllSystemInfo());
-                    resultMap.put("PrideXMLErrorList", ResourceManager.getConversionErrors());
-                    ResultManager resultManager = new ResultManager();
-                    Map<String, Object> projectResultMap = resultManager.buildResultMap();
-                    if (projectResultMap == null) {
-                        logger.error("Projectresultmap could not be built : null");
-                    } else if (projectResultMap.isEmpty()) {
-                        logger.error("Projectresultmap could not be built : empty");
-                    }
-                    resultMap.put("projectResult", projectResultMap);
-                } catch (Exception e) {
-                    sucess = false;
+                    sockOutput.writeInt(1);
+                    sockOutput.flush();
+                    sockOutput.writeObject(resultMap);
+                    sockOutput.flush();
+                    //sockInput.readBoolean();
+                    sentWorkerSpecs = true;
+                } catch (IOException e) {
+                    e.printStackTrace(System.err);
                 }
-                sockOutput.writeInt(1);
-                sockOutput.flush();
-                sockOutput.writeObject(resultMap);
-                sockOutput.flush();
-                //sockInput.readBoolean();
-                sucess = true;
-            } catch (IOException e) {
-                sucess = false;
+                // Sleep for a bit so the action doesn't happen to fast - this is purely for reasons of demonstration, and not required technically.
+                try {
+                    Thread.sleep(500);
+                } catch (Exception e) {
+                }
+
             } finally {
-                return sucess;
+                try {
+                    sock.close();
+                } catch (NullPointerException e) {
+                    e.printStackTrace();
+                } catch (IOException e) {
+                    System.err.println("Exception closing socket.");
+                    e.printStackTrace(System.err);
+                } finally {
+                    return sentWorkerSpecs;
+                }
             }
         }
-        return sucess;
+        return true;
     }
 
-    public boolean sendWorkerSpecs(HashMap<String, Object> resultMap) {
-        boolean sentWorkerSpecs = false;
-
-        try {
-            try {
-                sock = new Socket(serverHostname, serverPort);
-                sockInput = new ObjectInputStream(sock.getInputStream());
-                sockOutput = new ObjectOutputStream(sock.getOutputStream());
-            } catch (IOException e) {
-                e.printStackTrace(System.err);
-            }
-            try {
-                sockOutput.writeInt(1);
-                sockOutput.flush();
-                sockOutput.writeObject(resultMap);
-                sockOutput.flush();
-                //sockInput.readBoolean();
-                sentWorkerSpecs = true;
-            } catch (IOException e) {
-                e.printStackTrace(System.err);
-            }
-            // Sleep for a bit so the action doesn't happen to fast - this is purely for reasons of demonstration, and not required technically.
-            try {
-                Thread.sleep(500);
-            } catch (Exception e) {
-            }
-
-        } finally {
+    public static void shutdown() {
+        shutdownsignal = true;
+        if (sock != null) {
             try {
                 sock.close();
-            } catch (NullPointerException e) {
-                e.printStackTrace();
-            } catch (IOException e) {
-                System.err.println("Exception closing socket.");
-                e.printStackTrace(System.err);
-            } finally {
-                return sentWorkerSpecs;
+            } catch (IOException ex) {
+                sock = null;
+            }
+        }
+        if (sockInput != null) {
+            try {
+                sockInput.close();
+            } catch (IOException ex) {
+                sockInput = null;
+            }
+        }
+        if (sockOutput != null) {
+            try {
+                sockOutput.close();
+            } catch (IOException ex) {
+                sockOutput = null;
             }
         }
     }

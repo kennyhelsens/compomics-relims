@@ -38,6 +38,7 @@ public class Command {
      * Not sure what this does...kept it anyway TODO figure it out !
      */
     private static File lScriptFile;
+    private static Process processus;
 
 // -------------------------- STATIC METHODS --------------------------
     public static int call(String aCommand) {
@@ -45,7 +46,7 @@ public class Command {
         try {
             try {
                 logger.info("Running process: " + System.lineSeparator() + aCommand);
-                Process processus = Runtime.getRuntime().exec(aCommand, null, workFolder);
+                processus = Runtime.getRuntime().exec(aCommand, null, workFolder);
                 errorGuard = new CommandExceptionGuard(processus);
                 boolean errorless = (Boolean) errorGuard.call();
                 if (errorless) {
@@ -142,5 +143,11 @@ public class Command {
      }*/
     public static void setWorkFolder(File aWorkFolder) {
         workFolder = aWorkFolder;
+    }
+
+    public static void cancel() {
+        if (processus != null) {
+            processus.destroy();
+        }
     }
 }

@@ -27,7 +27,7 @@ import org.apache.log4j.Logger;
  * @author Kenneth
  */
 public class WorkerPool {
-    
+
     private static Logger logger;
     private static Map<Checkpoint, HashSet<WorkerRunner>> workerMap;
     private static ConcurrentHashMap<WorkerRunner, Boolean> totalServerPool;
@@ -35,18 +35,18 @@ public class WorkerPool {
     private static DatabaseService dds;
     private static WorkerPool workerpool;
     private static Checkpoint[] checkpoints;
-    
+
     private WorkerPool() {
         initializeWorkerPool();
     }
-    
+
     public static WorkerPool getInstance() {
         if (workerpool == null) {
             workerpool = new WorkerPool();
         }
         return workerpool;
     }
-    
+
     public static void initializeWorkerPool() {
         try {
             checkpoints = new Checkpoint[]{Checkpoint.IDLE, Checkpoint.REGISTER, Checkpoint.CANCELLED, Checkpoint.FAILED, Checkpoint.FINISHED, Checkpoint.RUNNING};
@@ -59,7 +59,7 @@ public class WorkerPool {
         } catch (Throwable e) {
             e.printStackTrace();
         }
-        
+
         for (Checkpoint aState : checkpoints) {
             HashSet<WorkerRunner> workerList = new HashSet<>();
             workerMap.put(aState, workerList);
@@ -71,7 +71,7 @@ public class WorkerPool {
         Thread workerManager = new Thread(new WorkerManager());
         workerManager.start();
     }
-    
+
     public synchronized static WorkerRunner getWorker() {
 //should return null if there is no potentialWorker !
         WorkerRunner selectedWorker = null;
@@ -91,11 +91,11 @@ public class WorkerPool {
         }
         return selectedWorker;
     }
-    
+
     public synchronized static boolean isRegistered(WorkerRunner worker) {
         //intermediate solution...
         boolean isRegistered = false;
-        
+
         for (WorkerRunner aConnector : totalServerPool.keySet()) {
             if (aConnector != null) {
                 if (aConnector.equals(worker)) {
@@ -107,13 +107,13 @@ public class WorkerPool {
         }
         return isRegistered;
     }
-    
+
     public synchronized static void register(WorkerRunner worker) {
         workerMap.get(Checkpoint.REGISTER).add(worker);
         totalServerPool.put(worker, true);
         setWorkerState(worker, Checkpoint.IDLE);
     }
-    
+
     public synchronized static void deRegister(WorkerRunner worker) {
         try {
             totalServerPool.remove(worker);
@@ -131,7 +131,7 @@ public class WorkerPool {
                                 dds.updateTask(taskID, Checkpoint.FAILED.toString());
                             }
                             dds.deleteWorker(worker.getHost(), worker.getPort());
-                            
+
                         } catch (Exception e) {
                             e.printStackTrace();
                             System.out.println("Could not reset the task...");
@@ -145,7 +145,7 @@ public class WorkerPool {
             logger.error("Worker was already removed from the WorkerPool...");
         }
     }
-    
+
     public synchronized static void setWorkerState(WorkerRunner worker, Checkpoint state) {
         //ignore requests for inexistent lists...
         boolean contains = false;
@@ -167,23 +167,23 @@ public class WorkerPool {
             WorkerPool.deRegister(worker);
         }
     }
-    
+
     public synchronized static ConcurrentHashMap<WorkerRunner, Boolean> getTotalServerPool() {
         return totalServerPool;
     }
-    
+
     public synchronized static void setOffline() {
         for (WorkerRunner aWorker : totalServerPool.keySet()) {
             totalServerPool.put(aWorker, false);
         }
     }
-    
+
     public synchronized static void setOnline(WorkerRunner aWorker) {
         totalServerPool.put(aWorker, true);
     }
-    
+
     public synchronized static void deregisterOffline() {
-        
+
         try {
             for (WorkerRunner aWorker : totalServerPool.keySet()) {
                 if (totalServerPool.get(aWorker) == false) {
@@ -203,20 +203,20 @@ public class WorkerPool {
             e.printStackTrace();
         }
     }
-    
+
     static Map<Checkpoint, HashSet<WorkerRunner>> getWorkerMap() {
         return WorkerPool.workerMap;
     }
-    
+
     private static void setWorkerToDelete(WorkerRunner aWorker) {
         WorkerPool.workerToDelete = aWorker;
     }
-    
+
     private static WorkerRunner getWorkerToDelete() {
         return WorkerPool.workerToDelete;
     }
     private static WorkerRunner workerToDelete;
-    
+
     public void updateFromDb() {
         logger.info("Looking for workers that are still active");
         List<WorkerRunner> activeWorkers = dds.getActiveWorkers();
@@ -225,17 +225,27 @@ public class WorkerPool {
             logger.info(aRunner.getHost() + " was still running and was readded to the pool");
         }
     }
-    
+
+    public static void shutdownPool() {
+        TaskDistributor.shutdown();
+        WorkerManager.shutdown();
+    }
+
     private static class TaskDistributor implements Runnable {
-        
+
         private static final Logger innerlogger = Logger.getLogger(TaskDistributor.class);
         static DatabaseService dds = DatabaseService.getInstance();
         static Task newTask = null;
         static WorkerRunner worker = null;
-        
+        static boolean shutdownsignal = false;
+
+        private static void shutdown() {
+            shutdownsignal = true;
+        }
+
         private TaskDistributor() {
         }
-        
+
         private synchronized static Task checkForTasks() {
             try {
                 newTask = dds.findNewTask();
@@ -244,12 +254,12 @@ public class WorkerPool {
             }
             return newTask;
         }
-        
+
         private synchronized static WorkerRunner checkForIDLEWorker() {
             worker = WorkerPool.getWorker();
             return worker;
         }
-        
+
         private synchronized static void sendTaskToWorker() {
             try {
                 String hostname = worker.getHost();
@@ -272,7 +282,7 @@ public class WorkerPool {
                 System.out.println(ex);
             }
         }
-        
+
         @Override
         public void run() {
             logger.debug("Taskdistributor was started...");
@@ -280,6 +290,9 @@ public class WorkerPool {
             WorkerRunner potentialWorker;
             int tasksSinceStartup = 0;
             while (true) {
+                if (shutdownsignal) {
+                    break;
+                }
                 potentialTask = checkForTasks();
                 potentialWorker = checkForIDLEWorker();
                 try {
@@ -310,13 +323,21 @@ public class WorkerPool {
             }
         }
     }
-    
+
     private static class WorkerManager implements Runnable {
-        
+
+        private static boolean shutdownsignal = false;
+
         private WorkerManager() {
         }
-        
-        private synchronized void cleanUpFailedWorkers() {
+
+        public static void shutdown() {
+            cleanUpFailedWorkers();
+            cleanUpFailedTasks();
+            shutdownsignal = false;
+        }
+
+        private static synchronized void cleanUpFailedWorkers() {
             int i = 0;
             for (WorkerRunner worker : workerMap.get(Checkpoint.FAILED)) {
                 WorkerPool.deRegister(worker);
@@ -326,19 +347,19 @@ public class WorkerPool {
                 logger.debug("Deregistered " + i + " failed worker(s).");
             }
         }
-        
-        private synchronized void cleanUpFailedTasks() {
+
+        private static synchronized void cleanUpFailedTasks() {
             int restoredTasks = dds.restoreTasks();
             if (restoredTasks != 0) {
                 logger.debug("Restored " + restoredTasks + " tasks.");
             }
         }
-        
+
         @Override
         public void run() {
             logger.debug("WorkerManager was started...");
-            
-            while (true) {
+
+            while (!shutdownsignal) {
                 try {
                     Thread.sleep(120000);
                 } catch (InterruptedException ex) {

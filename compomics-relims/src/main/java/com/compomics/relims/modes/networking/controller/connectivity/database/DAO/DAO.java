@@ -1,6 +1,7 @@
 package com.compomics.relims.modes.networking.controller.connectivity.database.DAO;
 
 import com.compomics.relims.conf.RelimsProperties;
+import com.compomics.relims.modes.networking.controller.connectivity.database.security.BackupService;
 import com.compomics.relims.modes.networking.controller.connectivity.database.service.DatabaseService;
 import java.io.File;
 import java.sql.Connection;
@@ -11,6 +12,7 @@ import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
+import java.util.logging.Level;
 import javax.annotation.Nullable;
 import javax.sql.DataSource;
 import org.apache.commons.dbcp.ConnectionFactory;
@@ -32,6 +34,17 @@ public class DAO {
     private static List<String> queryList = new ArrayList<String>();
     private static DataSource dataSource;
     private static final Object lock = new Object();
+    private static boolean blockNewConnections = false;
+
+    public static void shutdown() {
+        try {
+            BackupService.backupSQLliteDatabase(dataSource.getConnection());
+        } catch (SQLException ex) {
+            logger.error("Could not backup databases when shutting down...");
+        } finally {
+            blockNewConnections = true;
+        }
+    }
 
     private DAO() {
         RelimsProperties.initialize(false);
@@ -102,8 +115,7 @@ public class DAO {
         ObjectPool connectionPool = test;
         ConnectionFactory connectionFactory = new DriverManagerConnectionFactory(connectURI, null);
         PoolableConnectionFactory poolableConnectionFactory = new PoolableConnectionFactory(connectionFactory, connectionPool, null, null, false, true);
-        PoolingDataSource dataSource = new PoolingDataSource(connectionPool);
-
+        dataSource = new PoolingDataSource(connectionPool);
         return dataSource;
     }
     //make only 1 connection !
@@ -136,49 +148,55 @@ public class DAO {
     }
 
     private static synchronized Connection prepareWritingConnection() {
-        synchronized (lock) {
-            Connection connectionInstance = null;
-            Boolean success = false;
-            while (!success) {
-                Statement statement = null;
-                try {
-                    connectionInstance = getConnection();
-                    //connectionInstance.setAutoCommit(false);
-                    statement = connectionInstance.createStatement();
-                    statement.execute("begin immediate");
-                    connectionInstance.setTransactionIsolation(Connection.TRANSACTION_READ_UNCOMMITTED);
+        if (!blockNewConnections) {
+            synchronized (lock) {
+                Connection connectionInstance = null;
+                Boolean success = false;
+                while (!success) {
+                    Statement statement = null;
+                    try {
+                        connectionInstance = getConnection();
+                        //connectionInstance.setAutoCommit(false);
+                        statement = connectionInstance.createStatement();
+                        statement.execute("begin immediate");
+                        connectionInstance.setTransactionIsolation(Connection.TRANSACTION_READ_UNCOMMITTED);
 
-                    success = true;
-                } catch (SQLException ex) {
-                    if (!ex.toString().contains("cannot start a transaction within a transaction") && !ex.toString().contains("database is locked")) {
-                        ex.printStackTrace();
+                        success = true;
+                    } catch (SQLException ex) {
+                        if (!ex.toString().contains("cannot start a transaction within a transaction") && !ex.toString().contains("database is locked")) {
+                            ex.printStackTrace();
+                        }
                     }
                 }
+                return connectionInstance;
             }
-            return connectionInstance;
         }
+        return null;
     }
 
     public synchronized Connection prepareReadingConnection() {
-        synchronized (lock) {
-            Connection connectionInstance = null;
-            Boolean success = false;
-            while (!success) {
-                Statement statement = null;
-                try {
-                    connectionInstance = getConnection();
-                    connectionInstance.setTransactionIsolation(Connection.TRANSACTION_READ_UNCOMMITTED);
-                    success = true;
-                } catch (SQLException ex) {
-                    if (!ex.toString().contains("cannot start a transaction within a transaction")) {
-                        ex.printStackTrace();
+        if (!blockNewConnections) {
+            synchronized (lock) {
+                Connection connectionInstance = null;
+                Boolean success = false;
+                while (!success) {
+                    Statement statement = null;
+                    try {
+                        connectionInstance = getConnection();
+                        connectionInstance.setTransactionIsolation(Connection.TRANSACTION_READ_UNCOMMITTED);
+                        success = true;
+                    } catch (SQLException ex) {
+                        if (!ex.toString().contains("cannot start a transaction within a transaction")) {
+                            ex.printStackTrace();
+                        }
+                    } catch (NullPointerException e) {
+                        e.printStackTrace();
                     }
-                } catch (NullPointerException e) {
-                    e.printStackTrace();
                 }
+                return connectionInstance;
             }
-            return connectionInstance;
         }
+        return null;
     }
 
     public static void disconnect(@Nullable Connection conn, @Nullable ResultSet rs, @Nullable Statement statement) {
@@ -293,8 +311,8 @@ public class DAO {
                 + "projectID VarChar(50),"
                 + "parameterName VarChar(30),"
                 + "parameterValue VarChar(200));");
- //Set PRAGMA-MODE
-         queryList.add("PRAGMA journal_mode = OFF");
+        //Set PRAGMA-MODE
+        queryList.add("PRAGMA journal_mode = OFF");
     }
 
     public void setTimeOut(Connection connection) {

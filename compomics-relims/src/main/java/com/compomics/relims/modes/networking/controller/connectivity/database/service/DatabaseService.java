@@ -221,4 +221,8 @@ public class DatabaseService {
     public List<WorkerRunner> getActiveWorkers() {
         return WorkerDAO.getActiveWorkers();
     }
+
+    public void shutdownDatabase() {
+        DAO.shutdown();
+    }
 }

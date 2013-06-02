@@ -9,6 +9,7 @@ import com.compomics.relims.modes.networking.controller.connectivity.handlers.Mo
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.logging.Level;
 import org.apache.log4j.Logger;
 
 /**
@@ -29,6 +30,7 @@ public class PortListener extends Thread implements Runnable {
     private static ServerSocket serverSock = null;
     private Socket sock = null;
     private final static Logger logger = Logger.getLogger(PortListener.class);
+    private static boolean blockIncomingConnections = false;
 
     public PortListener() {
     }
@@ -43,14 +45,29 @@ public class PortListener extends Thread implements Runnable {
         }
     }
 
+    public static void shutdown() {
+        blockIncomingConnections = true;
+        try {
+            serverSock.close();
+        } catch (IOException ex) {
+            logger.error("Could not efficiently close portlistener. Forcing to close");
+        } finally {
+            if (serverSock != null) {
+                serverSock = null;
+            }
+        }
+    }
+
     public void waitForConnections() {
         while (true) {
-            try {
-                sock = serverSock.accept();
-                MotherHandler handler = new MotherHandler(sock);
-                handler.run();
-            } catch (Exception e) {
-                e.printStackTrace(System.err);
+            if (!blockIncomingConnections) {
+                try {
+                    sock = serverSock.accept();
+                    MotherHandler handler = new MotherHandler(sock);
+                    handler.run();
+                } catch (Exception e) {
+                    e.printStackTrace(System.err);
+                }
             }
         }
     }
