@@ -9,7 +9,6 @@ import com.compomics.relims.manager.usernotificationmanager.MailEngine;
 import com.compomics.relims.modes.networking.controller.connectivity.database.service.DatabaseService;
 import com.compomics.relims.modes.networking.controller.connectivity.listeners.PortListener;
 import com.compomics.relims.modes.networking.controller.workerpool.WorkerPool;
-import java.util.logging.Level;
 import org.apache.log4j.Logger;
 
 /**
@@ -25,7 +24,7 @@ public class ControllerShutdownHook extends RespinShutdownHook {
     protected void handleOpenConnections() {
         try {
             //Notify via mail 
-            MailEngine.sendMail("The controller has commenced shutting down !", "Controller was shut down", null);
+            MailEngine.sendMail(new String[]{}, "The controller has commenced shutting down !", "Controller was shut down", null);
         } catch (Exception ex) {
             ex.printStackTrace();
         }

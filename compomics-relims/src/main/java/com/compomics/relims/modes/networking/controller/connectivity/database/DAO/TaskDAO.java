@@ -137,7 +137,7 @@ public class TaskDAO {
 //            statement = conn.prepareStatement("BEGIN");
 //            statement.execute();
             String query = "insert into Tasks"
-                    + "(TaskState,ClientID,RelimsClientJob,TimeStamp) values (?, ?, ?, ?)";
+                    + "(TaskState,ClientID,RelimsClientJob,Fasta,TimeStamp) values (?, ?, ?, ?,?)";
             statement = conn.prepareStatement(query, Statement.RETURN_GENERATED_KEYS);
             statement.setString(1, "New");
             statement.setString(2, clientID);
@@ -207,6 +207,7 @@ public class TaskDAO {
         String foundStrategy;
         String foundSource;
         String foundUserID;
+        String foundFasta;
         Boolean foundAllowPipeline = false;
         byte[] foundSearchParameters = null;
         Task relimsWorkingTask = null;
@@ -229,9 +230,9 @@ public class TaskDAO {
                 foundStrategy = rs.getString("StrategyID");
                 foundSource = rs.getString("SourceID");
                 foundUserID = rs.getString("ClientID");
+                foundFasta = rs.getString("Fasta");
                 foundAllowPipeline = rs.getBoolean("usePride");
-
-                relimsWorkingTask = new Task(foundTaskID, foundProjectID, foundStrategy, foundSource, foundUserID);
+                relimsWorkingTask = new Task(foundTaskID, foundProjectID, foundStrategy, foundSource, foundUserID,foundFasta);
             }
         } catch (Exception ex) {
             logger.error("TaskDistributor Failed : ");
@@ -239,7 +240,7 @@ public class TaskDAO {
                 logger.error(ex);
                 ex.printStackTrace();
             } else {
-               logger.error(ex);
+                logger.error(ex);
             }
         } finally {
             DAO.disconnect(conn, rs, statement);
@@ -288,7 +289,7 @@ public class TaskDAO {
         return updates;
     }
 
-    public boolean storeTasks(List<String> aProjectIDList, boolean allowPrideAsaPipeline) throws IOException {
+    public boolean storeTasks(List<String> aProjectIDList, boolean allowPrideAsaPipeline, String fasta) throws IOException {
         // searchParameters = null;
         byte[] searchparameterToStore = null;
         PreparedStatement statement = null;
@@ -304,8 +305,8 @@ public class TaskDAO {
             for (String aProjectID : aProjectIDList) {
                 String query = "";
                 query = " insert into Tasks"
-                        + " (ProjectID,TaskState,ClientID,StrategyID,SourceID,TimeStamp,ProjectID,usePride) "
-                        + "values (?,?,?,?,?,?,?,?)";
+                        + " (ProjectID,TaskState,ClientID,StrategyID,SourceID,TimeStamp,ProjectName,Fasta,usePride) "
+                        + "values (?,?,?,?,?,?,?,?,?)";
                 success = false;
                 int attempts = 0;
                 while (!success) {
@@ -320,7 +321,8 @@ public class TaskDAO {
                         java.sql.Timestamp sqlDate = new java.sql.Timestamp(new java.util.Date().getTime());
                         statement.setTimestamp(6, sqlDate);
                         statement.setString(7, tasksToStore.get(aProjectID));
-                        statement.setBoolean(8, allowPrideAsaPipeline);
+                        statement.setString(8, fasta);
+                        statement.setBoolean(9, allowPrideAsaPipeline);
                         statement.setQueryTimeout(60);
                         statement.execute();
                         success = true;
@@ -382,7 +384,7 @@ public class TaskDAO {
                     subList = taskList.subList(0, remainder);
                 }
                 //store tasks in a future object...
-                storeTasks(subList, taskMap.isPrideAsaEnabled());
+                storeTasks(subList, taskMap.isPrideAsaEnabled(),taskMap.getFasta());
                 taskList.removeAll(subList);
                 i++;
             } catch (Exception e) {

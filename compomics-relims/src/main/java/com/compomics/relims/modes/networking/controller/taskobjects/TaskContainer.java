@@ -25,6 +25,7 @@ public class TaskContainer implements Serializable {
     private String strategyID;
     private String containerName;
     private boolean usePrideAsa;
+    private String fasta;
 
     public HashMap<String, String> getTaskList() {
         return TaskMap;
@@ -119,5 +120,13 @@ public class TaskContainer implements Serializable {
 
     public void setName(String containerName) {
         this.containerName = containerName;
+    }
+
+    public void setFasta(String fastaPath) {
+        this.fasta = fastaPath;
+    }
+
+    public String getFasta() {
+        return fasta;
     }
 }

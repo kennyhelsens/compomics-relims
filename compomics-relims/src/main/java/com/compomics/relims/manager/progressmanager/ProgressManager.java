@@ -160,7 +160,7 @@ public class ProgressManager {
                                 logger.error(logfile.getAbsolutePath() + " doesn't exist");
                                 logfile = null;
                             }
-                            MailEngine.sendMail("Project " + ProcessVariableManager.getProjectId() + " has failed !", "See attached logfile for further details", logfile);
+                            MailEngine.sendMail(new String[]{}, "Project " + ProcessVariableManager.getProjectId() + " has failed !", "See attached logfile for further details", logfile);
                         } catch (Exception ex) {
                             ex.printStackTrace();
                             logger.error("Could not send logfile...");

@@ -314,7 +314,7 @@ public class WorkerPool {
                                     workers++;
                                 }
                             }
-                            MailEngine.sendMail("Controller has started " + tasksSinceStartup + " task(s) on " + workers + " machines", onlineWorkers.toString(), null);
+                            MailEngine.sendMail(new String[]{}, "Controller has started " + tasksSinceStartup + " task(s) on " + workers + " machines", onlineWorkers.toString(), null);
                         } catch (Exception ex) {
                             logger.error(ex);
                         }

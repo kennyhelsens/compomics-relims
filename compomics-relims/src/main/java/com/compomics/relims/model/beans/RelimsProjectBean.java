@@ -112,6 +112,7 @@ public class RelimsProjectBean implements Cloneable {
     private final static Logger logger = Logger.getLogger(RelimsProjectBean.class);
     private File spectrumParentFolder;
     private boolean validated;
+    private File fastaFile;
 
     public RelimsProjectBean(long projectID) {
         this.projectID = projectID;
@@ -121,9 +122,11 @@ public class RelimsProjectBean implements Cloneable {
         boolean importSucces = false;
         this.projectID = projectID;
         try {
-            this.searchParametersFile = ProcessRelocalizer.localizeSearchParameters(searchParametersFile);
+           // this.searchParametersFile = ProcessRelocalizer.localizeSearchParameters(searchParametersFile);
+            this.searchParametersFile = searchParametersFile;
             this.spectrumFile = ProcessRelocalizer.localizeMGF(spectrumFile);
         } catch (IOException ex) {
+            ex.printStackTrace();
             logger.error("Could not put all files locally...Using remote files");
             this.searchParametersFile = searchParametersFile;
             this.spectrumFile = spectrumFile;
@@ -254,11 +257,12 @@ public class RelimsProjectBean implements Cloneable {
 
     public void createSearchParameters() {
 
-        File fastaFile = new File(RelimsProperties.getDefaultSearchDatabase());
         try {
             fastaFile = ProcessRelocalizer.localizeFasta(fastaFile);
+            logger.debug("Found the required fastafile for this task !");
         } catch (IOException ex) {
             logger.error("Could not localize fasta, using remote file");
+            fastaFile = new File(RelimsProperties.getDefaultSearchDatabase());
         }
 
         searchParameters = new SearchParameters();// this should be default..;
@@ -435,7 +439,7 @@ public class RelimsProjectBean implements Cloneable {
         logger.debug("Writing parameters to a file...");
         try {
             searchParametersFile = new File(ProcessRelocalizer.getLocalParametersFolder() + "/SearchGUI.parameters");
-            searchParameters.saveIdentificationParameters(searchParameters, searchParametersFile);
+            SearchParameters.saveIdentificationParameters(searchParameters, searchParametersFile);
             File repository = new File(RelimsProperties.getRepositoryPath());
             SearchParamStorage storage = new SearchParamFileRepository(repository, "pride");
             storage.storeParameters(String.valueOf(projectID), searchParameters);
@@ -626,5 +630,9 @@ public class RelimsProjectBean implements Cloneable {
 
     private void setSpectrumParentFolder(File spectrumParentFolder) {
         this.spectrumParentFolder = spectrumParentFolder;
+    }
+
+    public void setFastaFile(File fastaFile) {
+        this.fastaFile = fastaFile;
     }
 }

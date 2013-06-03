@@ -23,14 +23,13 @@ import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.List;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.lang.management.ManagementFactory;
+import java.util.List;
 import org.apache.commons.io.FileUtils;
-import org.apache.log4j.Appender;
 
 /**
  * This class contains the Relims properties.
@@ -53,6 +52,37 @@ public class RelimsProperties {
     public static int getAllowedRAM() {
         return (int) (0.9 * (((com.sun.management.OperatingSystemMXBean) ManagementFactory
                 .getOperatingSystemMXBean()).getTotalPhysicalMemorySize()) / 1024 / 1024);
+    }
+
+    public static void setFasta(String fasta) {
+        config.setProperty("searchgui.fasta.default", fasta);
+    }
+
+    public static List<String> getPossibleFasta() {
+        File fastaRepository = getFastaRepository();
+        List<String> possibleFastaNames = new ArrayList<String>();
+        for (File aFile : fastaRepository.listFiles()) {
+            if (aFile.getAbsolutePath().endsWith(".fasta")) {
+                possibleFastaNames.add(aFile.getName());
+            }
+        }
+        return possibleFastaNames;
+    }
+
+    private static File getFastaRepository() {
+        return new File(config.getString("relims.db.repository"));
+    }
+
+    public static File getFastaFromRepository(String fastaname) {
+        File fastaRepository = getFastaRepository();
+        for (File aFile : fastaRepository.listFiles()) {
+            System.out.println(aFile.getName());
+            System.out.println(fastaname);
+            if (aFile.getName().toLowerCase().equals(fastaname.toLowerCase())) {
+                return aFile;
+            }
+        }
+        return null;
     }
     /**
      * the results will all be placed in a user-specific folder. Therefor, all
@@ -203,8 +233,8 @@ public class RelimsProperties {
     public static File createWorkSpace() {
         workSpace = getWorkSpacePath();
         return workSpace;
-    }   
-    
+    }
+
     public static File getWorkSpace() {
         return workSpace;
     }

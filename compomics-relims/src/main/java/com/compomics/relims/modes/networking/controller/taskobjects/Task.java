@@ -21,19 +21,25 @@ public class Task implements Serializable {
     private String taskName;
     private SearchParameters searchParameters;
     private boolean allowPridePipeline = true;
+    private String fasta = null;
 
-    public Task(long foundTaskID, String foundProjectID, String strategyID, String sourceID, String userID) {
+    public Task(long foundTaskID, String foundProjectID, String strategyID, String sourceID, String userID,String fasta) {
         this.taskID = foundTaskID;
         this.projectID = foundProjectID;
         this.strategyID = strategyID;
         this.sourceID = sourceID;
         this.userID = userID;
+        this.fasta = fasta;
     }
 
     public void setSearchParameters(SearchParameters searchParameters) {
         this.searchParameters = searchParameters;
     }
 
+    public String getFasta(){
+        return fasta;
+    }
+    
     public void setAllowPridePipeline(Boolean allow) {
         this.allowPridePipeline = allow;
     }

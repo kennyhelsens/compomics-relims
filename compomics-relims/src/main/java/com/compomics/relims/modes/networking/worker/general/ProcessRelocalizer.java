@@ -139,12 +139,6 @@ public class ProcessRelocalizer {
     }
 
     public static File localizeSearchParameters(File searchparameters) throws IOException {
-// Look in local folder if the searchparameters is already there
-        for (File aSearchparameters : parameterFolder.listFiles()) {
-            if (searchparameters.getName().toLowerCase().equals(aSearchparameters.getName().toLowerCase())) {
-                return aSearchparameters;
-            }
-        }
         // Reaching this point = no searchparameters with that name was found locally...
         File newLocalParameters = new File(parameterFolder.getAbsolutePath() + "/" + searchparameters.getName());
         FileUtils.copyFile(searchparameters, newLocalParameters);

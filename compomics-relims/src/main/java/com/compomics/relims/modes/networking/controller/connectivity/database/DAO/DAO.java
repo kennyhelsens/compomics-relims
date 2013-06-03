@@ -265,6 +265,7 @@ public class DAO {
                 + "TaskState VARCHAR(20),"
                 + "ClientID VARCHAR(100),"
                 + "ProjectName VarChar(255),"
+                + "FASTA VarChar(255),"
                 + "Timestamp TIMESTAMP,"
                 + "usePride BOOLEAN);");
 // MAKE TASK TABLE____________________________________________PRIDE DETAILS : TODO rename this

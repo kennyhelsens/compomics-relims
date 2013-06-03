@@ -16,6 +16,7 @@ import com.compomics.relims.model.provider.mslims.MsLimsProjectProvider;
 import com.compomics.relims.model.provider.pride.PrideProjectProvider;
 import com.compomics.util.experiment.identification.SearchParameters;
 import com.google.common.collect.Lists;
+import java.io.File;
 import java.util.List;
 import java.util.Observable;
 import java.util.concurrent.Callable;
@@ -67,6 +68,7 @@ public class RelimsJob implements Callable, Closable {
      */
     private ProgressManager progressManager = ProgressManager.getInstance();
     private RelimsLoggingAppender appender;
+    private File fastaFile;
 
     public RelimsJob(String aSearchStrategyID, String aProjectProviderID) {
         //Initialize the logger
@@ -83,13 +85,13 @@ public class RelimsJob implements Callable, Closable {
         predicateManager = new PredicateManager(lDataProvider);
     }
 
-    public RelimsJob(String aSearchStrategyID, String aProjectProviderID, long aProjectID, long aTaskID, int aworkerPort, SearchParameters searchParameters, Boolean usePrideAsap) {
+    public RelimsJob(String aSearchStrategyID, String aProjectProviderID, long aProjectID, long aTaskID, int aworkerPort, SearchParameters searchParameters, Boolean usePrideAsap, File fastaFile) {
         //Initialize the logger
         initializeLogger();
         //Initialize the progressmanager
         Thread.setDefaultUncaughtExceptionHandler(new RelimsExceptionHandler());
         progressManager.setUp();
-
+       this.fastaFile = fastaFile;
         if (aProjectProviderID.toUpperCase().contains("PRIDE")) {
             projectProvider = new PrideProjectProvider();
         } else {
@@ -155,6 +157,7 @@ public class RelimsJob implements Callable, Closable {
         try {
             ProjectRunner lProjectRunner = new RelimsJobController();
             lProjectRunner.setProjectID(lProjectID);
+            lProjectRunner.setFastaFile(fastaFile);
             lProjectRunner.setProjectProvider(projectProvider);
             lProjectRunner.setPredicateManager(predicateManager);
             try {
@@ -234,12 +237,16 @@ public class RelimsJob implements Callable, Closable {
         }
     }
 
-    public RelimsLoggingAppender getAppender(){
+    public RelimsLoggingAppender getAppender() {
         return appender;
     }
-    
+
     private void exportLogger() {
         appender.export();
         appender.close();
+    }
+
+    public void setFasta(File fastaFile) {
+        this.fastaFile = fastaFile;
     }
 }

@@ -51,7 +51,6 @@ public class SpectrumFileRepository implements SpectrumStorage {
     public boolean hasBeenRun(String projectID) {
         File repositoryDirectory;
         try {
-            File resultFolder = RelimsProperties.getWorkSpace();
             if (provider.contains("mslims")) {
                 repositoryDirectory = new File(repository.getAbsolutePath() + "/mslims/");
             } else {

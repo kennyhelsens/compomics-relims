@@ -19,7 +19,6 @@ import org.apache.log4j.Logger;
 import java.io.File;
 import java.io.FileFilter;
 import java.io.IOException;
-import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -91,6 +90,8 @@ public class Simulator extends TestCase {
         File searchGUIDefaultFasta = new File(RelimsProperties.getDefaultSearchDatabase());
         config.setProperty("searchgui.fasta.default", searchGUIDefaultFasta.getAbsolutePath());
         config.setProperty("relims.db.DB_OR.file", searchGUIDefaultFasta.getAbsolutePath());
+        //test repo-mode pride\\11954\\
+     //   config.setProperty("remote.relims.repository", "C:\\Users\\Kenneth\\Desktop\\ReSPIn\\Pride Analysis\\pride\\repository-mimic\\");
         logger.info("Overriden searchgui's default database location");
     }
 
@@ -134,18 +135,18 @@ public class Simulator extends TestCase {
             }
         }
 
-        if (repository.exists()) {
-            //CLEAN UP REPOSITORY
-            File[] filesFolder = repository.listFiles();
-            for (File aFolder : filesFolder) {
-                try {
-                    FileUtils.deleteDirectory(aFolder);
-                    System.out.println("Removed " + aFolder.getName());
-                } catch (IOException ex) {
-                    System.err.println("COULD NOT REMOVE" + aFolder.getName());
-                }
-            }
-        }
+        /*  if (repository.exists()) {
+         //CLEAN UP REPOSITORY
+         File[] filesFolder = repository.listFiles();
+         for (File aFolder : filesFolder) {
+         try {
+         FileUtils.deleteDirectory(aFolder);
+         System.out.println("Removed " + aFolder.getName());
+         } catch (IOException ex) {
+         System.err.println("COULD NOT REMOVE" + aFolder.getName());
+         }
+         }
+         }*/
         File[] filesFolder = new File[0];
 
         if (fastawin.exists()) {
@@ -225,13 +226,14 @@ public class Simulator extends TestCase {
 
     public static void simulateClientInput(int projectId) {
 
-       //setting up TaskObject
+        //setting up TaskObject
         TaskContainer tasksForServer = new TaskContainer();
         tasksForServer.setStrategyID("rdbVarMOD1");
         tasksForServer.setSourceID("pride");
         tasksForServer.setName("TestingContainer");
         tasksForServer.enablePipeline();
         tasksForServer.addJob("" + projectId, "TestingProject");
+        tasksForServer.setFasta("WH_130523_concatenated_target_decoy.fasta");
         ServerConnector connector = new ServerConnector();
         connector.setConnectionParameters(RelimsProperties.getControllerIP(), RelimsProperties.getControllerPort());
         try {

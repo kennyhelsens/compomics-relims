@@ -65,7 +65,7 @@ public class SearchParamFileRepository implements SearchParamStorage {
             } else {
                 repositoryDirectory = new File(repository.getAbsolutePath() + "/pride/");
             }
-            projectRepositoryDirectory = new File(repositoryDirectory.getAbsolutePath() + "/" + projectID);
+            projectRepositoryDirectory = new File(repositoryDirectory.getAbsolutePath() + "/"+projectID);
 
             if (projectRepositoryDirectory.exists()) {
                 return true;

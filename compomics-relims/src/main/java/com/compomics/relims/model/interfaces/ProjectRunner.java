@@ -2,6 +2,7 @@ package com.compomics.relims.model.interfaces;
 
 import com.compomics.relims.model.guava.predicates.PredicateManager;
 import com.compomics.relims.model.provider.ProjectProvider;
+import java.io.File;
 
 import java.util.concurrent.Callable;
 
@@ -18,4 +19,6 @@ public interface ProjectRunner extends Callable<String> {
     public void setSearchStrategy(SearchStrategy aSearchStrategy);
 
     public void setProjectID(long aProjectID);
+
+    public void setFastaFile(File fastaFile);
 }

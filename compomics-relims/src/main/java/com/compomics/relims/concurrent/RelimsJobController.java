@@ -14,7 +14,6 @@ import com.compomics.relims.model.interfaces.ModificationResolver;
 import com.compomics.relims.model.interfaces.ProjectRunner;
 import com.compomics.relims.model.interfaces.SearchStrategy;
 import com.compomics.relims.model.provider.ProjectProvider;
-import com.compomics.relims.model.provider.pride.PrideProjectProvider;
 import com.compomics.relims.manager.resultmanager.cleanup.CleanupManager;
 import com.compomics.relims.manager.resultmanager.storage.searchparameterstorage.SearchParamFileRepository;
 import com.compomics.relims.manager.resultmanager.storage.searchparameterstorage.SearchParamSQLite;
@@ -32,8 +31,7 @@ import java.io.IOException;
 import java.util.Observable;
 
 import static java.lang.String.format;
-import java.util.logging.Level;
-import javax.mail.MessagingException;
+import org.apache.commons.io.FileUtils;
 
 public class RelimsJobController extends Observable implements ProjectRunner {
 
@@ -111,6 +109,7 @@ public class RelimsJobController extends Observable implements ProjectRunner {
     private SearchParamStorage searchParamManager;
     private SpectrumStorage spectrumManager;
     private boolean storeInRepository = true;
+    private File fastaFile;
 
     /**
      * A ProgressManager to store the state of the project and monitor it
@@ -156,6 +155,7 @@ public class RelimsJobController extends Observable implements ProjectRunner {
         ProcessVariableManager.setProjectID(projectID);
         relimsProjectBean = projectProvider.getProject(projectID);
         if (relimsProjectBean != null) {
+            relimsProjectBean.setFastaFile(fastaFile);
             relimsProjectBean.setDataProvider(dataProvider);
             relimsProjectBean.getSpectrumFile();
             //make a searchparameters object and file
@@ -286,7 +286,7 @@ public class RelimsJobController extends Observable implements ProjectRunner {
             logger.error("Search was aborted for " + projectID);
             try {
                 File logFile = new File(RelimsProperties.getWorkSpace().getAbsolutePath() + "/processinfo/relimsLog.log");
-                MailEngine.sendMail("A project has failed ", ProcessVariableManager.getProjectId() + " has failed...", logFile);
+                MailEngine.sendMail(new String[]{}, "A project has failed ", ProcessVariableManager.getProjectId() + " has failed...", logFile);
             } catch (Exception ex) {
                 logger.error(ex);
             }
@@ -300,16 +300,17 @@ public class RelimsJobController extends Observable implements ProjectRunner {
 
     private File makeCleanSearchParameters() {
         //MakeCleanSearchParameters
-        File repositorySearchParametersFile = new File(RelimsProperties.getWorkSpace() + "/SearchGUI.parameters");
+        File repositorySearchParametersFile = new File(RelimsProperties.getRepositoryPath() + "/pride/" + projectID + "/SearchGUI.parameters");
+        File localParametersFile = new File(ProcessRelocalizer.getLocalParametersFolder() + "/SearchGUI.parameters");
         try {
-            SearchParameters parameters = searchParamManager.retrieveParameters(String.valueOf(projectID));
-            SearchParameters.saveIdentificationParameters(parameters, new File(ProcessRelocalizer.getLocalParametersFolder() + "/searchparameters.parameters"));
+            FileUtils.copyFile(repositorySearchParametersFile, localParametersFile);
+            /* 
+             SearchParameters parameters = searchParamManager.retrieveParameters(String.valueOf(projectID));
+             SearchParameters.saveIdentificationParameters(parameters, new File(ProcessRelocalizer.getLocalParametersFolder() + "/SearchGUI.parameters"));*/
         } catch (IOException ex) {
             logger.error("Could not retrieve searchparameters");
-        } catch (ClassNotFoundException ex) {
-            logger.error("Could not retrieve searchparameters");
         } finally {
-            return repositorySearchParametersFile;
+            return localParametersFile;
         }
     }
 
@@ -317,7 +318,7 @@ public class RelimsJobController extends Observable implements ProjectRunner {
         //MakeCleanSearchParameters
         File MgfFile = null;
         try {
-            MgfFile = new File(RelimsProperties.getWorkSpace() + "/" + projectID + ".mgf");
+            MgfFile = new File(RelimsProperties.getRepositoryPath() + "/pride/" + projectID + "/" + projectID + ".mgf");
             MgfFile = ProcessRelocalizer.localizeMGF(MgfFile);
         } catch (IOException e) {
             logger.error("Could not retrieve MGF-file...using remote MGF");
@@ -337,5 +338,10 @@ public class RelimsJobController extends Observable implements ProjectRunner {
 
     private void storeMGFInRepository(File MGF) throws IOException {
         spectrumManager.storeMGF(String.valueOf(projectID), MGF);
+    }
+
+    @Override
+    public void setFastaFile(File fastaFile) {
+        this.fastaFile = fastaFile;
     }
 }
