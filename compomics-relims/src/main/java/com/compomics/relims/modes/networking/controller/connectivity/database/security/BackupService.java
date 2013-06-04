@@ -7,8 +7,10 @@ package com.compomics.relims.modes.networking.controller.connectivity.database.s
 import com.compomics.relims.conf.RelimsProperties;
 import com.compomics.relims.modes.networking.controller.connectivity.database.DAO.DAO;
 import java.io.File;
+import java.io.IOException;
 import java.sql.CallableStatement;
 import java.sql.Connection;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.text.SimpleDateFormat;
@@ -34,7 +36,7 @@ public class BackupService implements Runnable {
     private static int maxBackups = 10;
     private static int backupMinutes = 30;
     private static String dbLocationorigin;
-    private Connection conn;
+    private static Connection conn;
     private static BackupService bs;
 
     private BackupService() {
@@ -47,45 +49,51 @@ public class BackupService implements Runnable {
         return BackupService.bs;
     }
 
-    public static void backupDerbyDatabase(Connection conn) throws SQLException {
+    public static void backupSQLliteDatabase() throws SQLException {
+        PreparedStatement statement = null;
+        boolean copying = false;
         try {
-            dbLocation = RelimsProperties.getTaskDatabaseLocation().getParent().concat("/databases/");
-            Calendar calendar = Calendar.getInstance();
-            Date date = calendar.getTime();
-            formattedDate = new SimpleDateFormat("yyyy-MM-dd HH-mm-ss").format(date);
-            backupdirectory = dbLocation + "/" + formattedDate;
-            cs = conn.prepareCall("CALL SYSCS_UTIL.SYSCS_BACKUP_DATABASE(?)");
-            cs.setString(1, backupdirectory);
-            cs.execute();
-            cs.close();
-            logger.warn("Backed up databases to " + backupdirectory);
-            clearBackups();
+            conn = DAO.getConnection(logger.getName());
+            statement = conn.prepareStatement("BEGIN EXCLUSIVE TRANSACTION");
+            statement.execute();
+            copyDatabase();
+            copying = true;
+            while (copying) {
+                try {
+                    //    statement = conn.prepareStatement("ROLLBACK TRANSACTION");
+                    statement = conn.prepareStatement("COMMIT");
+                    statement.execute();
+                    copying = false;
+                } catch (SQLException e) {
+                    //5 = SQL_BUSY
+                    if (e.getErrorCode() == 5) {
+                        copying = true;
+                    }
+                }
+            }
+            statement.close();
         } catch (Exception e) {
-            e.printStackTrace();
             logger.error(e);
         } finally {
+            if (statement != null) {
+                statement = null;
+            }
+            DAO.release(conn);
         }
     }
 
-    public static void backupSQLliteDatabase(Connection conn) throws SQLException {
-        logger.info("Attempt to back up taskdatabase to : " + backupdirectory);
-        try {
-            dbLocation = RelimsProperties.getConfigFolder().getAbsolutePath().replace("conf", "databases");
-            Calendar calendar = Calendar.getInstance();
-            Date date = calendar.getTime();
-            formattedDate = new SimpleDateFormat("yyyy-MM-dd HH-mm-ss").format(date);
-            backupdirectory = dbLocation + "/backups/";
-            File backupDirectoryFile = new File(backupdirectory);
-            File originalDatabase = new File(dbLocation + "/" + RelimsProperties.getTaskDatabaseName() + ".db");
-            backupDirectoryFile.mkdirs();
-            FileUtils.copyFileToDirectory(originalDatabase, backupDirectoryFile);
-            logger.info("Backed up databases to " + backupdirectory);
-            clearBackups();
-        } catch (Exception e) {
-            e.printStackTrace();
-            logger.error(e);
-        } finally {
-        }
+    private static void copyDatabase() throws IOException {
+        dbLocation = RelimsProperties.getConfigFolder().getAbsolutePath().replace("conf", "databases");
+        Calendar calendar = Calendar.getInstance();
+        Date date = calendar.getTime();
+        formattedDate = new SimpleDateFormat("yyyy-MM-dd HH-mm-ss").format(date);
+        backupdirectory = dbLocation + "/backups/";
+        File backupDirectoryFile = new File(backupdirectory);
+        File originalDatabase = new File(dbLocation + "/" + RelimsProperties.getTaskDatabaseName() + ".db");
+        backupDirectoryFile.mkdirs();
+        FileUtils.copyFileToDirectory(originalDatabase, backupDirectoryFile);
+        logger.info("Backed up databases to " + backupdirectory);
+        clearBackups();
     }
 
     public static void clearBackups() {
@@ -182,21 +190,16 @@ public class BackupService implements Runnable {
         logger.info("Backing up every " + backupMinutes + " minutes. Max amount of backups = " + maxBackups + ".");
         while (true) {
             try {
-                try {
-                    conn = DAO.getConnection();
-                    if (conn.toString().contains("derby")) {
-                        backupDerbyDatabase(conn);
-                    } else {
-                        backupSQLliteDatabase(conn);
-                    }
-                } catch (SQLException ex) {
-                    logger.error("Failed to backup database !");
-                }
-                Thread.sleep(backupMinutes * 60 * 1000);
+                backupSQLliteDatabase();
             } catch (Exception ex) {
                 logger.error("Could not correctly perform backup of database...!");
             } finally {
-                DAO.disconnect(conn, rs, cs);
+                try {
+                    DAO.release(conn);
+                    Thread.sleep(backupMinutes * 60 * 1000);
+                } catch (InterruptedException ex) {
+                    logger.error(ex);
+                }
             }
         }
     }

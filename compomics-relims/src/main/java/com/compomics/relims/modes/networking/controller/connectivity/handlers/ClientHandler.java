@@ -9,6 +9,7 @@ package com.compomics.relims.modes.networking.controller.connectivity.handlers;
  * @author Kenneth
  */
 import com.compomics.relims.conf.RelimsProperties;
+import com.compomics.relims.modes.networking.controller.connectivity.database.DAO.TaskDAO;
 import com.compomics.relims.modes.networking.controller.connectivity.database.service.DatabaseService;
 import com.compomics.relims.modes.networking.controller.taskobjects.TaskContainer;
 import com.compomics.relims.modes.networking.controller.workerpool.WorkerRunner;
@@ -17,20 +18,19 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.util.List;
 import java.util.Map;
 import org.apache.log4j.Logger;
 
 public class ClientHandler implements Runnable {
 
-    private final static Logger logger = Logger.getLogger(WorkerHandler.class);
+    private final static Logger logger = Logger.getLogger(ClientHandler.class);
     private Socket sock = null;
     private ObjectInputStream sockInput = null;
     private ObjectOutputStream sockOutput = null;
     private Thread myThread = null;
     private WorkerRunner worker;
     private boolean registered = false;
-    private static final DatabaseService derbyDatabaseService = DatabaseService.getInstance();
+    private static final DatabaseService databaseService = DatabaseService.getInstance();
     private ServerSocket controllerSocket;//Public access setup
     private Socket socketConnection; //socket = a connection, rename later
     private int transferPort = RelimsProperties.getControllerPort();
@@ -64,7 +64,8 @@ public class ClientHandler implements Runnable {
             
                     if (taskObject.isValid()) {
                         logger.debug(clientID + " provided a valid input...");
-                        Map<String, Long> generatedTaskIDs = derbyDatabaseService.pushTaskMapToDB(taskObject);
+                        Map<String, Long> generatedTaskIDs //= databaseService.pushTaskMapToDB(taskObject);
+                        = new TaskDAO().pushTaskMapToDB(taskObject);
                         sockOutput.writeObject(generatedTaskIDs);
                         sockOutput.flush();
                     } else {

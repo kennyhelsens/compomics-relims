@@ -6,21 +6,10 @@ import com.compomics.relims.modes.networking.controller.connectivity.database.se
 import java.io.File;
 import java.sql.Connection;
 import java.sql.DriverManager;
-import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Properties;
-import java.util.logging.Level;
-import javax.annotation.Nullable;
-import javax.sql.DataSource;
-import org.apache.commons.dbcp.ConnectionFactory;
-import org.apache.commons.dbcp.DriverManagerConnectionFactory;
-import org.apache.commons.dbcp.PoolableConnectionFactory;
-import org.apache.commons.dbcp.PoolingDataSource;
-import org.apache.commons.pool.ObjectPool;
-import org.apache.commons.pool.impl.GenericObjectPool;
 import org.apache.log4j.Logger;
 
 public class DAO {
@@ -32,37 +21,45 @@ public class DAO {
     private static File directoryFile;
     private static String directory;
     private static List<String> queryList = new ArrayList<String>();
-    private static DataSource dataSource;
-    private static final Object lock = new Object();
-    private static boolean blockNewConnections = false;
+    private static DAO dao;
+    private static boolean connectionInUse;
+    private static String connectionHogger;
 
     public static void shutdown() {
         try {
-            BackupService.backupSQLliteDatabase(dataSource.getConnection());
-        } catch (SQLException ex) {
+            if (conn != null) {
+                makeSingleConnection();
+            }
+            BackupService.backupSQLliteDatabase();
+
+        } catch (InterruptedException | SQLException ex) {
             logger.error("Could not backup databases when shutting down...");
-        } finally {
-            blockNewConnections = true;
         }
     }
 
     private DAO() {
+        try {
+            setup();
+            makeSingleConnection();
+        } catch (SQLException ex) {
+            logger.error(ex);
+        } catch (InterruptedException ex) {
+            logger.error(ex);
+        }
+    }
+
+    private void setup() {
         RelimsProperties.initialize(false);
         protocol = RelimsProperties.getTaskDatabaseProtocol();
         dbName = RelimsProperties.getTaskDatabaseName();// the name of the database
         directoryFile = new File(RelimsProperties.getConfigFolder().getAbsolutePath().replace("conf", "databases"));
-        dbName = RelimsProperties.getTaskDatabaseName();// the name of the database
         directory = directoryFile.getAbsolutePath();
-        if (!protocol.contains("derby")) {
-            dbName = dbName + ".db";
-        }
         if (!directoryFile.exists()) {
             boolean success = directoryFile.mkdirs();
             if (!success) {
                 logger.error("Did not successfully create directory");
             }
         }
-        this.dataSource = setupDataSource(protocol + directory + "/" + dbName);
     }
 
     public void setProtocol(String protocol) {
@@ -89,167 +86,80 @@ public class DAO {
         return directory;
     }
 
-    public static void initiate() {
-        new DAO();
+    public static DAO getInstance() {
+        if (DAO.dao == null) {
+            dao = new DAO();
+        }
+        return dao;
     }
 
-    public synchronized static Connection getConnection() {
-        // synchronized (dataSource) {
-        try {
-            return dataSource.getConnection();
-        } catch (SQLException ex) {
-            ex.printStackTrace();
+    public static Connection getConnection(String name) {
+
+        while (connectionInUse) {
+            try {
+                Thread.sleep(3000);
+                logger.debug(connectionHogger + " is hogging the connection !");
+            } catch (InterruptedException ex) {
+                logger.error(ex);
+            }
         }
-//        }
-        return null;
+        connectionHogger = name;
+        connectionInUse = true;
+        return conn;
+
     }
 
     public String getDbPrefix() {
         return RelimsProperties.getDbDatabaseName() + ".";
     }
 
-    public static DataSource setupDataSource(String connectURI) {
-        GenericObjectPool test = new GenericObjectPool(null);
-        test.setMaxActive(500);
-        test.setMaxIdle(Integer.MAX_VALUE);
-        ObjectPool connectionPool = test;
-        ConnectionFactory connectionFactory = new DriverManagerConnectionFactory(connectURI, null);
-        PoolableConnectionFactory poolableConnectionFactory = new PoolableConnectionFactory(connectionFactory, connectionPool, null, null, false, true);
-        dataSource = new PoolingDataSource(connectionPool);
-        return dataSource;
-    }
-    //make only 1 connection !
-
-    public synchronized void initializePoollessConnection() throws SQLException, InterruptedException {
+    private synchronized static void makeSingleConnection() throws SQLException, InterruptedException {
         if (conn == null) {
             File directoryFile = new File(directory);
-            if (protocol.contains("derby")) {
-                conn = DriverManager.getConnection(protocol + directory + dbName);
-            } else {
-                if (!directoryFile.exists()) {
-                    directoryFile.mkdirs();
-                    conn = DriverManager.getConnection(protocol + directory + dbName + ".db");
-                } else {
-                    conn = DriverManager.getConnection(protocol + directory + dbName + ".db");
-                }
-            }
-        }
-    }
-    //use the connectionPool
-
-    public synchronized void initializeConnectionPool() throws SQLException, InterruptedException {
-        if (dataSource == null) {
-            File directoryFile = new File(directory);
-            dataSource = setupDataSource(protocol + directory + "/" + dbName + ".db");
             if (!directoryFile.exists()) {
                 directoryFile.mkdirs();
             }
-        }
-    }
-
-    private static synchronized Connection prepareWritingConnection() {
-        if (!blockNewConnections) {
-            synchronized (lock) {
-                Connection connectionInstance = null;
-                Boolean success = false;
-                while (!success) {
-                    Statement statement = null;
-                    try {
-                        connectionInstance = getConnection();
-                        //connectionInstance.setAutoCommit(false);
-                        statement = connectionInstance.createStatement();
-                        statement.execute("begin immediate");
-                        connectionInstance.setTransactionIsolation(Connection.TRANSACTION_READ_UNCOMMITTED);
-
-                        success = true;
-                    } catch (SQLException ex) {
-                        if (!ex.toString().contains("cannot start a transaction within a transaction") && !ex.toString().contains("database is locked")) {
-                            ex.printStackTrace();
-                        }
-                    }
-                }
-                return connectionInstance;
-            }
-        }
-        return null;
-    }
-
-    public synchronized Connection prepareReadingConnection() {
-        if (!blockNewConnections) {
-            synchronized (lock) {
-                Connection connectionInstance = null;
-                Boolean success = false;
-                while (!success) {
-                    Statement statement = null;
-                    try {
-                        connectionInstance = getConnection();
-                        connectionInstance.setTransactionIsolation(Connection.TRANSACTION_READ_UNCOMMITTED);
-                        success = true;
-                    } catch (SQLException ex) {
-                        if (!ex.toString().contains("cannot start a transaction within a transaction")) {
-                            ex.printStackTrace();
-                        }
-                    } catch (NullPointerException e) {
-                        e.printStackTrace();
-                    }
-                }
-                return connectionInstance;
-            }
-        }
-        return null;
-    }
-
-    public static void disconnect(@Nullable Connection conn, @Nullable ResultSet rs, @Nullable Statement statement) {
-        try {
-            statement.execute("commit");
-            rs.close();
-        } catch (Exception ex) {
-            if (rs != null) {
-                rs = null;
-            }
             try {
-                statement.close();
-            } catch (Exception ex2) {
-                if (statement != null) {
-                    statement = null;
-                }
+                Class.forName("org.sqlite.JDBC");
+                conn = DriverManager.getConnection(protocol + directory + "/" + dbName + ".db");
+            } catch (ClassNotFoundException ex) {
+                logger.error(ex);
             }
-            try {
-                conn.close();
-            } catch (Exception ex3) {
-                if (conn != null) {
-                    conn = null;
-                }
-            }
+
         }
+    }
+
+    public static void release(Connection conn) {
+        connectionInUse = false;
     }
 
     public static void createTables() {
-        Connection connectionInstance = null;
+        Connection connectionInstance = getConnection(logger.getName());
         Statement statement = null;
         setupMajorInitiationQuery();
         try {
             if (RelimsProperties.getTaskDatabaseDriver().contains("derby")) {
                 logger.debug("Creating new database...");
-                connectionInstance = prepareWritingConnection();
                 //connectionInstance.setTransactionIsolation(4);
             } else {
                 if (!new File(directory).exists()) {
                     (new File(directory)).mkdir();
                 }
-                //conn = DriverManager.getConnection("jdbc:sqlite:" + directory + "/" + dbName + ".db");
-                connectionInstance = prepareWritingConnection();
                 statement = connectionInstance.createStatement();
                 for (String aSubQuery : queryList) {
                     statement.execute(aSubQuery.toString());
                 }
             }
+            statement.close();
         } catch (Exception ex) {
             if (!ex.toString().contains("already exists")) {
                 ex.printStackTrace();
             }
         } finally {
-            disconnect(connectionInstance, null, statement);
+            if (statement != null) {
+                statement = null;
+            }
+            release(connectionInstance);
         }
     }
 
@@ -260,14 +170,13 @@ public class DAO {
         queryList.add("CREATE TABLE Tasks ("
                 + "TaskID INTEGER PRIMARY KEY,"
                 + "ProjectID VarChar(50),"
-                + "STRATEGYID VarChar(50),"
-                + "SOURCEID VarChar(50),"
                 + "TaskState VARCHAR(20),"
                 + "ClientID VARCHAR(100),"
+                + "SourceID VARCHAR(20),"
                 + "ProjectName VarChar(255),"
                 + "FASTA VarChar(255),"
-                + "Timestamp TIMESTAMP,"
-                + "usePride BOOLEAN);");
+                + "usePride int,"
+                + "Timestamp TIMESTAMP);");
 // MAKE TASK TABLE____________________________________________PRIDE DETAILS : TODO rename this
         queryList.add("CREATE TABLE PRIDEXMLERRORS ("
                 + "ProjectID VarChar(50),"
@@ -312,22 +221,5 @@ public class DAO {
                 + "projectID VarChar(50),"
                 + "parameterName VarChar(30),"
                 + "parameterValue VarChar(200));");
-        //Set PRAGMA-MODE
-        queryList.add("PRAGMA journal_mode = OFF");
-    }
-
-    public void setTimeOut(Connection connection) {
-        Statement statement = null;
-        try {
-            statement = connection.createStatement();
-            statement.execute("CALL SYSCS_UTIL.SYSCS_SET_DATABASE_PROPERTY('sqlite.locks.deadlockTimeout', '30')");
-            logger.debug("Set timeout configuration");
-        } catch (SQLException e) {
-            logger.debug("Could not set configuration");
-            e.printStackTrace();
-            logger.debug(e);
-        } finally {
-            disconnect(conn, null, statement);
-        }
     }
 }

@@ -12,7 +12,6 @@ import com.compomics.relims.modes.networking.controller.connectivity.database.DA
 import com.compomics.relims.modes.networking.controller.connectivity.database.DAO.WorkerSpecsDAO;
 import com.compomics.relims.modes.networking.controller.connectivity.database.DAO.TaskDAO;
 import com.compomics.relims.modes.networking.controller.connectivity.database.DAO.WorkerDAO;
-import com.compomics.relims.modes.networking.controller.connectivity.database.security.BackupService;
 import com.compomics.relims.modes.networking.controller.taskobjects.Task;
 import com.compomics.relims.modes.networking.controller.taskobjects.TaskContainer;
 import com.compomics.relims.modes.networking.controller.workerpool.WorkerRunner;
@@ -21,8 +20,6 @@ import java.sql.*;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 import org.apache.log4j.Logger;
 
 public class DatabaseService {
@@ -33,14 +30,8 @@ public class DatabaseService {
     private final static WorkerSpecsDAO WorkerSpecsDAO = new WorkerSpecsDAO();
     private final static PrideXMLErrorsDAO PRIDEXMLERRORSDAO = new PrideXMLErrorsDAO();
     private final static ProjectResultDAO projectResultDAO = new ProjectResultDAO();
-    private final static BackupService backupService = BackupService.getInstance();
-    private final static ExecutorService dbExService = Executors.newSingleThreadExecutor();
 
-    /*     
-     the default framework is embedded
-     */
     protected String framework = RelimsProperties.getTaskDatabaseFramework();
-    ;
     protected String driver = RelimsProperties.getTaskDatabaseDriver();
     protected String protocol = RelimsProperties.getTaskDatabaseProtocol();
     protected String dbName = RelimsProperties.getTaskDatabaseName();
@@ -69,18 +60,19 @@ public class DatabaseService {
         Connection setWALConn = null;
         Statement setWALstate = null;
         try {
-            setWALConn = DAO.getConnection();
+            setWALConn = DAO.getConnection(logger.getName());
             setWALstate = setWALConn.createStatement();
             setWALstate.execute("PRAGMA journal_mode=WAL");
-            DAO.disconnect(setWALConn, rs, setWALstate);
             logger.info("WALMODE set");
         } catch (Exception e) {
-            DAO.disconnect(setWALConn, null, setWALstate);
+            logger.error(e);
+        } finally {
+            DAO.release(setWALConn);
         }
     }
 
     public synchronized void launch() {
-        DAO.initiate();
+        DAO.getInstance();
         // load the desired JDBC driver
         loadDriver();
         try {
@@ -126,12 +118,6 @@ public class DatabaseService {
     public synchronized String readTask(long taskID) {
 
         return TaskDAO.readTask(taskID);
-
-    }
-
-    public synchronized List<String[]> getUserTasks(String userID, String queryParameters) {
-
-        return TaskDAO.getUserTasks(userID, queryParameters);
 
     }
 
@@ -192,11 +178,6 @@ public class DatabaseService {
     public synchronized void storeWorkerSpecs(HashMap<String, Object> WorkerSpecs, String workerhost) {
 
         WorkerSpecsDAO.createTaskWorkerSpecs(WorkerSpecs, workerhost);
-    }
-
-    public synchronized HashMap<String, Object> getAverageWorkerSpecs() {
-
-        return WorkerSpecsDAO.getAverageWorkerSpecs();
     }
 
     public synchronized Map<String, Object> getTaskInformation(long taskID) {

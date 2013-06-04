@@ -70,7 +70,6 @@ public class TaskRunner {
         private long lTaskID;
         private long lProjectID;
         private String lProjectProviderID;
-        private String lSearchStrategyID;
         private SearchParameters lSearchParameters;
         private Boolean usePrideAsa;
         private List<ConversionError> conversionErrorList;
@@ -80,14 +79,13 @@ public class TaskRunner {
             try {
                 ResourceManager.setTaskTime(System.currentTimeMillis());
                 lSearchParameters = task.getSearchParameters();
-                lSearchStrategyID = task.getStrategyID();
                 lProjectProviderID = task.getSourceID();
                 usePrideAsa = task.getAllowPridePipeline();
                 lProjectID = Long.parseLong(task.getProjectID());
                 lTaskID = task.getTaskID();
                 int lWorkerPort = ResourceManager.getWorkerPort();
                 File fastaFile = RelimsProperties.getFastaFromRepository(task.getFasta());
-                iRelimsJob = new RelimsJob(lSearchStrategyID, lProjectProviderID, lProjectID, lTaskID, lWorkerPort, lSearchParameters, usePrideAsa, fastaFile);
+                iRelimsJob = new RelimsJob(lProjectProviderID, lProjectID, lTaskID, lWorkerPort, lSearchParameters, usePrideAsa, fastaFile);
                 ResourceManager.setUserID(task.getUserID());
                 ResourceManager.setProjectID(lProjectID);
                 //get correct fasta
@@ -119,14 +117,12 @@ public class TaskRunner {
                     logger.debug("Finished task :" + lTaskID
                             + "(projectID : " + lProjectID
                             + "project provider : " + lProjectProviderID
-                            + "search strategy : " + lSearchStrategyID
                             + " )");
                     ResourceManager.setFinishState(Checkpoint.FINISHED);
                     System.out.println(" ");
                     System.out.println("Finished task :" + lTaskID
                             + "(projectID : " + lProjectID
                             + "project provider : " + lProjectProviderID
-                            + "search strategy : " + lSearchStrategyID
                             + " )");
                     System.out.println(" ");
                 } else {
@@ -134,15 +130,13 @@ public class TaskRunner {
                         logger.debug("Failed task :" + lTaskID
                                 + "(projectID : " + lProjectID
                                 + "project provider : " + lProjectProviderID
-                                + "search strategy : " + lSearchStrategyID
                                 + " )");
                         ResourceManager.setFinishState(Checkpoint.FAILED);
                         System.out.println(" ");
                         System.out.println("Could not run task :" + lTaskID
                                 + "(projectID : " + lProjectID
                                 + "project provider : " + lProjectProviderID
-                                + "search strategy : " + lSearchStrategyID
-                                + " )");
+                                 + " )");
                         System.out.println(" ");
                         ResultManager.removeJunk();
                     } else {
@@ -150,7 +144,6 @@ public class TaskRunner {
                             logger.debug("Failed task :" + lTaskID
                                     + "(projectID : " + lProjectID
                                     + "project provider : " + lProjectProviderID
-                                    + "search strategy : " + lSearchStrategyID
                                     + " )");
                             ResourceManager.setFinishState(Checkpoint.PRIDEFAILURE);
                             System.out.println("Reason : PRIDE-ASA did not provide workable data output");

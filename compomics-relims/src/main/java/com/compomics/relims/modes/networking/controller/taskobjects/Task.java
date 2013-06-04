@@ -15,7 +15,6 @@ public class Task implements Serializable {
 
     private long taskID = 0L;
     private String projectID;
-    private String strategyID;
     private String sourceID;
     private String userID;
     private String taskName;
@@ -23,10 +22,9 @@ public class Task implements Serializable {
     private boolean allowPridePipeline = true;
     private String fasta = null;
 
-    public Task(long foundTaskID, String foundProjectID, String strategyID, String sourceID, String userID,String fasta) {
+    public Task(long foundTaskID, String foundProjectID, String sourceID, String userID,String fasta) {
         this.taskID = foundTaskID;
         this.projectID = foundProjectID;
-        this.strategyID = strategyID;
         this.sourceID = sourceID;
         this.userID = userID;
         this.fasta = fasta;
@@ -57,10 +55,6 @@ public class Task implements Serializable {
 
     public long getTaskID() {
         return taskID;
-    }
-
-    public String getStrategyID() {
-        return strategyID;
     }
 
     public String getSourceID() {

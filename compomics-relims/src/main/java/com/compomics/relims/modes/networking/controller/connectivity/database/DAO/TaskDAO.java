@@ -11,7 +11,6 @@ import com.compomics.util.experiment.identification.SearchParameters;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.sql.Connection;
@@ -23,7 +22,6 @@ import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import org.apache.log4j.Logger;
@@ -34,21 +32,18 @@ import org.apache.log4j.Logger;
  */
 public class TaskDAO {
 
-    private Logger logger = Logger.getLogger(DatabaseService.class);
+    private Logger logger = Logger.getLogger(TaskDAO.class);
     private long newTaskID = 0L;
-    private InputStream in;
     private TaskContainer taskMap;
     private String clientID;
     private HashMap<String, String> tasksToStore = new LinkedHashMap<>();
-    private SearchParameters loadedParameters;
     private List<String> subList;
 
     public void updateTaskStatus(long taskID, String status) {
         PreparedStatement statement = null;
-        ResultSet rs = null;
         Connection conn = null;
         try {
-            conn = DAO.getConnection();
+            conn = DAO.getConnection(logger.getName());
             String query = "update Tasks set TaskState = ? where TaskID=?";
 //            statement = conn.prepareStatement("BEGIN");
             //           statement.execute();
@@ -59,17 +54,20 @@ public class TaskDAO {
             statement.executeUpdate();
 //            statement = conn.prepareStatement("COMMIT");
 //            statement.execute();
+            statement.close();
         } catch (SQLException ex) {
             logger.error("Error changing status of task " + taskID + " to " + status);
             logger.error(ex);
         } finally {
-            DAO.disconnect(conn, rs, statement);
+            if (statement != null) {
+                statement = null;
+            }
+            DAO.release(conn);
         }
     }
 
     public void updateSearchParameters(long taskID, SearchParameters searchParameters) {
         PreparedStatement statement = null;
-        ResultSet rs = null;
         Connection conn = null;
         byte[] searchparameterToStore = null;
 
@@ -87,7 +85,7 @@ public class TaskDAO {
         }
 
         try {
-            conn = DAO.getConnection();
+            conn = DAO.getConnection(logger.getName());
             String query = "update Tasks set searchParameters = ? where TaskID=?";
 //            statement = conn.prepareStatement("BEGIN");
             //           statement.execute();
@@ -98,20 +96,23 @@ public class TaskDAO {
             statement.executeUpdate();
 //            statement = conn.prepareStatement("COMMIT");
 //            statement.execute();
+            statement.close();
         } catch (SQLException ex) {
             logger.error(ex);
         } finally {
-            DAO.disconnect(conn, rs, statement);
+            if (statement != null) {
+                statement = null;
+            }
+            DAO.release(conn);
         }
     }
 
     public void deleteTask(long taskID) {
         PreparedStatement statement = null;
-        ResultSet rs = null;
         Connection conn = null;
         // Make PreparedStatements
         try {
-            conn = DAO.getConnection();
+            conn = DAO.getConnection(logger.getName());
 //            statement = conn.prepareStatement("BEGIN");
 //            statement.execute();
             String query = "delete from Tasks where TaskID = ?";
@@ -121,48 +122,15 @@ public class TaskDAO {
             statement.executeUpdate();
 //            statement = conn.prepareStatement("COMMIT");
 //            statement.execute();
+            statement.close();
         } catch (SQLException ex) {
             logger.error(ex);
         } finally {
-            DAO.disconnect(conn, rs, statement);
-        }
-    }
-
-    public long createTask(String status, String clientID, String strategyID, String sourceID) {
-        PreparedStatement statement = null;
-        ResultSet rs = null;
-        Connection conn = null;
-        try {
-            conn = DAO.getConnection();
-//            statement = conn.prepareStatement("BEGIN");
-//            statement.execute();
-            String query = "insert into Tasks"
-                    + "(TaskState,ClientID,RelimsClientJob,Fasta,TimeStamp) values (?, ?, ?, ?,?)";
-            statement = conn.prepareStatement(query, Statement.RETURN_GENERATED_KEYS);
-            statement.setString(1, "New");
-            statement.setString(2, clientID);
-            statement.setString(2, strategyID);
-            statement.setString(2, sourceID);
-            java.sql.Timestamp sqlDate = new java.sql.Timestamp(new java.util.Date().getTime());
-            statement.setTimestamp(4, sqlDate);
-            statement.setQueryTimeout(60);
-            statement.execute();
-            rs = statement.getGeneratedKeys();
-            while (rs.next()) {
-                newTaskID = rs.getInt(1);
+            if (statement != null) {
+                statement = null;
             }
-//            statement = conn.prepareStatement("COMMIT");
-//            statement.execute();
-            logger.debug(clientID + " created task( " + newTaskID + " )");
-        } catch (SQLException ex) {
-            logger.error("Error creating new Task");
-            logger.error(ex);
-            ex.printStackTrace();
-        } finally {
-            DAO.disconnect(conn, rs, statement);
-            return newTaskID;
+            DAO.release(conn);
         }
-
     }
 
     public String readTask(long taskID) {
@@ -171,7 +139,7 @@ public class TaskDAO {
         Connection conn = null;
         String message = null;
         try {
-            conn = DAO.getConnection();
+            conn = DAO.getConnection(logger.getName());
 //            statement = conn.prepareStatement("BEGIN");
 //            statement.execute();
             //     String query = "select * from " + RelimsProperties.getTaskDatabaseName()+".Tasks where TaskID = ?";
@@ -188,11 +156,19 @@ public class TaskDAO {
             }
 //            statement = conn.prepareStatement("COMMIT");
 //            statement.execute();
+            rs.close();
+            statement.close();
         } catch (SQLException ex) {
             message = "Could not read stream !";
             logger.error(ex);
         } finally {
-            DAO.disconnect(conn, rs, statement);
+            if (rs != null) {
+                rs = null;
+            }
+            if (statement != null) {
+                statement = null;
+            }
+            DAO.release(conn);
             return message;
         }
 
@@ -215,35 +191,34 @@ public class TaskDAO {
         ObjectInputStream ois = null;
         //find new task and make a workingTask out of it
         try {
-            conn = DAO.getConnection();
+            conn = DAO.getConnection(logger.getName());
             //           statement = conn.prepareStatement("BEGIN");
             //           statement.execute();
-            String query = "select * from Tasks where (TaskState = ? or TaskState = ?) order by Timestamp LIMIT 1";
+            String query = "select * from Tasks where (TaskState = ?) order by Timestamp LIMIT 1";
             statement = conn.prepareStatement(query);
-            statement.setString(1, "RESCHEDULED");
-            statement.setString(2, "NEW");
-            statement.setQueryTimeout(30);
+            statement.setString(1, "NEW");
             rs = statement.executeQuery();
             if (rs.next()) {
                 foundTaskID = rs.getLong("TaskID");
                 foundProjectID = rs.getString("ProjectID");
-                foundStrategy = rs.getString("StrategyID");
                 foundSource = rs.getString("SourceID");
                 foundUserID = rs.getString("ClientID");
                 foundFasta = rs.getString("Fasta");
                 foundAllowPipeline = rs.getBoolean("usePride");
-                relimsWorkingTask = new Task(foundTaskID, foundProjectID, foundStrategy, foundSource, foundUserID,foundFasta);
+                relimsWorkingTask = new Task(foundTaskID, foundProjectID, foundSource, foundUserID, foundFasta);
             }
-        } catch (Exception ex) {
-            logger.error("TaskDistributor Failed : ");
-            if (!ex.toString().contains("The database file is locked)")) {
-                logger.error(ex);
-                ex.printStackTrace();
-            } else {
-                logger.error(ex);
-            }
+            rs.close();
+            statement.close();
+        } catch (SQLException ex) {
+            logger.error(ex);
         } finally {
-            DAO.disconnect(conn, rs, statement);
+            if (rs != null) {
+                rs = null;
+            }
+            if (statement != null) {
+                statement = null;
+            }
+            DAO.release(conn);
             return relimsWorkingTask;
 
         }
@@ -251,14 +226,13 @@ public class TaskDAO {
 
     public long startupSweep() {
         PreparedStatement statement = null;
-        ResultSet rs = null;
         Connection conn = null;
         logger.info("Sweeping database for incorrectly shutdown tasks...");
         long updates = 0L;
         boolean sweeped = false;
         while (!sweeped) {
             try {
-                conn = DAO.getConnection();
+                conn = DAO.getConnection(logger.getName());
                 //         statement = conn.prepareStatement("BEGIN");
                 //         statement.execute();
                 String query = "update Tasks set TaskState = ? where TaskState=? OR TaskState=?";
@@ -266,12 +240,12 @@ public class TaskDAO {
                 statement.setString(1, "NEW");
                 statement.setString(2, "RUNNING");
                 statement.setString(3, "FAILED");
-                statement.setQueryTimeout(60);
                 updates = statement.executeUpdate();
                 sweeped = true;
                 logger.debug(updates + " tasks have been rescheduled...");
                 //         statement = conn.prepareStatement("COMMIT");
                 //         statement.execute();
+                statement.close();
             } catch (SQLException ex) {
                 if (!ex.toString().contains("database is locked")) {
                     //            System.err.println(ex);
@@ -280,33 +254,32 @@ public class TaskDAO {
                     ex.printStackTrace();
                 }
             } finally {
+                if (statement != null) {
+                    statement = null;
+                }
                 if (sweeped) {
                     logger.info("Reset " + updates + " tasks");
-                    DAO.disconnect(conn, rs, statement);
                 }
+                DAO.release(conn);
             }
         }
         return updates;
     }
 
-    public boolean storeTasks(List<String> aProjectIDList, boolean allowPrideAsaPipeline, String fasta) throws IOException {
-        // searchParameters = null;
-        byte[] searchparameterToStore = null;
+    public boolean storeTasks(List<String> aProjectIDList, boolean allowPrideAsaPipeline, String fasta,String sourceID) throws IOException {
         PreparedStatement statement = null;
-        ResultSet rs = null;
         Connection conn = null;
         boolean success = false;
 
         try {
-            // get the searchblob
-            conn = DAO.getConnection();
+            conn = DAO.getConnection(logger.getName());
             //     statement = conn.prepareStatement("BEGIN");
             //     statement.execute();
             for (String aProjectID : aProjectIDList) {
                 String query = "";
                 query = " insert into Tasks"
-                        + " (ProjectID,TaskState,ClientID,StrategyID,SourceID,TimeStamp,ProjectName,Fasta,usePride) "
-                        + "values (?,?,?,?,?,?,?,?,?)";
+                        + " (ProjectID,TaskState,ClientID,SourceID,TimeStamp,ProjectName,Fasta,usePride) "
+                        + "values (?,?,?,?,?,?,?,?)";
                 success = false;
                 int attempts = 0;
                 while (!success) {
@@ -316,24 +289,24 @@ public class TaskDAO {
                         statement.setString(1, aProjectID);
                         statement.setString(2, "NEW");
                         statement.setString(3, clientID);
-                        statement.setString(4, taskMap.getStrategyID());
-                        statement.setString(5, taskMap.getSourceID());
+                        statement.setString(4, sourceID);
                         java.sql.Timestamp sqlDate = new java.sql.Timestamp(new java.util.Date().getTime());
-                        statement.setTimestamp(6, sqlDate);
-                        statement.setString(7, tasksToStore.get(aProjectID));
-                        statement.setString(8, fasta);
-                        statement.setBoolean(9, allowPrideAsaPipeline);
-                        statement.setQueryTimeout(60);
+                        statement.setTimestamp(5, sqlDate);
+                        statement.setString(6, tasksToStore.get(aProjectID));
+                        statement.setString(7, fasta);
+                        statement.setBoolean(8, allowPrideAsaPipeline);
                         statement.execute();
                         success = true;
                         //                 statement = conn.prepareStatement("COMMIT");
                         //                 statement.execute();
+                        statement.close();
                     } catch (ArrayIndexOutOfBoundsException e) {
-                        e.printStackTrace();
+                        logger.error(e);
                     } catch (SQLException e) {
-                        e.printStackTrace();
+                        logger.error(e);
                         success = false;
                         if (attempts > 9) {
+                            DAO.release(conn);
                             return false;
                         }
                     }
@@ -342,18 +315,18 @@ public class TaskDAO {
         } catch (Exception ex) {
             logger.error("Error creating new Task");
             logger.error(ex);
-            ex.printStackTrace();
             success = false;
         } finally {
-            DAO.disconnect(conn, rs, statement);
+            if (statement != null) {
+                statement = null;
+            }
+            DAO.release(conn);
+            return success;
         }
-        return success;
     }
 
     public Map<String, Long> pushTaskMapToDB(TaskContainer taskMap) {
-        PreparedStatement statement = null;
-        ResultSet rs = null;
-        Connection conn = null;
+
         //WorkerPool.setDatabaseLocked(true);
         this.taskMap = taskMap;
         Map<String, Long> generatedTaskIDs = new HashMap<>();
@@ -361,7 +334,7 @@ public class TaskDAO {
         tasksToStore = taskMap.getTaskList();
         List<String> taskList = new ArrayList<>();
 
-        //break up the taskcontainer into managable subtasks (100 projects max)
+        //break up the taskcontainer into managable subtasks (10000 projects max)
         for (String aProject : tasksToStore.keySet()) {
             taskList.add(aProject);
         }
@@ -376,7 +349,6 @@ public class TaskDAO {
         }
         int i = 1;
         while (!taskList.isEmpty()) {
-            System.out.println("Storing tasks in batch : batch " + i + " / " + taskSteps);
             try {
                 if (taskList.size() > batchSize) {
                     subList = taskList.subList(0, batchSize);
@@ -384,11 +356,10 @@ public class TaskDAO {
                     subList = taskList.subList(0, remainder);
                 }
                 //store tasks in a future object...
-                storeTasks(subList, taskMap.isPrideAsaEnabled(),taskMap.getFasta());
+                storeTasks(subList, taskMap.isPrideAsaEnabled(), taskMap.getFasta(),taskMap.getSourceID());
                 taskList.removeAll(subList);
                 i++;
             } catch (Exception e) {
-                e.printStackTrace();
                 logger.error(e);
                 System.out.println("An error has occurred while storing the tasks : " + e);
                 break;
@@ -402,58 +373,12 @@ public class TaskDAO {
         return generatedTaskIDs;
     }
 
-    public List<String[]> getUserTasks(String userID, String queryParameters) {
-        PreparedStatement statement = null;
-        ResultSet rs = null;
-        Connection conn = null;
-        conn = DAO.getConnection();
-        List<String[]> results = new LinkedList<>();
-        StringBuilder query = new StringBuilder();
-        try {
-            if (queryParameters.equals("")) {
-                query.append("select ProjectID,WorkerSpecs.TaskID,TaskState,ProjectName from Tasks inner join WorkerSpecs on Tasks.TaskID = WorkerSpecs.TaskID where CLIENTID = ?");
-            } else {
-                query.append("select ProjectID,WorkerSpecs.TaskID,TaskState,ProjectName from Tasks inner join WorkerSpecs on Tasks.TaskID = WorkerSpecs.TaskID where CLIENTID = ? and ").append(queryParameters);
-            }
-
-            String queryString = query.toString();
-
-            //     statement = conn.prepareStatement("BEGIN");
-            //     statement.execute();
-            statement = conn.prepareStatement(queryString);
-            statement.setString(1, userID);
-            statement.setQueryTimeout(60);
-            rs = statement.executeQuery();
-            while (rs.next()) {
-                String projectID = rs.getString("ProjectId");
-                String taskState = rs.getString("TaskState");
-                String taskID = "" + rs.getLong("TaskID");
-                String projectName = rs.getString("ProjectName");
-                results.add(new String[]{projectID, taskID, taskState, projectName});
-            }
-            //     statement = conn.prepareStatement("COMMIT");
-            //     statement.execute();
-        } catch (SQLException ex) {
-            System.err.println(ex);
-            ex.printStackTrace();
-
-        } catch (Exception ex) {
-            System.out.println(ex);
-            ex.printStackTrace();
-        } finally {
-            DAO.disconnect(conn, rs, statement);
-            return results;
-        }
-
-    }
-
     public void resetTask(long taskID) {
         PreparedStatement statement = null;
-        ResultSet rs = null;
         Connection conn = null;
         if (taskID != 0L) {
             try {
-                conn = DAO.getConnection();
+                conn = DAO.getConnection(logger.getName());
                 //         statement = conn.prepareStatement("BEGIN");
                 //         statement.execute();
                 statement = conn.prepareStatement("update Tasks set TaskState = ? where TaskID=?");
@@ -463,21 +388,24 @@ public class TaskDAO {
                 statement.executeUpdate();
                 //         statement = conn.prepareStatement("COMMIT");
                 //         statement.execute();
+                statement.close();
             } catch (SQLException ex) {
                 logger.error(ex);
             } finally {
-                DAO.disconnect(conn, rs, statement);
+                if (statement != null) {
+                    statement = null;
+                }
+                DAO.release(conn);
             }
         }
     }
 
     public int resetFailedTasks() {
         PreparedStatement statement = null;
-        ResultSet rs = null;
         Connection conn = null;
         int restored = 0;
         try {
-            conn = DAO.getConnection();
+            conn = DAO.getConnection(logger.getName());
             //     statement = conn.prepareStatement("BEGIN");
             //     statement.execute();
             statement = conn.prepareStatement("update Tasks set TaskState ='NEW' where TaskState = 'FAILED'");
@@ -485,54 +413,56 @@ public class TaskDAO {
             restored = statement.executeUpdate();
             //     statement = conn.prepareStatement("COMMIT");
             //     statement.execute();
+            statement.close();
         } catch (SQLException ex) {
             logger.error(ex);
         } finally {
-            DAO.disconnect(conn, rs, statement);
+            if (statement != null) {
+                statement = null;
+            }
+            DAO.release(conn);
             return restored;
         }
     }
 
     public HashMap<String, Object> getTaskInformation(long taskID) {
         PreparedStatement statement = null;
-        ResultSet rs = null;
         Connection conn = null;
         HashMap<String, Object> informationMap = new HashMap<>();
-        ResultSet myResults = null;
-        PreparedStatement searchParametersQuery = null;
+        ResultSet rs = null;
 
         try {
             //get the columncount
-            conn = DAO.getConnection();
+            conn = DAO.getConnection(logger.getName());
             //     statement = conn.prepareStatement("BEGIN");
             //     statement.execute();
             statement = conn.prepareStatement("select * from Tasks inner join WorkerSpecs on Tasks.TaskID = WorkerSpecs.TaskID where Tasks.TaskID = ?");
             statement.setLong(1, taskID);
-            myResults = statement.executeQuery();
-            try {
-                if (myResults.next()) {
-                    ResultSetMetaData rsmd = myResults.getMetaData();
-                    int NumOfCol = rsmd.getColumnCount();
-                    for (int i = 1; i <= NumOfCol; i++) {
-                        informationMap.put(rsmd.getColumnName(i), myResults.getObject(rsmd.getColumnName(i)));
-                    }
+            rs = statement.executeQuery();
+
+            if (rs.next()) {
+                ResultSetMetaData rsmd = rs.getMetaData();
+                int NumOfCol = rsmd.getColumnCount();
+                for (int i = 1; i <= NumOfCol; i++) {
+                    informationMap.put(rsmd.getColumnName(i), rs.getObject(rsmd.getColumnName(i)));
                 }
-                //         statement = conn.prepareStatement("COMMIT");
-                //         statement.execute();
-            } catch (Exception e) {
-                e.printStackTrace();
             }
+            //         statement = conn.prepareStatement("COMMIT");
+            //         statement.execute();
+            statement.close();
+            rs.close();
+
         } catch (SQLException ex) {
             ex.printStackTrace();
             logger.error(ex);
         } finally {
-            try {
-                myResults.close();
-                //          searchParametersQuery.close();
-            } catch (SQLException ex) {
-                myResults = null;
+            if (statement != null) {
+                statement = null;
             }
-            DAO.disconnect(conn, rs, statement);
+            if (rs != null) {
+                rs = null;
+            }
+            DAO.release(conn);
             return informationMap;
         }
     }
@@ -541,7 +471,7 @@ public class TaskDAO {
         PreparedStatement statement = null;
         ResultSet rs = null;
         Connection conn = null;
-        conn = DAO.getConnection();
+        conn = DAO.getConnection(logger.getName());
         String projectID = "unknown";
         try {
             String query = ("select ProjectID from Tasks where TaskID = ?");
@@ -556,14 +486,18 @@ public class TaskDAO {
             }
             //     statement = conn.prepareStatement("COMMIT");
             //     statement.execute();
+            statement.close();
+            rs.close();
         } catch (SQLException ex) {
-            System.err.println(ex);
-            ex.printStackTrace();
-        } catch (Exception ex) {
-            System.out.println(ex);
-            ex.printStackTrace();
+            logger.error(ex);
         } finally {
-            DAO.disconnect(conn, rs, statement);
+            if (statement != null) {
+                statement = null;
+            }
+            if (rs != null) {
+                rs = null;
+            }
+            DAO.release(conn);
             return projectID;
         }
     }

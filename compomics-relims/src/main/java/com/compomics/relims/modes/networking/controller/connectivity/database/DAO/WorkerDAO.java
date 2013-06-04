@@ -25,12 +25,11 @@ public class WorkerDAO {
 
     public boolean createWorker(String hostname, int port, long taskID) {
         PreparedStatement statement = null;
-        ResultSet rs = null;
         Connection conn = null;
         boolean createSucces = false;
         List<String> errors = new ArrayList<>();
         try {
-            conn = DAO.getConnection();
+            conn = DAO.getConnection(logger.getName());
             //      statement = conn.prepareStatement("BEGIN");
             //      statement.execute();
             String query = "insert into Workers"
@@ -45,26 +44,24 @@ public class WorkerDAO {
             //      statement = conn.prepareStatement("COMMIT");
             //      statement.execute();
             logger.debug("Worker was registered in database...");
+            statement.close();
         } catch (Exception ex) {
             errors.add("Error creating worker");
             logger.error(ex);
             logger.error(ex.getCause());
             logger.error("Error creating new worker");
-        }
-        try {
-            DAO.disconnect(conn, rs, statement);
+        } finally {
+            if (statement != null) {
+                statement = null;
+            }
             if (errors != null) {
                 if (!errors.isEmpty()) {
                     createSucces = false;
                 }
             }
-        } catch (NullPointerException npe) {
-            npe.printStackTrace();
-            logger.error(npe);
-            return false;
+            DAO.release(conn);
+            return createSucces;
         }
-        return createSucces;
-
     }
 
     public long getTaskID(String hostname, int workerPort) {
@@ -73,7 +70,7 @@ public class WorkerDAO {
         Connection conn = null;
         long taskID = 0;
         try {
-            conn = DAO.getConnection();
+            conn = DAO.getConnection(logger.getName());
             //      statement = conn.prepareStatement("BEGIN");
             //      statement.execute();
             String query = "select taskID Workers where Hostname = ? and workerPort = ?";
@@ -87,20 +84,27 @@ public class WorkerDAO {
             }
             //      statement = conn.prepareStatement("COMMIT");
             //      statement.execute();
+            statement.close();
+            rs.close();
         } catch (SQLException ex) {
             logger.error(ex);
         } finally {
-            DAO.disconnect(conn, rs, statement);
+            if (statement != null) {
+                statement = null;
+            }
+            if (rs != null) {
+                rs = null;
+            }
+            DAO.release(conn);
             return taskID;
         }
     }
 
     public void deleteWorker(String hostname, int workerPort) {
         PreparedStatement statement = null;
-        ResultSet rs = null;
         Connection conn = null;
         try {
-            conn = DAO.getConnection();
+            conn = DAO.getConnection(logger.getName());
             //      statement = conn.prepareStatement("BEGIN");
             //      statement.execute();
             String query = "delete from Workers where Hostname = ? and workerPort = ?";
@@ -111,10 +115,14 @@ public class WorkerDAO {
             statement.execute();
             //      statement = conn.prepareStatement("COMMIT");
             //      statement.execute();
+            statement.close();
         } catch (SQLException ex) {
             logger.error(ex);
         } finally {
-            DAO.disconnect(conn, rs, statement);
+            if (statement != null) {
+                statement = null;
+            }
+            DAO.release(conn);
         }
     }
 
@@ -124,7 +132,7 @@ public class WorkerDAO {
         Connection conn = null;
         List<WorkerRunner> activeWorkers = new ArrayList<>();
         try {
-            conn = DAO.getConnection();
+            conn = DAO.getConnection(logger.getName());
             //      statement = conn.prepareStatement("BEGIN");
             //      statement.execute();
             String query = "select * from Workers";
@@ -138,18 +146,19 @@ public class WorkerDAO {
                 WorkerRunner runner = new WorkerRunner(rs.getString("HostName"), rs.getInt("workerPort"));
                 activeWorkers.add(runner);
             }
-        } catch (Exception ex) {
+            rs.close();
+            statement.close();
+        } catch (SQLException ex) {
             logger.error(ex);
             logger.error(ex.getCause());
         }
-        try {
-            DAO.disconnect(conn, rs, statement);
-        } catch (NullPointerException npe) {
-            npe.printStackTrace();
-            logger.error(npe);
-
-        } finally {
-            return activeWorkers;
+        if (statement != null) {
+            statement = null;
         }
+        if (rs != null) {
+            rs = null;
+        }
+        DAO.release(conn);
+        return activeWorkers;
     }
 }

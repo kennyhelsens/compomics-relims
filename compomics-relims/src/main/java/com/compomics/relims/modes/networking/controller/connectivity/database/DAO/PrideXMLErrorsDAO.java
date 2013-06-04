@@ -1,12 +1,12 @@
 package com.compomics.relims.modes.networking.controller.connectivity.database.DAO;
 
-
 import com.compomics.pridexmltomgfconverter.errors.enums.ConversionError;
-import com.compomics.relims.conf.RelimsProperties;
+import static com.compomics.relims.modes.networking.controller.connectivity.database.DAO.DAO.getConnection;
 import com.compomics.relims.modes.networking.controller.connectivity.database.service.DatabaseService;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -17,11 +17,10 @@ import java.util.List;
 public class PrideXMLErrorsDAO {
 
     private org.apache.log4j.Logger logger = org.apache.log4j.Logger.getLogger(DatabaseService.class);
- 
+
     public boolean createPRIDEXMLERRORS(List<ConversionError> errorList, String projectID) {
 
         PreparedStatement statement = null;
-        ResultSet rs = null;
         Connection conn = null;
         if (errorList == null) {
             errorList = new ArrayList<ConversionError>();
@@ -31,7 +30,7 @@ public class PrideXMLErrorsDAO {
         List<String> errors = null;
 
         try {
-            conn = DAO.getConnection();
+            conn = DAO.getConnection(logger.getName());
 
             //statement.execute("BEGIN");
 
@@ -47,12 +46,15 @@ public class PrideXMLErrorsDAO {
                 statement.executeUpdate();
             }
             //statement.execute("COMMIT");
-        } catch (Exception ex) {
+            statement.close();
+        } catch (SQLException ex) {
             logger.error("Error recording WorkerSpecs");
             logger.error(ex);
             ex.printStackTrace();
         } finally {
-            DAO.disconnect(conn, rs, statement);
+            if (statement != null) {
+                statement = null;
+            }
             if (errors != null) {
                 if (!errors.isEmpty()) {
                     createSucces = false;
@@ -60,6 +62,7 @@ public class PrideXMLErrorsDAO {
             } else {
                 createSucces = true;
             }
+            DAO.release(conn);
             return createSucces;
         }
     }

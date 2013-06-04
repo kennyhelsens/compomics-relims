@@ -24,13 +24,11 @@ public class ProjectResultDAO {
 
     public boolean storeParameter(long taskID, String projectId, String parameterName, String parameter) {
         PreparedStatement statement = null;
-        ResultSet rs = null;
+        ResultSet results = null;
         Connection conn = null;
         boolean createSucces = false;
-        List<String> errors = new ArrayList<>();
-
         try {
-            conn = DAO.getConnection();
+            conn = DAO.getConnection(logger.getName());
             //     statement = conn.prepareStatement("BEGIN");
             //     statement.execute();
             String query = "insert into ProjectResults"
@@ -41,30 +39,26 @@ public class ProjectResultDAO {
             statement.setString(3, parameterName);
             statement.setString(4, parameter);
             statement.execute();
-            ResultSet results = statement.getGeneratedKeys();
+            results = statement.getGeneratedKeys();
             if (results.next()) {
                 createSucces = true;
                 logger.debug("Stored " + parameterName + " for task " + taskID);
             }
             //     statement = conn.prepareStatement("COMMIT");
             //     statement.execute();
-        } catch (Exception ex) {
+            statement.close();
+            results.close();
+        } catch (SQLException ex) {
+            if (statement != null) {
+                statement = null;
+            }
+            if (results != null) {
+                results = null;
+            }
             logger.error("Error storing " + parameterName + " for task" + taskID);
             logger.error(ex);
-            ex.printStackTrace();
-            statement.close();
         } finally {
-            if (conn != null) {
-                try {
-                    conn.close();
-                } catch (SQLException ex) {
-                    conn = null;
-                }
-            }
-            DAO.disconnect(conn, rs, statement);
-            if (!errors.isEmpty()) {
-                createSucces = false;
-            }
+            DAO.release(conn);
             return createSucces;
         }
     }

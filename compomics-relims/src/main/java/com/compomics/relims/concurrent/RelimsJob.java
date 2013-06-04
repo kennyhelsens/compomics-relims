@@ -70,7 +70,7 @@ public class RelimsJob implements Callable, Closable {
     private RelimsLoggingAppender appender;
     private File fastaFile;
 
-    public RelimsJob(String aSearchStrategyID, String aProjectProviderID) {
+    public RelimsJob(String aProjectProviderID) {
         //Initialize the logger
         initializeLogger();
         //Initialize the progressmanager
@@ -85,7 +85,7 @@ public class RelimsJob implements Callable, Closable {
         predicateManager = new PredicateManager(lDataProvider);
     }
 
-    public RelimsJob(String aSearchStrategyID, String aProjectProviderID, long aProjectID, long aTaskID, int aworkerPort, SearchParameters searchParameters, Boolean usePrideAsap, File fastaFile) {
+    public RelimsJob( String aProjectProviderID, long aProjectID, long aTaskID, int aworkerPort, SearchParameters searchParameters, Boolean usePrideAsap, File fastaFile) {
         //Initialize the logger
         initializeLogger();
         //Initialize the progressmanager

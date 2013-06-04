@@ -4,17 +4,13 @@
  */
 package com.compomics.relims.modes.networking.controller.connectivity.database.DAO;
 
-import com.compomics.relims.conf.RelimsProperties;
 import com.compomics.relims.modes.networking.controller.connectivity.database.service.DatabaseService;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
-import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.text.DecimalFormat;
 import java.util.HashMap;
 import java.util.List;
-
 
 /**
  *
@@ -23,20 +19,18 @@ import java.util.List;
 public class WorkerSpecsDAO {
 
     private org.apache.log4j.Logger logger = org.apache.log4j.Logger.getLogger(DatabaseService.class);
-    private Statement cStatement;
     private DatabaseService dds = DatabaseService.getInstance();
 
     public boolean createTaskWorkerSpecs(HashMap<String, Object> WorkerSpecsMap, String workerHost) {
 
         PreparedStatement statement = null;
-        ResultSet rs = null;
         Connection conn = null;
 
         boolean createSucces = false;
         List<String> errors = null;
 
         try {
-            conn = DAO.getConnection();
+            conn = DAO.getConnection(logger.getName());
             //statement.execute("BEGIN");
             String query = "insert into WorkerSpecs"
                     + " values (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
@@ -69,12 +63,15 @@ public class WorkerSpecsDAO {
             statement.execute();
             //statement.execute("COMMIT");
             logger.debug("WorkerSpecs for task " + WorkerSpecsMap.get("taskID") + " were succesfully registered.");
-        } catch (Exception ex) {
+            statement.close();
+        } catch (SQLException ex) {
             logger.error("Error recording WorkerSpecs");
             logger.error(ex);
-            ex.printStackTrace();
         } finally {
-            DAO.disconnect(conn, rs, statement);
+            if (statement != null) {
+                statement = null;
+            }
+            DAO.release(conn);
             if (errors != null) {
                 if (!errors.isEmpty()) {
                     createSucces = false;
@@ -91,47 +88,4 @@ public class WorkerSpecsDAO {
             return createSucces;
         }
     }
-
-    public HashMap<String, Object> getAverageWorkerSpecs() {
-        DecimalFormat twoDForm = new DecimalFormat("#.##");
-        HashMap<String, Object> averageWorkerSpecs = new HashMap<String, Object>();
-        PreparedStatement statement = null;
-        ResultSet rs = null;
-        Connection conn = null;
-        try {
-            // cStatement = conn.createStatement();
-            //  cStatement.execute("BEGIN");
-            conn = DAO.getConnection();
-            String query = "SELECT "
-                    + "AVG(taskTime),"
-                    + "AVG(systemcpuload),"
-                    + "AVG(committedVirtualMemorySize),"
-                    + "AVG(cores)"
-                    + "FROM WorkerSpecs";
-            statement = conn.prepareStatement(query);
-            statement.setQueryTimeout(60);
-            rs = statement.executeQuery();
-            if (rs.next()) {
-                averageWorkerSpecs.put("taskTime", (twoDForm.format((double) rs.getLong(1) / (60 * 1000))));
-                averageWorkerSpecs.put("systemCPULoad", twoDForm.format(rs.getDouble(2) * 100));
-                averageWorkerSpecs.put("committedVirtualMemorySize", twoDForm.format((double) rs.getLong(3) / 1000000000));
-                averageWorkerSpecs.put("cores", rs.getInt(4));
-            } else {
-                averageWorkerSpecs.put("taskTime", 0L);
-                averageWorkerSpecs.put("systemCPULoad", 0L);
-                averageWorkerSpecs.put("committedVirtualMemorySize", 0L);
-                averageWorkerSpecs.put("cores", 0);
-            }
-            //cStatement.execute("COMMIT");
-            //cStatement.close();
-        } catch (SQLException ex) {
-            logger.error(ex);
-        } finally {
-            if (cStatement != null) {
-//                cStatement = null;
-            }
-            DAO.disconnect(conn, rs, statement);
-            return averageWorkerSpecs;
-        }
-    }
-}
+  }

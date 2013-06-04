@@ -115,35 +115,30 @@ public class WorkerPool {
     }
 
     public synchronized static void deRegister(WorkerRunner worker) {
-        try {
-            totalServerPool.remove(worker);
-            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS");
-            System.out.println(sdf.format(new java.util.Date().getTime()) + " : " + worker.getHost() + "( " + worker.getPort() + " )could not send a heartbeat within the timespan and will be deregistered");
-            //System.out.println("Deleting faulty potentialWorker : " + potentialWorker.getHost() + " ( " + potentialWorker.getPort() + " )");
-            for (Checkpoint aState : checkpoints) {
-                try {
-                    if (!workerMap.get(aState).isEmpty()) {
-                        workerMap.get(aState).remove(worker);
-                        // remove the tasks the potentialWorker was running and reset them...
-                        try {
-                            long taskID = dds.getTaskID(worker.getHost(), worker.getPort());
-                            if (taskID != 0L) {
-                                dds.updateTask(taskID, Checkpoint.FAILED.toString());
-                            }
-                            dds.deleteWorker(worker.getHost(), worker.getPort());
 
-                        } catch (Exception e) {
-                            e.printStackTrace();
-                            System.out.println("Could not reset the task...");
+        totalServerPool.remove(worker);
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS");
+        System.out.println(sdf.format(new java.util.Date().getTime()) + " : " + worker.getHost() + "( " + worker.getPort() + " )could not send a heartbeat within the timespan and will be deregistered");
+        //System.out.println("Deleting faulty potentialWorker : " + potentialWorker.getHost() + " ( " + potentialWorker.getPort() + " )");
+        for (Checkpoint aState : checkpoints) {
+            try {
+                if (!workerMap.get(aState).isEmpty()) {
+                    workerMap.get(aState).remove(worker);
+                    // remove the tasks the potentialWorker was running and reset them...
+                    try {
+                        long taskID = dds.getTaskID(worker.getHost(), worker.getPort());
+                        if (taskID != 0L) {
+                            dds.updateTask(taskID, Checkpoint.FAILED.toString());
                         }
+                        dds.deleteWorker(worker.getHost(), worker.getPort());
+                    } catch (Exception e) {
+                        System.out.println("Could not reset the task...");
                     }
-                } catch (NullPointerException NPE) {
                 }
+            } catch (NullPointerException NPE) {
             }
-        } catch (NullPointerException NPE) {
-            NPE.printStackTrace();
-            logger.error("Worker was already removed from the WorkerPool...");
         }
+        logger.error("Worker was already removed from the WorkerPool...");
     }
 
     public synchronized static void setWorkerState(WorkerRunner worker, Checkpoint state) {

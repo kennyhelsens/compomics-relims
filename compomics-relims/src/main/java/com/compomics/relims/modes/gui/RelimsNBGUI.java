@@ -600,8 +600,7 @@ public class RelimsNBGUI extends javax.swing.JFrame {
         public void run() {
             String lSearchStrategyID = iStrategySelectionModel.getSelectedItem().toString();
             String lProjectProviderID = iProjectSourceSelectionModel.getSelectedItem().toString();
-
-            iRelimsJob = new RelimsJob(lSearchStrategyID, lProjectProviderID);
+            iRelimsJob = new RelimsJob(lProjectProviderID);
             Object lCall = iRelimsJob.call();
             logger.debug(lCall.toString());
         }
