@@ -124,6 +124,21 @@ public class NewProjectDialog extends javax.swing.JFrame {
         spEnzyme.setModel(enzymeSpinnerModel);
         ProjectPredicateManager.initialize();
 
+
+        File fastaRepo = RelimsProperties.getFastaRepository();
+        File[] availableFasta = fastaRepo.listFiles();
+        List<String> fastas = new ArrayList<>();
+        for (File aFasta : availableFasta) {
+            if (aFasta.getAbsolutePath().toLowerCase().endsWith(".fasta")) {
+                fastas.add(aFasta.getName());
+            }
+        }
+        SpinnerListModel fastaSpinnerModel = new SpinnerListModel();
+        fastaSpinnerModel.setList(fastas);
+        fastaSpinnerModel.setValue(fastas.get(0));
+        spFasta.setModel(fastaSpinnerModel);
+
+
         formComponentResized(
                 null);
         SwingUtilities.invokeLater(
@@ -190,8 +205,8 @@ public class NewProjectDialog extends javax.swing.JFrame {
         tfMinMS1Spectra = new javax.swing.JTextField();
         cbMinMS2Count = new javax.swing.JCheckBox();
         tfMinMS2Spectra = new javax.swing.JTextField();
-        txtFieldFasta = new javax.swing.JTextField();
         jLabel16 = new javax.swing.JLabel();
+        spFasta = new javax.swing.JSpinner();
 
         editModificationsMenuItem.setText("Edit Modifications");
         editModificationsMenuItem.addActionListener(new java.awt.event.ActionListener() {
@@ -330,7 +345,7 @@ public class NewProjectDialog extends javax.swing.JFrame {
         jPanel3Layout.setVerticalGroup(
             jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel3Layout.createSequentialGroup()
-                .addContainerGap(17, Short.MAX_VALUE)
+                .addContainerGap(15, Short.MAX_VALUE)
                 .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
                     .addComponent(toRunLabel)
                     .addComponent(Importedlabels))
@@ -456,7 +471,7 @@ public class NewProjectDialog extends javax.swing.JFrame {
                             .addComponent(manualInputField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                         .addGap(18, 18, 18)
                         .addComponent(ManualSchedule)))
-                .addContainerGap(42, Short.MAX_VALUE))
+                .addContainerGap(44, Short.MAX_VALUE))
         );
 
         jTabbedPane1.addTab("Taskcontainer settings", jPanel2);
@@ -568,8 +583,6 @@ public class NewProjectDialog extends javax.swing.JFrame {
 
         tfMinMS2Spectra.setText("100");
 
-        txtFieldFasta.setText("WH_130523_concatenated_target_decoy.fasta");
-
         jLabel16.setFont(new java.awt.Font("Lucida Grande", 1, 12)); // NOI18N
         jLabel16.setText("Fasta ");
 
@@ -585,7 +598,6 @@ public class NewProjectDialog extends javax.swing.JFrame {
                         .addGap(17, 17, 17))
                     .addGroup(jPanel1Layout.createSequentialGroup()
                         .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(txtFieldFasta, javax.swing.GroupLayout.PREFERRED_SIZE, 361, javax.swing.GroupLayout.PREFERRED_SIZE)
                             .addGroup(jPanel1Layout.createSequentialGroup()
                                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                                     .addGroup(jPanel1Layout.createSequentialGroup()
@@ -608,7 +620,8 @@ public class NewProjectDialog extends javax.swing.JFrame {
                                         .addComponent(cbMinMS1Count))
                                     .addGroup(jPanel1Layout.createSequentialGroup()
                                         .addGap(35, 35, 35)
-                                        .addComponent(cbTaxonomy)))))
+                                        .addComponent(cbTaxonomy))))
+                            .addComponent(spFasta, javax.swing.GroupLayout.PREFERRED_SIZE, 361, javax.swing.GroupLayout.PREFERRED_SIZE))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)))
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
                     .addComponent(ImportLists)
@@ -673,19 +686,19 @@ public class NewProjectDialog extends javax.swing.JFrame {
                             .addGroup(javax.swing.GroupLayout.Alignment.LEADING, jPanel1Layout.createSequentialGroup()
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                                 .addComponent(tfMinMS1Spectra, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 33, Short.MAX_VALUE)))
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 35, Short.MAX_VALUE)))
                         .addComponent(ImportLists)
                         .addGap(25, 25, 25))
                     .addGroup(jPanel1Layout.createSequentialGroup()
                         .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addGroup(jPanel1Layout.createSequentialGroup()
                                 .addGap(10, 10, 10)
-                                .addComponent(jLabel16)
-                                .addGap(18, 18, 18)
-                                .addComponent(txtFieldFasta, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                .addComponent(jLabel16))
                             .addGroup(jPanel1Layout.createSequentialGroup()
                                 .addGap(5, 5, 5)
                                 .addComponent(cbMinMS1Count)))
+                        .addGap(18, 18, 18)
+                        .addComponent(spFasta, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))))
         );
 
@@ -798,7 +811,7 @@ public class NewProjectDialog extends javax.swing.JFrame {
             tasksForServer.setName(taskContainerName.getText());
             tasksForServer.setStrategyID(selectedStrategy.getName());
             tasksForServer.setSourceID(selectedSource.getName());
-            tasksForServer.setFasta(txtFieldFasta.getText()) ;
+            tasksForServer.setFasta(String.valueOf(spFasta.getValue()));
             tasksForServer.enablePipeline();
 
 
@@ -1309,6 +1322,7 @@ public class NewProjectDialog extends javax.swing.JFrame {
     private javax.swing.JRadioButton rdbSourcePRIDE1;
     private javax.swing.JRadioButton rdbStraight1;
     private javax.swing.JSpinner spEnzyme;
+    private javax.swing.JSpinner spFasta;
     private javax.swing.JTextField taskContainerName;
     private javax.swing.JTextField tfMaxMS1Spectra;
     private javax.swing.JTextField tfMaxMS2Spectra;
@@ -1317,6 +1331,5 @@ public class NewProjectDialog extends javax.swing.JFrame {
     private javax.swing.JTextField tfTaxonomyID;
     private javax.swing.JButton toRight;
     private javax.swing.JLabel toRunLabel;
-    private javax.swing.JTextField txtFieldFasta;
     // End of variables declaration//GEN-END:variables
 }

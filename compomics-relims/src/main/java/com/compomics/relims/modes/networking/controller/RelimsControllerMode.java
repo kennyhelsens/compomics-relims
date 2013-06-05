@@ -21,16 +21,16 @@ import org.apache.log4j.Logger;
  * @author Kenneth
  */
 public class RelimsControllerMode {
-    
+
     private static DatabaseService dds;
     private static BackupService bs;
     private static Logger logger = Logger.getLogger(RelimsControllerMode.class);
     private static ExecutorService bootingService;
-    
+
     public static void main(String[] args) {
-        Runtime.getRuntime().addShutdownHook(new ControllerShutdownHook());
         RelimsProperties.setNetworkingMode(RelimsProperties.NetworkMode.CONTROLLER);
         RelimsProperties.initialize(false);
+        Runtime.getRuntime().addShutdownHook(new ControllerShutdownHook());
         if (!RelimsProperties.getDebugMode()) {
             Logger.getRootLogger().setLevel(Level.INFO);
         }
@@ -39,7 +39,7 @@ public class RelimsControllerMode {
         logger = Logger.getLogger(RelimsControllerMode.class);
         bootingService = Executors.newSingleThreadExecutor();
         try {
-            
+
             System.out.println("-----------------------------------");
             System.out.println("------------RemoteRelims-----------");
             System.out.println("-----------------------------------");
@@ -48,7 +48,7 @@ public class RelimsControllerMode {
             System.out.println("---------STARTUP PROCEDURE---------");
             System.out.println("-----------------------------------");
             System.out.println("");
-            
+
             logger.info("Validating properties file...");
             //++++++++++++++++++++BOOTING THE DATABASE
 //making a connection
@@ -71,7 +71,7 @@ public class RelimsControllerMode {
             while (future.get() != null) {
                 // wait for the future   
             }
-            
+
             logger.info("Loaded Database...");
             logger.info("Checking for incorrectly shut down tasks...");
             future = bootingService.submit(new Runnable() {
@@ -93,7 +93,7 @@ public class RelimsControllerMode {
             while (future.get() != null) {
                 // wait for the future   
             }
-            
+
             logger.info("Loading job manager...");
             future = bootingService.submit(new Runnable() {
                 @Override
@@ -122,10 +122,10 @@ public class RelimsControllerMode {
             System.out.println("");
         } catch (Exception ex) {
             ex.printStackTrace();
-            
+
         }
     }
-    
+
     public static void stopController() {
         bootingService.shutdownNow();
         logger.info("Controller interrupted");

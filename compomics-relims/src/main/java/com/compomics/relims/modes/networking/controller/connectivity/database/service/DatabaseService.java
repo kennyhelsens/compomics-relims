@@ -30,8 +30,6 @@ public class DatabaseService {
     private final static WorkerSpecsDAO WorkerSpecsDAO = new WorkerSpecsDAO();
     private final static PrideXMLErrorsDAO PRIDEXMLERRORSDAO = new PrideXMLErrorsDAO();
     private final static ProjectResultDAO projectResultDAO = new ProjectResultDAO();
-
-    protected String framework = RelimsProperties.getTaskDatabaseFramework();
     protected String driver = RelimsProperties.getTaskDatabaseDriver();
     protected String protocol = RelimsProperties.getTaskDatabaseProtocol();
     protected String dbName = RelimsProperties.getTaskDatabaseName();

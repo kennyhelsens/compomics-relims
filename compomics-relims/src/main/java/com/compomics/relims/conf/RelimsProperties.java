@@ -69,7 +69,7 @@ public class RelimsProperties {
         return possibleFastaNames;
     }
 
-    private static File getFastaRepository() {
+    public static File getFastaRepository() {
         return new File(config.getString("relims.db.repository"));
     }
 
@@ -496,10 +496,6 @@ public class RelimsProperties {
 
     public static int getMaxBackups() {
         return config.getInt("relims.networking.db.maxBackups");
-    }
-
-    public static String getTaskDatabaseFramework() {
-        return config.getString("relims.networking.db.framework");
     }
 
     public static String getPassword() {

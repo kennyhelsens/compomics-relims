@@ -91,7 +91,7 @@ public class Simulator extends TestCase {
         config.setProperty("searchgui.fasta.default", searchGUIDefaultFasta.getAbsolutePath());
         config.setProperty("relims.db.DB_OR.file", searchGUIDefaultFasta.getAbsolutePath());
         //test repo-mode pride\\11954\\
-     //   config.setProperty("remote.relims.repository", "C:\\Users\\Kenneth\\Desktop\\ReSPIn\\Pride Analysis\\pride\\repository-mimic\\");
+        config.setProperty("remote.relims.repository", "C:\\Users\\Kenneth\\Desktop\\ReSPIn\\Pride Analysis\\pride\\repository-mimic\\");
         logger.info("Overriden searchgui's default database location");
     }
 

@@ -109,10 +109,6 @@ public class DAO {
 
     }
 
-    public String getDbPrefix() {
-        return RelimsProperties.getDbDatabaseName() + ".";
-    }
-
     private synchronized static void makeSingleConnection() throws SQLException, InterruptedException {
         if (conn == null) {
             File directoryFile = new File(directory);
@@ -174,7 +170,7 @@ public class DAO {
                 + "ClientID VARCHAR(100),"
                 + "SourceID VARCHAR(20),"
                 + "ProjectName VarChar(255),"
-                + "FASTA VarChar(255),"
+                + "Fasta VarChar(255),"
                 + "usePride int,"
                 + "Timestamp TIMESTAMP);");
 // MAKE TASK TABLE____________________________________________PRIDE DETAILS : TODO rename this
