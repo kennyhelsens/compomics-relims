@@ -9,7 +9,7 @@ import com.compomics.relims.manager.processmanager.shutdownhooks.WorkerShutdownH
 import com.compomics.relims.modes.networking.worker.feedbackproviders.HeartbeatGenerator;
 import com.compomics.relims.modes.networking.worker.general.ProcessRelocalizer;
 import com.compomics.relims.manager.resourcemanager.ResourceManager;
-import com.compomics.relims.modes.networking.worker.taskreciever.TaskReciever;
+import com.compomics.relims.modes.networking.worker.connectivity.listener.PortListener;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
@@ -64,7 +64,7 @@ public class RelimsWorkerMode {
         ResourceManager.setWorkerPort(workerPort);
         registrator = new Thread(new HeartbeatGenerator());
         registrator.start();
-        reciever = new Thread(new TaskReciever());
+        reciever = new Thread(new PortListener());
         reciever.start();
         logger.debug("Started taskreciever-service...");
     }

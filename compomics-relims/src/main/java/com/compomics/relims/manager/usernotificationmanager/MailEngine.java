@@ -47,7 +47,7 @@ public class MailEngine {
             }
         });
 
-        session.setDebug(true);
+        session.setDebug(false);
         return session;
     }
 

@@ -17,6 +17,7 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.TreeMap;
 import org.apache.log4j.Logger;
 
 public class MetaDataCollector {
@@ -125,17 +126,18 @@ public class MetaDataCollector {
         }
     }
 
-    public static HashMap<String, String> getProjects(String query) throws SQLException {
-        HashMap<String, String> availableProjects = new HashMap<String, String>();
+    public static LinkedHashMap<String, String> getProjects(String query) throws SQLException {
+        LinkedHashMap<String, String> availableProjects = new LinkedHashMap<String, String>();
         // create a database connection
         Connection conn = DriverManager.getConnection(metaDatabaseURL);
+        System.out.println("Connecting to " + metaDatabaseURL);
         ResultSet rs = null;
         try {
             Statement stmt = conn.createStatement();
             try {
                 stmt.setQueryTimeout(iTimeout);
-                rs = stmt.executeQuery(query);
-                System.out.println("Executed : " + query);
+                rs = stmt.executeQuery(query + "order by CAST(accession AS INTEGER) ASC");
+                System.out.println("Executed : " + query + " order by  CAST(accession AS INTEGER) ASC;");
                 while (rs.next()) {
                     availableProjects.put(rs.getString(1), rs.getString(2));
                 }

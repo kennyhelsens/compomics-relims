@@ -97,7 +97,6 @@ public class ResultHandler implements Runnable {
                         logger.debug("Finished storing resultmap");
                     } catch (NullPointerException e) {
                         logger.error("Projectresults could not be stored");
-                        e.printStackTrace();
                     }
                     dds.deleteWorker(runner.getHost(), runner.getPort());
                     WorkerPool.setWorkerState(runner, Checkpoint.IDLE);

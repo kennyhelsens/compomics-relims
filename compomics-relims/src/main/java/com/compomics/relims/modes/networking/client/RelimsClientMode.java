@@ -32,7 +32,7 @@ public class RelimsClientMode {
             ex.printStackTrace();
             logger.error("Could not build pride-metadata table. Filtering might be an issue !");
         }
-        NewProjectDialog gui = new NewProjectDialog(intermediateClient, RelimsProperties.getControllerIP(), RelimsProperties.getControllerPort(), "pride", "varmod");
+        NewProjectDialog gui = new NewProjectDialog(intermediateClient, RelimsProperties.getControllerIP(), RelimsProperties.getControllerPort(), "pride");
         gui.setVisible(true);
     }
 }

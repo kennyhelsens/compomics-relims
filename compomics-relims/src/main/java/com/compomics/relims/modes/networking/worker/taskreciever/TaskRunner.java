@@ -14,6 +14,7 @@ import com.compomics.relims.modes.networking.controller.taskobjects.Task;
 import com.compomics.relims.modes.networking.worker.feedbackproviders.ResultNotifier;
 import com.compomics.relims.manager.resourcemanager.ResourceManager;
 import com.compomics.relims.manager.resultmanager.ResultManager;
+import com.compomics.relims.modes.networking.worker.connectivity.listener.PortListener;
 import com.compomics.util.experiment.identification.SearchParameters;
 import java.io.File;
 import java.util.List;
@@ -197,7 +198,7 @@ public class TaskRunner {
                         finished = resultNotifier.sendResults(Checkpoint.valueOf(ResourceManager.getFinishState()));
                         //TODO re-activate later
                         //    ResultManager.importToColims();
-                        TaskReciever.locked = false;
+                        PortListener.locked = false;
                         Thread.sleep(30000);
                         System.out.println("");
                     } catch (Exception ex) {

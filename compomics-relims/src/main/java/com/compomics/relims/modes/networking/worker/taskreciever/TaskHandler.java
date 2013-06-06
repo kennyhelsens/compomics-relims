@@ -2,12 +2,14 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-package com.compomics.relims.modes.networking.worker.taskreciever;
+package com.compomics.relims.modes.networking.worker.connectivity.handlers;
 
 import com.compomics.relims.conf.RelimsProperties;
 import com.compomics.relims.modes.networking.controller.taskobjects.Task;
 import com.compomics.relims.manager.resourcemanager.ResourceManager;
 import com.compomics.relims.manager.variablemanager.ProcessVariableManager;
+import com.compomics.relims.modes.networking.worker.connectivity.listener.PortListener;
+import com.compomics.relims.modes.networking.worker.taskreciever.TaskRunner;
 import java.io.EOFException;
 import java.io.IOException;
 import java.io.ObjectInputStream;
@@ -19,12 +21,11 @@ import org.apache.log4j.Logger;
  *
  * @author Kenneth
  */
-class TaskHandler implements Runnable {
+public class TaskHandler implements Runnable {
 
     private Socket sock = null;
     private ObjectInputStream sockInput = null;
     private ObjectOutputStream sockOutput = null;
-    private Thread myThread = null;
     private final static Logger logger = Logger.getLogger(TaskHandler.class);
 
     public TaskHandler(Socket sock) throws IOException {
@@ -33,12 +34,7 @@ class TaskHandler implements Runnable {
         sockOutput = new ObjectOutputStream(sock.getOutputStream());
         sockInput = new ObjectInputStream(sock.getInputStream());
         ResourceManager.setFinishState(null);
-        this.myThread = new Thread(this);
         logger.debug("New handler created.");
-    }
-
-    public void start() {
-        myThread.start();
     }
 
     @Override
@@ -51,10 +47,10 @@ class TaskHandler implements Runnable {
             try {
                 Thread.sleep(10000);
                 //ONLY READ THIS STREAM IF THE TASKRECIEVER IS NOT BUSY ! = prevent error floods....
-                if (!TaskReciever.locked) {
+                if (!PortListener.locked) {
                     newTask = (Task) sockInput.readObject();
                     if (newTask != null) {
-                        TaskReciever.locked = true;
+                        PortListener.locked = true;
                         //Unlocked when the task is done...
                         logger.debug("Setting up worker to run for project " + newTask.getProjectID());
                         ProcessVariableManager.setProjectID(Long.parseLong(newTask.getProjectID()));

@@ -5,10 +5,10 @@
 package com.compomics.relims.manager.processmanager.shutdownhooks;
 
 import com.compomics.relims.concurrent.Command;
+import com.compomics.relims.modes.networking.controller.connectivity.listeners.PortListener;
 import com.compomics.relims.modes.networking.worker.feedbackproviders.HeartbeatGenerator;
 import com.compomics.relims.modes.networking.worker.feedbackproviders.ResultNotifier;
 import com.compomics.relims.modes.networking.worker.general.ProcessRelocalizer;
-import com.compomics.relims.modes.networking.worker.taskreciever.TaskReciever;
 import org.apache.log4j.Logger;
 
 /**
@@ -22,7 +22,7 @@ public class WorkerShutdownHook extends RespinShutdownHook {
     @Override
     protected void handleOpenConnections() {
         //close listeners and handlers?
-        TaskReciever.shutdown();
+        PortListener.shutdown();
         LOGGER.info("Shutting down taskreciever");
         //shut down heartbeats and resultnotifier
         HeartbeatGenerator.shutdown();
